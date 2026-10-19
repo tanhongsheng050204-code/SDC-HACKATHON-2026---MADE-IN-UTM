@@ -108,8 +108,8 @@ export const api = {
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}`),
   complete: (id: string, courseId: string, done: boolean) =>
     request<Profile>(`/profiles/${id}/complete`, { method: "POST", body: JSON.stringify({ course_id: courseId, done }) }),
-  turn: (messages: { role: "user" | "assistant"; content: string }[]) =>
-    request<ChatTurn>("/intake/turn", { method: "POST", body: JSON.stringify({ messages }) }),
+  turn: (messages: { role: "user" | "assistant"; content: string }[], language = "en") =>
+    request<ChatTurn>("/intake/turn", { method: "POST", body: JSON.stringify({ messages, language }) }),
   upload: async (file: File) => {
     const form = new FormData();
     form.append("file", file);

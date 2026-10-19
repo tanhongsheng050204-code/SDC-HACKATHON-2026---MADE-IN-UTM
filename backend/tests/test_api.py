@@ -106,3 +106,12 @@ def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch
     assert response.status_code == 201
     assert (data / "signals" / "2099-01-01-test.json").exists()
     assert client.get("/api/health").json()["snapshot"] == "2099-01-01-test"
+
+
+def test_intake_turn_in_chinese_still_finds_english_tool_names(client):
+    first = client.post("/api/intake/turn", json={"messages": [], "language": "zh"}).json()
+    assert "工作" in first["next_question"]
+    reply = client.post("/api/intake/turn", json={"language": "zh", "messages": [
+        {"role": "assistant", "content": first["next_question"]},
+        {"role": "user", "content": "我是客服，每天用 Excel 做报表。"}]}).json()
+    assert "excel" in reply["skills_found"]

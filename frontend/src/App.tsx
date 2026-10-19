@@ -2,11 +2,13 @@
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { Component, ReactNode, useEffect, useMemo, useState } from "react";
 import { LogoMark, Rosette } from "./brand";
+import { getLang, Lang, LANGS, setLang, t } from "./i18n";
 import QRCode from "qrcode";
 import { api, ChatTurn, CoachProposal, CoachReply, FutureCard, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
 
 type Screen = "landing" | "intake" | "review" | "radar" | "tasks" | "roles" | "role" | "impact" | "workforce";
 const PROFILE_KEY = "laluan.profileId";
+const LITE_KEY = "laluan.lite";
 const THEME_KEY = "laluan.theme";
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: "slow", label: "Slow" },
@@ -83,7 +85,32 @@ function MainApp({ demo }: { demo: string | null }) {
     setChosenTheme(next);
     try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode */ }
   }
-  useEffect(() => { api.health().then((h) => setModel(h.llm_model)).catch(() => undefined); }, []);
+  const [lang, setLangState] = useState<Lang>(getLang);
+  const [lite, setLite] = useState(() => { try { return localStorage.getItem(LITE_KEY) === "1"; } catch { return false; } });
+  const [offline, setOffline] = useState(false);
+  useEffect(() => {
+    if (lite) document.documentElement.dataset.lite = "1"; else delete document.documentElement.dataset.lite;
+    try { localStorage.setItem(LITE_KEY, lite ? "1" : "0"); } catch { /* private mode */ }
+  }, [lite]);
+  function checkServer() {
+    api.health().then((h) => { setModel(h.llm_model); setOffline(false); }).catch(() => setOffline(true));
+  }
+  useEffect(checkServer, []);
+  const langPicker = (
+    <label className="lang-picker"><span className="sr-only">{t("shell.language")}</span>
+      <select value={lang} onChange={(e) => { setLang(e.target.value as Lang); setLangState(e.target.value as Lang); }}>
+        {LANGS.map((l) => <option key={l.id} value={l.id}>{l.label}</option>)}
+      </select>
+    </label>
+  );
+  const liteToggle = (
+    <label className="check lite-toggle" title={t("shell.liteHelp")}>
+      <input type="checkbox" checked={lite} onChange={(e) => setLite(e.target.checked)} /> {t("shell.lite")}
+    </label>
+  );
+  const offlineBanner = offline && (
+    <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>
+  );
   useEffect(() => {
     if ((demo !== "clerk" && demo !== "student") || demoLinkUsed) return;
     demoLinkUsed = true;  // React dev mode runs effects twice; open one demo profile only
@@ -120,40 +147,43 @@ function MainApp({ demo }: { demo: string | null }) {
   if (screen === "landing") {
     return (
       <div className="site">
-        <div className="announce">Judging Laluan? <button onClick={() => openDemo("clerk")}>Open the demo profile in one click →</button></div>
+        <div className="announce">{t("landing.judge")} <button onClick={() => openDemo("clerk")}>{t("landing.judgeCta")}</button></div>
         <nav className="site-nav" aria-label="Main">
           <button className="brand" onClick={() => setScreen("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
           <div className="site-nav-actions">
+            {langPicker}
             {themeButton}
-            {storedId && <button className="btn quiet sm" onClick={resume}>Continue</button>}
-            <button className="btn ink sm" onClick={() => setScreen("intake")}>Get started</button>
+            {storedId && <button className="btn quiet sm" onClick={resume}>{t("landing.continue")}</button>}
+            <button className="btn ink sm" onClick={() => setScreen("intake")}>{t("landing.start")}</button>
           </div>
         </nav>
+        {offlineBanner}
         {error && <div className="banner error" role="alert">{error}</div>}
         <Landing onStart={() => setScreen("intake")} onDemo={openDemo} />
         <footer className="site-footer">
-          <span>Forecasts are estimates under different scenarios, not predictions. Laluan supports your career decision; it never makes it.</span>
-          {model && <span>AI model: {model}</span>}
+          <span>{t("landing.footer")}</span>
+          {model && <span>{t("shell.model")}: {model}</span>}
+          {liteToggle}
         </footer>
       </div>
     );
   }
 
   const groups: { label: string | null; items: { id: Screen; label: string; icon: IconName; enabled: boolean }[] }[] = [
-    { label: null, items: [{ id: "intake", label: "My profile", icon: "user", enabled: true }] },
-    { label: "Signals", items: [
-      { id: "radar", label: "Future Skills Radar", icon: "radar", enabled: !!profile },
-      { id: "tasks", label: "My job, task by task", icon: "list", enabled: !!profile },
+    { label: null, items: [{ id: "intake", label: t("nav.profile"), icon: "user", enabled: true }] },
+    { label: t("nav.signals"), items: [
+      { id: "radar", label: t("nav.radar"), icon: "radar", enabled: !!profile },
+      { id: "tasks", label: t("nav.tasks"), icon: "list", enabled: !!profile },
     ] },
-    { label: "My future", items: [
-      { id: "roles", label: "Future roles", icon: "briefcase", enabled: !!profile },
-      { id: "role", label: "Pathway", icon: "route", enabled: !!role },
-      { id: "impact", label: "SDG impact", icon: "globe", enabled: !!role },
+    { label: t("nav.future"), items: [
+      { id: "roles", label: t("nav.roles"), icon: "briefcase", enabled: !!profile },
+      { id: "role", label: t("nav.pathway"), icon: "route", enabled: !!role },
+      { id: "impact", label: t("nav.impact"), icon: "globe", enabled: !!role },
     ] },
-    { label: "Organisation", items: [{ id: "workforce", label: "Workforce view", icon: "users", enabled: true }] },
+    { label: t("nav.org"), items: [{ id: "workforce", label: t("nav.workforce"), icon: "users", enabled: true }] },
   ];
   const current = screen === "review" ? "intake" : screen;
-  const title = { intake: "My profile", review: "My profile", radar: "Future Skills Radar", tasks: "My job, task by task", roles: "Future roles", role: "Pathway", impact: "SDG impact", workforce: "Workforce view", landing: "" }[screen];
+  const title = { intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"), roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), workforce: t("nav.workforce"), landing: "" }[screen];
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -161,7 +191,7 @@ function MainApp({ demo }: { demo: string | null }) {
         {profile && (
           <div className="who">
             <span className="avatar" aria-hidden="true">{(profile.display_name ?? "You").slice(0, 1)}</span>
-            <span><strong>{profile.display_name ?? "Your profile"}</strong><small>{profile.skills.length} skills</small></span>
+            <span><strong>{profile.display_name ?? t("shell.yourProfile")}</strong><small>{profile.skills.length} {t("shell.skills")}</small></span>
           </div>
         )}
         <nav className="side-nav" aria-label="Sections">
@@ -179,9 +209,10 @@ function MainApp({ demo }: { demo: string | null }) {
           ))}
         </nav>
         <div className="side-foot">
-          {model && <p className="side-note">AI model: {model}</p>}
-          <p className="side-note">Estimates, not predictions. You decide.</p>
-          {profile && <button className="side-link danger" onClick={deleteProfile}><Icon name="trash" />Delete my profile</button>}
+          {model && <p className="side-note">{t("shell.model")}: {model}</p>}
+          <p className="side-note">{t("shell.estimates")}</p>
+          <div className="side-prefs">{langPicker}{liteToggle}</div>
+          {profile && <button className="side-link danger" onClick={deleteProfile}><Icon name="trash" />{t("shell.delete")}</button>}
         </div>
       </aside>
       <div className="workspace">
@@ -189,10 +220,11 @@ function MainApp({ demo }: { demo: string | null }) {
           <span className="workbar-title">{title}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
-            {profile && <button className="btn sm" onClick={() => setCoachOpen(true)} aria-expanded={coachOpen}><Icon name="chat" />Ask the coach</button>}
+            {profile && <button className="btn sm" onClick={() => setCoachOpen(true)} aria-expanded={coachOpen}><Icon name="chat" />{t("shell.coach")}</button>}
             {themeButton}
           </div>
         </header>
+        {offlineBanner}
         {error && <div className="banner error" role="alert">{error}</div>}
         <main>
           <ScreenBoundary key={screen}>
@@ -248,14 +280,14 @@ function Landing({ onStart, onDemo }: { onStart: () => void; onDemo: (k: string)
     <main className="landing">
       <header className="lv-hero">
         <Rosette className="hero-rosette" />
-        <p className="pill-tag">Career guidance for Malaysia's AI era</p>
-        <h1>See where your career goes before AI changes it.</h1>
-        <p className="lede">Laluan reads your skills, tracks dated AI-research and job-market signals, ranks the roles you can grow into under three futures, and plans free or low-cost courses to get there. You make the call.</p>
+        <p className="pill-tag">{t("landing.tag")}</p>
+        <h1>{t("landing.title")}</h1>
+        <p className="lede">{t("landing.lede")}</p>
         <div className="ctas">
-          <button className="btn ink" onClick={() => onDemo("clerk")}>Open the demo profile</button>
-          <button className="btn quiet" onClick={onStart}>Start with my skills</button>
+          <button className="btn ink" onClick={() => onDemo("clerk")}>{t("landing.demo")}</button>
+          <button className="btn quiet" onClick={onStart}>{t("landing.mine")}</button>
         </div>
-        <button className="link" onClick={() => onDemo("student")}>Or try the student demo</button>
+        <button className="link" onClick={() => onDemo("student")}>{t("landing.student")}</button>
       </header>
       <div className="lv-preview" aria-hidden="true">
         <div className="preview-card">
@@ -299,14 +331,14 @@ function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
   }
   return (
     <section>
-      <div className="page-head"><h1>Your skills</h1></div>
+      <div className="page-head"><h1>{t("h.skills")}</h1></div>
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === "upload"} onClick={() => setTab("upload")}>Upload CV</button>
         <button role="tab" aria-selected={tab === "cv"} onClick={() => setTab("cv")}>Paste CV</button>
         <button role="tab" aria-selected={tab === "chat"} onClick={() => setTab("chat")}>Questionnaire</button>
         <button role="tab" aria-selected={tab === "pick"} onClick={() => setTab("pick")}>Pick skills</button>
       </div>
-      <p className="source">Use a sample or your own CV. We remove names, emails, phone and IC numbers before any AI reads it, and we never store the file.</p>
+      <p className="source">{t("note.cv")}</p>
       {tab === "upload" ? <UploadCv onDone={onDone} /> : tab === "chat" ? <Questionnaire onDone={onDone} /> : tab === "cv" ? (
         <>
           <label htmlFor="cv">Paste your CV or describe your work (at least 50 characters)</label>
@@ -361,7 +393,7 @@ function Review({ initial, onSaved }: { initial: string[]; onSaved: (p: Profile)
   }
   return (
     <section>
-      <div className="page-head"><h1>Check your skills</h1></div>
+      <div className="page-head"><h1>{t("h.check")}</h1></div>
       {skills.length === 0 && <p>We didn't find any skills. Go back and pick them from the list.</p>}
       <div className="chips">
         {skills.map((id) => (
@@ -392,7 +424,7 @@ function Review({ initial, onSaved }: { initial: string[]; onSaved: (p: Profile)
           ))}
         </div>
       </fieldset>
-      <button className="primary" disabled={skills.length === 0} onClick={save}>See my future roles</button>
+      <button className="primary" disabled={skills.length === 0} onClick={save}>{t("a.seeRoles")}</button>
       {error && <p className="error" role="alert">{error}</p>}
     </section>
   );
@@ -417,18 +449,18 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
   return (
     <section>
       <div className="page-head">
-        <h1>Your future roles</h1>
+        <h1>{t("h.roles")}</h1>
         {profile.story && <p className="muted">{profile.display_name}: {profile.story}</p>}
       </div>
       {data && <Kpis data={data} scenario={scenario} />}
       <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
-          <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => setScenario(s.id)}>{s.label}</button>
+          <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => setScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
       </div>
       {data && (
         <div className="year-slider">
-          <label htmlFor="year">Look ahead to <strong>{data.year}</strong> <span className="badge">estimate</span></label>
+          <label htmlFor="year">{t("k.lookAhead")} <strong>{data.year}</strong> <span className="badge">{t("k.estimate")}</span></label>
           <input id="year" type="range" min={data.year_range[0]} max={data.year_range[1]} step={1}
             value={data.year} onChange={(e) => setYear(Number(e.target.value))}
             aria-valuetext={`${data.year}`} />
@@ -536,7 +568,7 @@ function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
         ? <>, checked against O*NET occupation <a href={`https://www.onetonline.org/link/summary/${role.skills_source.onet_code}`} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
         : " (a new role with no O*NET occupation yet)"}.</p>
       {role.missing.length === 0 ? <p>You already have every core skill for this role.</p> : !plan && (
-        <button className="primary" disabled={busy} onClick={build}>{busy ? "Building your plan…" : "Build my pathway"}</button>
+        <button className="primary" disabled={busy} onClick={build}>{busy ? "…" : t("a.build")}</button>
       )}
       {plan && (
         <>
@@ -568,8 +600,8 @@ function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
               </li>
             ))}
           </ol>
-          <button className="primary" onClick={onImpact}>See my impact</button>
-          <button onClick={() => window.print()}>Print summary</button>
+          <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
+          <button onClick={() => window.print()}>{t("a.print")}</button>
           <ShareCard profile={profile} roleId={role.role_id} />
         </>
       )}
@@ -599,7 +631,7 @@ function ShareCard({ profile, roleId }: { profile: Profile; roleId: string }) {
     <div className="card share-card">
       <h3>Future Card</h3>
       <p className="muted">A read-only summary of this plan you can show a counsellor, employer or family. It shows {profile.display_name ? `your name, ${profile.display_name},` : "no name"} the role, your readiness and the plan in brief, never your full skill list. It stops working when you delete your profile.</p>
-      {!link ? <button className="primary" onClick={create}>Create my Future Card</button> : (
+      {!link ? <button className="primary" onClick={create}>{t("a.card")}</button> : (
         <div className="share-row">
           {qr && <img src={qr} width={160} height={160} alt="QR code that opens your Future Card" />}
           <div className="share-actions">
@@ -694,8 +726,8 @@ function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
   const noData = data.skills.filter((s) => s.label === "no_data");
   return (
     <section>
-      <div className="page-head"><h1>Which skills are rising and declining</h1>
-      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p></div>
+      <div className="page-head"><h1>{t("h.radar")}</h1>
+      <p className="muted">{t("note.estimate")}</p></div>
       {data.illustrative && <div className="banner warning">The baseline forecast is illustrative seed data until the team replaces it with WEF figures.</div>}
       {data.skills.length === 0 ? (
         <div className="banner warning">This forecast has no skill trends yet. An admin can run <strong>Refresh trend data</strong> on the Roles screen to pull the latest research and job-posting data.</div>
@@ -739,7 +771,7 @@ function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
       )}
       <p className="source">Snapshot {data.snapshot_id} · imported {data.imported}
         {data.inputs.map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}</p>
-      <button className="primary" onClick={onNext}>See my future roles</button>
+      <button className="primary" onClick={onNext}>{t("a.seeRoles")}</button>
     </section>
   );
 }
@@ -838,7 +870,7 @@ function TaskView({ profile, onNext }: { profile: Profile; onNext: () => void })
   const ticked = done.filter((d) => ids.has(d));
   return (
     <section>
-      <div className="page-head"><h1>Your job, task by task</h1>
+      <div className="page-head"><h1>{t("h.tasks")}</h1>
         <p className="muted">AI rarely replaces a whole job at once: it changes tasks. Tick the tasks you actually do to see how much of your work AI is likely to automate, assist with, or leave to you.</p></div>
       <label className="narrow">Job
         <select value={roleId} onChange={(e) => { setRoleId(e.target.value); setDone([]); }}>
@@ -883,7 +915,7 @@ function TaskView({ profile, onNext }: { profile: Profile; onNext: () => void })
           </ul>
           <p className="source">Tasks: {data.source}{data.onet_code && <>, occupation <a href={`https://www.onetonline.org/link/summary/${data.onet_code}`} target="_blank" rel="noreferrer">{data.onet_code}</a></>}
             {data.onet_note && ` · ${data.onet_note}`} · Labels are judgements drafted with AI assistance, not predictions; checked by our team so far: {data.reviewed} of {data.tasks.length}.</p>
-          <button className="primary" onClick={onNext}>See roles you could move into</button>
+          <button className="primary" onClick={onNext}>{t("a.moveInto")}</button>
         </>
       )}
     </section>
@@ -921,35 +953,35 @@ function Coach({ profile, scenario, roleId, onApply, onClose }: {
   return (
     <aside className="coach" role="dialog" aria-modal="false" aria-labelledby="coach-title">
       <header className="coach-head">
-        <h2 id="coach-title">Coach</h2>
+        <h2 id="coach-title">{t("coach.title")}</h2>
         <button className="icon-btn" onClick={onClose} aria-label="Close the coach">×</button>
       </header>
-      <p className="muted coach-note">Answers come only from your own results, with sources. The coach can suggest a change; nothing changes unless you press Apply.</p>
+      <p className="muted coach-note">{t("note.coach")}</p>
       <ol className="coach-log" aria-live="polite">
-        {turns.map((t, i) => (
+        {turns.map((turn, i) => (
           <li key={i}>
-            <p className="coach-q">{t.question}</p>
-            {!t.reply && !t.error && <p className="muted">Thinking…</p>}
-            {t.error && <p className="error" role="alert">{t.error}</p>}
-            {t.reply && (
+            <p className="coach-q">{turn.question}</p>
+            {!turn.reply && !turn.error && <p className="muted">Thinking…</p>}
+            {turn.error && <p className="error" role="alert">{turn.error}</p>}
+            {turn.reply && (
               <div className="coach-a">
-                <p>{t.reply.answer}</p>
-                {t.reply.grounding && (
-                  <span className={`badge ${t.reply.grounding.all_supported ? "good" : "risk"}`}>
-                    {t.reply.grounding.all_supported ? "Every sentence backed by a source" : `Check sentence ${t.reply.grounding.unsupported.join(", ")}: not in the sources`}
+                <p>{turn.reply.answer}</p>
+                {turn.reply.grounding && (
+                  <span className={`badge ${turn.reply.grounding.all_supported ? "good" : "risk"}`}>
+                    {turn.reply.grounding.all_supported ? "Every sentence backed by a source" : `Check sentence ${turn.reply.grounding.unsupported.join(", ")}: not in the sources`}
                   </span>
                 )}
-                <details><summary className="muted">Sources ({t.reply.sources.length})</summary>
-                  <ul className="coach-sources">{t.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {s.text}</li>)}</ul>
+                <details><summary className="muted">Sources ({turn.reply.sources.length})</summary>
+                  <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {s.text}</li>)}</ul>
                 </details>
-                {t.reply.proposal && !t.dismissed && (
+                {turn.reply.proposal && !turn.dismissed && (
                   <div className="proposal card">
                     <p className="eyebrow">Suggested change</p>
-                    <p><strong>{t.reply.proposal.label}</strong></p>
-                    {t.applied ? <span className="badge good">Applied</span> : (
+                    <p><strong>{turn.reply.proposal.label}</strong></p>
+                    {turn.applied ? <span className="badge good">Applied</span> : (
                       <div className="actions">
-                        <button className="primary" onClick={async () => { await onApply(t.reply!.proposal!); mark(i, { applied: true }); }}>Apply</button>
-                        <button onClick={() => mark(i, { dismissed: true })}>Dismiss</button>
+                        <button className="primary" onClick={async () => { await onApply(turn.reply!.proposal!); mark(i, { applied: true }); }}>{t("a.apply")}</button>
+                        <button onClick={() => mark(i, { dismissed: true })}>{t("a.dismiss")}</button>
                       </div>
                     )}
                   </div>
@@ -965,7 +997,7 @@ function Coach({ profile, scenario, roleId, onApply, onClose }: {
       <form className="chat-form" onSubmit={(e) => { e.preventDefault(); ask(question); }}>
         <label className="sr-only" htmlFor="coach-q">Ask about your results</label>
         <input id="coach-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ask about your results" autoFocus />
-        <button className="primary" type="submit" disabled={busy || !question.trim()}>Ask</button>
+        <button className="primary" type="submit" disabled={busy || !question.trim()}>{t("a.ask")}</button>
       </form>
     </aside>
   );
@@ -1002,15 +1034,15 @@ function Kpis({ data, scenario }: { data: Matches; scenario: Scenario }) {
   const current = data.roles.find((r) => r.is_current_role);
   return (
     <div className="kpis">
-      <div className="kpi"><span className="kpi-label">Top match</span><strong>{top?.title ?? "–"}</strong>
-        {top && <span className="badge good">{Math.round(top.fit * 100)}% skill fit</span>}</div>
-      <div className="kpi"><span className="kpi-label">Robust picks</span><strong>{robust}</strong>
-        <span className="badge">Top five in every scenario</span></div>
-      <div className="kpi"><span className="kpi-label">Your current role</span><strong>{current ? `${signed(current.outlook[scenario].index)}%` : "–"}</strong>
+      <div className="kpi"><span className="kpi-label">{t("k.top")}</span><strong>{top?.title ?? "–"}</strong>
+        {top && <span className="badge good">{Math.round(top.fit * 100)}% {t("k.fit")}</span>}</div>
+      <div className="kpi"><span className="kpi-label">{t("k.robust")}</span><strong>{robust}</strong>
+        <span className="badge">{t("k.robustNote")}</span></div>
+      <div className="kpi"><span className="kpi-label">{t("k.current")}</span><strong>{current ? `${signed(current.outlook[scenario].index)}%` : "–"}</strong>
         {current ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]} to {data.signal_source.horizon_year}</span>
-          : <span className="badge">Not set</span>}</div>
-      <div className="kpi"><span className="kpi-label">Forecast data</span><strong>{data.signal_source.imported.slice(0, 10)}</strong>
-        <span className={`badge ${data.signal_source.illustrative ? "risk" : "good"}`}>{data.signal_source.illustrative ? "Illustrative baseline" : "Cited sources"}</span></div>
+          : <span className="badge">{t("k.notSet")}</span>}</div>
+      <div className="kpi"><span className="kpi-label">{t("k.data")}</span><strong>{data.signal_source.imported.slice(0, 10)}</strong>
+        <span className={`badge ${data.signal_source.illustrative ? "risk" : "good"}`}>{data.signal_source.illustrative ? t("k.illustrative") : t("k.cited")}</span></div>
     </div>
   );
 }
@@ -1061,7 +1093,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    api.turn([]).then((t) => { setTurn(t); setMessages([{ role: "assistant", content: t.next_question }]); })
+    api.turn([], getLang()).then((t) => { setTurn(t); setMessages([{ role: "assistant", content: t.next_question }]); })
       .catch(() => setError("The questionnaire is unavailable. Try another tab."));
   }, []);
   async function send() {
@@ -1069,7 +1101,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
     const next = [...messages, { role: "user" as const, content: answer.trim() }];
     setAnswer("");
     try {
-      const t = await api.turn(next);
+      const t = await api.turn(next, getLang());
       setTurn(t);
       setMessages([...next, { role: "assistant", content: t.next_question }]);
     } catch { setError("Couldn't send that. Try again."); }
@@ -1121,7 +1153,7 @@ function WorkforceView() {
   return (
     <section>
       <div className="page-head">
-        <h1>Workforce view</h1>
+        <h1>{t("h.workforce")}</h1>
         <p className="muted">For HR and learning teams: see which roles in your company AI puts at risk and the cheapest reskilling moves. Results are totals by role, never a ranking of individual people, and must not be used for hiring or firing decisions.</p>
       </div>
       <div className="card">

@@ -51,7 +51,7 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 2. ✅ Automatic re-planning notice after a refresh ("Your plan changed because …")
 3. ✅ Your job, task by task (O\*NET 30.0 tasks; ⬜ labels reviewed by the team: fill `reviewed_by` in `tasks.json`)
 4. ✅ Progress tracking + skill badges
-5. BM + 中文 strings and lite mode
+5. ✅ BM + 中文 strings (shell, landing, headings, main buttons, honesty notices, questionnaire; ⬜ native-speaker check, ⬜ remaining screen text) and lite mode
 6. ✅ AI coach (cited answers, proposals the user applies; works offline)
 7. ✅ Future Card + QR (also `/?demo=clerk` and `/?demo=student` links)
 

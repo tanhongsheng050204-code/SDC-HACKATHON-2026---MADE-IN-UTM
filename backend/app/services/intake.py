@@ -23,23 +23,37 @@ SCRIPTED_QUESTIONS = {
         "Ada kursus, sijil atau projek sampingan?",
         "Isu apa yang penting bagi anda? Contohnya iklim, kesihatan, pendidikan atau pekerjaan yang adil.",
     ],
+    # Drafted with AI assistance; needs a native speaker's check. Skills are matched against the
+    # English dictionary, so tool names (Excel, Python ...) are found in Chinese answers too.
+    "zh": [
+        "您现在的工作是什么？或者您在读什么专业？",
+        "您平时最常用哪些工具或软件？例如 Excel、CRM、社交媒体或编程语言。",
+        "说说一件您在工作或学校里感到自豪的事。您做了什么？",
+        "有没有上过课程、考过证书或做过副业项目？",
+        "您关心哪些议题？例如气候、健康、教育或公平就业。",
+    ],
 }
 DONE = {
     "en": "Thanks! Check the skills we found, then see your future roles.",
     "ms": "Terima kasih! Semak kemahiran yang kami jumpa, kemudian lihat peranan masa depan anda.",
+    "zh": "谢谢！请核对我们找到的技能，然后查看您的未来职位。",
 }
 
 # Words in the last answer that point to an SDG interest.
 INTEREST_WORDS = {
-    3: ("health", "kesihatan", "care"), 4: ("education", "pendidikan", "teaching"),
-    5: ("gender", "women", "wanita"), 7: ("energy", "tenaga", "solar"),
-    8: ("fair work", "jobs", "pekerjaan"), 10: ("inequality", "poverty", "b40"),
-    12: ("waste", "recycling", "consumption"), 13: ("climate", "iklim", "environment", "alam sekitar"),
+    3: ("health", "kesihatan", "care", "健康"), 4: ("education", "pendidikan", "teaching", "教育"),
+    5: ("gender", "women", "wanita", "性别", "女性"), 7: ("energy", "tenaga", "solar", "能源"),
+    8: ("fair work", "jobs", "pekerjaan", "就业"), 10: ("inequality", "poverty", "b40", "贫困", "不平等"),
+    12: ("waste", "recycling", "consumption", "回收", "废物"),
+    13: ("climate", "iklim", "environment", "alam sekitar", "气候", "环境"),
 }
 
 
 def _lang(language: str) -> str:
-    return "ms" if language.strip().lower() in {"ms", "bm", "malay", "bahasa melayu"} else "en"
+    lang = language.strip().lower()
+    if lang in {"ms", "bm", "malay", "bahasa melayu"}:
+        return "ms"
+    return "zh" if lang in {"zh", "zh-hans", "zh-cn", "chinese", "中文"} else "en"
 
 
 def turn(messages: list[dict], language: str = "en") -> dict:
