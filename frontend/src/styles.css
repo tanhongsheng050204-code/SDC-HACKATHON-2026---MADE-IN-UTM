@@ -90,5 +90,21 @@ fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding:
 .banner.warning { background: var(--warn-bg); } .banner.error, .error { color: var(--decline); }
 footer { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 
+.eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin: 0; }
+.radar { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .radar { grid-template-columns: repeat(3, 1fr); } }
+.radar-col { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 16px; }
+.radar-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.radar-col li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px; }
+.radar-col li.mine { background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 500; }
+.radar-col .badge { margin-left: 6px; }
+.momentum { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.momentum li { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr 48px; gap: 8px; align-items: center; }
+.momentum .bar { position: relative; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.momentum .bar span { display: block; height: 100%; }
+.momentum .pos { background: var(--accent); } .momentum .neg { background: var(--muted); }
+.admin summary { cursor: pointer; font-weight: 600; } .admin input { display: block; margin-top: 4px; min-height: 44px; width: 100%; max-width: 360px; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+.steps-log { font-size: 13px; margin: 0; }
+.changed { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } button.card:hover { transform: none; } }
 @media print { .topbar, footer, button { display: none !important; } body { background: #fff; } }

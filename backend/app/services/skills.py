@@ -10,7 +10,7 @@ import re
 
 from app.llm import generate_json
 from app.reference import get_reference
-from app.services.deid import scrub
+from app.services.deid import scrub_cv
 from app.services.embeddings import cosine, embed_text
 
 EMBEDDING_MATCH_THRESHOLD = 0.75
@@ -69,7 +69,7 @@ Text:
 
 def extract(text: str, names: list[str] | None = None) -> dict:
     """Scrub, then extract. Returns skill IDs, phrases we could not map, and the mode used."""
-    clean = scrub(text, names or [])
+    clean = scrub_cv(text, names or [])
     skill_ids = dictionary_extract(clean)
     unmatched: list[str] = []
     mode = "dictionary"

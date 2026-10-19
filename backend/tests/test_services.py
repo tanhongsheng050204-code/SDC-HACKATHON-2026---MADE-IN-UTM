@@ -99,3 +99,22 @@ def test_score_breakdown_adds_up_and_range_covers_every_scenario():
         assert role["estimate_range"]["low"] == min(indexes)
         assert role["estimate_range"]["high"] == max(indexes)
         assert role["citation"]["snapshot_id"] and role["citation"]["imported"]
+
+
+def test_cv_header_name_is_removed_without_being_told_the_name():
+    from app.services.deid import scrub_cv
+    cv = "NURUL AISYAH BINTI AHMAD\nData entry clerk, Shah Alam\nSkills: Excel"
+    assert scrub_cv(cv).splitlines()[0] == "[NAME]"
+    assert "Lim Wei Jie" not in scrub_cv("Name: Lim Wei Jie\nPython, SQL")
+    assert "Data entry clerk" in scrub_cv(cv)
+
+
+def test_chat_turns_never_call_the_llm(monkeypatch):
+    from app.services import intake
+
+    def boom(*_args, **_kwargs):
+        raise AssertionError("LLM called from a chat turn")
+    monkeypatch.setattr(skills, "generate_json", boom)
+    messages = [{"role": "user", "content": "I use Excel and SQL"}] * 50
+    result = intake.turn(messages)
+    assert result["is_complete"] and {"excel", "sql"} <= set(result["skills_found"])

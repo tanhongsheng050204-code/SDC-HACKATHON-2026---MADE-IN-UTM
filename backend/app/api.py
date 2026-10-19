@@ -9,7 +9,9 @@ from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
 from app.schemas import ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario
+from app.services.scenario import outlook, signals_from_snapshot
 from app.services import intake, matching, pathway, skills
+from app.trends import refresh
 
 router = APIRouter(prefix="/api")
 
@@ -79,11 +81,56 @@ def list_snapshots():
             for s in reversed(get_reference().snapshots)]
 
 
+def _require_admin(token: str) -> None:
+    settings = get_settings()
+    if not settings.admin_token or not hmac.compare_digest(token, settings.admin_token):
+        raise HTTPException(401, "Admin token required")
+
+
+@router.post("/signals/refresh", status_code=202)
+def start_refresh(force: bool = False, x_admin_token: str = Header(default="")):
+    """Collect research and job-posting counts and build a new dated snapshot, in the background."""
+    _require_admin(x_admin_token)
+    if not refresh.start(force):
+        raise HTTPException(409, "A refresh is already running")
+    return refresh.status()
+
+
+@router.get("/signals/refresh")
+def refresh_status():
+    return refresh.status()
+
+
+@router.get("/radar")
+def radar(profile_id: str | None = None):
+    """Future Skills Radar: which skills and roles are rising or declining, with sources."""
+    ref = get_reference()
+    snapshot = ref.latest_snapshot
+    mine = set(_profile_or_404(profile_id)["skills"]) if profile_id else set()
+    baseline = ref.scenarios["baseline"]
+    signals = signals_from_snapshot(snapshot)
+    roles = sorted(({"role_id": rid, "title": ref.roles[rid]["title"],
+                    **vars(outlook(sig, "baseline", float(baseline["adoption"])))}
+                   for rid, sig in signals.items()), key=lambda r: -r["index"])
+    skills_out = sorted(({**s, "name": ref.skills[s["skill_id"]]["name"], "mine": s["skill_id"] in mine}
+                         for s in snapshot.get("skill_signals", [])),
+                        key=lambda s: -(s["trend"] if s["trend"] is not None else -9))
+    return {
+        "snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
+        "source": snapshot["source"], "illustrative": snapshot["illustrative"],
+        "inputs": snapshot.get("inputs", []),
+        "capability_momentum": [{"id": c["id"], "name": c["name"],
+                                 "momentum": snapshot.get("capability_momentum", {}).get(c["id"])}
+                                for c in ref.capabilities],
+        "skills": skills_out,
+        "roles": roles,
+    }
+
+
 @router.post("/signals/import", status_code=201)
 def import_snapshot(snapshot: dict, x_admin_token: str = Header(default="")):
     settings = get_settings()
-    if not settings.admin_token or not hmac.compare_digest(x_admin_token, settings.admin_token):
-        raise HTTPException(401, "Admin token required")
+    _require_admin(x_admin_token)
     ref = get_reference()
     required = {"snapshot_id", "source", "source_url", "published", "imported", "horizon_year",
                 "illustrative", "signals"}

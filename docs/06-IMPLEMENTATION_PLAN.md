@@ -22,15 +22,18 @@ fairness tests, model name shown. 28 backend tests.
 | # | Task | Owner | Done when |
 |---|---|---|---|
 | 2.1 | **Baseline data**: WEF Future of Jobs 2025 growth figures and O\*NET skills/tasks for each role → CSV → `scripts/build_snapshot.py` | C | Every figure has a page or table reference; `illustrative: false`; reviewed |
-| 2.2 | **arXiv collector** (`scripts/collect_arxiv.py`): papers per month for each AI capability (document understanding, speech, code generation, computer vision, robotics…) | A | Re-runnable; raw counts saved with query and date |
-| 2.3 | **Job-posting collector** (`scripts/collect_jobs.py`): skill mentions per month in a public job-posting source (e.g. Hacker News "Who is hiring" via its public API; check terms of use) | A | Re-runnable; raw counts saved with source and date |
-| 2.4 | **Signal builder**: capability momentum → automation exposure of each role's tasks; skill-mention trend → skill demand; both adjust the WEF baseline within a capped range → new dated snapshot with skill-level and role-level signals | A | Formula documented in CODE_TO_EXPLAIN.md; tests; a refresh visibly changes rankings |
-| 2.5 | **Future Skills Radar** screen: skills and roles rising/declining, each with source and date | B | Matches brief section 3, step 2 |
-| 2.6 | **Refresh in the demo**: admin button "Refresh trend data" → new snapshot → rankings move, with "what changed" | A + B | Works live, falls back to the last good snapshot |
+| 2.2 | ✅ **Research collector** (`app/trends/research.py`): arXiv, falling back to OpenAlex | A | Re-runnable; raw counts saved in `data/raw/research/<date>.json` |
+| 2.3 | ✅ **Job-posting collector** (`app/trends/jobs.py`): HN hiring threads, this year vs last | A | Re-runnable; raw counts saved in `data/raw/jobs/<date>.json`. Team to check the source's terms of use |
+| 2.4 | ✅ **Signal builder** (`app/trends/builder.py`): capability momentum → automation exposure of each role's tasks; skill-mention trend → skill demand; both adjust the WEF baseline within a capped range → new dated snapshot with skill-level and role-level signals | A | Formula documented in CODE_TO_EXPLAIN.md; tests; a refresh visibly changes rankings |
+| 2.5 | ✅ **Future Skills Radar** screen: skills and roles rising/declining, each with source and date | B | Matches brief section 3, step 2 |
+| 2.6 | ✅ **Refresh in the demo**: admin button "Refresh trend data" → new snapshot → rankings move, with "what changed" | A + B | Works live, falls back to the last good snapshot |
 | 2.7 | **Proposal** (problem → approach → expected outcome), following the submission format | C | Someone hearing it cold can explain it back |
 | 2.8 | Repo public, README explains how to run, CI green | A | Judges can open it |
 
 **Checkpoint (preliminary):** live demo of 2.6, repo public, proposal submitted.
+
+**To rehearse the demo:** delete `backend/data/signals/*trend*.json` so the app starts on the baseline;
+the Refresh button then reuses today's raw counts (fast) or collects new ones (about 1 minute).
 
 ## M3: complete the must-haves (Day 2–3)
 

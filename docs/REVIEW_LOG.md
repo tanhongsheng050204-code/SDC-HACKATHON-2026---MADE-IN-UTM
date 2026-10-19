@@ -12,4 +12,11 @@ One row per thing reviewed: generated code, data, or text. Write what was wrong 
 | 5 | 2026-10-19 | Plan vs official brief | Same check | Evaluation planned to use real CVs; the rules forbid real CVs | Changed to synthetic CVs | ______ |
 | 6 | 2026-10-19 | Plan vs official brief | Same check | Trend layer was a hand-typed list; "hard-coded lists alone do not count" | Plan: arXiv + job-posting collectors + WEF/O\*NET baseline, dated snapshots (M2) | ______ |
 | 7 | 2026-10-19 | Plan vs official brief | Same check | SDG interests were stored but unused (decorative); no estimate range; model not named; no fairness check | SDG boost with explanation, estimate range per role, model shown in footer, demographic fields rejected; tests added | ______ |
-| 8 | | | | | | |
+| 8 | 2026-10-19 | `deid.py`, `skills.py` | Automated security review | Names in a CV could reach the LLM when the caller did not supply them, although the UI promised names are removed | `scrub_cv()` also removes a "Name:" line and a first line made only of capitalised words; test added | ______ |
+| 9 | 2026-10-19 | `intake.py` | Automated security review | Each chat turn re-ran full extraction (possibly an LLM call) over every earlier answer: cost grows with message count | Chat turns use dictionary matching only and at most one answer per question; test asserts no LLM call | ______ |
+| 10 | 2026-10-19 | Research collector | Live run | arXiv returned 429 (rate limit) and later 500 | Automatic fallback to OpenAlex for the whole run; test added | ______ |
+| 11 | 2026-10-19 | Signal builder | Reading the first live results | Raw year-on-year paper growth hit the +1 cap for 5 of 8 capabilities, because all research grows | Momentum now relative to the median capability (log2) | ______ |
+| 12 | 2026-10-19 | Signal builder | Same | With relative momentum, a capability growing slower than average *raised* the outlook of roles it threatens (marketing +12.7) | Only acceleration counts in adjustments; signed value still displayed; test added | ______ |
+| 13 | 2026-10-19 | Job collector | Same | Search matched prefixes and typos ("excel" counted "excellent") | Whole-word, exact matching; phrases quoted | ______ |
+| 14 | 2026-10-19 | Skills Radar | Browser check | Tiny counts gave ±100% swings (Power BI 1 → 0) | Minimum 20 mentions before a job trend counts; otherwise "too few postings"; test added | ______ |
+| 15 | | | | | | |

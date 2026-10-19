@@ -1,9 +1,9 @@
 // Screens follow docs/03-APP_FLOW.md: S0 Landing, S1 Intake, S2 Review, S3 Roles, S4/S5 Gap + Pathway, S6 Impact.
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { useEffect, useMemo, useState } from "react";
-import { api, Matches, Pathway, Profile, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
+import { api, Matches, Pathway, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
 
-type Screen = "landing" | "intake" | "review" | "roles" | "role" | "impact";
+type Screen = "landing" | "intake" | "review" | "radar" | "roles" | "role" | "impact";
 const PROFILE_KEY = "laluan.profileId";
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: "slow", label: "Slow" },
@@ -45,7 +45,7 @@ export default function App() {
     catch { storeProfileId(null); setError("That saved profile has expired. Start again."); }
   }
 
-  const steps: [Screen, string][] = [["intake", "Profile"], ["roles", "Roles"], ["role", "Pathway"], ["impact", "Impact"]];
+  const steps: [Screen, string][] = [["intake", "Profile"], ["radar", "Skills Radar"], ["roles", "Roles"], ["role", "Pathway"], ["impact", "Impact"]];
   return (
     <div className="app">
       <header className="topbar">
@@ -65,8 +65,9 @@ export default function App() {
         )}
         {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
         {screen === "review" && (
-          <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("roles"); }} />
+          <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
         )}
+        {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
         {screen === "roles" && profile && (
           <Roles profile={profile} scenario={scenario} setScenario={setScenario}
             onOpen={(r) => { setRole(r); setScreen("role"); }} />
@@ -228,9 +229,16 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [changes, setChanges] = useState<Change[] | null>(null);
   useEffect(() => {
     api.matches(profile.id, scenario).then(setData).catch(() => setError("Couldn't update scenario."));
   }, [profile.id, scenario]);
+  async function afterRefresh() {
+    const before = data;
+    const after = await api.matches(profile.id, scenario);
+    setData(after);
+    if (before) setChanges(compare(before, after, scenario));
+  }
   return (
     <section>
       <h2>Your future roles</h2>
@@ -245,6 +253,8 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
         <div className="banner warning">Illustrative seed data. Replace it with real figures before the demo.</div>
       )}
       {error && <p className="error" role="alert">{error}</p>}
+      <RefreshPanel onDone={afterRefresh} />
+      {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       <div className="grid">
         {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
       </div>
@@ -374,4 +384,137 @@ function Impact({ role }: { role: RoleMatch }) {
 
 function signed(n: number) {
   return `${n > 0 ? "+" : ""}${n}`;
+}
+
+const TREND_TEXT: Record<string, string> = { rising: "▲ Rising", steady: "▬ Steady", declining: "▼ Declining", no_data: "No data" };
+
+function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
+  const [data, setData] = useState<RadarData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { api.radar(profile.id).then(setData).catch(() => setError("Couldn't load the radar.")); }, [profile.id]);
+  if (error) return <section><p className="error" role="alert">{error}</p></section>;
+  if (!data) return <section><p className="muted">Loading the radar…</p></section>;
+  const groups = (["rising", "steady", "declining"] as const).map((label) => ({
+    label, skills: data.skills.filter((s) => s.label === label),
+  }));
+  const noData = data.skills.filter((s) => s.label === "no_data");
+  return (
+    <section>
+      <p className="eyebrow">Future Skills Radar</p>
+      <h2>Which skills are rising and declining</h2>
+      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p>
+      {data.illustrative && <div className="banner warning">The baseline forecast is illustrative seed data until the team replaces it with WEF figures.</div>}
+      {data.skills.length === 0 ? (
+        <div className="banner warning">This forecast has no skill trends yet. An admin can run <strong>Refresh trend data</strong> on the Roles screen to pull the latest research and job-posting data.</div>
+      ) : (
+        <div className="radar">
+          {groups.map((g) => (
+            <div key={g.label} className={`radar-col ${g.label}`}>
+              <h3 className={`outlook ${g.label === "rising" ? "growing" : g.label}`}>{TREND_TEXT[g.label]} ({g.skills.length})</h3>
+              <ul>
+                {g.skills.map((s) => (
+                  <li key={s.skill_id} className={s.mine ? "mine" : ""} title={s.sources.join("\n")}>
+                    <span>{s.name}{s.mine && <span className="badge">Yours</span>}</span>
+                    <span className="muted">{s.trend !== null ? `${s.trend > 0 ? "+" : ""}${Math.round(s.trend * 100)}%` : ""}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      {noData.length > 0 && (
+        <details><summary className="muted">{noData.length} skills have no data in these sources</summary>
+          <p className="muted">{noData.map((s) => s.name).join(", ")}. The job-posting source is tech-heavy, so we show "no data" instead of guessing.</p>
+        </details>
+      )}
+      {data.capability_momentum.some((c) => c.momentum !== null) && (
+        <div className="card">
+          <h3>AI capabilities: research momentum</h3>
+          <p className="muted">Paper growth compared with AI research overall. Above zero means accelerating faster than average.</p>
+          <ul className="momentum">
+            {data.capability_momentum.map((c) => (
+              <li key={c.id}>
+                <span>{c.name}</span>
+                <span className="bar"><span style={{ width: `${Math.abs(c.momentum ?? 0) * 50}%`, marginLeft: (c.momentum ?? 0) < 0 ? `${50 - Math.abs(c.momentum ?? 0) * 50}%` : "50%" }} className={(c.momentum ?? 0) < 0 ? "neg" : "pos"} /></span>
+                <span className="muted">{c.momentum !== null ? signed(Math.round(c.momentum * 100) / 100) : "–"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="source">Snapshot {data.snapshot_id} · imported {data.imported}
+        {data.inputs.map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}</p>
+      <button className="primary" onClick={onNext}>See my future roles</button>
+    </section>
+  );
+}
+
+const TOKEN_KEY = "laluan.adminToken";
+
+function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
+  const [token, setToken] = useState(() => { try { return sessionStorage.getItem(TOKEN_KEY) ?? ""; } catch { return ""; } });
+  const [status, setStatus] = useState<RefreshStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  async function start(force: boolean) {
+    setError(null);
+    try { sessionStorage.setItem(TOKEN_KEY, token); } catch { /* private mode */ }
+    try { setStatus(await api.refreshStart(token, force)); }
+    catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't start the refresh."); return; }
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 1000));
+      const s = await api.refreshStatus();
+      setStatus(s);
+      if (s.state !== "running") {
+        if (s.state === "done") await onDone();
+        return;
+      }
+    }
+  }
+  const running = status?.state === "running";
+  return (
+    <details className="card admin">
+      <summary>Admin: refresh trend data</summary>
+      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy) and job-posting counts, then saves a new dated forecast. Older forecasts are kept.</p>
+      <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} /></label>
+      <div className="actions">
+        <button className="primary" disabled={running || !token} onClick={() => start(false)}>{running ? "Refreshing…" : "Refresh trend data"}</button>
+        <button disabled={running || !token} onClick={() => start(true)}>Collect again (slower)</button>
+      </div>
+      {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
+      {status?.state === "failed" && <p className="error" role="alert">Refresh failed: {status.error}. The previous forecast is still in use.</p>}
+      {error && <p className="error" role="alert">{error}</p>}
+    </details>
+  );
+}
+
+interface Change { role_id: string; title: string; before: number; after: number; outlookBefore: number; outlookAfter: number }
+
+function compare(before: Matches, after: Matches, scenario: Scenario): Change[] {
+  const old = new Map(before.roles.map((r) => [r.role_id, r]));
+  return after.roles
+    .map((r) => {
+      const o = old.get(r.role_id)!;
+      return { role_id: r.role_id, title: r.title, before: o.rank, after: r.rank,
+        outlookBefore: o.outlook[scenario].index, outlookAfter: r.outlook[scenario].index };
+    })
+    .filter((c) => c.before !== c.after || Math.abs(c.outlookAfter - c.outlookBefore) >= 0.5)
+    .sort((a, b) => Math.abs(b.outlookAfter - b.outlookBefore) - Math.abs(a.outlookAfter - a.outlookBefore));
+}
+
+function WhatChanged({ changes, snapshot, onClose }: { changes: Change[]; snapshot: string; onClose: () => void }) {
+  return (
+    <div className="card changed" role="status">
+      <p className="eyebrow">New trend data · {snapshot}</p>
+      <h3>{changes.length === 0 ? "Nothing changed for you" : "Your plan changed because the trend data changed"}</h3>
+      <ul>
+        {changes.slice(0, 6).map((c) => (
+          <li key={c.role_id}>
+            <strong>{c.title}</strong>: rank #{c.before} → #{c.after}, outlook {signed(c.outlookBefore)}% → {signed(c.outlookAfter)}%
+          </li>
+        ))}
+      </ul>
+      <button className="link" onClick={onClose}>Dismiss</button>
+    </div>
+  );
 }

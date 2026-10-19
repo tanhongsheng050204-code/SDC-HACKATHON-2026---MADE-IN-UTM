@@ -29,6 +29,7 @@ class Settings:
     database_path: Path
     data_dir: Path
     cors_origins: tuple[str, ...]
+    contact_email: str
 
     @property
     def llm_mode(self) -> str:
@@ -53,6 +54,7 @@ def get_settings() -> Settings:
         admin_token=os.environ.get("ADMIN_TOKEN", ""),
         database_path=Path(os.environ.get("DATABASE_PATH", str(BACKEND_DIR / "laluan.db"))),
         data_dir=Path(os.environ.get("DATA_DIR", str(BACKEND_DIR / "data"))),
+        contact_email=os.environ.get("CONTACT_EMAIL", ""),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")

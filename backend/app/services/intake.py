@@ -6,6 +6,7 @@ SCRIPTED_QUESTIONS later (task 3.7).
 """
 
 from app.services import skills
+from app.services.deid import scrub
 
 SCRIPTED_QUESTIONS = {
     "en": [
@@ -43,17 +44,18 @@ def _lang(language: str) -> str:
 
 def turn(messages: list[dict], language: str = "en") -> dict:
     lang = _lang(language)
-    answers = [m["content"] for m in messages if m.get("role") == "user"]
+    questions = SCRIPTED_QUESTIONS[lang]
+    # Never more answers than questions, and dictionary matching only: a chat turn makes no LLM call.
+    answers = [m["content"] for m in messages if m.get("role") == "user"][: len(questions)]
     found: list[str] = []
     for answer in answers:
-        for skill_id in skills.extract(answer)["skills"]:
+        for skill_id in skills.dictionary_extract(scrub(answer)):
             if skill_id not in found:
                 found.append(skill_id)
     interests = []
     if len(answers) >= len(SCRIPTED_QUESTIONS[lang]):
         last = answers[-1].casefold()
         interests = [sdg for sdg, words in INTEREST_WORDS.items() if any(w in last for w in words)]
-    questions = SCRIPTED_QUESTIONS[lang]
     complete = len(answers) >= len(questions)
     return {
         "next_question": DONE[lang] if complete else questions[len(answers)],

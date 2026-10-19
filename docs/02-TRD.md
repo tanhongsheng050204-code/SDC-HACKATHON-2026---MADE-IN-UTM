@@ -21,20 +21,26 @@ anyone can re-run:
 
 | Source | What it measures | How it is used |
 |---|---|---|
-| **arXiv API** (public) | New AI papers per month per capability (document understanding, speech, code generation, vision, robotics, agents) | **AI advancement**: rising capability momentum raises the automation exposure of the tasks it can do |
-| **Public job postings** (e.g. Hacker News "Who is hiring" via its public search API; terms of use to be checked) | Mentions of each skill per month | **Job-market demand** for skills, which feeds the Future Skills Radar |
+| **arXiv API** (public); **OpenAlex** (open research index that includes arXiv) as automatic fallback | Papers per AI capability in the last 6 months (ending 60 days ago, as recent papers are still being indexed) vs the same months a year earlier | **AI advancement**: a capability accelerating faster than AI research overall raises the exposure of roles it can automate and the outlook of roles it complements |
+| **Public job postings**: Hacker News "Ask HN: Who is hiring?" threads through the public Algolia API | Share of postings mentioning each skill (whole word or exact phrase) in the latest 3 monthly threads vs the same months a year earlier | **Job-market demand** for skills, which feeds the Future Skills Radar. Tech-heavy source: skills with fewer than 20 mentions show "too few postings" |
 | **WEF Future of Jobs Report 2025** | Expected growth and decline by role to 2030 | **Baseline** outlook |
 | **O\*NET** (open database) | Skills and tasks per occupation | Role skill lists, task lists, codes for citation |
 
 **From signals to forecasts** (simple, explainable, capped):
 
 ```
-skill_trend      = change in monthly mention share over the last 6 months (job postings)
-capability_trend = change in monthly paper count over the last 12 months (arXiv), scaled 0–1
-exposure_adj     = automation_exposure + 0.2 × Σ capability_trend of capabilities that can do the role's tasks
-role_outlook     = WEF baseline + skill-demand adjustment (capped at ±15 points) − exposure adjustment
-scenario outlook = role_outlook + (adoption − 1) × 40 × (ai_complementarity − exposure_adj)
+momentum(capability) = log2(its paper growth ÷ median growth of all capabilities), clipped to ±1
+                       (only acceleration above 0 moves roles and skills)
+skill trend          = change in share of postings mentioning it (needs ≥ 20 mentions)
+                       + 0.5 × (momentum of capabilities that boost it − of those that automate it), clipped to ±1
+role demand points   = 15 × weighted mean skill trend of the role's skills, capped ±15
+role AI points       = 15 × (mean momentum of complementing − of exposing capabilities), capped ±15
+net growth           = WEF baseline + demand points + AI points
+scenario outlook     = net growth + (adoption − 1) × 40 × (ai_complementarity − automation_exposure)
 ```
+
+Mappings (which capability exposes or complements which role, which job term counts for which skill)
+live in `data/capabilities.json` and `data/job_terms.json` and are reviewed by the team.
 
 Each collector run saves its raw counts with the query and date; the builder writes a new snapshot
 `data/signals/<date>-<slug>.json` and never edits an old one. If a source fails, the last good

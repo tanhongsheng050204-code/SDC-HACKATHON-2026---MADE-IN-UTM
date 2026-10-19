@@ -27,6 +27,28 @@ def _name_patterns(names: Iterable[str]) -> list[re.Pattern]:
     return patterns
 
 
+_NAME_LINE = re.compile(r"^\s*(?:full\s+)?name\s*[:\-].*$", re.IGNORECASE | re.MULTILINE)
+_NAME_WORD = re.compile(r"^(?:[A-Z][a-z'\-]+|[A-Z]{2,}|bin|binti|bt|a/l|a/p|s/o|d/o|anak|@)$")
+
+
+def _looks_like_name(line: str) -> bool:
+    words = line.replace(",", " ").split()
+    return 1 <= len(words) <= 6 and all(_NAME_WORD.match(w) for w in words)
+
+
+def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
+    """scrub(), plus the two places a CV usually carries its owner's name: a "Name:" line and
+    a first line made only of capitalised words. Errs on the side of removing too much."""
+    text = _NAME_LINE.sub("[NAME]", text)
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip():
+            if _looks_like_name(line.strip()):
+                lines[i] = "[NAME]"
+            break
+    return scrub("\n".join(lines), names)
+
+
 def scrub(text: str, names: Iterable[str] = ()) -> str:
     """Replace IC numbers, phone numbers, emails and known names with placeholders."""
     text = _IC.sub("[IC]", text)

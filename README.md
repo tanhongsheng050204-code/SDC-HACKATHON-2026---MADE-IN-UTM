@@ -29,7 +29,7 @@ How we reviewed the AI's work: [AI declaration](docs/AI_DECLARATION.md) ·
 | Must-have | Code |
 |---|---|
 | Skills profile intake | `backend/app/services/skills.py`, `intake.py`, `deid.py`; Intake screen |
-| AI-trend signal layer (updatable, dated source) | `backend/data/signals/*.json`, `POST /api/signals/import`, `scripts/build_snapshot.py`; source line on the Roles screen |
+| AI-trend signal layer (updatable, dated source) | `backend/app/trends/` (research + job-posting collectors, signal builder), `scripts/refresh_trends.py`, `POST /api/signals/refresh`; Future Skills Radar and source line on every role card |
 | Future-role matching + skills gap | `backend/app/services/matching.py`; Roles and role detail screens |
 | Personalised reskilling pathway | `backend/app/services/pathway.py` + `grounding.py`; Pathway section |
 | SDG mapping | `backend/data/sdg_map.json`; SDG tiles and Impact screen |
@@ -61,6 +61,18 @@ npm run dev
 Open http://localhost:5173 and press **Demo: Aisyah, data-entry clerk**.
 
 Everything runs offline. To use Gemini, copy `backend/.env.example` to `backend/.env` and set `GEMINI_API_KEY`.
+
+## Refresh the trend data
+
+Set `ADMIN_TOKEN` in `backend/.env`, then either use **Admin: refresh trend data** on the Roles screen, or run:
+
+```bash
+.venv/Scripts/python scripts/refresh_trends.py
+```
+
+It counts AI research papers per capability (arXiv, or OpenAlex if arXiv is busy) and skill mentions in
+Hacker News "Who is hiring?" threads, then writes a new dated snapshot in `backend/data/signals/`. Raw counts
+are kept in `backend/data/raw/`. Run it on a schedule to keep the forecast current.
 
 ## Tests
 

@@ -22,6 +22,8 @@ class Reference:
     scenarios: dict[str, dict]
     snapshots: list[dict]  # oldest first
     demo_profiles: dict[str, dict]
+    capabilities: list[dict]
+    job_terms: dict[str, str]
 
     @property
     def latest_snapshot(self) -> dict:
@@ -57,6 +59,8 @@ def get_reference() -> Reference:
         scenarios={s["id"]: s for s in _read(data_dir / "scenarios.json")},
         snapshots=load_snapshots(data_dir),
         demo_profiles=_read(data_dir / "demo_profiles.json"),
+        capabilities=_read(data_dir / "capabilities.json")["capabilities"],
+        job_terms=_read(data_dir / "job_terms.json")["terms"],
     )
 
 

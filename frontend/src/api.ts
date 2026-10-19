@@ -25,6 +25,18 @@ export interface SignalSource {
   imported: string; horizon_year: number; illustrative: boolean;
 }
 export interface Matches { scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[] }
+export interface SkillTrend {
+  skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
+  sources: string[]; mine: boolean;
+}
+export interface Radar {
+  snapshot_id: string; imported: string; source: string; illustrative: boolean;
+  inputs: { source: string; url: string; retrieved: string }[];
+  capability_momentum: { id: string; name: string; momentum: number | null }[];
+  skills: SkillTrend[];
+  roles: { role_id: string; title: string; index: number; label: string }[];
+}
+export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; snapshot_id: string | null; error: string | null }
 export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string }
 export interface Pathway {
   role_id: string; fit: number; total_hours: number; summary: string; summary_mode: string;
@@ -57,5 +69,9 @@ export const api = {
   getProfile: (id: string) => request<Profile>(`/profiles/${id}`),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
   matches: (id: string, scenario: Scenario) => request<Matches>(`/profiles/${id}/matches?scenario=${scenario}`),
+  radar: (id: string) => request<Radar>(`/radar?profile_id=${id}`),
+  refreshStart: (token: string, force: boolean) =>
+    request<RefreshStatus>(`/signals/refresh?force=${force}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  refreshStatus: () => request<RefreshStatus>("/signals/refresh"),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

@@ -20,3 +20,7 @@
 | 14 | No age, gender or background inputs; the API rejects them | Collect them for analytics | Fairness checks (brief, good-to-have) |
 | 15 | AI coach moved to a lower priority | Coach as a headline feature | The rubric wants more than "upload a CV and ask a chatbot for jobs" |
 | 16 | Synthetic CVs only for testing | Friends' real CVs | The rules forbid real CVs |
+| 17 | Research signal from arXiv with OpenAlex fallback | arXiv only | arXiv returned 429 and 500 errors during development |
+| 18 | Capability momentum measured relative to the median capability, and only acceleration counts | Raw year-on-year growth | All research grows every year; raw growth saturated the cap for 5 of 8 capabilities. Overall speed is what the scenarios model. Team to confirm (______) |
+| 19 | A skill needs ≥ 20 job-posting mentions before its trend counts | Use every count | 0 → 1 mentions produced ±100% swings |
+| 20 | Refreshes write new snapshots and never edit the baseline | Update in place | History shows how forecasts changed; refreshes never compound |
