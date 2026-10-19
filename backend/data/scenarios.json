@@ -1,0 +1,8 @@
+[
+  {"id": "slow", "label": "Slow AI adoption", "adoption": 0.5,
+   "description": "Businesses adopt AI cautiously. Automation pressure and AI-boosted demand are both about half of the baseline."},
+  {"id": "baseline", "label": "Baseline", "adoption": 1.0,
+   "description": "The forecast as published by the source."},
+  {"id": "accelerated", "label": "Accelerated AI adoption", "adoption": 1.6,
+   "description": "AI spreads faster than expected. Roles exposed to automation shrink faster; roles that work with AI grow faster."}
+]
