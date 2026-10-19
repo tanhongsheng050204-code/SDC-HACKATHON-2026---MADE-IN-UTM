@@ -22,4 +22,5 @@ One row per thing reviewed: generated code, data, or text. Write what was wrong 
 | 15 | 2026-10-19 | `api.py` refresh status | Automated security review | Anyone could read refresh progress, and errors could echo full source URLs | Status endpoint now needs the admin token; errors are stripped of URLs and cut to 200 characters; test added | ______ |
 | 16 | 2026-10-19 | Year slider design | Planning review (AI-assisted) | The UI brief planned a slider to 2035, but the sources only forecast to 2030 | Slider limited to the horizon year; test proves later years are clamped | ______ |
 | 17 | 2026-10-19 | Pathway costs | Same | The plan called for RM prices and HRD Corp flags, but none are sourced | Show only free / free-to-audit / paid from the catalogue, and "check with the provider" for the rest | ______ |
-| 18 | | | | | | |
+| 18 | 2026-10-19 | `api.py` snapshot import | Automated security review; confirmed by a failing test (AI-assisted) | `snapshot_id` went straight into the file path, so `../../app/x` wrote a file outside `data/signals`; numbers were never validated, so one bad import could break every later request | `SnapshotIn` model: ID limited to letters, digits, `-` and `_`; numeric ranges checked; resolved path must stay in `data/signals`; validation runs only after the admin check; tests added | ______ |
+| 19 | | | | | | |

@@ -5,12 +5,13 @@ import json
 
 from fastapi import APIRouter, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
+from pydantic import ValidationError
 
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
 from app.schemas import (CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
-                         WorkforceRequest)
+                         SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services import documents, intake, matching, pathway, skills, workforce
 from app.trends import refresh
@@ -132,20 +133,23 @@ def radar(profile_id: str | None = None):
 
 
 @router.post("/signals/import", status_code=201)
-def import_snapshot(snapshot: dict, x_admin_token: str = Header(default="")):
+def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
     settings = get_settings()
-    _require_admin(x_admin_token)
+    _require_admin(x_admin_token)  # before validation, so strangers learn nothing about the format
+    try:
+        snapshot = SnapshotIn.model_validate(body).model_dump(exclude_none=True)
+    except ValidationError as error:
+        raise HTTPException(422, error.errors(include_url=False, include_input=False)) from error
     ref = get_reference()
-    required = {"snapshot_id", "source", "source_url", "published", "imported", "horizon_year",
-                "illustrative", "signals"}
-    if missing := required - snapshot.keys():
-        raise HTTPException(422, f"Missing fields: {', '.join(sorted(missing))}")
     if snapshot["imported"] <= ref.latest_snapshot["imported"]:
         raise HTTPException(422, "imported date must be later than the latest snapshot")
     for s in snapshot["signals"]:
-        if s.get("role_id") not in ref.roles:
-            raise HTTPException(422, f"Unknown role in signals: {s.get('role_id')}")
-    path = settings.data_dir / "signals" / f"{snapshot['snapshot_id']}.json"
+        if s["role_id"] not in ref.roles:
+            raise HTTPException(422, f"Unknown role in signals: {s['role_id']}")
+    folder = (settings.data_dir / "signals").resolve()
+    path = (folder / f"{snapshot['snapshot_id']}.json").resolve()
+    if path.parent != folder:  # belt and braces: the ID pattern already rules this out
+        raise HTTPException(422, "Invalid snapshot_id")
     if path.exists():
         raise HTTPException(409, "Snapshot already exists")
     path.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")

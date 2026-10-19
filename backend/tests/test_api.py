@@ -70,3 +70,39 @@ def test_fairness_name_does_not_change_ranking(client):
 
 def test_health_names_the_model(client):
     assert "offline" in client.get("/api/health").json()["llm_model"].lower()
+
+
+def _snapshot(**overrides):
+    base = {"snapshot_id": "2099-01-01-test", "source": "Test source", "source_url": "https://example.org",
+            "published": "2025-01-07", "imported": "2099-01-01", "horizon_year": 2030, "illustrative": True,
+            "signals": [{"role_id": "data_entry_clerk", "net_growth_pct": -20, "automation_exposure": 0.8,
+                         "ai_complementarity": 0.2}]}
+    return {**base, **overrides}
+
+
+def test_snapshot_import_rejects_unsafe_ids_and_bad_numbers(client):
+    admin = {"X-Admin-Token": "test-admin-token"}
+    for bad_id in ["../../app/x", r"..\..\x","/tmp/x", "C:/x", "a/b", "", ".hidden", "x" * 120]:
+        response = client.post("/api/signals/import", json=_snapshot(snapshot_id=bad_id), headers=admin)
+        assert response.status_code == 422, bad_id
+    bad_signal = {"role_id": "data_entry_clerk", "net_growth_pct": "lots", "automation_exposure": 5,
+                  "ai_complementarity": 0.2}
+    assert client.post("/api/signals/import", json=_snapshot(signals=[bad_signal]),
+                       headers=admin).status_code == 422
+
+
+def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch):
+    import shutil
+
+    from app.config import get_settings
+    from app.reference import get_reference
+
+    data = tmp_path / "data"
+    shutil.copytree(get_settings().data_dir, data)
+    monkeypatch.setenv("DATA_DIR", str(data))
+    get_settings.cache_clear()
+    get_reference.cache_clear()
+    response = client.post("/api/signals/import", json=_snapshot(), headers={"X-Admin-Token": "test-admin-token"})
+    assert response.status_code == 201
+    assert (data / "signals" / "2099-01-01-test.json").exists()
+    assert client.get("/api/health").json()["snapshot"] == "2099-01-01-test"
