@@ -1,0 +1,24 @@
+{
+  "snapshot_id": "2026-10-19-illustrative-seed",
+  "source": "Illustrative seed data (NOT real figures). Replace with WEF Future of Jobs Report 2025 tables before the demo.",
+  "source_url": "https://www.weforum.org/publications/the-future-of-jobs-report-2025/",
+  "published": "2025-01-07",
+  "imported": "2026-10-19",
+  "horizon_year": 2030,
+  "illustrative": true,
+  "signals": [
+    {"role_id": "data_entry_clerk", "net_growth_pct": -30, "automation_exposure": 0.9, "ai_complementarity": 0.1, "note": "Placeholder: clerical roles are among those expected to decline."},
+    {"role_id": "admin_assistant", "net_growth_pct": -15, "automation_exposure": 0.7, "ai_complementarity": 0.3},
+    {"role_id": "customer_service_rep", "net_growth_pct": -8, "automation_exposure": 0.6, "ai_complementarity": 0.4},
+    {"role_id": "data_analyst", "net_growth_pct": 35, "automation_exposure": 0.3, "ai_complementarity": 0.7},
+    {"role_id": "ai_ml_engineer", "net_growth_pct": 80, "automation_exposure": 0.1, "ai_complementarity": 0.95},
+    {"role_id": "ai_operations_specialist", "net_growth_pct": 60, "automation_exposure": 0.2, "ai_complementarity": 0.9},
+    {"role_id": "software_developer", "net_growth_pct": 45, "automation_exposure": 0.35, "ai_complementarity": 0.75},
+    {"role_id": "cybersecurity_analyst", "net_growth_pct": 50, "automation_exposure": 0.15, "ai_complementarity": 0.7},
+    {"role_id": "digital_marketing_specialist", "net_growth_pct": 20, "automation_exposure": 0.45, "ai_complementarity": 0.55},
+    {"role_id": "ux_designer", "net_growth_pct": 15, "automation_exposure": 0.35, "ai_complementarity": 0.5},
+    {"role_id": "renewable_energy_technician", "net_growth_pct": 55, "automation_exposure": 0.1, "ai_complementarity": 0.2},
+    {"role_id": "sustainability_analyst", "net_growth_pct": 40, "automation_exposure": 0.25, "ai_complementarity": 0.5},
+    {"role_id": "care_worker", "net_growth_pct": 30, "automation_exposure": 0.05, "ai_complementarity": 0.15}
+  ]
+}

@@ -1,0 +1,110 @@
+/* Tokens from docs/04-UI_UX_BRIEF.md */
+:root {
+  --ink: #14212b; --muted: #5b6b78; --bg: #f7f8f6; --surface: #ffffff; --line: #e1e5e8;
+  --accent: #0f7b6c; --grow: #2e7d32; --stable: #8a6d1b; --decline: #b3261e; --warn-bg: #fff6dc;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8edf0; --muted: #9aabb8; --bg: #10181e; --surface: #18232b; --line: #2a3742;
+    --accent: #3fb8a5; --grow: #6cc070; --stable: #d9b44a; --decline: #f08178; --warn-bg: #3a3215;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #e8edf0; --muted: #9aabb8; --bg: #10181e; --surface: #18232b; --line: #2a3742;
+  --accent: #3fb8a5; --grow: #6cc070; --stable: #d9b44a; --decline: #f08178; --warn-bg: #3a3215;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/24px Inter, system-ui, sans-serif; }
+h1, h2, h3 { font-family: Manrope, Inter, system-ui, sans-serif; margin: 0 0 12px; }
+h1 { font-size: 32px; line-height: 40px; } h2 { font-size: 24px; line-height: 32px; } h3 { font-size: 18px; line-height: 26px; }
+.app { max-width: 1120px; margin: 0 auto; padding: 0 16px 48px; }
+main section { display: grid; gap: 16px; padding: 24px 0; }
+
+button { font: inherit; min-height: 44px; padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--muted); }
+button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; justify-self: start; }
+button.link { border: none; background: none; text-decoration: underline; color: var(--accent); }
+textarea { width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+a { color: var(--accent); }
+
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.brand { font-family: Manrope, sans-serif; font-weight: 700; font-size: 20px; border: none; background: none; padding: 0; }
+.topbar nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.step { border: none; background: none; }
+.step.active { color: var(--accent); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+
+.hero { padding-top: 48px; }
+.three-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; padding-left: 20px; }
+.actions, .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs [aria-selected="true"], .segmented [aria-checked="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.segmented { display: inline-flex; gap: 0; }
+.segmented button { border-radius: 0; } .segmented button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.segmented button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; min-height: 36px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.chip.covered { border-color: var(--accent); }
+.chip.missing { border-style: dashed; border-color: var(--muted); }
+.chip button { min-height: 28px; padding: 0 6px; border: none; background: none; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+.card { display: grid; gap: 8px; text-align: left; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+@media (min-width: 640px) { .card { padding: 24px; } }
+button.card:hover { transform: translateY(-1px); }
+.card.at-risk { opacity: 0.75; }
+.card-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rank { font-variant-numeric: tabular-nums; color: var(--muted); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 13px; justify-self: start; }
+.badge.muted { background: var(--line); color: var(--ink); }
+.fit { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.fit div { height: 100%; background: var(--accent); }
+.outlook.emerging, .outlook.growing { color: var(--grow); } .outlook.stable { color: var(--stable); } .outlook.declining { color: var(--decline); }
+
+.sdgs { display: flex; gap: 4px; }
+.sdg { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 4px; color: #fff; font-weight: 700; font-size: 14px; }
+.sdg-card { border-top: 6px solid; }
+.sdg.small { width: 22px; height: 22px; font-size: 11px; margin-right: 6px; }
+select, input[type="number"] { display: block; width: 100%; min-height: 44px; margin-top: 4px; font: inherit; padding: 8px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.why summary { cursor: pointer; font-weight: 600; }
+.why ul { margin: 8px 0; padding-left: 20px; }
+
+.two-col { display: grid; gap: 16px; } @media (min-width: 640px) { .two-col { grid-template-columns: 1fr 1fr; } }
+.outlooks { border-collapse: collapse; } .outlooks th, .outlooks td { padding: 4px 16px 4px 0; text-align: left; }
+.outlooks caption { text-align: left; color: var(--muted); font-size: 13px; }
+.steps { display: grid; gap: 12px; padding-left: 20px; }
+
+.muted, .source { color: var(--muted); } .source { font-size: 13px; line-height: 20px; }
+.banner { padding: 12px 16px; border-radius: var(--radius); margin: 8px 0; }
+.banner.warning { background: var(--warn-bg); } .banner.error, .error { color: var(--decline); }
+footer { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+
+.eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin: 0; }
+.radar { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .radar { grid-template-columns: repeat(3, 1fr); } }
+.radar-col { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 16px; }
+.radar-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.radar-col li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px; }
+.radar-col li.mine { background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 500; }
+.radar-col .badge { margin-left: 6px; }
+.momentum { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.momentum li { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr 48px; gap: 8px; align-items: center; }
+.momentum .bar { position: relative; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.momentum .bar span { display: block; height: 100%; }
+.momentum .pos { background: var(--accent); } .momentum .neg { background: var(--muted); }
+.admin summary { cursor: pointer; font-weight: 600; } .admin input { display: block; margin-top: 4px; min-height: 44px; width: 100%; max-width: 360px; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+.steps-log { font-size: 13px; margin: 0; }
+.changed { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } button.card:hover { transform: none; } }
+@media print { .topbar, footer, button { display: none !important; } body { background: #fff; } }

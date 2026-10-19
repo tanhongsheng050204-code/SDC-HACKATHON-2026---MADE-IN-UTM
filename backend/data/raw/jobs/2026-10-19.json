@@ -1,0 +1,209 @@
+{
+  "source": "Hacker News 'Who is hiring?' threads (Algolia public API)",
+  "source_url": "https://hn.algolia.com/api/v1",
+  "retrieved": "2026-10-19",
+  "threads": {
+    "recent": [
+      {
+        "id": "49922569",
+        "title": "Ask HN: Who is hiring? (October 2026)",
+        "date": "2026-10-01"
+      },
+      {
+        "id": "49522897",
+        "title": "Ask HN: Who is hiring? (September 2026)",
+        "date": "2026-09-01"
+      },
+      {
+        "id": "49156683",
+        "title": "Ask HN: Who is hiring? (August 2026)",
+        "date": "2026-08-03"
+      }
+    ],
+    "prior": [
+      {
+        "id": "45438503",
+        "title": "Ask HN: Who is hiring? (October 2025)",
+        "date": "2025-10-01"
+      },
+      {
+        "id": "45093192",
+        "title": "Ask HN: Who is hiring? (September 2025)",
+        "date": "2025-09-01"
+      },
+      {
+        "id": "44757794",
+        "title": "Ask HN: Who is hiring? (August 2025)",
+        "date": "2025-08-01"
+      }
+    ]
+  },
+  "terms": {
+    "excel": "excel",
+    "sql": "sql",
+    "python": "python",
+    "statistics": "statistics",
+    "data_visualization": "dashboards",
+    "power_bi": "power bi",
+    "machine_learning": "machine learning",
+    "deep_learning": "pytorch",
+    "genai_tools": "llm",
+    "prompt_engineering": "prompt",
+    "mlops": "mlops",
+    "cloud_computing": "aws",
+    "javascript": "typescript",
+    "git": "git",
+    "software_testing": "testing",
+    "api_design": "api",
+    "cybersecurity_fundamentals": "security",
+    "network_security": "network security",
+    "incident_response": "incident response",
+    "seo": "seo",
+    "social_media_marketing": "social media",
+    "marketing_analytics": "marketing",
+    "content_writing": "content",
+    "ux_research": "user research",
+    "ui_design": "figma",
+    "customer_service": "customer support",
+    "project_management": "project management",
+    "communication": "communication",
+    "esg_reporting": "sustainability",
+    "carbon_accounting": "carbon",
+    "solar_pv": "solar",
+    "electrical_systems": "electrical"
+  },
+  "postings": {
+    "recent": 1160,
+    "prior": 1353
+  },
+  "mentions": {
+    "excel": {
+      "recent": 2,
+      "prior": 9
+    },
+    "sql": {
+      "recent": 39,
+      "prior": 43
+    },
+    "python": {
+      "recent": 204,
+      "prior": 256
+    },
+    "statistics": {
+      "recent": 9,
+      "prior": 0
+    },
+    "data_visualization": {
+      "recent": 12,
+      "prior": 13
+    },
+    "power_bi": {
+      "recent": 0,
+      "prior": 1
+    },
+    "machine_learning": {
+      "recent": 31,
+      "prior": 70
+    },
+    "deep_learning": {
+      "recent": 19,
+      "prior": 26
+    },
+    "genai_tools": {
+      "recent": 115,
+      "prior": 125
+    },
+    "prompt_engineering": {
+      "recent": 12,
+      "prior": 11
+    },
+    "mlops": {
+      "recent": 14,
+      "prior": 9
+    },
+    "cloud_computing": {
+      "recent": 106,
+      "prior": 144
+    },
+    "javascript": {
+      "recent": 166,
+      "prior": 232
+    },
+    "git": {
+      "recent": 20,
+      "prior": 17
+    },
+    "software_testing": {
+      "recent": 26,
+      "prior": 41
+    },
+    "api_design": {
+      "recent": 112,
+      "prior": 112
+    },
+    "cybersecurity_fundamentals": {
+      "recent": 108,
+      "prior": 107
+    },
+    "network_security": {
+      "recent": 3,
+      "prior": 0
+    },
+    "incident_response": {
+      "recent": 8,
+      "prior": 1
+    },
+    "seo": {
+      "recent": 8,
+      "prior": 1
+    },
+    "social_media_marketing": {
+      "recent": 3,
+      "prior": 5
+    },
+    "marketing_analytics": {
+      "recent": 51,
+      "prior": 51
+    },
+    "content_writing": {
+      "recent": 21,
+      "prior": 27
+    },
+    "ux_research": {
+      "recent": 2,
+      "prior": 2
+    },
+    "ui_design": {
+      "recent": 6,
+      "prior": 7
+    },
+    "customer_service": {
+      "recent": 9,
+      "prior": 13
+    },
+    "project_management": {
+      "recent": 0,
+      "prior": 5
+    },
+    "communication": {
+      "recent": 43,
+      "prior": 50
+    },
+    "esg_reporting": {
+      "recent": 7,
+      "prior": 1
+    },
+    "carbon_accounting": {
+      "recent": 0,
+      "prior": 0
+    },
+    "solar_pv": {
+      "recent": 4,
+      "prior": 6
+    },
+    "electrical_systems": {
+      "recent": 7,
+      "prior": 6
+    }
+  }
+}

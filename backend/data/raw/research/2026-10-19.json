@@ -1,0 +1,59 @@
+{
+  "source": "openalex",
+  "source_url": "https://api.openalex.org/works",
+  "retrieved": "2026-10-19",
+  "windows": {
+    "recent": [
+      "2026-02-19",
+      "2026-08-20"
+    ],
+    "prior": [
+      "2025-02-19",
+      "2025-08-20"
+    ]
+  },
+  "queries": {
+    "document_understanding": "document understanding",
+    "conversational_ai": "conversational agent",
+    "code_generation": "code generation",
+    "llm_agents": "LLM agents",
+    "automated_data_analysis": "text-to-SQL",
+    "generative_media": "text-to-image generation",
+    "ai_security": "adversarial attacks",
+    "mlops": "MLOps"
+  },
+  "counts": {
+    "document_understanding": {
+      "recent": 1514,
+      "prior": 521
+    },
+    "conversational_ai": {
+      "recent": 12875,
+      "prior": 7244
+    },
+    "code_generation": {
+      "recent": 14225,
+      "prior": 5077
+    },
+    "llm_agents": {
+      "recent": 14462,
+      "prior": 2308
+    },
+    "automated_data_analysis": {
+      "recent": 1198,
+      "prior": 444
+    },
+    "generative_media": {
+      "recent": 3258,
+      "prior": 2453
+    },
+    "ai_security": {
+      "recent": 8918,
+      "prior": 6099
+    },
+    "mlops": {
+      "recent": 1973,
+      "prior": 944
+    }
+  }
+}

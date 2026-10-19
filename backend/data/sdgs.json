@@ -1,0 +1,19 @@
+[
+  {"number": 1, "name": "No Poverty", "colour": "#E5243B"},
+  {"number": 2, "name": "Zero Hunger", "colour": "#DDA63A"},
+  {"number": 3, "name": "Good Health and Well-being", "colour": "#4C9F38"},
+  {"number": 4, "name": "Quality Education", "colour": "#C5192D"},
+  {"number": 5, "name": "Gender Equality", "colour": "#FF3A21"},
+  {"number": 6, "name": "Clean Water and Sanitation", "colour": "#26BDE2"},
+  {"number": 7, "name": "Affordable and Clean Energy", "colour": "#FCC30B"},
+  {"number": 8, "name": "Decent Work and Economic Growth", "colour": "#A21942"},
+  {"number": 9, "name": "Industry, Innovation and Infrastructure", "colour": "#FD6925"},
+  {"number": 10, "name": "Reduced Inequalities", "colour": "#DD1367"},
+  {"number": 11, "name": "Sustainable Cities and Communities", "colour": "#FD9D24"},
+  {"number": 12, "name": "Responsible Consumption and Production", "colour": "#BF8B2E"},
+  {"number": 13, "name": "Climate Action", "colour": "#3F7E44"},
+  {"number": 14, "name": "Life Below Water", "colour": "#0A97D9"},
+  {"number": 15, "name": "Life on Land", "colour": "#56C02B"},
+  {"number": 16, "name": "Peace, Justice and Strong Institutions", "colour": "#00689D"},
+  {"number": 17, "name": "Partnerships for the Goals", "colour": "#19486A"}
+]

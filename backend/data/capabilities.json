@@ -1,0 +1,29 @@
+{
+  "_note": "AI capabilities tracked through research-paper counts. Draft mapping: the team must review which roles each capability exposes or complements and which skills it automates or boosts (REVIEW_LOG.md).",
+  "capabilities": [
+    {"id": "document_understanding", "name": "Document understanding and extraction", "query": "document understanding",
+     "exposes_roles": ["data_entry_clerk", "admin_assistant"], "complements_roles": ["ai_operations_specialist"],
+     "automates_skills": ["data_entry", "office_admin"], "boosts_skills": ["genai_tools"]},
+    {"id": "conversational_ai", "name": "Conversational AI and chat agents", "query": "conversational agent",
+     "exposes_roles": ["customer_service_rep", "admin_assistant"], "complements_roles": ["ai_operations_specialist"],
+     "automates_skills": ["customer_service", "scheduling"], "boosts_skills": ["prompt_engineering"]},
+    {"id": "code_generation", "name": "Code generation", "query": "code generation",
+     "exposes_roles": ["software_developer"], "complements_roles": ["ai_ml_engineer", "ai_operations_specialist"],
+     "automates_skills": [], "boosts_skills": ["genai_tools", "software_testing"]},
+    {"id": "llm_agents", "name": "LLM agents and workflow automation", "query": "LLM agents",
+     "exposes_roles": ["admin_assistant", "data_analyst"], "complements_roles": ["ai_operations_specialist", "ai_ml_engineer"],
+     "automates_skills": ["office_admin"], "boosts_skills": ["prompt_engineering", "api_design"]},
+    {"id": "automated_data_analysis", "name": "Automated data analysis (text-to-SQL)", "query": "text-to-SQL",
+     "exposes_roles": ["data_analyst"], "complements_roles": [],
+     "automates_skills": [], "boosts_skills": ["critical_thinking"]},
+    {"id": "generative_media", "name": "Generative images and marketing content", "query": "text-to-image generation",
+     "exposes_roles": ["digital_marketing_specialist", "ux_designer"], "complements_roles": [],
+     "automates_skills": ["content_writing"], "boosts_skills": ["genai_tools"]},
+    {"id": "ai_security", "name": "AI security and adversarial attacks", "query": "adversarial attacks",
+     "exposes_roles": [], "complements_roles": ["cybersecurity_analyst"],
+     "automates_skills": [], "boosts_skills": ["cybersecurity_fundamentals", "incident_response"]},
+    {"id": "mlops", "name": "Deploying and monitoring machine-learning models", "query": "MLOps",
+     "exposes_roles": [], "complements_roles": ["ai_ml_engineer"],
+     "automates_skills": [], "boosts_skills": ["mlops", "cloud_computing"]}
+  ]
+}
