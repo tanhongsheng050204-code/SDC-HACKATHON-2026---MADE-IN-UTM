@@ -463,7 +463,7 @@ function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
     catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't start the refresh."); return; }
     for (;;) {
       await new Promise((r) => setTimeout(r, 1000));
-      const s = await api.refreshStatus();
+      const s = await api.refreshStatus(token);
       setStatus(s);
       if (s.state !== "running") {
         if (s.state === "done") await onDone();

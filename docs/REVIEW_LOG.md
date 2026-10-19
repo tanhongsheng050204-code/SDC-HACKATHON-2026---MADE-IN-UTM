@@ -19,4 +19,5 @@ One row per thing reviewed: generated code, data, or text. Write what was wrong 
 | 12 | 2026-10-19 | Signal builder | Same | With relative momentum, a capability growing slower than average *raised* the outlook of roles it threatens (marketing +12.7) | Only acceleration counts in adjustments; signed value still displayed; test added | ______ |
 | 13 | 2026-10-19 | Job collector | Same | Search matched prefixes and typos ("excel" counted "excellent") | Whole-word, exact matching; phrases quoted | ______ |
 | 14 | 2026-10-19 | Skills Radar | Browser check | Tiny counts gave ±100% swings (Power BI 1 → 0) | Minimum 20 mentions before a job trend counts; otherwise "too few postings"; test added | ______ |
-| 15 | | | | | | |
+| 15 | 2026-10-19 | `api.py` refresh status | Automated security review | Anyone could read refresh progress, and errors could echo full source URLs | Status endpoint now needs the admin token; errors are stripped of URLs and cut to 200 characters; test added | ______ |
+| 16 | | | | | | |

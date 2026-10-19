@@ -72,6 +72,7 @@ export const api = {
   radar: (id: string) => request<Radar>(`/radar?profile_id=${id}`),
   refreshStart: (token: string, force: boolean) =>
     request<RefreshStatus>(`/signals/refresh?force=${force}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
-  refreshStatus: () => request<RefreshStatus>("/signals/refresh"),
+  refreshStatus: (token: string) =>
+    request<RefreshStatus>("/signals/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

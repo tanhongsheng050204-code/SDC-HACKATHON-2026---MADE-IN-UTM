@@ -97,7 +97,9 @@ def start_refresh(force: bool = False, x_admin_token: str = Header(default="")):
 
 
 @router.get("/signals/refresh")
-def refresh_status():
+def refresh_status(x_admin_token: str = Header(default="")):
+    """Progress and errors of the running refresh: admin only, like starting one."""
+    _require_admin(x_admin_token)
     return refresh.status()
 
 
