@@ -134,3 +134,14 @@ def test_tasks_for_a_role_without_onet_occupation_are_empty_not_guessed(client):
     body = client.get("/api/roles/ai_operations_specialist/tasks").json()
     assert body["tasks"] == [] and body["onet_code"] is None and body["onet_note"]
     assert client.get("/api/roles/nope/tasks").status_code == 404
+
+
+def test_every_recommendation_carries_a_source(client):
+    """Task 3.5: roles, skills and courses each say where they come from."""
+    profile = client.post("/api/profiles/demo/clerk").json()
+    roles = client.get(f"/api/profiles/{profile['id']}/matches").json()["roles"]
+    assert all(r["citation"]["snapshot_id"] and "skills_source" in r for r in roles)
+    analyst = next(r for r in roles if r["role_id"] == "data_analyst")
+    assert analyst["skills_source"]["onet_code"] == "15-2051.01"
+    plan = client.get(f"/api/profiles/{profile['id']}/pathway", params={"role": "data_analyst"}).json()
+    assert all("checked" in s["course"] and s["course"]["provider"] for s in plan["steps"])

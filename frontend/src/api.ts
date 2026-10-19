@@ -16,6 +16,7 @@ export interface RoleMatch {
   why: { fit: number; score: number; fit_points: number; outlook_points: number; sdg_points: number; matched_sdgs: number[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   citation: { snapshot_id: string; imported: string; note: string | null };
+  skills_source: { onet_code: string | null; onet_note: string | null };
   outlook: Record<Scenario, { index: number; label: string }>;
   robust_pick: boolean; at_risk: boolean; is_current_role: boolean;
   covered: SkillRef[]; missing: SkillRef[]; sdgs: Sdg[];
@@ -58,7 +59,7 @@ export interface RoleTasks {
   counted: number; shares: Record<TaskLabel, number>; reviewed: number;
 }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[]; interests: number[] }
-export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string }
+export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null }
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];

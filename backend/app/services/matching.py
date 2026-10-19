@@ -72,6 +72,12 @@ def _sdg_view(ref: Reference, tags: list[dict]) -> list[dict]:
     return [{**ref.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"]} for t in tags]
 
 
+def _skills_source(ref: Reference, role_id: str) -> dict:
+    """Where a role's skill list comes from: the team's list, checked against an O*NET occupation."""
+    entry = ref.tasks["roles"].get(role_id, {})
+    return {"onet_code": entry.get("onet_code"), "onet_note": entry.get("onet_note")}
+
+
 def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = None) -> dict:
     snapshot = ref.latest_snapshot
     signals = signals_from_snapshot(snapshot)
@@ -112,6 +118,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "sdgs": _sdg_view(ref, ref.role_sdgs(role_id)),
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},
+            "skills_source": _skills_source(ref, role_id),
         })
     first_year = max(int(str(snapshot["published"])[:4]), min(dt.date.today().year, snapshot["horizon_year"]))
     return {

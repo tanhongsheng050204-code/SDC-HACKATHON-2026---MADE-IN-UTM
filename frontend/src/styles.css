@@ -336,3 +336,5 @@ code { font-size: .88em; background: var(--surface-2); padding: 1px 5px; border-
 .task-list .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
 .task-list .check input { margin-top: 4px; }
 .task-list .card-row { justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
+.radar-col li { flex-wrap: wrap; }
+.radar-col .radar-src { flex-basis: 100%; font-weight: 400; margin: 0; }

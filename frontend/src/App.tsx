@@ -1,6 +1,6 @@
 // Screens follow docs/03-APP_FLOW.md: S0 Landing, S1 Intake, S2 Review, S3 Roles, S4/S5 Gap + Pathway, S6 Impact.
 // Navigation is component state for now; task 3.5 moves it to real routes.
-import { useEffect, useMemo, useState } from "react";
+import { Component, ReactNode, useEffect, useMemo, useState } from "react";
 import { LogoMark, Rosette } from "./brand";
 import { api, ChatTurn, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
 
@@ -163,6 +163,7 @@ export default function App() {
         </header>
         {error && <div className="banner error" role="alert">{error}</div>}
         <main>
+          <ScreenBoundary key={screen}>
           {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
           {screen === "review" && (
             <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
@@ -179,10 +180,30 @@ export default function App() {
           )}
           {screen === "impact" && role && <Impact role={role} />}
           {screen === "workforce" && <WorkforceView />}
+          </ScreenBoundary>
         </main>
       </div>
     </div>
   );
+}
+
+// One screen failing to render must not blank the whole app: the sidebar stays usable and the
+// person gets a way out. Keyed by screen, so moving to another screen resets it.
+class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error: unknown) { console.error(error); }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <section>
+        <div className="banner error" role="alert">
+          <strong>Something went wrong on this screen.</strong> Your profile is safe. Reload the page or pick another section on the left.
+        </div>
+        <button className="primary" onClick={() => window.location.reload()}>Reload</button>
+      </section>
+    );
+  }
 }
 
 function Landing({ onStart, onDemo }: { onStart: () => void; onDemo: (k: string) => void }) {
@@ -474,6 +495,9 @@ function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
         <div><h3>You have</h3><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div></div>
         <div><h3>You need</h3><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing">{s.name}{s.weight === 3 ? " (core)" : ""}</span>)}</div></div>
       </div>
+      <p className="source">Skills for this role: the Laluan team's list{role.skills_source.onet_code
+        ? <>, checked against O*NET occupation <a href={`https://www.onetonline.org/link/summary/${role.skills_source.onet_code}`} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
+        : " (a new role with no O*NET occupation yet)"}.</p>
       {role.missing.length === 0 ? <p>You already have every core skill for this role.</p> : !plan && (
         <button className="primary" disabled={busy} onClick={build}>{busy ? "Building your plan…" : "Build my pathway"}</button>
       )}
@@ -501,6 +525,7 @@ function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
                   <span className={`badge ${COST[s.course.cost]?.tone ?? ""}`}>{COST[s.course.cost]?.label ?? s.course.cost}</span></div>
                 <span>{s.course.url ? <a href={s.course.url} target="_blank" rel="noreferrer">{s.course.title}</a> : s.course.title} · {s.course.provider}</span>
                 <span className="muted">About {s.course.hours} hours · {s.course.level} · {s.why}</span>
+                <span className="source">From the Laluan course catalogue · {s.course.url ? (s.course.checked ? `link checked ${s.course.checked}` : "link not yet checked") : "no single course page: search the provider"}</span>
                 {s.course.cost === "paid" && <span className="source">Price and HRD Corp claimability: check with the provider or your employer before enrolling.</span>}
                 <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => toggle(s.course.id, e.target.checked)} /> I finished this</label>
               </li>
@@ -566,6 +591,7 @@ function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
                   <li key={s.skill_id} className={s.mine ? "mine" : ""} title={s.sources.join("\n")}>
                     <span>{s.name}{s.mine && <span className="badge">Yours</span>}</span>
                     <span className="muted">{s.trend !== null ? `${s.trend > 0 ? "+" : ""}${Math.round(s.trend * 100)}%` : ""}</span>
+                    {s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}
                   </li>
                 ))}
               </ul>
