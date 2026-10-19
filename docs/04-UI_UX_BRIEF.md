@@ -9,38 +9,47 @@ always end a screen on a next step. Never use alarm red for a whole screen.
 
 ## Look
 
-Deep green on a pale mint-grey background, white cards with large rounded corners and soft shadows,
-pill-shaped buttons, small uppercase labels above headings, light and dark themes.
+Two surfaces. The **landing page** is white with a black announcement bar, a centered pill tag,
+a very large tight headline and ink buttons. The **app** is a pale porcelain canvas with a 250 px
+sidebar (grouped links, current item on a soft grey), a sticky top bar, and white cards with a
+hairline border and a barely visible shadow. Status is shown with small pill badges. Deep teal is
+the accent for links, progress and "covered" skills; primary buttons are ink, not teal.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#F3F6F4` | `#0C1714` | Page |
+| `--canvas` | `#F3F6F4` | `#0C1714` | App background |
+| `--page` | `#FFFFFF` | `#0C1714` | Landing background |
 | `--surface` | `#FFFFFF` | `#12201C` | Cards |
-| `--surface-2` | `#E9EFEC` | `#182924` | Inset panels, chips |
-| `--ink` | `#10241F` | `#EAF2EF` | Text |
-| `--ink-soft` | `#4F625C` | `#A7B8B2` | Secondary text, sources and dates |
-| `--line` | `#DCE4E0` | `#24352F` | Borders |
-| `--accent` | `#086759` | `#2BB59F` | Buttons, selected states, covered skills |
-| `--gold` | `#B7860F` | `#E0B23A` | Highlights: robust pick, readiness |
-| `--red` | `#C0392B` | `#F07163` | Declining outlook, errors (sparingly) |
-| radii | 28 / 18 / 12 px | | Hero cards / cards / chips and inputs |
-| shadow | `0 30px 60px -28px rgba(16,36,31,.28)` | darker | Cards |
+| `--surface-2` | `#F4F6F5` | `#182924` | Segmented tracks, neutral badges |
+| `--hover` | `#ECEFEE` | `#1D2D28` | Sidebar hover and current item |
+| `--ink` | `#10241F` | `#EAF2EF` | Text and primary buttons |
+| `--ink-soft` | `#5A6B66` | `#A7B8B2` | Secondary text, labels |
+| `--line` | `#E6EAE8` | `#22332D` | Card borders, dividers |
+| `--accent` | `#086759` | `#2BB59F` | Links, progress bars, selected states |
+| good badge | `#E8F3EF` / `#0B5B4F` | tinted | Growing, covered, cited |
+| risk badge | `#F9EBE7` / `#9A2617` | tinted | Declining, illustrative data |
+| gold badge | `#FBF3DF` / `#7A5A06` | tinted | Robust pick, warnings |
+| radii | cards 14 px, buttons 10 px, links 8 px, pills 99 px | | |
+| shadows | card `0 1px 2px rgba(16,36,31,.04)`; ink button inset highlight | | |
 
-SDG tiles use the official UN colours and nothing else does. Outlook is always a word and an arrow
-as well as a colour (▲ Growing, ▬ Stable, ▼ Declining).
+SDG tiles use the official UN colours and nothing else does. Outlook always shows a word and an
+arrow as well as a colour (▲ Growing, ▬ Stable, ▼ Declining).
 
 ## Type
 
-Headings **Manrope** 600–700; text **Inter** 400–500. Eyebrow labels 11 px uppercase, letter-spacing .1em.
-Scale: 32 / 24 / 18 / 16 / 13 px. Figures use tabular numbers.
+**Inter** (variable, self-hosted) for everything. Landing headline 4.96 rem, weight 600, letter-spacing
+−0.045em; page titles 1.6 rem / 650; card titles 1 rem / 650; stat numbers 1.65 rem / 750 with
+−0.035em tracking; labels and pills 0.76 rem / 600. Tabular figures throughout.
 
 ## Components
 
 | Component | Notes |
 |---|---|
-| Top bar | Logo, persona switch (Worker · Student · Organisation), steps, **Ask the coach** button |
+| Sidebar | Logo, profile chip, grouped links (My profile · Signals · My future), model line, Delete my profile; becomes a scrolling strip on phones |
+| Top bar | Page title, persona badge, theme toggle |
+| Stat card | Label, big number, one pill badge (Top match, Robust picks, Your current role, Forecast data) |
 | Hero card | Large rounded card at the top of each screen: eyebrow, headline number (e.g. "N% of your tasks can be automated", always computed from cited data), one sentence |
-| Pill button | Primary (green fill), secondary (outline), text link; min height 44 px |
+| Button | Primary ink with inset highlight, quiet white with hairline border, text link; 10 px radius |
 | Year slider | 2026–2035 with tick labels; scenario presets as a segmented pill group above it |
 | Role card | Rank + movement arrow, title, fit bar, outlook word, **estimate range** ("−8% to +20% to 2030, estimate"), "Serves your goals" badge, SDG tiles, source line, **Why this rank?** link, job links |
 | Radar | Skills and roles as rising / steady / declining bands; the user's skills highlighted; every point has a source and date on tap |
@@ -57,7 +66,7 @@ Every forecast says "estimate" and shows a range, never one number alone. Every 
 
 ## Layout
 
-8 px grid; content max 1240 px; < 640 px one column, 640–1024 two, > 1024 three; 16 px gutter on
+8 px grid; app content max 1200 px beside a 250 px sidebar (stacks under 900 px); < 640 px one column, 640–1024 two, > 1024 three; 16 px gutter on
 phones; the coach drawer becomes a full-screen sheet on phones. **Lite mode** (low bandwidth): system fonts, no images, same content.
 
 ## Accessibility

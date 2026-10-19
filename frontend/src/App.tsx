@@ -1,18 +1,36 @@
 // Screens follow docs/03-APP_FLOW.md: S0 Landing, S1 Intake, S2 Review, S3 Roles, S4/S5 Gap + Pathway, S6 Impact.
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { useEffect, useMemo, useState } from "react";
+import { LogoMark, Rosette } from "./brand";
 import { api, Matches, Pathway, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
 
 type Screen = "landing" | "intake" | "review" | "radar" | "roles" | "role" | "impact";
 const PROFILE_KEY = "laluan.profileId";
+const THEME_KEY = "laluan.theme";
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: "slow", label: "Slow" },
   { id: "baseline", label: "Baseline" },
   { id: "accelerated", label: "Accelerated" },
 ];
+const OUTLOOK_TONE: Record<string, string> = { emerging: "good", growing: "good", stable: "", declining: "risk" };
 const OUTLOOK_TEXT: Record<string, string> = {
-  emerging: "▲▲ Emerging", growing: "▲ Growing", stable: "▬ Stable", declining: "▼ Declining",
+  emerging: "▲ Emerging", growing: "▲ Growing", stable: "▬ Stable", declining: "▼ Declining",
 };
+
+type Theme = "light" | "dark";
+
+// A theme is remembered only once the person picks one; until then the system setting wins.
+function savedTheme(): Theme | null {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "light" || saved === "dark") return saved;
+  } catch { /* private mode */ }
+  return null;
+}
+
+function systemTheme(): Theme {
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function readStoredProfileId(): string | null {
   try { return localStorage.getItem(PROFILE_KEY); } catch { return null; }
@@ -30,6 +48,17 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const storedId = readStoredProfileId();
   const [model, setModel] = useState<string | null>(null);
+  const [chosenTheme, setChosenTheme] = useState<Theme | null>(savedTheme);
+  const theme = chosenTheme ?? systemTheme();
+  useEffect(() => {
+    if (chosenTheme) document.documentElement.dataset.theme = chosenTheme;
+    else delete document.documentElement.dataset.theme;
+  }, [chosenTheme]);
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setChosenTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode */ }
+  }
   useEffect(() => { api.health().then((h) => setModel(h.llm_model)).catch(() => undefined); }, []);
 
   async function openDemo(key: string) {
@@ -45,68 +74,146 @@ export default function App() {
     catch { storeProfileId(null); setError("That saved profile has expired. Start again."); }
   }
 
-  const steps: [Screen, string][] = [["intake", "Profile"], ["radar", "Skills Radar"], ["roles", "Roles"], ["role", "Pathway"], ["impact", "Impact"]];
+  const deleteProfile = async () => {
+    if (!profile) return;
+    await api.deleteProfile(profile.id).catch(() => undefined);
+    storeProfileId(null); setProfile(null); setRole(null); setScreen("landing");
+  };
+  const themeButton = (
+    <button className="icon-btn" onClick={toggleTheme}
+      aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+      <Icon name={theme === "dark" ? "sun" : "moon"} />
+    </button>
+  );
+
+  if (screen === "landing") {
+    return (
+      <div className="site">
+        <div className="announce">Judging Laluan? <button onClick={() => openDemo("clerk")}>Open the demo profile in one click →</button></div>
+        <nav className="site-nav" aria-label="Main">
+          <button className="brand" onClick={() => setScreen("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+          <div className="site-nav-actions">
+            {themeButton}
+            {storedId && <button className="btn quiet sm" onClick={resume}>Continue</button>}
+            <button className="btn ink sm" onClick={() => setScreen("intake")}>Get started</button>
+          </div>
+        </nav>
+        {error && <div className="banner error" role="alert">{error}</div>}
+        <Landing onStart={() => setScreen("intake")} onDemo={openDemo} />
+        <footer className="site-footer">
+          <span>Forecasts are estimates under different scenarios, not predictions. Laluan supports your career decision; it never makes it.</span>
+          {model && <span>AI model: {model}</span>}
+        </footer>
+      </div>
+    );
+  }
+
+  const groups: { label: string | null; items: { id: Screen; label: string; icon: IconName; enabled: boolean }[] }[] = [
+    { label: null, items: [{ id: "intake", label: "My profile", icon: "user", enabled: true }] },
+    { label: "Signals", items: [{ id: "radar", label: "Future Skills Radar", icon: "radar", enabled: !!profile }] },
+    { label: "My future", items: [
+      { id: "roles", label: "Future roles", icon: "briefcase", enabled: !!profile },
+      { id: "role", label: "Pathway", icon: "route", enabled: !!role },
+      { id: "impact", label: "SDG impact", icon: "globe", enabled: !!role },
+    ] },
+  ];
+  const current = screen === "review" ? "intake" : screen;
+  const title = { intake: "My profile", review: "My profile", radar: "Future Skills Radar", roles: "Future roles", role: "Pathway", impact: "SDG impact", landing: "" }[screen];
   return (
-    <div className="app">
-      <header className="topbar">
-        <button className="brand" onClick={() => setScreen("landing")}>Laluan</button>
-        <nav aria-label="Steps">
-          {steps.map(([s, label]) => (
-            <button key={s} className={screen === s ? "step active" : "step"}
-              disabled={s !== "intake" && !profile || s === "role" && !role || s === "impact" && !role}
-              onClick={() => setScreen(s)}>{label}</button>
+    <div className="shell">
+      <aside className="sidebar">
+        <button className="brand" onClick={() => setScreen("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+        {profile && (
+          <div className="who">
+            <span className="avatar" aria-hidden="true">{(profile.display_name ?? "You").slice(0, 1)}</span>
+            <span><strong>{profile.display_name ?? "Your profile"}</strong><small>{profile.skills.length} skills</small></span>
+          </div>
+        )}
+        <nav className="side-nav" aria-label="Sections">
+          {groups.map((g) => (
+            <div key={g.label ?? "top"} className="side-group">
+              {g.label && <div className="side-label">{g.label}</div>}
+              {g.items.map((item) => (
+                <button key={item.id} className={current === item.id ? "side-link is-current" : "side-link"}
+                  aria-current={current === item.id ? "page" : undefined} disabled={!item.enabled}
+                  onClick={() => setScreen(item.id)}>
+                  <Icon name={item.icon} />{item.label}
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
-      </header>
-      {error && <div className="banner error" role="alert">{error}</div>}
-      <main>
-        {screen === "landing" && (
-          <Landing onStart={() => setScreen("intake")} onDemo={openDemo} onResume={storedId ? resume : undefined} />
-        )}
-        {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
-        {screen === "review" && (
-          <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
-        )}
-        {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
-        {screen === "roles" && profile && (
-          <Roles profile={profile} scenario={scenario} setScenario={setScenario}
-            onOpen={(r) => { setRole(r); setScreen("role"); }} />
-        )}
-        {screen === "role" && profile && role && (
-          <RoleDetail profile={profile} role={role} scenario={scenario} onImpact={() => setScreen("impact")} />
-        )}
-        {screen === "impact" && role && <Impact role={role} />}
-      </main>
-      <footer>
-        <span>Forecasts are estimates under different scenarios, not predictions. Laluan supports your decision; it does not make it.
-          We remove names, emails and phone numbers before any AI reads your CV.{model && <> AI model: {model}.</>}</span>
-        {profile && (
-          <button className="link" onClick={async () => {
-            await api.deleteProfile(profile.id).catch(() => undefined);
-            storeProfileId(null); setProfile(null); setRole(null); setScreen("landing");
-          }}>Delete my profile</button>
-        )}
-      </footer>
+        <div className="side-foot">
+          {model && <p className="side-note">AI model: {model}</p>}
+          <p className="side-note">Estimates, not predictions. You decide.</p>
+          {profile && <button className="side-link danger" onClick={deleteProfile}><Icon name="trash" />Delete my profile</button>}
+        </div>
+      </aside>
+      <div className="workspace">
+        <header className="workbar">
+          <span className="workbar-title">{title}</span>
+          <div className="workbar-actions">
+            {profile?.story && <span className="badge">{profile.display_name}</span>}
+            {themeButton}
+          </div>
+        </header>
+        {error && <div className="banner error" role="alert">{error}</div>}
+        <main>
+          {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
+          {screen === "review" && (
+            <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
+          )}
+          {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
+          {screen === "roles" && profile && (
+            <Roles profile={profile} scenario={scenario} setScenario={setScenario}
+              onOpen={(r) => { setRole(r); setScreen("role"); }} />
+          )}
+          {screen === "role" && profile && role && (
+            <RoleDetail profile={profile} role={role} scenario={scenario} onImpact={() => setScreen("impact")} />
+          )}
+          {screen === "impact" && role && <Impact role={role} />}
+        </main>
+      </div>
     </div>
   );
 }
 
-function Landing({ onStart, onDemo, onResume }: { onStart: () => void; onDemo: (k: string) => void; onResume?: () => void }) {
+function Landing({ onStart, onDemo }: { onStart: () => void; onDemo: (k: string) => void }) {
   return (
-    <section className="hero">
-      <h1>See where your career goes when AI changes the job market.</h1>
-      <ol className="three-steps">
-        <li><strong>Your skills</strong> from a CV or a few questions</li>
-        <li><strong>Future roles</strong> under three AI-adoption scenarios</li>
-        <li><strong>Your pathway</strong> and the UN goals it serves</li>
-      </ol>
-      <div className="actions">
-        <button className="primary" onClick={onStart}>Start</button>
-        <button onClick={() => onDemo("clerk")}>Demo: Aisyah, data-entry clerk</button>
-        <button onClick={() => onDemo("student")}>Demo: Wei Jie, student</button>
-        {onResume && <button className="link" onClick={onResume}>Continue where you left off</button>}
+    <main className="landing">
+      <header className="lv-hero">
+        <Rosette className="hero-rosette" />
+        <p className="pill-tag">Career guidance for Malaysia's AI era</p>
+        <h1>See where your career goes before AI changes it.</h1>
+        <p className="lede">Laluan reads your skills, tracks dated AI-research and job-market signals, ranks the roles you can grow into under three futures, and plans free or low-cost courses to get there. You make the call.</p>
+        <div className="ctas">
+          <button className="btn ink" onClick={() => onDemo("clerk")}>Open the demo profile</button>
+          <button className="btn quiet" onClick={onStart}>Start with my skills</button>
+        </div>
+        <button className="link" onClick={() => onDemo("student")}>Or try the student demo</button>
+      </header>
+      <div className="lv-preview" aria-hidden="true">
+        <div className="preview-card">
+          <div className="preview-head"><span className="preview-title">Future roles for Aisyah, data-entry clerk</span><span className="badge">Example view</span></div>
+          <div className="seg-track"><span>Slow</span><span className="on">Baseline</span><span>Accelerated</span></div>
+          <ol className="preview-list">
+            <li><span>AI operations specialist</span><span className="badge good">Emerging</span></li>
+            <li><span>Sustainability and ESG analyst</span><span className="badge good">Growing</span></li>
+            <li><span>Data analyst</span><span className="badge good">Growing</span></li>
+            <li className="dim"><span>Data entry clerk</span><span className="badge risk">Declining</span></li>
+          </ol>
+          <div className="preview-note"><span className="dot" /><div><strong>Robust pick</strong><span>Stays in her top five in every scenario.</span></div></div>
+        </div>
       </div>
-    </section>
+      <section className="lv-section">
+        <h2>Made for the people AI is changing first. <span>Clerks, service staff, graduates and the HR teams planning their next move.</span></h2>
+        <div className="pillars">
+          <div className="pillar"><span className="pillar-icon"><Icon name="radar" /></span><h3>Future Skills Radar</h3><p>Which skills are rising or declining, built from research papers and real job postings, each with its source and date.</p></div>
+          <div className="pillar"><span className="pillar-icon"><Icon name="briefcase" /></span><h3>Matches you can check</h3><p>Every rank shows how much comes from your skills, the outlook and the goals you care about.</p></div>
+          <div className="pillar"><span className="pillar-icon"><Icon name="route" /></span><h3>A plan you can start this week</h3><p>Ordered free or low-cost courses with hours, each linked to the UN Sustainable Development Goals.</p></div>
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -127,7 +234,7 @@ function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
   }
   return (
     <section>
-      <h2>Your skills</h2>
+      <div className="page-head"><h1>Your skills</h1></div>
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === "cv"} onClick={() => setTab("cv")}>Paste CV</button>
         <button role="tab" aria-selected={tab === "pick"} onClick={() => setTab("pick")}>Pick skills</button>
@@ -187,7 +294,7 @@ function Review({ initial, onSaved }: { initial: string[]; onSaved: (p: Profile)
   }
   return (
     <section>
-      <h2>Check your skills</h2>
+      <div className="page-head"><h1>Check your skills</h1></div>
       {skills.length === 0 && <p>We didn't find any skills. Go back and pick them from the list.</p>}
       <div className="chips">
         {skills.map((id) => (
@@ -241,8 +348,11 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
   }
   return (
     <section>
-      <h2>Your future roles</h2>
-      {profile.story && <p className="muted">{profile.display_name}: {profile.story}</p>}
+      <div className="page-head">
+        <h1>Your future roles</h1>
+        {profile.story && <p className="muted">{profile.display_name}: {profile.story}</p>}
+      </div>
+      {data && <Kpis data={data} scenario={scenario} />}
       <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => setScenario(s.id)}>{s.label}</button>
@@ -273,16 +383,16 @@ function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario: Scena
     <button className={role.at_risk ? "card at-risk" : "card"} onClick={onOpen}>
       <div className="card-head">
         <span className="rank">#{role.rank}{move > 0 ? ` ▲${move}` : move < 0 ? ` ▼${-move}` : ""}</span>
-        {role.robust_pick && <span className="badge">Robust pick</span>}
-        {role.is_current_role && <span className="badge muted">Your current role</span>}
+        {role.robust_pick && <span className="badge gold">Robust pick</span>}
+        {role.is_current_role && <span className="badge">Your current role</span>}
       </div>
       <h3>{role.title}</h3>
       <div className="fit" aria-label={`Fit ${Math.round(role.fit * 100)} percent`}>
         <div style={{ width: `${role.fit * 100}%` }} />
       </div>
-      <p>{Math.round(role.fit * 100)}% fit · <span className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</span></p>
+      <div className="card-row"><span className="fit-num">{Math.round(role.fit * 100)}% fit</span><span className={`badge ${OUTLOOK_TONE[o.label]}`}>{OUTLOOK_TEXT[o.label]}</span></div>
       <p className="muted">Estimate to {role.estimate_range.horizon_year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
-      {role.why.sdg_points > 0 && <span className="badge muted">Serves your goals: SDG {role.why.matched_sdgs.join(", ")}</span>}
+      {role.why.sdg_points > 0 && <span className="badge good">Serves your goals: SDG {role.why.matched_sdgs.join(", ")}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">Source: {role.citation.snapshot_id} (imported {role.citation.imported})</span>
     </button>
@@ -313,8 +423,7 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
   }
   return (
     <section>
-      <h2>{role.title}</h2>
-      <p>{role.summary}</p>
+      <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
       <details className="card why" open>
         <summary>Why this rank? Score {role.why.score.toFixed(2)}</summary>
         <ul>
@@ -366,7 +475,7 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
 function Impact({ role }: { role: RoleMatch }) {
   return (
     <section>
-      <h2>Your impact as a {role.title}</h2>
+      <div className="page-head"><h1>Your impact as a {role.title}</h1></div>
       <div className="grid">
         {role.sdgs.map((g) => (
           <div key={g.number} className="card sdg-card" style={{ borderTopColor: g.colour }}>
@@ -400,9 +509,8 @@ function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
   const noData = data.skills.filter((s) => s.label === "no_data");
   return (
     <section>
-      <p className="eyebrow">Future Skills Radar</p>
-      <h2>Which skills are rising and declining</h2>
-      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p>
+      <div className="page-head"><h1>Which skills are rising and declining</h1>
+      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p></div>
       {data.illustrative && <div className="banner warning">The baseline forecast is illustrative seed data until the team replaces it with WEF figures.</div>}
       {data.skills.length === 0 ? (
         <div className="banner warning">This forecast has no skill trends yet. An admin can run <strong>Refresh trend data</strong> on the Roles screen to pull the latest research and job-posting data.</div>
@@ -515,6 +623,46 @@ function WhatChanged({ changes, snapshot, onClose }: { changes: Change[]; snapsh
         ))}
       </ul>
       <button className="link" onClick={onClose}>Dismiss</button>
+    </div>
+  );
+}
+
+type IconName = "user" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon";
+const ICONS: Record<IconName, string> = {
+  user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0",
+  radar: "M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 12l6-6",
+  briefcase: "M4 8h16v11H4zM9 8V5h6v3M4 13h16",
+  route: "M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8 17h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7",
+  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18",
+  trash: "M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13",
+  sun: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5",
+  moon: "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z",
+};
+
+function Icon({ name }: { name: IconName }) {
+  return (
+    <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d={ICONS[name]} />
+    </svg>
+  );
+}
+
+function Kpis({ data, scenario }: { data: Matches; scenario: Scenario }) {
+  const top = data.roles[0];
+  const robust = data.roles.filter((r) => r.robust_pick).length;
+  const current = data.roles.find((r) => r.is_current_role);
+  return (
+    <div className="kpis">
+      <div className="kpi"><span className="kpi-label">Top match</span><strong>{top?.title ?? "–"}</strong>
+        {top && <span className="badge good">{Math.round(top.fit * 100)}% skill fit</span>}</div>
+      <div className="kpi"><span className="kpi-label">Robust picks</span><strong>{robust}</strong>
+        <span className="badge">Top five in every scenario</span></div>
+      <div className="kpi"><span className="kpi-label">Your current role</span><strong>{current ? `${signed(current.outlook[scenario].index)}%` : "–"}</strong>
+        {current ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]} to {data.signal_source.horizon_year}</span>
+          : <span className="badge">Not set</span>}</div>
+      <div className="kpi"><span className="kpi-label">Forecast data</span><strong>{data.signal_source.imported.slice(0, 10)}</strong>
+        <span className={`badge ${data.signal_source.illustrative ? "risk" : "good"}`}>{data.signal_source.illustrative ? "Illustrative baseline" : "Cited sources"}</span></div>
     </div>
   );
 }
