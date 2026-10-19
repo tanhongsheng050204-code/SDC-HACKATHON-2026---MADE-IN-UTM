@@ -9,7 +9,7 @@ sentence that the catalogue and role data do not support (draft, then validate a
 from app.llm import generate_json
 from app.reference import Reference
 from app.services import grounding
-from app.services.matching import fit_and_gap
+from app.services.matching import effective_skills, fit_and_gap
 
 LEVEL_ORDER = {"intro": 0, "intermediate": 1, "advanced": 2}
 
@@ -51,9 +51,13 @@ Steps: {steps}
 Total hours: {hours}"""
 
 
-def build(ref: Reference, profile: dict, role_id: str) -> dict:
+def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True) -> dict:
+    """The plan is built from the skills the person reported, so finished steps stay visible
+    (marked done) and readiness shows the progress since the plan was made."""
     role = ref.roles[role_id]
     fit, _, missing = fit_and_gap(role, set(profile["skills"]))
+    readiness, _, _ = fit_and_gap(role, effective_skills(ref, profile))
+    done = set(profile.get("completed_courses") or [])
     steps = []
     for n, (course, taught) in enumerate(
         sorted(_choose_courses(ref, missing), key=lambda ct: LEVEL_ORDER[ct[0]["level"]]), start=1
@@ -65,18 +69,21 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
             "course": course,
             "why": ("Core skill" if weight == 3 else "Important skill" if weight == 2 else "Useful skill")
                    + f" for {role['title']}.",
+            "done": course["id"] in done,
         })
     uncovered = [rs["skill_id"] for rs in missing
                  if not any(rs["skill_id"] in s["course"]["skills"] for s in steps)]
     total_hours = sum(s["course"]["hours"] for s in steps)
 
     if not steps:
-        return {"role_id": role_id, "fit": fit, "steps": [], "total_hours": 0,
+        return {"role_id": role_id, "fit": fit, "readiness": readiness, "steps": [], "total_hours": 0,
                 "summary": f"You already have every skill we track for {role['title']}.",
                 "summary_mode": "template", "grounding": None, "uncovered_skills": []}
 
     summary, mode = _template_summary(role, steps, total_hours), "template"
     try:
+        if not summarize:
+            raise RuntimeError("summary not requested")
         result = generate_json(SUMMARY_PROMPT.format(
             role=role["title"],
             steps=[(s["course"]["title"], s["course"]["provider"], s["course"]["hours"]) for s in steps],
@@ -94,6 +101,8 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
     return {
         "role_id": role_id,
         "fit": fit,
+        "readiness": readiness,
+        "hours_left": sum(s["course"]["hours"] for s in steps if not s["done"]),
         "steps": steps,
         "total_hours": total_hours,
         "summary": summary,

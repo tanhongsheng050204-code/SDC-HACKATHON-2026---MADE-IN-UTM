@@ -10,6 +10,10 @@ The formula is deliberately simple, so every number can be explained to a judge:
 Baseline (adoption 1.0) is exactly the published figure. Slow adoption halves the AI effect;
 accelerated adoption strengthens it. Roles that work *with* AI gain under faster adoption;
 roles exposed to automation lose.
+
+For a year before the horizon, the change is scaled linearly from the source's base year
+(fraction 0) to the horizon year (fraction 1). Years after the horizon are never shown: the
+sources do not cover them, and extending the line would be inventing numbers.
 """
 
 from dataclasses import dataclass
@@ -59,9 +63,9 @@ def label_for(index: float) -> str:
     return "declining"
 
 
-def outlook(signal: RoleSignal, scenario_id: str, adoption: float) -> Outlook:
+def outlook(signal: RoleSignal, scenario_id: str, adoption: float, fraction: float = 1.0) -> Outlook:
     swing = (adoption - 1.0) * AI_SWING * (signal.ai_complementarity - signal.automation_exposure)
-    index = round(signal.net_growth_pct + swing, 1)
+    index = round((signal.net_growth_pct + swing) * fraction, 1)
     clamped = min(max(index, INDEX_FLOOR), INDEX_CEILING)
     return Outlook(
         role_id=signal.role_id,
@@ -72,11 +76,19 @@ def outlook(signal: RoleSignal, scenario_id: str, adoption: float) -> Outlook:
     )
 
 
-def outlooks(signals: dict[str, RoleSignal], scenarios: dict[str, dict]) -> dict[str, dict[str, Outlook]]:
+def year_fraction(snapshot: dict, year: int | None) -> tuple[int, float]:
+    """(year used, share of the way from the base year to the horizon year)."""
+    base, horizon = int(str(snapshot["published"])[:4]), int(snapshot["horizon_year"])
+    year = horizon if year is None else max(base, min(horizon, int(year)))
+    return year, (year - base) / (horizon - base) if horizon > base else 1.0
+
+
+def outlooks(signals: dict[str, RoleSignal], scenarios: dict[str, dict],
+             fraction: float = 1.0) -> dict[str, dict[str, Outlook]]:
     """{scenario_id: {role_id: Outlook}} for every scenario and every role with a signal."""
     return {
         scenario_id: {
-            role_id: outlook(signal, scenario_id, float(scenario["adoption"]))
+            role_id: outlook(signal, scenario_id, float(scenario["adoption"]), fraction)
             for role_id, signal in signals.items()
         }
         for scenario_id, scenario in scenarios.items()

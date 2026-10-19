@@ -7,6 +7,7 @@ refresh can be traced, and a second refresh on the same day reuses them unless f
 
 import datetime as dt
 import json
+import re
 import threading
 from pathlib import Path
 
@@ -16,6 +17,14 @@ from app.trends import builder, jobs, research
 
 _lock = threading.Lock()
 _status: dict = {"state": "idle", "steps": [], "snapshot_id": None, "error": None}
+
+
+_URL = re.compile(r"https?://\S+")
+
+
+def _safe_error(error: Exception) -> str:
+    """Error text for the admin screen: no URLs or query strings, at most 200 characters."""
+    return f"{type(error).__name__}: {_URL.sub('[url]', str(error))}"[:200]
 
 
 def status() -> dict:
@@ -75,7 +84,7 @@ def start(force: bool = False) -> bool:
                 _status.update(state="done", snapshot_id=snapshot["snapshot_id"])
         except Exception as error:  # reported to the admin; the last good snapshot stays in use
             with _lock:
-                _status.update(state="failed", error=f"{type(error).__name__}: {error}")
+                _status.update(state="failed", error=_safe_error(error))
 
     threading.Thread(target=work, daemon=True).start()
     return True

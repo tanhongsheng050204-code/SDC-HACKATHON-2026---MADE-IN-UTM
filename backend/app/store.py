@@ -8,7 +8,7 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -23,6 +23,7 @@ _MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS profiles_updated_at ON profiles(updated_at);
     """,
     2: "ALTER TABLE profiles ADD COLUMN experience_years INTEGER;",
+    3: "ALTER TABLE profiles ADD COLUMN completed_courses TEXT NOT NULL DEFAULT '[]';",
 }
 
 
@@ -61,6 +62,7 @@ def _row(row: sqlite3.Row | None) -> dict | None:
         "skills": json.loads(row["skills"]),
         "interests": json.loads(row["interests"]),
         "experience_years": row["experience_years"],
+        "completed_courses": json.loads(row["completed_courses"]),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
@@ -87,6 +89,15 @@ def update_profile(profile_id, display_name, current_role_id, skills, interests,
             (display_name, current_role_id, json.dumps(skills), json.dumps(interests),
              experience_years, _now(), profile_id),
         )
+        if cursor.rowcount == 0:
+            return None
+    return get_profile(profile_id)
+
+
+def set_completed(profile_id: str, completed: list[str]) -> dict | None:
+    with _connect() as conn:
+        cursor = conn.execute("UPDATE profiles SET completed_courses=?, updated_at=? WHERE id=?",
+                              (json.dumps(completed), _now(), profile_id))
         if cursor.rowcount == 0:
             return None
     return get_profile(profile_id)

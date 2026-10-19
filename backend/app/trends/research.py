@@ -77,7 +77,8 @@ def collect(capabilities: list[dict], today: dt.date, *, client: httpx.Client | 
                         sleep(ARXIV_SPACING_SECONDS)
                     counts[cap["id"]][name] = _arxiv_count(client, cap["query"], start, end)
         except (SourceUnavailable, httpx.HTTPError) as error:
-            progress(f"arXiv unavailable ({error}); switching to OpenAlex")
+            reason = "rate limit" if isinstance(error, SourceUnavailable) else type(error).__name__
+            progress(f"arXiv unavailable ({reason}); switching to OpenAlex")
             source, counts = "openalex", {}
             for cap in capabilities:
                 progress(f"OpenAlex: {cap['name']}")

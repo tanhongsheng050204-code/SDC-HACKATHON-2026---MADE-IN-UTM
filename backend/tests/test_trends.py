@@ -150,7 +150,7 @@ def test_refresh_endpoint_writes_a_snapshot_and_reranks(data_copy, client, monke
     assert client.post("/api/signals/refresh").status_code == 401
     assert client.post("/api/signals/refresh", headers={"X-Admin-Token": "test-admin-token"}).status_code == 202
     for _ in range(200):
-        state = client.get("/api/signals/refresh").json()
+        state = client.get("/api/signals/refresh", headers={"X-Admin-Token": "test-admin-token"}).json()
         if state["state"] != "running":
             break
     assert state["state"] == "done", state
@@ -180,3 +180,10 @@ def test_too_few_postings_give_no_job_trend():
     skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), raw)
     assert skills["power_bi"]["label"] == "no_data" and "too few" in skills["power_bi"]["sources"][0]
     assert skills["statistics"]["label"] == "no_data"
+
+
+def test_refresh_status_needs_admin_and_hides_urls(client):
+    from app.trends import refresh
+    assert client.get("/api/signals/refresh").status_code == 401
+    error = RuntimeError("500 for url 'https://export.arxiv.org/api/query?search_query=secret'")
+    assert "arxiv.org" not in refresh._safe_error(error) and "[url]" in refresh._safe_error(error)

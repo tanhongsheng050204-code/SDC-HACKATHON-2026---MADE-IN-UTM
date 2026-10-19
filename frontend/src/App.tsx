@@ -1,18 +1,36 @@
 // Screens follow docs/03-APP_FLOW.md: S0 Landing, S1 Intake, S2 Review, S3 Roles, S4/S5 Gap + Pathway, S6 Impact.
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { useEffect, useMemo, useState } from "react";
-import { api, Matches, Pathway, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
+import { LogoMark, Rosette } from "./brand";
+import { api, ChatTurn, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
 
-type Screen = "landing" | "intake" | "review" | "radar" | "roles" | "role" | "impact";
+type Screen = "landing" | "intake" | "review" | "radar" | "roles" | "role" | "impact" | "workforce";
 const PROFILE_KEY = "laluan.profileId";
+const THEME_KEY = "laluan.theme";
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: "slow", label: "Slow" },
   { id: "baseline", label: "Baseline" },
   { id: "accelerated", label: "Accelerated" },
 ];
+const OUTLOOK_TONE: Record<string, string> = { emerging: "good", growing: "good", stable: "", declining: "risk" };
 const OUTLOOK_TEXT: Record<string, string> = {
-  emerging: "▲▲ Emerging", growing: "▲ Growing", stable: "▬ Stable", declining: "▼ Declining",
+  emerging: "▲ Emerging", growing: "▲ Growing", stable: "▬ Stable", declining: "▼ Declining",
 };
+
+type Theme = "light" | "dark";
+
+// A theme is remembered only once the person picks one; until then the system setting wins.
+function savedTheme(): Theme | null {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "light" || saved === "dark") return saved;
+  } catch { /* private mode */ }
+  return null;
+}
+
+function systemTheme(): Theme {
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function readStoredProfileId(): string | null {
   try { return localStorage.getItem(PROFILE_KEY); } catch { return null; }
@@ -30,6 +48,17 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const storedId = readStoredProfileId();
   const [model, setModel] = useState<string | null>(null);
+  const [chosenTheme, setChosenTheme] = useState<Theme | null>(savedTheme);
+  const theme = chosenTheme ?? systemTheme();
+  useEffect(() => {
+    if (chosenTheme) document.documentElement.dataset.theme = chosenTheme;
+    else delete document.documentElement.dataset.theme;
+  }, [chosenTheme]);
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setChosenTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode */ }
+  }
   useEffect(() => { api.health().then((h) => setModel(h.llm_model)).catch(() => undefined); }, []);
 
   async function openDemo(key: string) {
@@ -45,73 +74,154 @@ export default function App() {
     catch { storeProfileId(null); setError("That saved profile has expired. Start again."); }
   }
 
-  const steps: [Screen, string][] = [["intake", "Profile"], ["radar", "Skills Radar"], ["roles", "Roles"], ["role", "Pathway"], ["impact", "Impact"]];
+  const deleteProfile = async () => {
+    if (!profile) return;
+    await api.deleteProfile(profile.id).catch(() => undefined);
+    storeProfileId(null); setProfile(null); setRole(null); setScreen("landing");
+  };
+  const themeButton = (
+    <button className="icon-btn" onClick={toggleTheme}
+      aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+      <Icon name={theme === "dark" ? "sun" : "moon"} />
+    </button>
+  );
+
+  if (screen === "landing") {
+    return (
+      <div className="site">
+        <div className="announce">Judging Laluan? <button onClick={() => openDemo("clerk")}>Open the demo profile in one click →</button></div>
+        <nav className="site-nav" aria-label="Main">
+          <button className="brand" onClick={() => setScreen("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+          <div className="site-nav-actions">
+            {themeButton}
+            {storedId && <button className="btn quiet sm" onClick={resume}>Continue</button>}
+            <button className="btn ink sm" onClick={() => setScreen("intake")}>Get started</button>
+          </div>
+        </nav>
+        {error && <div className="banner error" role="alert">{error}</div>}
+        <Landing onStart={() => setScreen("intake")} onDemo={openDemo} />
+        <footer className="site-footer">
+          <span>Forecasts are estimates under different scenarios, not predictions. Laluan supports your career decision; it never makes it.</span>
+          {model && <span>AI model: {model}</span>}
+        </footer>
+      </div>
+    );
+  }
+
+  const groups: { label: string | null; items: { id: Screen; label: string; icon: IconName; enabled: boolean }[] }[] = [
+    { label: null, items: [{ id: "intake", label: "My profile", icon: "user", enabled: true }] },
+    { label: "Signals", items: [{ id: "radar", label: "Future Skills Radar", icon: "radar", enabled: !!profile }] },
+    { label: "My future", items: [
+      { id: "roles", label: "Future roles", icon: "briefcase", enabled: !!profile },
+      { id: "role", label: "Pathway", icon: "route", enabled: !!role },
+      { id: "impact", label: "SDG impact", icon: "globe", enabled: !!role },
+    ] },
+    { label: "Organisation", items: [{ id: "workforce", label: "Workforce view", icon: "users", enabled: true }] },
+  ];
+  const current = screen === "review" ? "intake" : screen;
+  const title = { intake: "My profile", review: "My profile", radar: "Future Skills Radar", roles: "Future roles", role: "Pathway", impact: "SDG impact", workforce: "Workforce view", landing: "" }[screen];
   return (
-    <div className="app">
-      <header className="topbar">
-        <button className="brand" onClick={() => setScreen("landing")}>Laluan</button>
-        <nav aria-label="Steps">
-          {steps.map(([s, label]) => (
-            <button key={s} className={screen === s ? "step active" : "step"}
-              disabled={s !== "intake" && !profile || s === "role" && !role || s === "impact" && !role}
-              onClick={() => setScreen(s)}>{label}</button>
+    <div className="shell">
+      <aside className="sidebar">
+        <button className="brand" onClick={() => setScreen("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+        {profile && (
+          <div className="who">
+            <span className="avatar" aria-hidden="true">{(profile.display_name ?? "You").slice(0, 1)}</span>
+            <span><strong>{profile.display_name ?? "Your profile"}</strong><small>{profile.skills.length} skills</small></span>
+          </div>
+        )}
+        <nav className="side-nav" aria-label="Sections">
+          {groups.map((g) => (
+            <div key={g.label ?? "top"} className="side-group">
+              {g.label && <div className="side-label">{g.label}</div>}
+              {g.items.map((item) => (
+                <button key={item.id} className={current === item.id ? "side-link is-current" : "side-link"}
+                  aria-current={current === item.id ? "page" : undefined} disabled={!item.enabled}
+                  onClick={() => setScreen(item.id)}>
+                  <Icon name={item.icon} />{item.label}
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
-      </header>
-      {error && <div className="banner error" role="alert">{error}</div>}
-      <main>
-        {screen === "landing" && (
-          <Landing onStart={() => setScreen("intake")} onDemo={openDemo} onResume={storedId ? resume : undefined} />
-        )}
-        {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
-        {screen === "review" && (
-          <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
-        )}
-        {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
-        {screen === "roles" && profile && (
-          <Roles profile={profile} scenario={scenario} setScenario={setScenario}
-            onOpen={(r) => { setRole(r); setScreen("role"); }} />
-        )}
-        {screen === "role" && profile && role && (
-          <RoleDetail profile={profile} role={role} scenario={scenario} onImpact={() => setScreen("impact")} />
-        )}
-        {screen === "impact" && role && <Impact role={role} />}
-      </main>
-      <footer>
-        <span>Forecasts are estimates under different scenarios, not predictions. Laluan supports your decision; it does not make it.
-          We remove names, emails and phone numbers before any AI reads your CV.{model && <> AI model: {model}.</>}</span>
-        {profile && (
-          <button className="link" onClick={async () => {
-            await api.deleteProfile(profile.id).catch(() => undefined);
-            storeProfileId(null); setProfile(null); setRole(null); setScreen("landing");
-          }}>Delete my profile</button>
-        )}
-      </footer>
+        <div className="side-foot">
+          {model && <p className="side-note">AI model: {model}</p>}
+          <p className="side-note">Estimates, not predictions. You decide.</p>
+          {profile && <button className="side-link danger" onClick={deleteProfile}><Icon name="trash" />Delete my profile</button>}
+        </div>
+      </aside>
+      <div className="workspace">
+        <header className="workbar">
+          <span className="workbar-title">{title}</span>
+          <div className="workbar-actions">
+            {profile?.story && <span className="badge">{profile.display_name}</span>}
+            {themeButton}
+          </div>
+        </header>
+        {error && <div className="banner error" role="alert">{error}</div>}
+        <main>
+          {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); setScreen("review"); }} />}
+          {screen === "review" && (
+            <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
+          )}
+          {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
+          {screen === "roles" && profile && (
+            <Roles profile={profile} scenario={scenario} setScenario={setScenario}
+              onOpen={(r) => { setRole(r); setScreen("role"); }} />
+          )}
+          {screen === "role" && profile && role && (
+            <RoleDetail profile={profile} role={role} scenario={scenario} onImpact={() => setScreen("impact")}
+              onProfile={setProfile} />
+          )}
+          {screen === "impact" && role && <Impact role={role} />}
+          {screen === "workforce" && <WorkforceView />}
+        </main>
+      </div>
     </div>
   );
 }
 
-function Landing({ onStart, onDemo, onResume }: { onStart: () => void; onDemo: (k: string) => void; onResume?: () => void }) {
+function Landing({ onStart, onDemo }: { onStart: () => void; onDemo: (k: string) => void }) {
   return (
-    <section className="hero">
-      <h1>See where your career goes when AI changes the job market.</h1>
-      <ol className="three-steps">
-        <li><strong>Your skills</strong> from a CV or a few questions</li>
-        <li><strong>Future roles</strong> under three AI-adoption scenarios</li>
-        <li><strong>Your pathway</strong> and the UN goals it serves</li>
-      </ol>
-      <div className="actions">
-        <button className="primary" onClick={onStart}>Start</button>
-        <button onClick={() => onDemo("clerk")}>Demo: Aisyah, data-entry clerk</button>
-        <button onClick={() => onDemo("student")}>Demo: Wei Jie, student</button>
-        {onResume && <button className="link" onClick={onResume}>Continue where you left off</button>}
+    <main className="landing">
+      <header className="lv-hero">
+        <Rosette className="hero-rosette" />
+        <p className="pill-tag">Career guidance for Malaysia's AI era</p>
+        <h1>See where your career goes before AI changes it.</h1>
+        <p className="lede">Laluan reads your skills, tracks dated AI-research and job-market signals, ranks the roles you can grow into under three futures, and plans free or low-cost courses to get there. You make the call.</p>
+        <div className="ctas">
+          <button className="btn ink" onClick={() => onDemo("clerk")}>Open the demo profile</button>
+          <button className="btn quiet" onClick={onStart}>Start with my skills</button>
+        </div>
+        <button className="link" onClick={() => onDemo("student")}>Or try the student demo</button>
+      </header>
+      <div className="lv-preview" aria-hidden="true">
+        <div className="preview-card">
+          <div className="preview-head"><span className="preview-title">Future roles for Aisyah, data-entry clerk</span><span className="badge">Example view</span></div>
+          <div className="seg-track"><span>Slow</span><span className="on">Baseline</span><span>Accelerated</span></div>
+          <ol className="preview-list">
+            <li><span>AI operations specialist</span><span className="badge good">Emerging</span></li>
+            <li><span>Sustainability and ESG analyst</span><span className="badge good">Growing</span></li>
+            <li><span>Data analyst</span><span className="badge good">Growing</span></li>
+            <li className="dim"><span>Data entry clerk</span><span className="badge risk">Declining</span></li>
+          </ol>
+          <div className="preview-note"><span className="dot" /><div><strong>Robust pick</strong><span>Stays in her top five in every scenario.</span></div></div>
+        </div>
       </div>
-    </section>
+      <section className="lv-section">
+        <h2>Made for the people AI is changing first. <span>Clerks, service staff, graduates and the HR teams planning their next move.</span></h2>
+        <div className="pillars">
+          <div className="pillar"><span className="pillar-icon"><Icon name="radar" /></span><h3>Future Skills Radar</h3><p>Which skills are rising or declining, built from research papers and real job postings, each with its source and date.</p></div>
+          <div className="pillar"><span className="pillar-icon"><Icon name="briefcase" /></span><h3>Matches you can check</h3><p>Every rank shows how much comes from your skills, the outlook and the goals you care about.</p></div>
+          <div className="pillar"><span className="pillar-icon"><Icon name="route" /></span><h3>A plan you can start this week</h3><p>Ordered free or low-cost courses with hours, each linked to the UN Sustainable Development Goals.</p></div>
+        </div>
+      </section>
+    </main>
   );
 }
 
 function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
-  const [tab, setTab] = useState<"cv" | "pick">("cv");
+  const [tab, setTab] = useState<"upload" | "cv" | "chat" | "pick">("upload");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -127,13 +237,15 @@ function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
   }
   return (
     <section>
-      <h2>Your skills</h2>
+      <div className="page-head"><h1>Your skills</h1></div>
       <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={tab === "upload"} onClick={() => setTab("upload")}>Upload CV</button>
         <button role="tab" aria-selected={tab === "cv"} onClick={() => setTab("cv")}>Paste CV</button>
+        <button role="tab" aria-selected={tab === "chat"} onClick={() => setTab("chat")}>Questionnaire</button>
         <button role="tab" aria-selected={tab === "pick"} onClick={() => setTab("pick")}>Pick skills</button>
-        {/* Task 3.7: guided chat tab using POST /api/intake/turn */}
       </div>
-      {tab === "cv" ? (
+      <p className="source">Use a sample or your own CV. We remove names, emails, phone and IC numbers before any AI reads it, and we never store the file.</p>
+      {tab === "upload" ? <UploadCv onDone={onDone} /> : tab === "chat" ? <Questionnaire onDone={onDone} /> : tab === "cv" ? (
         <>
           <label htmlFor="cv">Paste your CV or describe your work (at least 50 characters)</label>
           <textarea id="cv" rows={10} value={text} onChange={(e) => setText(e.target.value)} />
@@ -187,7 +299,7 @@ function Review({ initial, onSaved }: { initial: string[]; onSaved: (p: Profile)
   }
   return (
     <section>
-      <h2>Check your skills</h2>
+      <div className="page-head"><h1>Check your skills</h1></div>
       {skills.length === 0 && <p>We didn't find any skills. Go back and pick them from the list.</p>}
       <div className="chips">
         {skills.map((id) => (
@@ -230,24 +342,40 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
   const [data, setData] = useState<Matches | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<Change[] | null>(null);
+  const [year, setYear] = useState<number | undefined>(undefined);
   useEffect(() => {
-    api.matches(profile.id, scenario).then(setData).catch(() => setError("Couldn't update scenario."));
-  }, [profile.id, scenario]);
+    api.matches(profile.id, scenario, year).then(setData).catch(() => setError("Couldn't update scenario."));
+  }, [profile.id, scenario, year]);
   async function afterRefresh() {
     const before = data;
-    const after = await api.matches(profile.id, scenario);
+    const after = await api.matches(profile.id, scenario, year);
     setData(after);
     if (before) setChanges(compare(before, after, scenario));
   }
   return (
     <section>
-      <h2>Your future roles</h2>
-      {profile.story && <p className="muted">{profile.display_name}: {profile.story}</p>}
+      <div className="page-head">
+        <h1>Your future roles</h1>
+        {profile.story && <p className="muted">{profile.display_name}: {profile.story}</p>}
+      </div>
+      {data && <Kpis data={data} scenario={scenario} />}
       <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => setScenario(s.id)}>{s.label}</button>
         ))}
       </div>
+      {data && (
+        <div className="year-slider">
+          <label htmlFor="year">Look ahead to <strong>{data.year}</strong> <span className="badge">estimate</span></label>
+          <input id="year" type="range" min={data.year_range[0]} max={data.year_range[1]} step={1}
+            value={data.year} onChange={(e) => setYear(Number(e.target.value))}
+            aria-valuetext={`${data.year}`} />
+          <div className="year-ticks" aria-hidden="true">
+            {Array.from({ length: data.year_range[1] - data.year_range[0] + 1 }, (_, i) => <span key={i}>{data.year_range[0] + i}</span>)}
+          </div>
+          <p className="source">The sources forecast to {data.year_range[1]}; we do not extend them further.</p>
+        </div>
+      )}
       {data && <p className="muted">{data.scenario.description}</p>}
       {data?.signal_source.illustrative && (
         <div className="banner warning">Illustrative seed data. Replace it with real figures before the demo.</div>
@@ -273,16 +401,16 @@ function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario: Scena
     <button className={role.at_risk ? "card at-risk" : "card"} onClick={onOpen}>
       <div className="card-head">
         <span className="rank">#{role.rank}{move > 0 ? ` ▲${move}` : move < 0 ? ` ▼${-move}` : ""}</span>
-        {role.robust_pick && <span className="badge">Robust pick</span>}
-        {role.is_current_role && <span className="badge muted">Your current role</span>}
+        {role.robust_pick && <span className="badge gold">Robust pick</span>}
+        {role.is_current_role && <span className="badge">Your current role</span>}
       </div>
       <h3>{role.title}</h3>
       <div className="fit" aria-label={`Fit ${Math.round(role.fit * 100)} percent`}>
         <div style={{ width: `${role.fit * 100}%` }} />
       </div>
-      <p>{Math.round(role.fit * 100)}% fit · <span className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</span></p>
-      <p className="muted">Estimate to {role.estimate_range.horizon_year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
-      {role.why.sdg_points > 0 && <span className="badge muted">Serves your goals: SDG {role.why.matched_sdgs.join(", ")}</span>}
+      <div className="card-row"><span className="fit-num">{Math.round(role.fit * 100)}% fit</span><span className={`badge ${OUTLOOK_TONE[o.label]}`}>{OUTLOOK_TEXT[o.label]}</span></div>
+      <p className="muted">Estimate to {role.estimate_range.year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
+      {role.why.sdg_points > 0 && <span className="badge good">Serves your goals: SDG {role.why.matched_sdgs.join(", ")}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">Source: {role.citation.snapshot_id} (imported {role.citation.imported})</span>
     </button>
@@ -300,7 +428,9 @@ function Sdgs({ sdgs }: { sdgs: RoleMatch["sdgs"] }) {
   );
 }
 
-function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; role: RoleMatch; scenario: Scenario; onImpact: () => void }) {
+function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
+  profile: Profile; role: RoleMatch; scenario: Scenario; onImpact: () => void; onProfile: (p: Profile) => void;
+}) {
   const [plan, setPlan] = useState<Pathway | null>(null);
   const [busy, setBusy] = useState(false);
   const outlookRows = useMemo(
@@ -311,10 +441,13 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
     setBusy(true);
     try { setPlan(await api.pathway(profile.id, role.role_id)); } finally { setBusy(false); }
   }
+  async function toggle(courseId: string, done: boolean) {
+    onProfile(await api.complete(profile.id, courseId, done));
+    setPlan(await api.pathway(profile.id, role.role_id));
+  }
   return (
     <section>
-      <h2>{role.title}</h2>
-      <p>{role.summary}</p>
+      <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
       <details className="card why" open>
         <summary>Why this rank? Score {role.why.score.toFixed(2)}</summary>
         <ul>
@@ -330,6 +463,9 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
           <tr key={r.id}><th scope="row">{r.name}</th><td className={`outlook ${r.outlook}`}>{OUTLOOK_TEXT[r.outlook]}</td><td>{r.index > 0 ? "+" : ""}{r.index}%</td></tr>
         ))}</tbody>
       </table>
+      <div className="job-links"><span className="muted">See open jobs:</span>
+        {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
+      </div>
       <div className="two-col">
         <div><h3>You have</h3><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div></div>
         <div><h3>You need</h3><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing">{s.name}{s.weight === 3 ? " (core)" : ""}</span>)}</div></div>
@@ -339,6 +475,14 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
       )}
       {plan && (
         <>
+          <div className="readiness card">
+            <div className="card-row"><h3>Readiness for {role.title}</h3><strong className="readiness-num">{Math.round(plan.readiness * 100)}%</strong></div>
+            <div className="fit" aria-label={`Readiness ${Math.round(plan.readiness * 100)} percent`}><div style={{ width: `${plan.readiness * 100}%` }} /></div>
+            <p className="muted">Started at {Math.round(plan.fit * 100)}% · {plan.steps.filter((s) => s.done).length} of {plan.steps.length} steps done · about {plan.hours_left} hours left</p>
+            {plan.steps.some((s) => s.done) && (
+              <div className="chips">{plan.steps.filter((s) => s.done).flatMap((s) => s.skills).map((k) => <span key={k.skill_id} className="badge gold">★ {k.name}</span>)}</div>
+            )}
+          </div>
           <h3>Your pathway: {plan.steps.length} steps, about {plan.total_hours} hours</h3>
           <p>{plan.summary}</p>
           {plan.grounding && (
@@ -348,10 +492,13 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
           )}
           <ol className="steps">
             {plan.steps.map((s) => (
-              <li key={s.step} className="card">
-                <strong>{s.skills.map((k) => k.name).join(", ")}</strong>
+              <li key={s.step} className={s.done ? "card is-done" : "card"}>
+                <div className="card-row"><strong>{s.skills.map((k) => k.name).join(", ")}</strong>
+                  <span className={`badge ${COST[s.course.cost]?.tone ?? ""}`}>{COST[s.course.cost]?.label ?? s.course.cost}</span></div>
                 <span>{s.course.url ? <a href={s.course.url} target="_blank" rel="noreferrer">{s.course.title}</a> : s.course.title} · {s.course.provider}</span>
-                <span className="muted">{s.course.hours} h · {s.course.level} · {s.course.cost.replace("_", " ")} · {s.why}</span>
+                <span className="muted">About {s.course.hours} hours · {s.course.level} · {s.why}</span>
+                {s.course.cost === "paid" && <span className="source">Price and HRD Corp claimability: check with the provider or your employer before enrolling.</span>}
+                <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => toggle(s.course.id, e.target.checked)} /> I finished this</label>
               </li>
             ))}
           </ol>
@@ -366,7 +513,7 @@ function RoleDetail({ profile, role, scenario, onImpact }: { profile: Profile; r
 function Impact({ role }: { role: RoleMatch }) {
   return (
     <section>
-      <h2>Your impact as a {role.title}</h2>
+      <div className="page-head"><h1>Your impact as a {role.title}</h1></div>
       <div className="grid">
         {role.sdgs.map((g) => (
           <div key={g.number} className="card sdg-card" style={{ borderTopColor: g.colour }}>
@@ -400,9 +547,8 @@ function Radar({ profile, onNext }: { profile: Profile; onNext: () => void }) {
   const noData = data.skills.filter((s) => s.label === "no_data");
   return (
     <section>
-      <p className="eyebrow">Future Skills Radar</p>
-      <h2>Which skills are rising and declining</h2>
-      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p>
+      <div className="page-head"><h1>Which skills are rising and declining</h1>
+      <p className="muted">Estimates from research and job-posting trends, not predictions. Your skills are marked.</p></div>
       {data.illustrative && <div className="banner warning">The baseline forecast is illustrative seed data until the team replaces it with WEF figures.</div>}
       {data.skills.length === 0 ? (
         <div className="banner warning">This forecast has no skill trends yet. An admin can run <strong>Refresh trend data</strong> on the Roles screen to pull the latest research and job-posting data.</div>
@@ -463,7 +609,7 @@ function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
     catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't start the refresh."); return; }
     for (;;) {
       await new Promise((r) => setTimeout(r, 1000));
-      const s = await api.refreshStatus();
+      const s = await api.refreshStatus(token);
       setStatus(s);
       if (s.state !== "running") {
         if (s.state === "done") await onDone();
@@ -516,5 +662,238 @@ function WhatChanged({ changes, snapshot, onClose }: { changes: Change[]; snapsh
       </ul>
       <button className="link" onClick={onClose}>Dismiss</button>
     </div>
+  );
+}
+
+type IconName = "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon" | "upload";
+const ICONS: Record<IconName, string> = {
+  user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0",
+  radar: "M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 12l6-6",
+  briefcase: "M4 8h16v11H4zM9 8V5h6v3M4 13h16",
+  route: "M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8 17h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7",
+  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18",
+  trash: "M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13",
+  users: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20a6 6 0 0 1 12 0M16 4.5a3.5 3.5 0 0 1 0 6.5M18 20a6 6 0 0 0-3-5.2",
+  upload: "M12 16V4M7 9l5-5 5 5M5 20h14",
+  sun: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5",
+  moon: "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z",
+};
+
+function Icon({ name }: { name: IconName }) {
+  return (
+    <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d={ICONS[name]} />
+    </svg>
+  );
+}
+
+function Kpis({ data, scenario }: { data: Matches; scenario: Scenario }) {
+  const top = data.roles[0];
+  const robust = data.roles.filter((r) => r.robust_pick).length;
+  const current = data.roles.find((r) => r.is_current_role);
+  return (
+    <div className="kpis">
+      <div className="kpi"><span className="kpi-label">Top match</span><strong>{top?.title ?? "–"}</strong>
+        {top && <span className="badge good">{Math.round(top.fit * 100)}% skill fit</span>}</div>
+      <div className="kpi"><span className="kpi-label">Robust picks</span><strong>{robust}</strong>
+        <span className="badge">Top five in every scenario</span></div>
+      <div className="kpi"><span className="kpi-label">Your current role</span><strong>{current ? `${signed(current.outlook[scenario].index)}%` : "–"}</strong>
+        {current ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]} to {data.signal_source.horizon_year}</span>
+          : <span className="badge">Not set</span>}</div>
+      <div className="kpi"><span className="kpi-label">Forecast data</span><strong>{data.signal_source.imported.slice(0, 10)}</strong>
+        <span className={`badge ${data.signal_source.illustrative ? "risk" : "good"}`}>{data.signal_source.illustrative ? "Illustrative baseline" : "Cited sources"}</span></div>
+    </div>
+  );
+}
+
+const COST: Record<string, { label: string; tone: string }> = {
+  free: { label: "Free", tone: "good" },
+  free_audit: { label: "Free to audit", tone: "good" },
+  paid: { label: "Paid", tone: "gold" },
+};
+
+function jobLinks(title: string) {
+  const q = encodeURIComponent(title);
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return [
+    { label: "MYFutureJobs", url: "https://myfuturejobs.gov.my/" },
+    { label: "JobStreet", url: `https://my.jobstreet.com/${slug}-jobs` },
+    { label: "LinkedIn", url: `https://www.linkedin.com/jobs/search/?keywords=${q}&location=Malaysia` },
+  ];
+}
+
+function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function upload(file: File | undefined) {
+    if (!file) return;
+    setBusy(true); setError(null);
+    try { onDone((await api.upload(file)).skills); }
+    catch (e) { setError(e instanceof Error ? e.message : "Upload failed"); }
+    finally { setBusy(false); }
+  }
+  return (
+    <div className="dropzone">
+      <Icon name="upload" />
+      <p><strong>Upload your CV</strong></p>
+      <p className="muted">PDF, Word (.docx) or text, up to 5 MB. Read in memory and never stored.</p>
+      <label className="btn ink file-btn">{busy ? "Reading…" : "Choose a file"}
+        <input type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+          disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
+      </label>
+      {error && <p className="error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
+  const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [turn, setTurn] = useState<ChatTurn | null>(null);
+  const [answer, setAnswer] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    api.turn([]).then((t) => { setTurn(t); setMessages([{ role: "assistant", content: t.next_question }]); })
+      .catch(() => setError("The questionnaire is unavailable. Try another tab."));
+  }, []);
+  async function send() {
+    if (!answer.trim()) return;
+    const next = [...messages, { role: "user" as const, content: answer.trim() }];
+    setAnswer("");
+    try {
+      const t = await api.turn(next);
+      setTurn(t);
+      setMessages([...next, { role: "assistant", content: t.next_question }]);
+    } catch { setError("Couldn't send that. Try again."); }
+  }
+  return (
+    <div className="chat card">
+      <ol className="chat-log" aria-live="polite">
+        {messages.map((m, i) => <li key={i} className={m.role}>{m.content}</li>)}
+      </ol>
+      {turn && turn.skills_found.length > 0 && <p className="muted">Skills found so far: {turn.skills_found.length}</p>}
+      {turn?.is_complete ? (
+        <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found)}>
+          {turn.skills_found.length ? `Continue with ${turn.skills_found.length} skills` : "No skills found. Try another tab"}
+        </button>
+      ) : (
+        <form className="chat-form" onSubmit={(e) => { e.preventDefault(); send(); }}>
+          <label className="sr-only" htmlFor="answer">Your answer</label>
+          <input id="answer" type="text" maxLength={1000} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer" />
+          <button className="primary" type="submit" disabled={!answer.trim()}>Send</button>
+        </form>
+      )}
+      {error && <p className="error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+const HEAT: Record<string, string> = { emerging: "hm-good", growing: "hm-good", stable: "hm-stable", declining: "hm-risk" };
+
+function WorkforceView() {
+  const [csv, setCsv] = useState("");
+  const [scenario, setScenario] = useState<Scenario>("baseline");
+  const [result, setResult] = useState<Workforce | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function analyse(text = csv, s = scenario) {
+    setBusy(true); setError(null);
+    try { setResult(await api.workforce(text, s)); }
+    catch (e) { setError(e instanceof Error ? e.message : "Couldn't read that file"); setResult(null); }
+    finally { setBusy(false); }
+  }
+  async function sample() {
+    const text = await api.workforceSample();
+    setCsv(text);
+    analyse(text);
+  }
+  async function readFile(file: File | undefined) {
+    if (file) { const text = await file.text(); setCsv(text); analyse(text); }
+  }
+  return (
+    <section>
+      <div className="page-head">
+        <h1>Workforce view</h1>
+        <p className="muted">For HR and learning teams: see which roles in your company AI puts at risk and the cheapest reskilling moves. Results are totals by role, never a ranking of individual people, and must not be used for hiring or firing decisions.</p>
+      </div>
+      <div className="card">
+        <h2>Your team</h2>
+        <p className="muted">A CSV with a <code>role</code> column and a <code>skills</code> column (separate skills with ;). Leave out names, emails, IC numbers and staff IDs: files that contain them are refused.</p>
+        <textarea rows={6} value={csv} onChange={(e) => setCsv(e.target.value)} placeholder={"role,skills\nData entry clerk,Excel; data entry\nCustomer service representative,customer service; communication"} />
+        <div className="actions">
+          <button className="primary" disabled={busy || csv.trim().length < 10} onClick={() => analyse()}>{busy ? "Analysing…" : "Analyse"}</button>
+          <label className="btn quiet file-btn">Upload CSV<input type="file" accept=".csv,text/csv" onChange={(e) => readFile(e.target.files?.[0])} /></label>
+          <button onClick={sample} disabled={busy}>Use the sample company (synthetic, 160 people)</button>
+        </div>
+        {error && <p className="error" role="alert">{error}</p>}
+      </div>
+      {result && (
+        <>
+          <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+            {SCENARIOS.map((s) => (
+              <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => { setScenario(s.id); analyse(csv, s.id); }}>{s.label}</button>
+            ))}
+          </div>
+          <div className="kpis">
+            <div className="kpi"><span className="kpi-label">People analysed</span><strong>{result.employees}</strong><span className="badge">{result.roles.length} roles</span></div>
+            <div className="kpi"><span className="kpi-label">In declining roles</span><strong>{result.at_risk}</strong>
+              <span className={`badge ${result.at_risk ? "risk" : "good"}`}>{Math.round((result.at_risk / result.employees) * 100)}% of the team</span></div>
+            <div className="kpi"><span className="kpi-label">Learning hours to move them</span><strong>{result.total_hours.toLocaleString()}</strong><span className="badge">From the course catalogue</span></div>
+            <div className="kpi"><span className="kpi-label">Forecast data</span><strong>{result.signal_source.imported.slice(0, 10)}</strong>
+              <span className={`badge ${result.signal_source.illustrative ? "risk" : "good"}`}>{result.signal_source.illustrative ? "Illustrative baseline" : "Cited sources"}</span></div>
+          </div>
+          <div className="card">
+            <h2>Risk heatmap by role</h2>
+            <div className="table-wrap">
+              <table className="heatmap">
+                <thead><tr><th>Role</th><th>People</th><th>Slow</th><th>Baseline</th><th>Accelerated</th><th>Skill fit today</th></tr></thead>
+                <tbody>
+                  {result.roles.map((r) => (
+                    <tr key={r.role_id}>
+                      <th scope="row">{r.title}</th><td>{r.headcount}</td>
+                      {SCENARIOS.map((s) => (
+                        <td key={s.id} className={HEAT[r.outlook[s.id].label]}>{signed(r.outlook[s.id].index)}%</td>
+                      ))}
+                      <td>{Math.round(r.avg_fit * 100)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="source">Expected change in jobs to the horizon year under each scenario (estimates). Snapshot {result.signal_source.snapshot_id}.</p>
+          </div>
+          <div className="card">
+            <h2>Cheapest reskilling moves</h2>
+            {result.moves.length === 0 ? <p className="muted">No one is in a declining role under this scenario.</p> : (
+              <div className="table-wrap">
+                <table className="heatmap">
+                  <thead><tr><th>From</th><th>To</th><th>People</th><th>Hours each</th><th>Fit today</th><th>SDGs</th></tr></thead>
+                  <tbody>
+                    {result.moves.map((m) => (
+                      <tr key={m.from_role + m.to_role}>
+                        <td>{m.from_role}</td><th scope="row">{m.to_role}</th><td>{m.people}</td><td>{m.avg_hours}</td>
+                        <td>{Math.round(m.avg_fit_now * 100)}%</td><td><Sdgs sdgs={m.sdgs} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          {result.sdg_contribution.length > 0 && (
+            <div className="card">
+              <h2>What these moves contribute to the SDGs</h2>
+              <div className="sdg-totals">
+                {result.sdg_contribution.map((g) => (
+                  <div key={g.number} className="sdg-total"><span className="sdg" style={{ background: g.colour }}>{g.number}</span>
+                    <span><strong>{g.people} people</strong><small>{g.name}</small></span></div>
+                ))}
+              </div>
+            </div>
+          )}
+          {result.problems.length > 0 && <div className="banner">Rows skipped: {result.problems.join(" · ")}</div>}
+        </>
+      )}
+    </section>
   );
 }

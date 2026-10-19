@@ -16,12 +16,21 @@ recommendation that does not depend on which future happens.
 Outlooks are estimates: each role also carries the range across all scenarios.
 """
 
+import datetime as dt
+
 from app.reference import Reference
-from app.services.scenario import Outlook, outlooks, signals_from_snapshot
+from app.services.scenario import Outlook, outlooks, signals_from_snapshot, year_fraction
 
 FIT_WEIGHT, OUTLOOK_WEIGHT = 0.6, 0.4
 SDG_BOOST = 0.05
 ROBUST_TOP_N = 5
+
+
+def effective_skills(ref: Reference, profile: dict) -> set[str]:
+    """Skills the person reported, plus skills taught by courses they marked as finished."""
+    done = set(profile.get("completed_courses") or [])
+    earned = {s for c in ref.courses if c["id"] in done for s in c["skills"]}
+    return set(profile["skills"]) | earned
 
 
 def fit_and_gap(role: dict, skills: set[str]) -> tuple[float, list[dict], list[dict]]:
@@ -63,11 +72,12 @@ def _sdg_view(ref: Reference, tags: list[dict]) -> list[dict]:
     return [{**ref.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"]} for t in tags]
 
 
-def match(ref: Reference, profile: dict, scenario_id: str) -> dict:
+def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = None) -> dict:
     snapshot = ref.latest_snapshot
     signals = signals_from_snapshot(snapshot)
-    all_outlooks = outlooks(signals, ref.scenarios)
-    skills = set(profile["skills"])
+    year, fraction = year_fraction(snapshot, year)
+    all_outlooks = outlooks(signals, ref.scenarios, fraction)
+    skills = effective_skills(ref, profile)
     interests = set(profile.get("interests") or [])
     ranks = {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, interests, by_role))}
              for sid, by_role in all_outlooks.items()}
@@ -93,7 +103,7 @@ def match(ref: Reference, profile: dict, scenario_id: str) -> dict:
             "outlook": {sid: {"index": o[role_id].index, "label": o[role_id].label}
                         for sid, o in all_outlooks.items()},
             "estimate_range": {"low": min(indexes), "high": max(indexes),
-                               "horizon_year": snapshot["horizon_year"]},
+                               "horizon_year": snapshot["horizon_year"], "year": year},
             "robust_pick": role_id in robust,
             "at_risk": all_outlooks[scenario_id][role_id].label == "declining",
             "is_current_role": role_id == profile.get("current_role_id"),
@@ -103,8 +113,11 @@ def match(ref: Reference, profile: dict, scenario_id: str) -> dict:
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},
         })
+    first_year = max(int(str(snapshot["published"])[:4]), min(dt.date.today().year, snapshot["horizon_year"]))
     return {
         "scenario": ref.scenarios[scenario_id],
+        "year": year,
+        "year_range": [first_year, snapshot["horizon_year"]],
         "signal_source": {
             "snapshot_id": snapshot["snapshot_id"],
             "source": snapshot["source"],
