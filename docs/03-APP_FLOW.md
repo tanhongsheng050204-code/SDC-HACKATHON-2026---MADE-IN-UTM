@@ -28,7 +28,7 @@ different demo data; Organisation opens the HR view.
 | S9 | Sources | Every snapshot: source, date, reviewer | `GET /signals` |
 | H1 | HR workforce | Upload or paste anonymous CSV (or the synthetic sample) → heatmap, cheapest moves, hours, SDG totals | `POST /workforce/analyse`, `GET /workforce/sample` |
 | A1 | Admin | **Refresh trend data** (runs collectors, writes a new snapshot, shows what changed); approve / reject proposals | `POST /signals/refresh`, `GET /signals/refresh` (progress) |
-| — | Coach drawer | Opens from any screen; cited answers; **Apply** on proposed changes | `POST /coach` ⬜ |
+| — | Coach drawer | Opens from any screen; cited answers; **Apply** on proposed changes | `POST /coach` ✅ |
 
 ## Primary journey (worker)
 

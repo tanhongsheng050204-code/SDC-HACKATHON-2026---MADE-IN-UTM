@@ -10,10 +10,10 @@ from pydantic import ValidationError
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
+from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
                          SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import cards, documents, intake, matching, pathway, skills, tasks, workforce
+from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
 from app.trends import refresh
 
 router = APIRouter(prefix="/api")
@@ -261,6 +261,15 @@ def get_card(card_id: str):
     if card is None or profile is None or card["role_id"] not in get_reference().roles:
         raise HTTPException(404, "Card not found")
     return cards.view(get_reference(), profile, card)
+
+
+@router.post("/coach")
+def ask_coach(body: CoachRequest):
+    """A cited answer about the person's own results, plus at most one change they can apply."""
+    ref = get_reference()
+    if body.role_id is not None and body.role_id not in ref.roles:
+        raise HTTPException(422, "Unknown role")
+    return coach.answer(ref, _profile_or_404(body.profile_id), body.question, body.scenario, body.role_id)
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

@@ -170,3 +170,50 @@ def test_future_card_goes_when_the_profile_is_deleted(client):
     card_id = client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "data_analyst"}).json()["card_id"]
     client.delete(f"/api/profiles/{profile['id']}")
     assert client.get(f"/api/cards/{card_id}").status_code == 404
+
+
+# ---------- AI coach ----------
+
+def _ask(client, profile_id, question, **extra):
+    return client.post("/api/coach", json={"profile_id": profile_id, "question": question, **extra})
+
+
+def test_coach_offline_answers_from_the_persons_own_results_with_sources(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    reply = _ask(client, profile["id"], "Why is this my top role?").json()
+    assert reply["mode"] == "offline" and reply["sources"]
+    top = client.get(f"/api/profiles/{profile['id']}/matches").json()["roles"][0]
+    assert top["title"] in reply["answer"]
+    assert reply["grounding"]["all_supported"]
+
+    hours = _ask(client, profile["id"], "How long will the plan take?", role_id="data_analyst").json()
+    assert "hours" in hours["answer"] and hours["grounding"]["all_supported"]
+
+
+def test_coach_proposes_changes_but_never_applies_them(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    reply = _ask(client, profile["id"], "What if AI adoption is faster?").json()
+    assert reply["proposal"] == {"kind": "scenario", "value": "accelerated",
+                                 "label": "Switch to the Accelerated AI adoption scenario"}
+    climate = _ask(client, profile["id"], "I care about climate change").json()
+    assert climate["proposal"]["kind"] == "interest" and climate["proposal"]["value"] == 13
+    assert client.get(f"/api/profiles/{profile['id']}").json()["interests"] == profile["interests"]
+
+
+def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatch):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    assert _ask(client, profile["id"], "").status_code == 422
+    assert _ask(client, profile["id"], "x" * 501).status_code == 422
+    assert _ask(client, "no-such-profile", "hello there").status_code == 404
+
+    from app.services import coach
+    seen = {}
+
+    def fake_llm(prompt):
+        seen["prompt"] = prompt
+        return {"answer": "Your top role is shown first [SOURCE-1].", "proposal": None}
+
+    monkeypatch.setattr(coach, "_llm_available", lambda: True)
+    monkeypatch.setattr(coach, "generate_json", fake_llm)
+    reply = _ask(client, profile["id"], "Call me on 012-345 6789 about my top role").json()
+    assert reply["mode"] == "gemini" and "012-345" not in seen["prompt"] and "[PHONE]" in seen["prompt"]

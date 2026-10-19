@@ -44,6 +44,13 @@ class CompleteRequest(BaseModel):
     done: bool = True
 
 
+class CoachRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    question: str = Field(min_length=1, max_length=500)
+    scenario: Scenario = "baseline"
+    role_id: str | None = Field(default=None, max_length=80)
+
+
 class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 

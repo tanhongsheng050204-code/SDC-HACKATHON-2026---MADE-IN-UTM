@@ -3,7 +3,7 @@
 import { Component, ReactNode, useEffect, useMemo, useState } from "react";
 import { LogoMark, Rosette } from "./brand";
 import QRCode from "qrcode";
-import { api, ChatTurn, FutureCard, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
+import { api, ChatTurn, CoachProposal, CoachReply, FutureCard, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
 
 type Screen = "landing" | "intake" | "review" | "radar" | "tasks" | "roles" | "role" | "impact" | "workforce";
 const PROFILE_KEY = "laluan.profileId";
@@ -59,6 +59,19 @@ function MainApp({ demo }: { demo: string | null }) {
   const [error, setError] = useState<string | null>(null);
   const storedId = readStoredProfileId();
   const [model, setModel] = useState<string | null>(null);
+  const [coachOpen, setCoachOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  async function applyProposal(p: CoachProposal) {
+    if (!profile) return;
+    if (p.kind === "scenario") { setScenario(p.value as Scenario); setScreen("roles"); }
+    else {
+      const interests = Array.from(new Set([...profile.interests, Number(p.value)]));
+      setProfile(await api.updateProfile({ ...profile, interests }));
+      setScreen("roles");
+    }
+    setToast(`Applied: ${p.label}`);
+    window.setTimeout(() => setToast(null), 4000);
+  }
   const [chosenTheme, setChosenTheme] = useState<Theme | null>(savedTheme);
   const theme = chosenTheme ?? systemTheme();
   useEffect(() => {
@@ -176,6 +189,7 @@ function MainApp({ demo }: { demo: string | null }) {
           <span className="workbar-title">{title}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
+            {profile && <button className="btn sm" onClick={() => setCoachOpen(true)} aria-expanded={coachOpen}><Icon name="chat" />Ask the coach</button>}
             {themeButton}
           </div>
         </header>
@@ -201,6 +215,11 @@ function MainApp({ demo }: { demo: string | null }) {
           </ScreenBoundary>
         </main>
       </div>
+      {coachOpen && profile && (
+        <Coach profile={profile} scenario={scenario} roleId={role?.role_id}
+          onApply={applyProposal} onClose={() => setCoachOpen(false)} />
+      )}
+      {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   );
 }
@@ -388,7 +407,7 @@ function Roles({ profile, scenario, setScenario, onOpen }: {
   const [year, setYear] = useState<number | undefined>(undefined);
   useEffect(() => {
     api.matches(profile.id, scenario, year).then(setData).catch(() => setError("Couldn't update scenario."));
-  }, [profile.id, scenario, year]);
+  }, [profile.id, profile.interests.join(","), scenario, year]);
   async function afterRefresh() {
     const before = data;
     const after = await api.matches(profile.id, scenario, year);
@@ -871,8 +890,90 @@ function TaskView({ profile, onNext }: { profile: Profile; onNext: () => void })
   );
 }
 
-type IconName = "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon" | "upload" | "list";
+interface CoachTurn { question: string; reply: CoachReply | null; error?: string; dismissed?: boolean; applied?: boolean }
+
+function Coach({ profile, scenario, roleId, onApply, onClose }: {
+  profile: Profile; scenario: Scenario; roleId?: string; onApply: (p: CoachProposal) => Promise<void>; onClose: () => void;
+}) {
+  const [turns, setTurns] = useState<CoachTurn[]>([]);
+  const [question, setQuestion] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  async function ask(q: string) {
+    const text = q.trim();
+    if (!text || busy) return;
+    setQuestion(""); setBusy(true);
+    const index = turns.length;
+    setTurns((t) => [...t, { question: text, reply: null }]);
+    try {
+      const reply = await api.coach(profile.id, text, scenario, roleId);
+      setTurns((t) => t.map((x, i) => (i === index ? { ...x, reply } : x)));
+    } catch {
+      setTurns((t) => t.map((x, i) => (i === index ? { ...x, error: "The coach is offline right now. Try one of the suggested questions later." } : x)));
+    } finally { setBusy(false); }
+  }
+  function mark(i: number, patch: Partial<CoachTurn>) { setTurns((t) => t.map((x, j) => (j === i ? { ...x, ...patch } : x))); }
+  const suggestions = turns.at(-1)?.reply?.suggestions ?? ["Why is this my top role?", "How long will the plan take?", "Is my current job at risk?", "What if AI adoption is faster?"];
+  return (
+    <aside className="coach" role="dialog" aria-modal="false" aria-labelledby="coach-title">
+      <header className="coach-head">
+        <h2 id="coach-title">Coach</h2>
+        <button className="icon-btn" onClick={onClose} aria-label="Close the coach">×</button>
+      </header>
+      <p className="muted coach-note">Answers come only from your own results, with sources. The coach can suggest a change; nothing changes unless you press Apply.</p>
+      <ol className="coach-log" aria-live="polite">
+        {turns.map((t, i) => (
+          <li key={i}>
+            <p className="coach-q">{t.question}</p>
+            {!t.reply && !t.error && <p className="muted">Thinking…</p>}
+            {t.error && <p className="error" role="alert">{t.error}</p>}
+            {t.reply && (
+              <div className="coach-a">
+                <p>{t.reply.answer}</p>
+                {t.reply.grounding && (
+                  <span className={`badge ${t.reply.grounding.all_supported ? "good" : "risk"}`}>
+                    {t.reply.grounding.all_supported ? "Every sentence backed by a source" : `Check sentence ${t.reply.grounding.unsupported.join(", ")}: not in the sources`}
+                  </span>
+                )}
+                <details><summary className="muted">Sources ({t.reply.sources.length})</summary>
+                  <ul className="coach-sources">{t.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {s.text}</li>)}</ul>
+                </details>
+                {t.reply.proposal && !t.dismissed && (
+                  <div className="proposal card">
+                    <p className="eyebrow">Suggested change</p>
+                    <p><strong>{t.reply.proposal.label}</strong></p>
+                    {t.applied ? <span className="badge good">Applied</span> : (
+                      <div className="actions">
+                        <button className="primary" onClick={async () => { await onApply(t.reply!.proposal!); mark(i, { applied: true }); }}>Apply</button>
+                        <button onClick={() => mark(i, { dismissed: true })}>Dismiss</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
+      <div className="chips coach-suggest">
+        {suggestions.map((s) => <button key={s} className="chip" onClick={() => ask(s)} disabled={busy}>{s}</button>)}
+      </div>
+      <form className="chat-form" onSubmit={(e) => { e.preventDefault(); ask(question); }}>
+        <label className="sr-only" htmlFor="coach-q">Ask about your results</label>
+        <input id="coach-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ask about your results" autoFocus />
+        <button className="primary" type="submit" disabled={busy || !question.trim()}>Ask</button>
+      </form>
+    </aside>
+  );
+}
+
+type IconName = "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon" | "upload" | "list" | "chat";
 const ICONS: Record<IconName, string> = {
+  chat: "M4 5h16v11H9l-5 4z",
   list: "M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0",
   radar: "M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 12l6-6",
