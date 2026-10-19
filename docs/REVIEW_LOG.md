@@ -20,4 +20,6 @@ One row per thing reviewed: generated code, data, or text. Write what was wrong 
 | 13 | 2026-10-19 | Job collector | Same | Search matched prefixes and typos ("excel" counted "excellent") | Whole-word, exact matching; phrases quoted | ______ |
 | 14 | 2026-10-19 | Skills Radar | Browser check | Tiny counts gave ±100% swings (Power BI 1 → 0) | Minimum 20 mentions before a job trend counts; otherwise "too few postings"; test added | ______ |
 | 15 | 2026-10-19 | `api.py` refresh status | Automated security review | Anyone could read refresh progress, and errors could echo full source URLs | Status endpoint now needs the admin token; errors are stripped of URLs and cut to 200 characters; test added | ______ |
-| 16 | | | | | | |
+| 16 | 2026-10-19 | Year slider design | Planning review (AI-assisted) | The UI brief planned a slider to 2035, but the sources only forecast to 2030 | Slider limited to the horizon year; test proves later years are clamped | ______ |
+| 17 | 2026-10-19 | Pathway costs | Same | The plan called for RM prices and HRD Corp flags, but none are sourced | Show only free / free-to-audit / paid from the catalogue, and "check with the provider" for the rest | ______ |
+| 18 | | | | | | |

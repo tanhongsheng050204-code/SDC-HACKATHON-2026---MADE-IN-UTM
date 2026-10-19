@@ -24,3 +24,7 @@
 | 18 | Capability momentum measured relative to the median capability, and only acceleration counts | Raw year-on-year growth | All research grows every year; raw growth saturated the cap for 5 of 8 capabilities. Overall speed is what the scenarios model. Team to confirm (______) |
 | 19 | A skill needs ≥ 20 job-posting mentions before its trend counts | Use every count | 0 → 1 mentions produced ±100% swings |
 | 20 | Refreshes write new snapshots and never edit the baseline | Update in place | History shows how forecasts changed; refreshes never compound |
+| 21 | Year slider stops at the sources' horizon year (2030) | Slider to 2035 | Extending past the forecast would be inventing numbers |
+| 22 | Courses show free / free to audit / paid, and "check with the provider" for price and HRD Corp status | Show RM prices and HRD Corp flags now | We have no sourced prices or HRD Corp listings yet; the rules forbid invented figures |
+| 23 | Workforce view returns totals by role only and refuses files that identify people | Per-employee results | Human-centred rule: the tool must not drive hiring or firing |
+| 24 | Finished courses add their skills to the profile for matching | Separate badge list only | Readiness and rankings should move as the person learns |

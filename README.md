@@ -19,6 +19,7 @@ skill to the UN Sustainable Development Goals.
 4. [UI/UX Brief](docs/04-UI_UX_BRIEF.md): look and feel
 5. [Backend Schema](docs/05-BACKEND_SCHEMA.md): data and rules
 6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones, owners, definition of done
+- [Preliminary proposal draft](docs/PROPOSAL.md)
 
 How we reviewed the AI's work: [AI declaration](docs/AI_DECLARATION.md) ·
 [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) ·
@@ -28,12 +29,13 @@ How we reviewed the AI's work: [AI declaration](docs/AI_DECLARATION.md) ·
 
 | Must-have | Code |
 |---|---|
-| Skills profile intake | `backend/app/services/skills.py`, `intake.py`, `deid.py`; Intake screen |
+| Skills profile intake | CV upload (`services/documents.py`), questionnaire (`intake.py`), skill picker; scrubbed by `deid.py` |
 | AI-trend signal layer (updatable, dated source) | `backend/app/trends/` (research + job-posting collectors, signal builder), `scripts/refresh_trends.py`, `POST /api/signals/refresh`; Future Skills Radar and source line on every role card |
-| Future-role matching + skills gap | `backend/app/services/matching.py`; Roles and role detail screens |
-| Personalised reskilling pathway | `backend/app/services/pathway.py` + `grounding.py`; Pathway section |
+| Future-role matching + skills gap | `backend/app/services/matching.py`; Roles screen with stat cards and "Why this rank?" |
+| Personalised reskilling pathway | `backend/app/services/pathway.py` + `grounding.py`; cost labels, job links, progress and badges |
 | SDG mapping | `backend/data/sdg_map.json`; SDG tiles and Impact screen |
-| More than one future scenario | `backend/app/services/scenario.py`; Slow / Baseline / Accelerated switch |
+| More than one future scenario | `backend/app/services/scenario.py`; Slow / Baseline / Accelerated switch and a year slider |
+| Employer view (good-to-have) | `backend/app/services/workforce.py`; Workforce view with a synthetic sample company |
 
 ## Run it
 

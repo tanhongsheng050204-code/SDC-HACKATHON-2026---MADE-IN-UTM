@@ -44,26 +44,26 @@ decent jobs · 8.2 productivity through innovation · 8.5 full and productive em
 
 | # | Must-have | What the brief expects | Our design | Status |
 |---|---|---|---|---|
-| M1 | Skills profile intake | Skills **and potential**, via **CV upload**, form or questionnaire | Paste or **upload PDF/DOCX** CV, guided questionnaire, or pick skills; current role, years of experience, goals | ✅ paste, pick, experience, goals · ⬜ file upload, questionnaire tab |
-| M2 | AI-trend signal layer | ≥ 1 **updatable** source; show source and date; **hard-coded lists alone do not count** | Re-runnable pipeline: **arXiv API** (AI advancement by capability), **public job postings** (skill demand per month), **WEF Future of Jobs 2025 + O\*NET** (baseline). Each run writes a dated snapshot | ⬜ (seed snapshot is illustrative only) |
+| M1 | Skills profile intake | Skills **and potential**, via **CV upload**, form or questionnaire | Paste or **upload PDF/DOCX** CV, guided questionnaire, or pick skills; current role, years of experience, goals | ✅ upload (PDF/DOCX/TXT), paste, questionnaire, pick, experience, goals |
+| M2 | AI-trend signal layer | ≥ 1 **updatable** source; show source and date; **hard-coded lists alone do not count** | Re-runnable pipeline: **arXiv API** (AI advancement by capability), **public job postings** (skill demand per month), **WEF Future of Jobs 2025 + O\*NET** (baseline). Each run writes a dated snapshot | ✅ pipeline and refresh · ⬜ real WEF baseline (seed is illustrative) |
 | M3 | Future-role matching | Ranked roles, **explainable** match score, clear skills gap | Score = 0.6 fit + 0.4 outlook (+ SDG preference); "Why this rank?" breakdown; covered vs missing skills | ✅ |
-| M4 | Personalised pathway | Ordered plan, **estimated time**, **free or low-cost** resources, HRD Corp-claimable | Steps only from the course catalogue; hours, RM cost, free / HRD Corp flags | ✅ order + hours · ⬜ RM cost, HRD Corp flags |
+| M4 | Personalised pathway | Ordered plan, **estimated time**, **free or low-cost** resources, HRD Corp-claimable | Steps only from the course catalogue; hours, RM cost, free / HRD Corp flags | ✅ order, hours, free / free-to-audit / paid labels, progress · ⬜ RM prices and HRD Corp status (shown as "check with provider" until sourced) |
 | M5 | SDG mapping | **Each role and skill** → ≥ 1 SDG; show how the chosen path contributes | All 13 roles and 42 skills tagged with an SDG target (test enforced); Impact screen; SDG preference re-ranks roles | ✅ |
-| M6 | Handling uncertainty | > 1 scenario; make clear **predictions are estimates** | Slow / baseline / accelerated + year slider; each role shows a low–high estimate range and the word "estimate" | ✅ scenarios + range · ⬜ year slider |
+| M6 | Handling uncertainty | > 1 scenario; make clear **predictions are estimates** | Slow / baseline / accelerated + year slider; each role shows a low–high estimate range and the word "estimate" | ✅ scenarios, range, year slider to the horizon year |
 
 Also required: the **Future Skills Radar** screen (brief, section 3, step 2), showing which **skills**
-and roles are rising or declining. ⬜
+and roles are rising or declining. ✅
 
 ## Good-to-have features (brief, section 5)
 
 | Feature | Plan | Priority |
 |---|---|---|
-| Employer / HR view: workforce skills-gap heatmap and reskilling plan | Anonymous CSV → heatmap, cheapest moves, cost; **aggregate only, no per-employee ranking** | High |
-| Automatic re-planning when trend data changes | After a refresh: "Your plan changed because …" with the signal that caused it | High |
+| Employer / HR view: workforce skills-gap heatmap and reskilling plan | Anonymous CSV → heatmap, cheapest moves, learning hours, SDG totals; **aggregate only, no per-employee ranking** | ✅ |
+| Automatic re-planning when trend data changes | After a refresh: "Your plan changed because …" with the roles that moved | ✅ |
 | Inclusive design: EN / BM / 中文, low-bandwidth, mobile-friendly | Responsive now; "lite mode" (no web fonts); BM + 中文 strings | Medium |
-| Learner motivation: progress tracking, skill badges | Tick steps → readiness meter; a badge per skill completed | Medium |
+| Learner motivation: progress tracking, skill badges | Tick steps → readiness meter; a badge per skill earned | ✅ |
 | Fairness checks | No age, gender or background inputs; API rejects them; tests prove names don't change rankings | ✅ |
-| SDG contribution for a person, company or region | Person ✅ (Impact screen); company in the HR view; region out of scope | Medium |
+| SDG contribution for a person, company or region | Person ✅ (Impact screen); company ✅ (HR view); region out of scope | ✅ |
 
 Lower priority, since the rubric asks for more than "a chatbot for jobs": an AI coach that answers
 questions about the user's own results, with citations, and proposes changes the user applies.

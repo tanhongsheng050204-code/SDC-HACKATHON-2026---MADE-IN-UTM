@@ -267,6 +267,48 @@ legend { font-weight: 600; padding: 0 6px; }
 .site .banner.error { margin: 12px auto 0; max-width: 1160px; }
 .error { color: var(--risk); }
 
+/* ---------- Intake extras ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+.dropzone { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 32px 20px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-card); background: var(--surface); color: var(--ink-soft); }
+.dropzone strong { color: var(--ink); }
+.file-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: .65rem 1.1rem; border-radius: var(--radius-btn); font: 600 .92rem/1 var(--font); cursor: pointer; overflow: hidden; }
+.file-btn.ink { background: var(--ink); color: var(--page); box-shadow: var(--shadow-btn); }
+.file-btn.quiet { background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chat-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 340px; overflow-y: auto; }
+.chat-log li { max-width: 80%; padding: 10px 14px; border-radius: 14px; line-height: 1.45; }
+.chat-log .assistant { background: var(--surface-2); justify-self: start; border-bottom-left-radius: 4px; }
+.chat-log .user { background: var(--ink); color: var(--page); justify-self: end; border-bottom-right-radius: 4px; }
+.chat-form { display: flex; gap: 8px; }
+.chat-form input { flex: 1; }
+
+/* ---------- Year slider, job links, progress ---------- */
+.year-slider { display: grid; gap: 6px; max-width: 520px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.year-slider label { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+.year-slider input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px; }
+.year-ticks { display: flex; justify-content: space-between; font-size: .74rem; color: var(--ink-faint); }
+.job-links { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-weight: 600; }
+.readiness-num { font-size: 1.65rem; font-weight: 750; letter-spacing: -.035em; }
+.check { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; justify-self: start; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.steps > li.is-done { background: var(--good-bg); border-color: transparent; }
+.steps > li.is-done::before { content: "✓"; background: var(--good); }
+
+/* ---------- Workforce view ---------- */
+code { font-size: .88em; background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
+.table-wrap { overflow-x: auto; }
+.heatmap { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.heatmap th, .heatmap td { padding: 9px 10px; text-align: left; border-top: 1px solid var(--line); white-space: nowrap; }
+.heatmap thead th { border-top: none; color: var(--ink-soft); font-weight: 500; font-size: .8rem; }
+.heatmap tbody th { font-weight: 600; }
+.hm-good { background: var(--good-bg); color: var(--good); font-weight: 600; }
+.hm-stable { background: var(--gold-bg); color: var(--gold); font-weight: 600; }
+.hm-risk { background: var(--risk-bg); color: var(--risk); font-weight: 600; }
+.sdg-totals { display: flex; flex-wrap: wrap; gap: 10px; }
+.sdg-total { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.sdg-total strong { display: block; } .sdg-total small { color: var(--ink-soft); }
+
 /* ---------- Motion and print ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

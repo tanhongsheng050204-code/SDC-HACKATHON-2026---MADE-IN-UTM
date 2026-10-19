@@ -3,14 +3,16 @@
 import hmac
 import json
 
-from fastapi import APIRouter, Header, HTTPException, Query
+from fastapi import APIRouter, File, Header, HTTPException, Query, UploadFile
+from fastapi.responses import PlainTextResponse
 
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario
+from app.schemas import (CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
+                         WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import intake, matching, pathway, skills
+from app.services import documents, intake, matching, pathway, skills, workforce
 from app.trends import refresh
 
 router = APIRouter(prefix="/api")
@@ -108,7 +110,7 @@ def radar(profile_id: str | None = None):
     """Future Skills Radar: which skills and roles are rising or declining, with sources."""
     ref = get_reference()
     snapshot = ref.latest_snapshot
-    mine = set(_profile_or_404(profile_id)["skills"]) if profile_id else set()
+    mine = matching.effective_skills(ref, _profile_or_404(profile_id)) if profile_id else set()
     baseline = ref.scenarios["baseline"]
     signals = signals_from_snapshot(snapshot)
     roles = sorted(({"role_id": rid, "title": ref.roles[rid]["title"],
@@ -159,6 +161,17 @@ def extract_skills(body: ExtractRequest):
     return skills.extract(body.text)
 
 
+@router.post("/intake/upload")
+async def upload_cv(file: UploadFile = File(...)):
+    """A CV file in, skill IDs out. Read in memory, scrubbed before any LLM call, never stored."""
+    data = await file.read(documents.MAX_BYTES + 1)
+    try:
+        text = documents.read_text(file.filename or "", data)
+    except documents.UnreadableDocument as error:
+        raise HTTPException(422, str(error)) from error
+    return {**skills.extract(text), "characters": len(text)}
+
+
 @router.post("/intake/turn")
 def intake_turn(body: IntakeTurnRequest):
     return intake.turn([m.model_dump() for m in body.messages], body.language)
@@ -203,8 +216,34 @@ def delete_profile(profile_id: str):
 
 
 @router.get("/profiles/{profile_id}/matches")
-def profile_matches(profile_id: str, scenario: Scenario = "baseline"):
-    return matching.match(get_reference(), _profile_or_404(profile_id), scenario)
+def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None):
+    return matching.match(get_reference(), _profile_or_404(profile_id), scenario, year)
+
+
+@router.post("/profiles/{profile_id}/complete")
+def complete_course(profile_id: str, body: CompleteRequest):
+    """Mark a pathway course finished (or not). Its skills then count as covered."""
+    profile = _profile_or_404(profile_id)
+    if body.course_id not in {c["id"] for c in get_reference().courses}:
+        raise HTTPException(422, "Unknown course")
+    done = [c for c in profile["completed_courses"] if c != body.course_id]
+    if body.done:
+        done.append(body.course_id)
+    return store.set_completed(profile_id, done)
+
+
+@router.get("/workforce/sample", response_class=PlainTextResponse)
+def workforce_sample():
+    """A synthetic company of 160 people, for trying the HR view."""
+    return (get_settings().data_dir / "sample_workforce.csv").read_text(encoding="utf-8")
+
+
+@router.post("/workforce/analyse")
+def workforce_analyse(body: WorkforceRequest):
+    try:
+        return workforce.analyse(get_reference(), body.csv, body.scenario)
+    except workforce.WorkforceError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @router.get("/profiles/{profile_id}/pathway")

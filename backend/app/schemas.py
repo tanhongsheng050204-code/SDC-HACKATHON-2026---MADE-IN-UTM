@@ -15,6 +15,16 @@ class ExtractRequest(BaseModel):
     text: str = Field(min_length=50, max_length=20_000)
 
 
+class CompleteRequest(BaseModel):
+    course_id: str = Field(min_length=1, max_length=80)
+    done: bool = True
+
+
+class WorkforceRequest(BaseModel):
+    csv: str = Field(min_length=10, max_length=1_000_000)
+    scenario: Scenario = "baseline"
+
+
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(max_length=1_000)
