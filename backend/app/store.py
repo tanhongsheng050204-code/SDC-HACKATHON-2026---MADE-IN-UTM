@@ -2,13 +2,14 @@
 
 import datetime as dt
 import json
+import secrets
 import sqlite3
 import uuid
 from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -24,6 +25,15 @@ _MIGRATIONS = {
     """,
     2: "ALTER TABLE profiles ADD COLUMN experience_years INTEGER;",
     3: "ALTER TABLE profiles ADD COLUMN completed_courses TEXT NOT NULL DEFAULT '[]';",
+    4: """
+    CREATE TABLE IF NOT EXISTS cards (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        role_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS cards_profile ON cards(profile_id);
+    """,
 }
 
 
@@ -31,6 +41,7 @@ _MIGRATIONS = {
 def _connect():
     conn = sqlite3.connect(get_settings().database_path)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")  # so deleting a profile deletes its cards
     try:
         yield conn
         conn.commit()
@@ -111,6 +122,21 @@ def get_profile(profile_id: str) -> dict | None:
 def delete_profile(profile_id: str) -> bool:
     with _connect() as conn:
         return conn.execute("DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount > 0
+
+
+def create_card(profile_id: str, role_id: str) -> str:
+    """A short random ID that reveals nothing about the profile, for a read-only shared link."""
+    card_id = secrets.token_urlsafe(9)
+    with _connect() as conn:
+        conn.execute("INSERT INTO cards (id, profile_id, role_id, created_at) VALUES (?, ?, ?, ?)",
+                     (card_id, profile_id, role_id, _now()))
+    return card_id
+
+
+def get_card(card_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM cards WHERE id=?", (card_id,)).fetchone()
+    return dict(row) if row else None
 
 
 def purge_older_than(days: int = 30) -> int:

@@ -33,7 +33,7 @@ Snapshots are **immutable**: a change creates a new file, and the newest `import
 | `profiles` | `id` UUID PK, `display_name?` ≤ 60, `current_role_id?`, `skills` JSON, `interests` JSON (SDG numbers, used in ranking), `experience_years?` 0–60, `tasks_done` JSON ⬜, `created_at`, `updated_at` (indexed). **No age, gender, ethnicity or background fields; unknown fields are rejected** | ✅ |
 | `progress` ⬜ | `profile_id` FK cascade, `role_id`, `course_id`, `done_at` | Readiness meter |
 | `watcher_proposals` ⬜ | `id`, `created_at`, `source_title`, `source_url`, `role_id`, `field`, `old_value`, `new_value`, `reason`, `status` pending/approved/rejected, `decided_by?`, `decided_at?` | Approving writes a new snapshot |
-| `cards` ⬜ | `id` short random, `profile_id` FK cascade, `role_id`, `created_at` | Future Card read-only link |
+| `cards` ✅ | `id` short random, `profile_id` FK cascade, `role_id`, `created_at` | Future Card read-only link |
 | `schema_version` | `version` | Numbered migrations in `app/store.py` |
 
 ## Relationships

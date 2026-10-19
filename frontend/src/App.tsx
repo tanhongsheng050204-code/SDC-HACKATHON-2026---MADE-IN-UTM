@@ -2,7 +2,8 @@
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { Component, ReactNode, useEffect, useMemo, useState } from "react";
 import { LogoMark, Rosette } from "./brand";
-import { api, ChatTurn, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
+import QRCode from "qrcode";
+import { api, ChatTurn, FutureCard, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
 
 type Screen = "landing" | "intake" | "review" | "radar" | "tasks" | "roles" | "role" | "impact" | "workforce";
 const PROFILE_KEY = "laluan.profileId";
@@ -39,7 +40,17 @@ function storeProfileId(id: string | null) {
   try { id ? localStorage.setItem(PROFILE_KEY, id) : localStorage.removeItem(PROFILE_KEY); } catch { /* private mode */ }
 }
 
+// Entry points (docs/03-APP_FLOW.md): /?card=ID opens a read-only Future Card; /?demo=clerk|student
+// opens a demo profile directly; anything else starts on the landing page.
 export default function App() {
+  const params = new URLSearchParams(window.location.search);
+  const cardId = params.get("card");
+  return cardId ? <CardPage cardId={cardId} /> : <MainApp demo={params.get("demo")} />;
+}
+
+let demoLinkUsed = false;
+
+function MainApp({ demo }: { demo: string | null }) {
   const [screen, setScreen] = useState<Screen>("landing");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [scenario, setScenario] = useState<Scenario>("baseline");
@@ -60,6 +71,13 @@ export default function App() {
     try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode */ }
   }
   useEffect(() => { api.health().then((h) => setModel(h.llm_model)).catch(() => undefined); }, []);
+  useEffect(() => {
+    if ((demo !== "clerk" && demo !== "student") || demoLinkUsed) return;
+    demoLinkUsed = true;  // React dev mode runs effects twice; open one demo profile only
+    window.history.replaceState(null, "", window.location.pathname);
+    openDemo(demo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function openDemo(key: string) {
     setError(null);
@@ -533,9 +551,90 @@ function RoleDetail({ profile, role, scenario, onImpact, onProfile }: {
           </ol>
           <button className="primary" onClick={onImpact}>See my impact</button>
           <button onClick={() => window.print()}>Print summary</button>
+          <ShareCard profile={profile} roleId={role.role_id} />
         </>
       )}
     </section>
+  );
+}
+
+function ShareCard({ profile, roleId }: { profile: Profile; roleId: string }) {
+  const [link, setLink] = useState<string | null>(null);
+  const [qr, setQr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function create() {
+    setError(null);
+    try {
+      const { card_id } = await api.createCard(profile.id, roleId);
+      const url = `${window.location.origin}${window.location.pathname}?card=${card_id}`;
+      setLink(url);
+      setQr(await QRCode.toDataURL(url, { margin: 1, width: 220, errorCorrectionLevel: "M" }));
+    } catch { setError("Couldn't create the card. Try again."); }
+  }
+  async function copy() {
+    if (!link) return;
+    try { await navigator.clipboard.writeText(link); setCopied(true); } catch { setCopied(false); }
+  }
+  return (
+    <div className="card share-card">
+      <h3>Future Card</h3>
+      <p className="muted">A read-only summary of this plan you can show a counsellor, employer or family. It shows {profile.display_name ? `your name, ${profile.display_name},` : "no name"} the role, your readiness and the plan in brief, never your full skill list. It stops working when you delete your profile.</p>
+      {!link ? <button className="primary" onClick={create}>Create my Future Card</button> : (
+        <div className="share-row">
+          {qr && <img src={qr} width={160} height={160} alt="QR code that opens your Future Card" />}
+          <div className="share-actions">
+            <a href={link} target="_blank" rel="noreferrer">Open the card ↗</a>
+            <button onClick={copy}>{copied ? "Link copied" : "Copy link"}</button>
+            <code className="share-link">{link}</code>
+          </div>
+        </div>
+      )}
+      {error && <p className="error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+function CardPage({ cardId }: { cardId: string }) {
+  const [card, setCard] = useState<FutureCard | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    api.card(cardId).then(setCard).catch((e) => setError(e instanceof Error && e.message.startsWith("404")
+      ? "This Future Card no longer exists. Its owner may have deleted their profile."
+      : "Can't reach Laluan right now. Try again in a moment."));
+  }, [cardId]);
+  return (
+    <div className="site">
+      <nav className="site-nav" aria-label="Main">
+        <a className="brand" href={window.location.pathname} aria-label="Laluan home"><LogoMark /><span>Laluan</span></a>
+      </nav>
+      <main className="card-page">
+        {error && <div className="banner error" role="alert">{error}</div>}
+        {!card && !error && <p className="muted">Loading the card…</p>}
+        {card && (
+          <article className="future-card card">
+            <p className="eyebrow">Future Card{card.display_name ? ` · ${card.display_name}` : ""}</p>
+            <h1>Moving toward {card.role.title}</h1>
+            <p className="muted">{card.role.summary}</p>
+            <div className="kpis">
+              <div className="kpi"><span className="kpi-label">Readiness</span><strong>{Math.round(card.readiness * 100)}%</strong>
+                <span className="badge">skills already covered</span></div>
+              <div className="kpi"><span className="kpi-label">Outlook to {card.estimate_range.horizon_year}</span><strong>{signed(card.outlook.index)}%</strong>
+                <span className={`badge ${OUTLOOK_TONE[card.outlook.label]}`}>{OUTLOOK_TEXT[card.outlook.label]}</span></div>
+              <div className="kpi"><span className="kpi-label">Plan</span><strong>{card.steps} steps</strong>
+                <span className="badge">about {card.hours} hours left</span></div>
+            </div>
+            {card.robust_pick && <p><span className="badge gold">Robust pick</span> Stays in the top five under every AI-adoption scenario.</p>}
+            <p className="muted">Range across scenarios: {signed(card.estimate_range.low)}% to {signed(card.estimate_range.high)}% jobs. An estimate, not a prediction.</p>
+            {card.next_skills.length > 0 && <p><strong>Next skills:</strong> {card.next_skills.join(", ")}</p>}
+            {card.first_step && <p><strong>First step:</strong> {card.first_step}</p>}
+            <Sdgs sdgs={card.sdgs} />
+            <p className="source">Outlook source: {card.source.snapshot_id}, imported {card.source.imported}. Card created {card.created_at.slice(0, 10)}; figures update when the data does.</p>
+            <a className="btn ink" href={window.location.pathname}>Make your own plan</a>
+          </article>
+        )}
+      </main>
+    </div>
   );
 }
 

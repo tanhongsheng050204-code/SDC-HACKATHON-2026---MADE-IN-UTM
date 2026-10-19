@@ -10,10 +10,10 @@ from pydantic import ValidationError
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
+from app.schemas import (CardRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
                          SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import documents, intake, matching, pathway, skills, tasks, workforce
+from app.services import cards, documents, intake, matching, pathway, skills, tasks, workforce
 from app.trends import refresh
 
 router = APIRouter(prefix="/api")
@@ -243,6 +243,24 @@ def complete_course(profile_id: str, body: CompleteRequest):
     if body.done:
         done.append(body.course_id)
     return store.set_completed(profile_id, done)
+
+
+@router.post("/profiles/{profile_id}/cards", status_code=201)
+def create_card(profile_id: str, body: CardRequest):
+    """A Future Card: a read-only link to a summary of this person's move to one role."""
+    _profile_or_404(profile_id)
+    if body.role_id not in get_reference().roles:
+        raise HTTPException(422, "Unknown role")
+    return {"card_id": store.create_card(profile_id, body.role_id)}
+
+
+@router.get("/cards/{card_id}")
+def get_card(card_id: str):
+    card = store.get_card(card_id)
+    profile = store.get_profile(card["profile_id"]) if card else None
+    if card is None or profile is None or card["role_id"] not in get_reference().roles:
+        raise HTTPException(404, "Card not found")
+    return cards.view(get_reference(), profile, card)
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

@@ -58,6 +58,14 @@ export interface RoleTasks {
   tasks: { id: string; text: string; label: TaskLabel; reason: string; reviewed_by: string | null }[];
   counted: number; shares: Record<TaskLabel, number>; reviewed: number;
 }
+export interface FutureCard {
+  card_id: string; created_at: string; display_name: string | null;
+  role: { role_id: string; title: string; summary: string };
+  readiness: number; outlook: { index: number; label: string };
+  estimate_range: { low: number; high: number; horizon_year: number; year: number };
+  robust_pick: boolean; next_skills: string[]; steps: number; hours: number; first_step: string | null;
+  sdgs: Sdg[]; source: { snapshot_id: string; imported: string; note: string | null };
+}
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[]; interests: number[] }
 export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null }
 export interface Pathway {
@@ -120,5 +128,8 @@ export const api = {
     request<RefreshStatus>("/signals/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
+  createCard: (id: string, roleId: string) =>
+    request<{ card_id: string }>(`/profiles/${id}/cards`, { method: "POST", body: JSON.stringify({ role_id: roleId }) }),
+  card: (cardId: string) => request<FutureCard>(`/cards/${encodeURIComponent(cardId)}`),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

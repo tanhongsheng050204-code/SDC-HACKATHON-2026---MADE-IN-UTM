@@ -145,3 +145,28 @@ def test_every_recommendation_carries_a_source(client):
     assert analyst["skills_source"]["onet_code"] == "15-2051.01"
     plan = client.get(f"/api/profiles/{profile['id']}/pathway", params={"role": "data_analyst"}).json()
     assert all("checked" in s["course"] and s["course"]["provider"] for s in plan["steps"])
+
+
+# ---------- Future Card ----------
+
+def test_future_card_is_a_read_only_summary_without_private_details(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    card = client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "data_analyst"})
+    assert card.status_code == 201
+    card_id = card.json()["card_id"]
+    assert len(card_id) >= 10 and profile["id"] not in card_id
+
+    view = client.get(f"/api/cards/{card_id}").json()
+    assert view["role"]["title"] == "Data analyst" and view["display_name"] == "Aisyah (demo)"
+    assert 0 <= view["readiness"] <= 1 and view["steps"] >= 1 and view["hours"] > 0
+    assert view["sdgs"] and view["source"]["snapshot_id"]
+    flat = str(view)
+    assert profile["id"] not in flat and "skills" not in view  # no profile ID or full skill list
+
+
+def test_future_card_goes_when_the_profile_is_deleted(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    assert client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "nope"}).status_code == 422
+    card_id = client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "data_analyst"}).json()["card_id"]
+    client.delete(f"/api/profiles/{profile['id']}")
+    assert client.get(f"/api/cards/{card_id}").status_code == 404

@@ -44,6 +44,10 @@ class CompleteRequest(BaseModel):
     done: bool = True
 
 
+class CardRequest(BaseModel):
+    role_id: str = Field(min_length=1, max_length=80)
+
+
 class WorkforceRequest(BaseModel):
     csv: str = Field(min_length=10, max_length=1_000_000)
     scenario: Scenario = "baseline"
