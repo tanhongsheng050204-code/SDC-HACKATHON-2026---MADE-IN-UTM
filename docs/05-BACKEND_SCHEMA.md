@@ -12,7 +12,7 @@ team checked it.
 |---|---|---|---|
 | `skills.json` | A skill in our standard list | `id`, `name`, `category`, `aliases[]` (unique across skills) | ✅ |
 | `roles.json` | A job role | `id`, `title`, `family`, `summary`, `skills[{skill_id, weight 1–3}]`, `onet_code?`, `esco_code?` | ✅ (codes ⬜) |
-| `tasks.json` | Tasks for a role from O\*NET | `role_id`, `tasks[{id, text, label: automate/assist/human, reason, source, reviewed_by}]` | ⬜ |
+| `tasks.json` | Tasks for a role from O\*NET | `role_id`, `onet_code`, `onet_note`, `tasks[{id, text, label: automate/assist/human, reason, reviewed_by}]`; built by `scripts/build_tasks.py` from O\*NET 30.0 and `raw/onet_task_labels.json` | ✅ (label review ⬜) |
 | `signals/<date>-<slug>.json` | One dated snapshot built from the sources below | `snapshot_id`, `source`, `source_url`, `published`, `imported`, `horizon_year`, `illustrative`, `reviewed_by`, `kind` ("trend-adjusted"), `baseline_snapshot_id`, `inputs[{source, url, retrieved, windows/threads}]`, `capability_momentum{}`, `signals[{role_id, net_growth_pct −100…300, automation_exposure 0–1, ai_complementarity 0–1, note}]`, `skill_signals[{skill_id, trend −1…1 or null, label rising/steady/declining/no_data, sources[]}]` | ✅ |
 | `raw/research/<date>.json`, `raw/jobs/<date>.json` | Raw counts from one collector run (evidence) | research: `source`, `windows`, `queries`, `counts{cap: {recent, prior}}` · jobs: `threads`, `terms`, `postings`, `mentions{skill: {recent, prior}}` | ✅ |
 | `capabilities.json` | An AI capability tracked in research | `id`, `name`, `query`, `exposes_roles`, `complements_roles`, `automates_skills`, `boosts_skills` | ✅ (review ⬜) |

@@ -50,6 +50,13 @@ export interface Workforce {
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
 }
+export type TaskLabel = "automate" | "assist" | "human";
+export interface RoleTasks {
+  role_id: string; onet_code: string | null; onet_note: string | null;
+  source: string; source_url: string; labels_note: string;
+  tasks: { id: string; text: string; label: TaskLabel; reason: string; reviewed_by: string | null }[];
+  counted: number; shares: Record<TaskLabel, number>; reviewed: number;
+}
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[]; interests: number[] }
 export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string }
 export interface Pathway {
@@ -110,5 +117,7 @@ export const api = {
     request<RefreshStatus>(`/signals/refresh?force=${force}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   refreshStatus: (token: string) =>
     request<RefreshStatus>("/signals/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  tasks: (roleId: string, done: string[] = []) =>
+    request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

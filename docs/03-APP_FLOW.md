@@ -19,7 +19,7 @@ different demo data; Organisation opens the HR view.
 | S1 | Intake | Upload CV (PDF/DOCX) / paste CV / questionnaire / pick skills | `POST /intake/upload`, `POST /intake/extract`, `POST /intake/turn`, `GET /skills` |
 | S2 | Review | Confirm skills, current job, years of experience, goals (SDGs) | `POST /profiles` |
 | S2b | **Future Skills Radar** | Which skills and roles are rising or declining, each with source and date; the user's own skills highlighted | `GET /radar?profile_id=` |
-| S3 | Your job, task by task | Tick tasks you do → % automate / assist / human | `GET /roles/{id}/tasks` ⬜ |
+| S3 | Your job, task by task | Tick tasks you do → % automate / assist / human | `GET /roles/{id}/tasks?done=` ✅ |
 | S4 | Future roles | Stat cards, scenario presets, year slider (today → horizon), ranked cards | `GET /profiles/{id}/matches?scenario=&year=` |
 | S5 | Role detail | Outlook over time, covered vs missing skills, **Why this rank?** | same + `GET /roles/{id}` |
 | S6 | Pathway | Job links, readiness meter, badges, steps with hours and cost labels, "I finished this" | `GET /profiles/{id}/pathway?role=`, `POST /profiles/{id}/complete` |

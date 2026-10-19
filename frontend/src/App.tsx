@@ -2,9 +2,9 @@
 // Navigation is component state for now; task 3.5 moves it to real routes.
 import { useEffect, useMemo, useState } from "react";
 import { LogoMark, Rosette } from "./brand";
-import { api, ChatTurn, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, Scenario, Sdg, Skill } from "./api";
+import { api, ChatTurn, Matches, Pathway, Workforce, Profile, Radar as RadarData, RefreshStatus, RoleMatch, RoleOption, RoleTasks, Scenario, Sdg, Skill, TaskLabel } from "./api";
 
-type Screen = "landing" | "intake" | "review" | "radar" | "roles" | "role" | "impact" | "workforce";
+type Screen = "landing" | "intake" | "review" | "radar" | "tasks" | "roles" | "role" | "impact" | "workforce";
 const PROFILE_KEY = "laluan.profileId";
 const THEME_KEY = "laluan.theme";
 const SCENARIOS: { id: Scenario; label: string }[] = [
@@ -110,7 +110,10 @@ export default function App() {
 
   const groups: { label: string | null; items: { id: Screen; label: string; icon: IconName; enabled: boolean }[] }[] = [
     { label: null, items: [{ id: "intake", label: "My profile", icon: "user", enabled: true }] },
-    { label: "Signals", items: [{ id: "radar", label: "Future Skills Radar", icon: "radar", enabled: !!profile }] },
+    { label: "Signals", items: [
+      { id: "radar", label: "Future Skills Radar", icon: "radar", enabled: !!profile },
+      { id: "tasks", label: "My job, task by task", icon: "list", enabled: !!profile },
+    ] },
     { label: "My future", items: [
       { id: "roles", label: "Future roles", icon: "briefcase", enabled: !!profile },
       { id: "role", label: "Pathway", icon: "route", enabled: !!role },
@@ -119,7 +122,7 @@ export default function App() {
     { label: "Organisation", items: [{ id: "workforce", label: "Workforce view", icon: "users", enabled: true }] },
   ];
   const current = screen === "review" ? "intake" : screen;
-  const title = { intake: "My profile", review: "My profile", radar: "Future Skills Radar", roles: "Future roles", role: "Pathway", impact: "SDG impact", workforce: "Workforce view", landing: "" }[screen];
+  const title = { intake: "My profile", review: "My profile", radar: "Future Skills Radar", tasks: "My job, task by task", roles: "Future roles", role: "Pathway", impact: "SDG impact", workforce: "Workforce view", landing: "" }[screen];
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -165,6 +168,7 @@ export default function App() {
             <Review initial={draftSkills} onSaved={(p) => { storeProfileId(p.id); setProfile(p); setScreen("radar"); }} />
           )}
           {screen === "radar" && profile && <Radar profile={profile} onNext={() => setScreen("roles")} />}
+          {screen === "tasks" && profile && <TaskView profile={profile} onNext={() => setScreen("roles")} />}
           {screen === "roles" && profile && (
             <Roles profile={profile} scenario={scenario} setScenario={setScenario}
               onOpen={(r) => { setRole(r); setScreen("role"); }} />
@@ -665,8 +669,86 @@ function WhatChanged({ changes, snapshot, onClose }: { changes: Change[]; snapsh
   );
 }
 
-type IconName = "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon" | "upload";
+const TASK_LABEL: Record<TaskLabel, { text: string; tone: string; help: string }> = {
+  automate: { text: "AI likely to automate", tone: "risk", help: "Software can already do most of this." },
+  assist: { text: "AI assists you", tone: "gold", help: "AI speeds it up; you stay in charge." },
+  human: { text: "Stays human", tone: "good", help: "Needs judgement, presence or trust." },
+};
+const TASKS_KEY = "laluan.tasksDone";
+
+function TaskView({ profile, onNext }: { profile: Profile; onNext: () => void }) {
+  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const [roleId, setRoleId] = useState(profile.current_role_id ?? "");
+  const [done, setDone] = useState<string[]>(() => {
+    try { return JSON.parse(sessionStorage.getItem(TASKS_KEY) ?? "[]"); } catch { return []; }
+  });
+  const [data, setData] = useState<RoleTasks | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { api.roles().then(setRoles).catch(() => setError("Couldn't load the role list.")); }, []);
+  useEffect(() => {
+    if (!roleId) return;
+    api.tasks(roleId, done).then((d) => { setData(d); setError(null); }).catch(() => setError("Couldn't load the tasks for this job."));
+    try { sessionStorage.setItem(TASKS_KEY, JSON.stringify(done)); } catch { /* private mode */ }
+  }, [roleId, done]);
+  const ids = new Set(data?.tasks.map((t) => t.id));
+  const ticked = done.filter((d) => ids.has(d));
+  return (
+    <section>
+      <div className="page-head"><h1>Your job, task by task</h1>
+        <p className="muted">AI rarely replaces a whole job at once: it changes tasks. Tick the tasks you actually do to see how much of your work AI is likely to automate, assist with, or leave to you.</p></div>
+      <label className="narrow">Job
+        <select value={roleId} onChange={(e) => { setRoleId(e.target.value); setDone([]); }}>
+          <option value="">Choose a job</option>
+          {roles.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
+        </select>
+      </label>
+      {error && <p className="error" role="alert">{error}</p>}
+      {!roleId && <p className="muted">Pick your current or most recent job to start.</p>}
+      {data && data.tasks.length === 0 && (
+        <div className="banner">{data.onet_note ?? "No task data for this job yet."}</div>
+      )}
+      {data && data.tasks.length > 0 && (
+        <>
+          <div className="task-split card" aria-label="Share of your tasks">
+            <div className="split-bar" aria-hidden="true">
+              {(["automate", "assist", "human"] as const).map((l) => (
+                <span key={l} className={`split ${l}`} style={{ width: `${data.shares[l] * 100}%` }} />
+              ))}
+            </div>
+            <ul className="split-legend">
+              {(["automate", "assist", "human"] as const).map((l) => (
+                <li key={l}><span className={`swatch ${l}`} aria-hidden="true" /><strong>{Math.round(data.shares[l] * 100)}%</strong> {TASK_LABEL[l].text}</li>
+              ))}
+            </ul>
+            <p className="muted">{ticked.length ? `Based on the ${data.counted} ${data.counted === 1 ? "task" : "tasks"} you ticked.` : `Based on all ${data.counted} tasks. Tick yours to make it personal.`}</p>
+          </div>
+          <ul className="task-list">
+            {data.tasks.map((t) => (
+              <li key={t.id} className="card">
+                <label className="check">
+                  <input type="checkbox" checked={done.includes(t.id)}
+                    onChange={(e) => setDone(e.target.checked ? [...done, t.id] : done.filter((d) => d !== t.id))} />
+                  <span>{t.text}</span>
+                </label>
+                <div className="card-row">
+                  <span className={`badge ${TASK_LABEL[t.label].tone}`} title={TASK_LABEL[t.label].help}>{TASK_LABEL[t.label].text}</span>
+                  <span className="muted">{t.reason}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="source">Tasks: {data.source}{data.onet_code && <>, occupation <a href={`https://www.onetonline.org/link/summary/${data.onet_code}`} target="_blank" rel="noreferrer">{data.onet_code}</a></>}
+            {data.onet_note && ` · ${data.onet_note}`} · Labels are judgements drafted with AI assistance, not predictions; checked by our team so far: {data.reviewed} of {data.tasks.length}.</p>
+          <button className="primary" onClick={onNext}>See roles you could move into</button>
+        </>
+      )}
+    </section>
+  );
+}
+
+type IconName = "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash" | "sun" | "moon" | "upload" | "list";
 const ICONS: Record<IconName, string> = {
+  list: "M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0",
   radar: "M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 12l6-6",
   briefcase: "M4 8h16v11H4zM9 8V5h6v3M4 13h16",

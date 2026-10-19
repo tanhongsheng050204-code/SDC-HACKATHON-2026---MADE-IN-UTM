@@ -24,6 +24,7 @@ class Reference:
     demo_profiles: dict[str, dict]
     capabilities: list[dict]
     job_terms: dict[str, str]
+    tasks: dict  # {"source", "source_url", "labels_note", "roles": {role_id: {...}}}
 
     @property
     def latest_snapshot(self) -> dict:
@@ -47,6 +48,11 @@ def load_snapshots(data_dir: Path) -> list[dict]:
     return sorted(snapshots, key=lambda s: (s["imported"], s["snapshot_id"]))
 
 
+def _tasks(path: Path) -> dict:
+    raw = _read(path)
+    return {**raw, "roles": {r["role_id"]: r for r in raw["roles"]}}
+
+
 @lru_cache
 def get_reference() -> Reference:
     data_dir = get_settings().data_dir
@@ -61,6 +67,7 @@ def get_reference() -> Reference:
         demo_profiles=_read(data_dir / "demo_profiles.json"),
         capabilities=_read(data_dir / "capabilities.json")["capabilities"],
         job_terms=_read(data_dir / "job_terms.json")["terms"],
+        tasks=_tasks(data_dir / "tasks.json"),
     )
 
 

@@ -1,0 +1,594 @@
+{
+  "source": "O*NET 30.0 Database, Task Statements (U.S. Department of Labor/ETA, CC BY 4.0)",
+  "source_url": "https://www.onetcenter.org/database.html",
+  "labels_note": "automate / assist / human labels were drafted with AI assistance; a label counts as checked only when reviewed_by is filled.",
+  "roles": [
+    {
+      "role_id": "data_entry_clerk",
+      "onet_code": "43-9021.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-11402",
+          "text": "Compile, sort, and verify the accuracy of data before it is entered.",
+          "label": "automate",
+          "reason": "Document-reading AI already extracts and checks fields from invoices and forms.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-11403",
+          "text": "Compare data with source documents, or re-enter data in verification format to detect errors.",
+          "label": "automate",
+          "reason": "Comparing entries with source documents is rule-based and is done by validation software.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-11404",
+          "text": "Store completed documents in appropriate locations.",
+          "label": "automate",
+          "reason": "Digital filing and records systems store documents automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-11405",
+          "text": "Locate and correct data entry errors, or report them to supervisors.",
+          "label": "assist",
+          "reason": "Software flags likely errors, but a person decides the correction and when to escalate.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-11407",
+          "text": "Select materials needed to complete work assignments.",
+          "label": "human",
+          "reason": "Planning one's own work and materials stays with the person.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "admin_assistant",
+      "onet_code": "43-6014.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-20281",
+          "text": "Create, maintain, and enter information into databases.",
+          "label": "automate",
+          "reason": "Entering and updating database records is increasingly done by forms, integrations and document AI.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2797",
+          "text": "Review work done by others to check for correct spelling and grammar, ensure that company format policies are followed, and recommend revisions.",
+          "label": "assist",
+          "reason": "Grammar and style tools check text; a person judges tone and company context.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20284",
+          "text": "Compose, type, and distribute meeting notes, routine correspondence, or reports, such as presentations or expense, statistical, or monthly reports.",
+          "label": "assist",
+          "reason": "Generative AI drafts notes and reports; a person checks facts and sends them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2790",
+          "text": "Answer telephones and give information to callers, take messages, or transfer calls to appropriate individuals.",
+          "label": "assist",
+          "reason": "Voice assistants route routine calls; people handle the rest.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2791",
+          "text": "Greet visitors or callers and handle their inquiries or direct them to the appropriate persons according to their needs.",
+          "label": "human",
+          "reason": "Welcoming visitors in person depends on presence and judgement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20289",
+          "text": "Train and assist staff with computer usage.",
+          "label": "human",
+          "reason": "Training colleagues needs patience, trust and knowing the team.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "customer_service_rep",
+      "onet_code": "43-4051.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-2578",
+          "text": "Keep records of customer interactions or transactions, recording details of inquiries, complaints, or comments, as well as actions taken.",
+          "label": "automate",
+          "reason": "Contact-centre software logs and summarises interactions automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2583",
+          "text": "Determine charges for services requested, collect deposits or payments, or arrange for billing.",
+          "label": "automate",
+          "reason": "Charges and billing follow rules that systems apply.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2584",
+          "text": "Complete contract forms, prepare change of address records, or issue service discontinuance orders, using computers.",
+          "label": "automate",
+          "reason": "Standard forms and account changes are handled by self-service and workflow tools.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-18565",
+          "text": "Confer with customers by telephone or in person to provide information about products or services, take or enter orders, cancel accounts, or obtain details of complaints.",
+          "label": "assist",
+          "reason": "Chatbots answer routine questions; people handle complex or upset customers with AI-suggested answers.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2581",
+          "text": "Contact customers to respond to inquiries or to notify them of claim investigation results or any planned adjustments.",
+          "label": "assist",
+          "reason": "Notifications can be drafted and sent by AI; sensitive news still needs a person.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2582",
+          "text": "Refer unresolved customer grievances to designated departments for further investigation.",
+          "label": "human",
+          "reason": "Deciding how to handle an unresolved complaint takes judgement and ownership.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "data_analyst",
+      "onet_code": "15-2051.01",
+      "onet_note": "Closest O*NET occupation: Business Intelligence Analysts.",
+      "tasks": [
+        {
+          "id": "onet-16150",
+          "text": "Generate standard or custom reports summarizing business, financial, or economic data for review by executives, managers, clients, and other stakeholders.",
+          "label": "automate",
+          "reason": "Standard reports are generated on a schedule by BI tools.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16146",
+          "text": "Collect business intelligence data from available industry reports, public information, field reports, or purchased sources.",
+          "label": "assist",
+          "reason": "AI gathers and summarises sources; a person judges which are reliable.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16139",
+          "text": "Maintain or update business intelligence tools, databases, dashboards, systems, or methods.",
+          "label": "assist",
+          "reason": "AI helps write queries and dashboard code; the analyst designs and maintains them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16144",
+          "text": "Create business intelligence tools or systems, including design of related databases, spreadsheets, or outputs.",
+          "label": "assist",
+          "reason": "AI speeds up building tools; deciding what to build stays with the analyst.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16141",
+          "text": "Identify and analyze industry or geographic trends with business strategy implications.",
+          "label": "human",
+          "reason": "Linking trends to business strategy needs context and accountability.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16149",
+          "text": "Synthesize current business intelligence or trend data to support recommendations for action.",
+          "label": "human",
+          "reason": "Recommending action is a judgement the analyst owns.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "ai_ml_engineer",
+      "onet_code": "15-2051.00",
+      "onet_note": "Closest O*NET occupation: Data Scientists.",
+      "tasks": [
+        {
+          "id": "onet-21826",
+          "text": "Clean and manipulate raw data using statistical software.",
+          "label": "assist",
+          "reason": "AI coding tools speed up data cleaning; the engineer checks the result.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21823",
+          "text": "Analyze, manipulate, or process large sets of data using statistical software.",
+          "label": "assist",
+          "reason": "Analysis is faster with AI help, but the engineer designs and verifies it.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21824",
+          "text": "Apply feature selection algorithms to models predicting outcomes of interest, such as sales, attrition, and healthcare use.",
+          "label": "assist",
+          "reason": "AutoML tries feature sets; the engineer judges what is valid and fair.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21827",
+          "text": "Compare models using statistical performance metrics, such as loss functions or proportion of explained variance.",
+          "label": "assist",
+          "reason": "Metrics are computed automatically; choosing the right one is a judgement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21831",
+          "text": "Identify business problems or management objectives that can be addressed through data analysis.",
+          "label": "human",
+          "reason": "Framing the right problem needs business understanding.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21829",
+          "text": "Deliver oral or written presentations of the results of mathematical modeling and data analysis to management or other end users.",
+          "label": "human",
+          "reason": "Explaining results and limits to decision makers stays with people.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "ai_operations_specialist",
+      "onet_code": null,
+      "onet_note": "A new role with no O*NET occupation yet, so we do not show tasks for it rather than guess.",
+      "tasks": []
+    },
+    {
+      "role_id": "software_developer",
+      "onet_code": "15-1252.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-21670",
+          "text": "Modify existing software to correct errors, adapt it to new hardware, or upgrade interfaces and improve performance.",
+          "label": "assist",
+          "reason": "AI coding assistants propose fixes; developers review and own them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21669",
+          "text": "Develop or direct software system testing or validation procedures, programming, or documentation.",
+          "label": "assist",
+          "reason": "AI writes test and documentation drafts; developers decide what must be tested.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21667",
+          "text": "Design, develop and modify software systems, using scientific analysis and mathematical models to predict and measure outcomes and consequences of design.",
+          "label": "assist",
+          "reason": "AI generates code; design and trade-offs stay with the developer.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21668",
+          "text": "Determine system performance standards.",
+          "label": "assist",
+          "reason": "Tools measure performance; setting the standard is a decision.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21662",
+          "text": "Analyze user needs and software requirements to determine feasibility of design within time and cost constraints.",
+          "label": "human",
+          "reason": "Understanding what users need and what is feasible needs conversation and judgement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21664",
+          "text": "Confer with systems analysts, engineers, programmers and others to design systems and to obtain information on project limitations and capabilities, performance requirements and interfaces.",
+          "label": "human",
+          "reason": "Working out designs with other people is collaborative.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "cybersecurity_analyst",
+      "onet_code": "15-1212.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-5316",
+          "text": "Monitor current reports of computer viruses to determine when to update virus protection systems.",
+          "label": "automate",
+          "reason": "Threat feeds and endpoint tools update protection automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-5317",
+          "text": "Modify computer security files to incorporate new software, correct errors, or change individual access status.",
+          "label": "automate",
+          "reason": "Access changes are increasingly handled by identity-management workflows.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-5320",
+          "text": "Perform risk assessments and execute tests of data processing system to ensure functioning of data processing activities and security measures.",
+          "label": "assist",
+          "reason": "Scanners find weaknesses; the analyst judges risk and impact.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-5322",
+          "text": "Document computer security and emergency measures policies, procedures, and tests.",
+          "label": "assist",
+          "reason": "AI drafts policies; the analyst makes them fit the organisation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-5314",
+          "text": "Develop plans to safeguard computer files against accidental or unauthorized modification, destruction, or disclosure and to meet emergency data processing needs.",
+          "label": "assist",
+          "reason": "Planning protection uses AI analysis but needs human priorities.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-5313",
+          "text": "Train users and promote security awareness to ensure system security and to improve server and network efficiency.",
+          "label": "human",
+          "reason": "Changing people's security habits needs trust and teaching.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "digital_marketing_specialist",
+      "onet_code": "13-1161.01",
+      "onet_note": "Closest O*NET occupation: Search Marketing Strategists.",
+      "tasks": [
+        {
+          "id": "onet-16186",
+          "text": "Conduct market research analysis to identify search query trends, real-time search and news media activity, popular social media topics, electronic commerce trends, market opportunities, or competitor performance.",
+          "label": "automate",
+          "reason": "Trend and competitor monitoring is done by analytics platforms.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16185",
+          "text": "Coordinate sales or other promotional strategies with merchandising, operations, or inventory control staff to ensure product catalogs are current, accurate, and organized for best findability against user intent.",
+          "label": "automate",
+          "reason": "Product catalogues are kept current by feeds and AI tagging.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16187",
+          "text": "Conduct financial modeling for online marketing programs or Web site revenue forecasting.",
+          "label": "assist",
+          "reason": "Forecasts come from tools; the specialist sets assumptions.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16179",
+          "text": "Propose online or multiple-sales-channel campaigns to marketing executives.",
+          "label": "assist",
+          "reason": "AI drafts campaign ideas and copy; the specialist chooses and pitches.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16182",
+          "text": "Participate in the development or implementation of online marketing strategy.",
+          "label": "human",
+          "reason": "Strategy depends on brand, customers and judgement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-16188",
+          "text": "Communicate and collaborate with merchants, Webmasters, bloggers, or online editors to strategically place hyperlinks.",
+          "label": "human",
+          "reason": "Partnerships rely on relationships.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "ux_designer",
+      "onet_code": "15-1255.00",
+      "onet_note": "Closest O*NET occupation: Web and Digital Interface Designers.",
+      "tasks": [
+        {
+          "id": "onet-21690",
+          "text": "Create searchable indices for Web page content.",
+          "label": "automate",
+          "reason": "Search indexing is done by software.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21691",
+          "text": "Create Web models or prototypes that include physical, interface, logical, or data models.",
+          "label": "assist",
+          "reason": "AI generates prototype drafts; the designer shapes them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21692",
+          "text": "Design, build, or maintain Web sites, using authoring or scripting languages, content creation tools, management tools, and digital media.",
+          "label": "assist",
+          "reason": "Site builders and AI speed up building; quality is the designer's call.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21693",
+          "text": "Develop and document style guidelines for Web site content.",
+          "label": "assist",
+          "reason": "AI can draft style guides from examples.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21688",
+          "text": "Conduct user research to determine design requirements and analyze user feedback to improve design quality.",
+          "label": "human",
+          "reason": "Talking to users and reading their reactions needs empathy.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21689",
+          "text": "Confer with management or development teams to prioritize needs, resolve conflicts, develop content criteria, or choose solutions.",
+          "label": "human",
+          "reason": "Resolving conflicting needs is negotiation.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "renewable_energy_technician",
+      "onet_code": "47-2231.00",
+      "onet_note": "Closest O*NET occupation: Solar Photovoltaic Installers.",
+      "tasks": [
+        {
+          "id": "onet-17749",
+          "text": "Determine photovoltaic (PV) system designs or configurations based on factors such as customer needs, expectations, and site conditions.",
+          "label": "assist",
+          "reason": "Design software proposes layouts from site data; the technician checks the site.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-17750",
+          "text": "Diagram layouts and locations for photovoltaic (PV) arrays and equipment, including existing building or site features.",
+          "label": "assist",
+          "reason": "Drones and mapping tools speed up diagrams.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-17744",
+          "text": "Activate photovoltaic (PV) systems to verify system functionality and conformity to performance expectations.",
+          "label": "assist",
+          "reason": "Monitoring systems test output; the technician fixes faults.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-17740",
+          "text": "Assemble solar modules, panels, or support structures, as specified.",
+          "label": "human",
+          "reason": "Physical assembly on varied sites is hard to automate.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-17742",
+          "text": "Install photovoltaic (PV) systems in accordance with codes and standards, using drawings, schematics, and instructions.",
+          "label": "human",
+          "reason": "Installation on roofs and sites needs hands-on skill and safety judgement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-17745",
+          "text": "Apply weather sealing to array, building, or support mechanisms.",
+          "label": "human",
+          "reason": "Weather sealing is manual work on each site.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "sustainability_analyst",
+      "onet_code": "13-1199.05",
+      "onet_note": "Closest O*NET occupation: Sustainability Specialists.",
+      "tasks": [
+        {
+          "id": "onet-15969",
+          "text": "Research or review regulatory, technical, or market issues related to sustainability.",
+          "label": "assist",
+          "reason": "AI summarises regulations and reports; the analyst checks what applies.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-15976",
+          "text": "Develop reports or presentations to communicate the effectiveness of sustainability initiatives.",
+          "label": "assist",
+          "reason": "AI drafts reports and charts from data.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-15972",
+          "text": "Write grant applications, rebate applications, or project proposals to secure funding for sustainability projects.",
+          "label": "assist",
+          "reason": "AI drafts applications; the analyst tailors and stands behind them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-15968",
+          "text": "Review and revise sustainability proposals or policies.",
+          "label": "assist",
+          "reason": "AI compares policies against standards; changes need human sign-off.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-15971",
+          "text": "Identify or create new sustainability indicators.",
+          "label": "human",
+          "reason": "Choosing what to measure reflects values and context.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-15970",
+          "text": "Identify or investigate violations of natural resources, waste management, recycling, or other environmental policies.",
+          "label": "human",
+          "reason": "Investigating violations needs site visits and judgement.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "care_worker",
+      "onet_code": "31-1122.00",
+      "onet_note": "Closest O*NET occupation: Personal Care Aides.",
+      "tasks": [
+        {
+          "id": "onet-2371",
+          "text": "Prepare and maintain records of client progress and services performed, reporting changes in client condition to manager or supervisor.",
+          "label": "assist",
+          "reason": "Voice notes and apps speed up care records.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2369",
+          "text": "Perform healthcare-related tasks, such as monitoring vital signs and medication, under the direction of registered nurses or physiotherapists.",
+          "label": "assist",
+          "reason": "Sensors and apps track vital signs; the carer acts on them.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2370",
+          "text": "Administer bedside or personal care, such as ambulation or personal hygiene assistance.",
+          "label": "human",
+          "reason": "Personal care needs touch, dignity and trust.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2372",
+          "text": "Perform housekeeping duties, such as cooking, cleaning, washing clothes or dishes, or running errands.",
+          "label": "human",
+          "reason": "Household tasks in varied homes remain manual.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2373",
+          "text": "Care for individuals or families during periods of incapacitation, family disruption, or convalescence, providing companionship, personal care, or help in adjusting to new lifestyles.",
+          "label": "human",
+          "reason": "Companionship is human by nature.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2376",
+          "text": "Participate in case reviews, consulting with the team caring for the client, to evaluate the client's needs and plan for continuing services.",
+          "label": "human",
+          "reason": "Case reviews depend on knowing the person.",
+          "reviewed_by": null
+        }
+      ]
+    }
+  ]
+}

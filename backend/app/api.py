@@ -13,7 +13,7 @@ from app.reference import get_reference, reload_reference
 from app.schemas import (CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
                          SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import documents, intake, matching, pathway, skills, workforce
+from app.services import documents, intake, matching, pathway, skills, tasks, workforce
 from app.trends import refresh
 
 router = APIRouter(prefix="/api")
@@ -65,6 +65,15 @@ def role_detail(role_id: str):
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
     }
+
+
+@router.get("/roles/{role_id}/tasks")
+def role_tasks(role_id: str, done: str = Query(default="", max_length=2_000)):
+    """The role's O*NET tasks with automate / assist / human labels; `done` = ticked task IDs."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return tasks.for_role(ref, role_id, {d for d in done.split(",") if d})
 
 
 @router.get("/scenarios")

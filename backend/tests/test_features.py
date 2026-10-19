@@ -114,3 +114,23 @@ def test_workforce_sample_runs(client):
     sample = client.get("/api/workforce/sample").text
     result = client.post("/api/workforce/analyse", json={"csv": sample, "scenario": "accelerated"}).json()
     assert result["employees"] == 160 and result["moves"]
+
+
+# ---------- your job, task by task ----------
+
+def test_tasks_come_from_onet_and_shares_follow_ticked_tasks(client):
+    body = client.get("/api/roles/data_entry_clerk/tasks").json()
+    assert body["onet_code"] == "43-9021.00" and "O*NET" in body["source"]
+    assert all(t["label"] in {"automate", "assist", "human"} and t["reason"] for t in body["tasks"])
+    assert round(sum(body["shares"].values()), 6) == 1.0
+
+    ticked = [t["id"] for t in body["tasks"] if t["label"] == "human"]
+    only_human = client.get("/api/roles/data_entry_clerk/tasks", params={"done": ",".join(ticked)}).json()
+    assert only_human["shares"] == {"automate": 0.0, "assist": 0.0, "human": 1.0}
+    assert only_human["counted"] == len(ticked)
+
+
+def test_tasks_for_a_role_without_onet_occupation_are_empty_not_guessed(client):
+    body = client.get("/api/roles/ai_operations_specialist/tasks").json()
+    assert body["tasks"] == [] and body["onet_code"] is None and body["onet_note"]
+    assert client.get("/api/roles/nope/tasks").status_code == 404
