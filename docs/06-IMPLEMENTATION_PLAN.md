@@ -62,7 +62,7 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 | Error, empty and offline states | Each one seen once in the browser |
 | Accessibility | Keyboard-only run; contrast checked |
 | Privacy and fairness | Tests: CV never stored; scrub before every LLM call; demographic fields rejected; HR CSV with personal columns rejected |
-| Human evaluation | 5 **synthetic** CVs marked by a person; a lecturer or counsellor reviews both personas' pathways → EVALUATION.md |
+| Human evaluation | ◐ 5 synthetic CVs and `scripts/eval_extraction.py` ready in `backend/data/eval/`; ⬜ 5 **synthetic** CVs marked by a person; a lecturer or counsellor reviews both personas' pathways → EVALUATION.md |
 | Code walkthrough | Every teammate explains their modules from CODE_TO_EXPLAIN.md without notes |
 
 ## M6: release (Day 5)

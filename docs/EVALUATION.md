@@ -4,6 +4,8 @@
 
 ## 1. Skill extraction: 5 synthetic CVs
 
+The five CVs are in `backend/data/eval/` (all invented). A teammate who did not write the skill dictionary lists the skills they see in `backend/data/eval/person_marked.json`; then `python scripts/eval_extraction.py` prints this table with recall filled in.
+
 | CV | Skills a person found | Skills the app found | Both | Recall (both ÷ person) | Notes |
 |---|---|---|---|---|---|
 | 1 | | | | | |

@@ -1,0 +1,15 @@
+CHONG KAI XUAN
+kaixuan.c@example.com | +60 11-2233 4455 | Penang
+
+Final-year BSc Business Analytics, Universiti Contoh Malaysia (expected 2027)
+
+Projects
+* Built a dashboard in Tableau showing bus ridership in George Town; cleaned the raw data with pandas.
+* Final-year project: predicted customer churn for a telco dataset using scikit-learn (logistic regression, random forest).
+* Wrote SQL queries in PostgreSQL for a mock retail database.
+
+Internship — Marketing analytics intern, Kedai Online Sdn Bhd (Jun–Aug 2026)
+* Ran A/B testing on email subject lines and reported results to the marketing manager.
+* Used ChatGPT to draft product descriptions, then edited them.
+
+Skills: Python, statistics, hypothesis testing, presenting to non-technical audiences, teamwork.

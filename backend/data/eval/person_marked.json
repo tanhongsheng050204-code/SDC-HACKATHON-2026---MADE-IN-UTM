@@ -1,0 +1,11 @@
+{
+  "_about": "To be filled by a teammate who did not write the skill dictionary: skill IDs from data/skills.json that a person sees in each CV. Leave a list empty until it has been marked.",
+  "marked_by": null,
+  "cvs": {
+    "cv1_clerk.txt": [],
+    "cv2_student.txt": [],
+    "cv3_service.txt": [],
+    "cv4_technician.txt": [],
+    "cv5_manager.txt": []
+  }
+}
