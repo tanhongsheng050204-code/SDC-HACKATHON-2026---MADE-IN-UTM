@@ -40,10 +40,10 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 | # | Task | Owner | Done when |
 |---|---|---|---|
 | 3.1 | ✅ CV **file upload** (PDF/DOCX) + guided questionnaire tab | A + B | Text extracted in memory, scrubbed, never stored |
-| 3.2 | ◐ free / free-to-audit / paid labels shown; ⬜ RM prices, HRD Corp status and link checks need sourcing · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
+| 3.2 | ◐ free / free-to-audit / paid labels shown; ✅ 25 of 29 links opened and dated by `scripts/check_links.py` (4 generic Malaysian providers have no single course page); ⬜ RM prices, HRD Corp status, `reviewed_by` · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
 | 3.3 | ✅ Year slider (today → horizon year, never beyond), scenarios as presets | A + B | Re-ranks < 300 ms; keyboard works |
 | 3.4 | ✅ New visual design (white landing, sidebar app shell, stat cards, pill badges) | B | All screens restyled |
-| 3.5 | Source shown on every recommendation (roles ✅, skills, tasks, courses) | B | Spot check: nothing without a source |
+| 3.5 | ✅ Source shown on every recommendation (roles, skills with their O\*NET occupation, tasks, courses with link-check date, radar skills) | B | Spot check: nothing without a source |
 
 ## M4: good-to-haves, in this order (Day 3–4)
 
