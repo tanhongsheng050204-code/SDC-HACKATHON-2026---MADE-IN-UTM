@@ -16,7 +16,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 
 | Feature | What you can do |
 | --- | --- |
-| **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers are removed before any AI reads the text, and the file is never stored. Only that one extraction step sees CV text: afterwards the language model receives only skill names, role titles and your scrubbed questions (a test checks this). Use a paid-tier Gemini key for any public deployment; Google does not use paid-tier requests to improve its products. You confirm the skill list before it is saved. Profiles you don't save to an account are deleted after 30 days; log in with Google to keep yours until you delete it. |
+| **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers, addresses, birth dates and employer or school names are removed before any AI reads the text, and **What gets sent** shows you the exact text (which you can still edit) before it goes. The file is never stored. With a RunPod open model configured, CV text goes to it instead of Gemini. A mic button on skill entry, the survey and the coach turns speech into text (Whisper on RunPod, else the browser's own recognition, else typing); audio is never stored. Only that one extraction step sees CV text: afterwards the language model receives only skill names, role titles and your scrubbed questions (a test checks this). Use a paid-tier Gemini key for any public deployment; Google does not use paid-tier requests to improve its products. You confirm the skill list before it is saved. Profiles you don't save to an account are deleted after 30 days; log in with Google to keep yours until you delete it. |
 | **Today** | Your home screen after opening a profile: top match, how your current role is trending, robust picks, your best five roles and next steps. Ask the coach straight from here. |
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
@@ -118,6 +118,10 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `GEMINI_MODEL` | Generation model, default `gemini-2.5-flash`. |
 | `GEMINI_EMBEDDING_MODEL` | Embedding model, default `gemini-embedding-001`. |
 | `GEMINI_TIMEOUT_SECONDS` | Provider timeout, default `15`. |
+| `RUNPOD_API_KEY` | Optional. Turns on the RunPod Serverless endpoints below. |
+| `RUNPOD_LLM_ENDPOINT`, `RUNPOD_LLM_MODEL` | A vLLM worker serving an open model (default `Qwen/Qwen2.5-7B-Instruct`) for CV reading, so Gemini only sees confirmed skills. Fallback: Gemini, then the dictionary. |
+| `RUNPOD_WHISPER_ENDPOINT`, `RUNPOD_WHISPER_MODEL` | A faster-whisper worker (default model `small`) for voice input. Empty means the browser's own speech recognition, then typing. |
+| `RUNPOD_TIMEOUT_SECONDS` | Default `20`: a cold worker falls back instead of keeping the person waiting. |
 | `ADMIN_TOKEN` | Needed for **Refresh trend data** and snapshot import. Use a long random value. |
 | `CORS_ORIGINS` | Comma-separated frontend addresses, default `http://localhost:5173`. |
 | `CORS_ORIGIN_REGEX` | Optional pattern for hosts that serve one site under many addresses, e.g. Vercel's per-deploy URLs. |
@@ -174,7 +178,8 @@ Human scoring of the synthetic CVs and an outside review of the pathways are sti
 - **Forecasts:** WEF figures are global, not Malaysia-specific, and come from an employer survey. AI operations specialist has no WEF category; it uses Process Automation Specialists as the closest match. The earlier illustrative seed is kept for history. Horizon: 2030.
 - **Task labels:** tasks come from O\*NET 30.0; the automate / assist / human labels are our judgements, drafted with AI help and still being reviewed (`reviewed_by` in `backend/data/tasks.json`).
 - **Courses:** RM prices and HRD Corp status come from each provider's own page and are dated (`price_checked`). Three paid courses (NIOSH, electrical, caregiver) have no published fee, so the app says to ask the provider; only the GRI training is confirmed HRD Corp-claimable.
-- **CVs:** read in memory and scrubbed before any model call; only confirmed skills, goals and course progress are saved.
+- **CVs:** read in memory and scrubbed before any model call; only confirmed skills, goals and course progress are saved. The scrubber is rule-based: it catches the usual Malaysian shapes (IC, phone, `Jalan …` / postcode addresses, labelled birth dates, `Sdn Bhd` / university names) but not every possible detail, which is why the person sees and can edit the text first.
+- **Voice:** the browser fallback (Web Speech API) is run by the browser's maker; Chrome sends the audio to Google. The app says so whenever it uses it.
 - **Accounts:** there are none. A profile is reached by its ID, which the browser remembers; Future Cards use a separate read-only link. Treat both links as private.
 - **Workforce view:** files with name, email, IC or staff-ID columns are refused, but the data should still be anonymous before upload.
 

@@ -8,6 +8,8 @@ export interface PrefMatch { dim: string; label: string; labels?: Record<string,
 export type Audience = "worker" | "graduate" | "switcher";
 
 export interface Skill { id: string; name: string; category: string }
+/** The scrubbed CV text that would go to a language model, and how many details were removed. */
+export interface SendPreview { text: string; removed: Partial<Record<"NAME" | "EMAIL" | "PHONE" | "IC" | "DOB" | "AGE" | "ADDRESS" | "ORG", number>>; characters: number }
 export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
 export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[] }
 export interface RoleOption { id: string; title: string }
@@ -250,7 +252,7 @@ export const api = {
     if (!response.ok) throw new Error(`${response.status}`);
     return { profile_id: body.profile_id as string };
   },
-  health: () => request<{ status: string; llm_model: string; snapshot_imported: string }>("/health"),
+  health: () => request<{ status: string; llm_model: string; snapshot_imported: string; voice?: boolean }>("/health"),
   skills: () => request<Skill[]>("/skills"),
   sdgs: () => request<Sdg[]>("/sdgs"),
   roles: () => request<RoleOption[]>("/roles"),
@@ -273,6 +275,24 @@ export const api = {
     request<Profile>(`/profiles/${id}/complete`, { method: "POST", body: JSON.stringify({ course_id: courseId, done }) }),
   turn: (messages: { role: "user" | "assistant"; content: string }[], language = "en") =>
     request<ChatTurn>("/intake/turn", { method: "POST", body: JSON.stringify({ messages, language }) }),
+  preview: (text: string) =>
+    requestDetail<SendPreview>("/intake/preview", { method: "POST", body: JSON.stringify({ text }) }),
+  previewUpload: async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const response = await fetchAwake(`${BASE}/api/intake/upload/preview`, { method: "POST", body: form });
+    const body = await response.json();
+    if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Upload failed");
+    return body as SendPreview;
+  },
+  transcribe: async (audio: Blob, language: string) => {
+    const form = new FormData();
+    form.append("audio", audio, audio.type.includes("mp4") ? "speech.mp4" : audio.type.includes("ogg") ? "speech.ogg" : "speech.webm");
+    const response = await fetchAwake(`${BASE}/api/voice/transcribe?language=${language}`, { method: "POST", body: form });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Voice input failed");
+    return body as { text: string };
+  },
   upload: async (file: File) => {
     const form = new FormData();
     form.append("file", file);

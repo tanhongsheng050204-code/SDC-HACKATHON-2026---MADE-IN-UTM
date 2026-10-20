@@ -489,3 +489,17 @@ main:focus { outline: none; }
 .tree-node.has-step:not(.course-done) .ring-track { stroke-dasharray: 3 3; }
 .path-head { display: grid; gap: 6px; margin-top: 12px; }
 .node-panel .actions { margin-top: 10px; }
+
+/* Voice input and the "what gets sent" check (Phase 2 privacy) */
+.row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mic { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mic-btn { display: inline-grid; place-items: center; width: 40px; min-height: 40px; padding: 0; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); box-shadow: none; }
+.mic-btn:hover { background: var(--hover); }
+.mic-btn.recording { background: var(--risk-bg); border-color: var(--risk); color: var(--risk); animation: mic-pulse 1.2s ease-in-out infinite; }
+.mic-note { font-size: .8rem; max-width: 46ch; }
+@keyframes mic-pulse { 50% { box-shadow: 0 0 0 6px var(--risk-bg); } }
+@media (prefers-reduced-motion: reduce) { .mic-btn.recording { animation: none; } }
+.send-check { display: grid; gap: 10px; }
+.send-check h2 { margin: 0; }
+.send-check .chips { align-items: center; margin: 0; }
+.send-check textarea { font: .86rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }

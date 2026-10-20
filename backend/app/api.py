@@ -7,14 +7,14 @@ from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Uplo
 from fastapi.responses import PlainTextResponse
 from pydantic import ValidationError
 
-from app import store
+from app import runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
 from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services.deid import scrub
+from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
                           tasks, tipping, workforce, xray)
 from app.trends import refresh, review
@@ -44,6 +44,7 @@ def health():
         "llm_model": get_settings().llm_model_label,
         "snapshot": ref.latest_snapshot["snapshot_id"],
         "snapshot_imported": ref.latest_snapshot["imported"],
+        "voice": runpod.voice_available(),
     }
 
 
@@ -241,6 +242,49 @@ async def upload_cv(file: UploadFile = File(...)):
     except documents.UnreadableDocument as error:
         raise HTTPException(422, str(error)) from error
     return {**skills.extract(text), "characters": len(text)}
+
+
+def _preview(text: str) -> dict:
+    clean = scrub_cv(text)
+    return {"text": clean, "removed": removed_counts(clean), "characters": len(clean)}
+
+
+@router.post("/intake/preview")
+def preview_cv(body: ExtractRequest):
+    """What gets sent: the scrubbed text, for the person to check (and edit) before extraction."""
+    return _preview(body.text)
+
+
+@router.post("/intake/upload/preview")
+async def preview_upload(file: UploadFile = File(...)):
+    """A CV file in, its scrubbed text out. Read in memory, never stored."""
+    data = await file.read(documents.MAX_BYTES + 1)
+    try:
+        return _preview(documents.read_text(file.filename or "", data))
+    except documents.UnreadableDocument as error:
+        raise HTTPException(422, str(error)) from error
+
+
+VOICE_MAX_BYTES = 5 * 1024 * 1024  # about five minutes of compressed speech
+
+
+@router.post("/voice/transcribe")
+async def transcribe(audio: UploadFile = File(...), language: str | None = Query(None, pattern="^(en|ms|zh)$")):
+    """Speech in, scrubbed text out. The audio is held in memory for one call and never stored or
+    logged. 503 when voice is not set up or the worker is cold, so the app falls back to the
+    browser's speech recognition, then typing."""
+    if not runpod.voice_available():
+        raise HTTPException(503, "Voice input is not set up on this server")
+    data = await audio.read(VOICE_MAX_BYTES + 1)
+    if len(data) > VOICE_MAX_BYTES:
+        raise HTTPException(413, "Recording is too long")
+    if not data:
+        raise HTTPException(422, "Recording is empty")
+    try:
+        text = runpod.transcribe(data, language)
+    except Exception as error:
+        raise HTTPException(503, "Voice input is unavailable right now") from error
+    return {"text": scrub(text)}
 
 
 @router.post("/intake/turn")

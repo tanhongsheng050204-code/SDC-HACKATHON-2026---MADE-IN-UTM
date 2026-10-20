@@ -12,6 +12,9 @@ os.environ["DATABASE_PATH"] = os.path.join(tempfile.mkdtemp(prefix="laluan-test-
 os.environ["DATABASE_URL"] = ""
 os.environ["SUPABASE_JWT_SECRET"] = "test-jwt-secret-long-enough-for-hs256"
 os.environ["SUPABASE_URL"] = ""
+os.environ["RUNPOD_API_KEY"] = ""
+os.environ["RUNPOD_LLM_ENDPOINT"] = ""
+os.environ["RUNPOD_WHISPER_ENDPOINT"] = ""
 
 
 @pytest.fixture

@@ -35,6 +35,12 @@ class Settings:
     supabase_url: str
     supabase_jwt_secret: str  # legacy HS256 secret; empty = verify with the project's public keys
     frontend_dist: Path | None  # built React app served at /, so one process hosts everything
+    runpod_api_key: str
+    runpod_llm_endpoint: str  # Serverless endpoint ID of a vLLM worker; empty = no open-model CV reading
+    runpod_llm_model: str
+    runpod_whisper_endpoint: str  # Serverless endpoint ID of a faster-whisper worker; empty = browser speech only
+    runpod_whisper_model: str
+    runpod_timeout_seconds: int
 
     @property
     def llm_mode(self) -> str:
@@ -43,9 +49,10 @@ class Settings:
     @property
     def llm_model_label(self) -> str:
         """Shown in the app, as the rules require naming the language model used."""
+        cv = f"; CV reading: {self.runpod_llm_model} on RunPod" if self.runpod_api_key and self.runpod_llm_endpoint else ""
         if self.gemini_api_key:
-            return f"Google {self.gemini_model}"
-        return "No language model (offline rules and templates)"
+            return f"Google {self.gemini_model}{cv}"
+        return f"No language model (offline rules and templates){cv}"
 
 
 def _frontend_dist() -> Path | None:
@@ -70,6 +77,12 @@ def get_settings() -> Settings:
         supabase_url=os.environ.get("SUPABASE_URL", ""),
         supabase_jwt_secret=os.environ.get("SUPABASE_JWT_SECRET", ""),
         frontend_dist=_frontend_dist(),
+        runpod_api_key=os.environ.get("RUNPOD_API_KEY", ""),
+        runpod_llm_endpoint=os.environ.get("RUNPOD_LLM_ENDPOINT", ""),
+        runpod_llm_model=os.environ.get("RUNPOD_LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct"),
+        runpod_whisper_endpoint=os.environ.get("RUNPOD_WHISPER_ENDPOINT", ""),
+        runpod_whisper_model=os.environ.get("RUNPOD_WHISPER_MODEL", "small"),
+        runpod_timeout_seconds=int(os.environ.get("RUNPOD_TIMEOUT_SECONDS", "20")),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
