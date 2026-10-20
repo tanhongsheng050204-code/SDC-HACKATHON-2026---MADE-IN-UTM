@@ -93,3 +93,39 @@ def test_skill_prereqs_reference_known_skills_and_have_no_cycles():
 def test_skill_levels_are_basic_working_advanced():
     assert [(lvl["level"], lvl["name"]) for lvl in get_reference().skill_levels] == [
         (1, "Basic"), (2, "Working"), (3, "Advanced")]
+
+
+def test_every_role_has_a_full_work_context():
+    ref = get_reference()
+    dims = {d["id"] for d in ref.work_dimensions}
+    assert dims == {"people", "structured", "field", "shifts", "team"}
+    for role in ref.roles.values():
+        context = role["work_context"]
+        assert set(context) == dims, role["id"]
+        assert all(-1 <= v <= 1 for v in context.values()), role["id"]
+
+
+def test_survey_cards_are_valid():
+    ref = get_reference()
+    dims = {d["id"] for d in ref.work_dimensions}
+    assert len(ref.survey_cards) >= 30
+    for card_id, card in ref.survey_cards.items():
+        assert card_id == card["id"] and card_id.startswith("card-")
+        assert card["role_ids"] and all(r in ref.roles for r in card["role_ids"]), card_id
+        assert card["dims"] and all(d in dims and v in (1, -1) for d, v in card["dims"].items()), card_id
+        assert all(card["text"][lang].strip() for lang in ("en", "ms", "zh")), card_id
+    for d in ref.work_dimensions:
+        assert all(d[pole][lang].strip() for pole in ("plus", "minus") for lang in ("en", "ms", "zh"))
+
+
+def test_every_dimension_has_cards_both_ways():
+    ref = get_reference()
+    for d in ref.work_dimensions:
+        directions = {card["dims"].get(d["id"]) for card in ref.survey_cards.values()}
+        assert {1, -1} <= directions, d["id"]
+
+
+def test_every_role_has_survey_cards():
+    ref = get_reference()
+    covered = {r for card in ref.survey_cards.values() for r in card["role_ids"]}
+    assert covered == set(ref.roles)

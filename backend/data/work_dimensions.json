@@ -1,0 +1,17 @@
+[
+  {"id": "people",
+   "plus": {"en": "working with people", "ms": "bekerja dengan orang", "zh": "与人打交道"},
+   "minus": {"en": "working with data and systems", "ms": "bekerja dengan data dan sistem", "zh": "与数据和系统打交道"}},
+  {"id": "structured",
+   "plus": {"en": "structured, predictable days", "ms": "hari yang tersusun dan boleh dijangka", "zh": "有条理、可预期的工作日"},
+   "minus": {"en": "open-ended, varied work", "ms": "kerja yang terbuka dan pelbagai", "zh": "开放、多变的工作"}},
+  {"id": "field",
+   "plus": {"en": "working on site or out and about", "ms": "bekerja di tapak atau di luar", "zh": "在现场或外出工作"},
+   "minus": {"en": "working at a desk", "ms": "bekerja di meja", "zh": "坐办公桌工作"}},
+  {"id": "shifts",
+   "plus": {"en": "shift or flexible hours", "ms": "waktu syif atau anjal", "zh": "轮班或弹性工时"},
+   "minus": {"en": "fixed office hours", "ms": "waktu pejabat tetap", "zh": "固定的办公时间"}},
+  {"id": "team",
+   "plus": {"en": "working in a team", "ms": "bekerja dalam pasukan", "zh": "团队合作"},
+   "minus": {"en": "working on your own", "ms": "bekerja sendiri", "zh": "独立工作"}}
+]
