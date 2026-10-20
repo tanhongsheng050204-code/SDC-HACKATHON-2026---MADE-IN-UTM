@@ -20,7 +20,7 @@ def gemini(monkeypatch):
     """Stand-in for the model: returns queued replies and records every prompt."""
     calls = {"prompts": [], "replies": []}
 
-    def fake(prompt: str):
+    def fake(prompt: str, **_):
         calls["prompts"].append(prompt)
         reply = calls["replies"].pop(0) if calls["replies"] else _questions()
         if isinstance(reply, Exception):
@@ -28,6 +28,8 @@ def gemini(monkeypatch):
         return reply
 
     monkeypatch.setattr(proofcheck, "generate_json", fake)
+    # Keep option order fixed here so answers are predictable; shuffling has its own test.
+    monkeypatch.setattr(proofcheck, "_shuffled", lambda q: {**q, "explanation": str(q.get("explanation") or "")})
     return calls
 
 
@@ -123,3 +125,35 @@ def test_prompt_has_no_profile_details(client, gemini):
     _start(client, pid)
     assert gemini["prompts"] and all("Siti" not in p and "Nurhaliza" not in p for p in gemini["prompts"])
     assert "Spreadsheets" in gemini["prompts"][0] and "Basic" in gemini["prompts"][0]
+
+
+def test_day_starts_at_midnight_in_malaysia():
+    import datetime as dt
+
+    # 01:00 on 21 Oct in Kuala Lumpur is 17:00 on 20 Oct UTC: "today" began at 16:00 UTC on 20 Oct.
+    now = dt.datetime(2026, 10, 20, 17, 0, tzinfo=dt.UTC)
+    assert store.day_start_utc(now) == "2026-10-20T16:00:00+00:00"
+
+
+def test_check_starts_are_rate_limited_even_for_demos(client, gemini, monkeypatch):
+    monkeypatch.setattr(proofcheck, "STARTS_PER_HOUR", 2)
+    pid = client.post("/api/profiles/demo/clerk").json()["id"]
+    assert _start(client, pid).status_code == 201
+    assert _start(client, pid).status_code == 201
+    third = _start(client, pid)
+    assert third.status_code == 429 and "hour" in third.json()["detail"]
+
+
+def test_options_are_shuffled_so_positions_give_nothing_away(monkeypatch):
+    from app.reference import get_reference
+
+    # The model tends to put the right answer in the same place, or rotate it predictably.
+    always_first = {"questions": [{"prompt": f"Q{i}?", "options": [f"right{i}", f"w{i}a", f"w{i}b", f"w{i}c"],
+                                   "answer": 0, "explanation": "."} for i in range(3)]}
+    monkeypatch.setattr(proofcheck, "generate_json", lambda prompt, **_: always_first)
+    positions = set()
+    for _ in range(30):
+        for q in proofcheck.generate(get_reference(), "sql", 1):
+            assert q["options"][q["answer"]].startswith("right")  # the key still points at the right option
+            positions.add(q["answer"])
+    assert len(positions) > 1

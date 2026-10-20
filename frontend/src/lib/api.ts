@@ -4,6 +4,7 @@ const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export type Scenario = "slow" | "baseline" | "accelerated";
 export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string }
+export interface PrefMatch { dim: string; label: string; labels?: Record<string, string> }
 export type Audience = "worker" | "graduate" | "switcher";
 
 export interface Skill { id: string; name: string; category: string }
@@ -22,7 +23,7 @@ export interface RoleMatch {
   rank_without_extra?: number;
   pay: Pay; pay_change_rm: number | null;
   why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number; entry_points: number;
-    matched_preferences: { dim: string; label: string }[] };
+    matched_preferences: PrefMatch[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   citation: { snapshot_id: string; imported: string; note: string | null };
   skills_source: { onet_code: string | null; onet_note: string | null };
@@ -88,6 +89,7 @@ export interface FutureCard {
   robust_pick: boolean; next_skills: string[]; steps: number; hours: number; first_step: string | null;
   sdgs: Sdg[]; source: { snapshot_id: string; imported: string; note: string | null };
   pay: Pay; pay_change_rm: number | null;
+  proven?: { name: string; level: number; level_name: string }[];
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
 export interface CoachReply {
@@ -125,7 +127,7 @@ export interface WorkDimension { id: string; plus: Record<string, string>; minus
 export interface SurveyAnswer { card_id: string; answer: "like" | "dislike" | "other"; note?: string; dims?: Record<string, number> }
 export interface AlsoLike {
   role_id: string; title: string; rank: number; fit: number; preference_match: number;
-  matched_preferences: { dim: string; label: string }[];
+  matched_preferences: PrefMatch[];
 }
 export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
 

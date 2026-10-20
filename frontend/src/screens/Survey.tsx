@@ -24,15 +24,17 @@ export function Survey({ profile, userId, onDone, onSkip }: {
 
   const card = cards && answers.length < cards.length ? cards[answers.length] : null;
 
+  async function submit(all: SurveyAnswer[]) {
+    setBusy(true); setError(null);
+    try { setResult(await api.submitSurvey(profile.id, all, getLang())); }
+    catch { setError(t("survey.saveFailed")); }
+    finally { setBusy(false); }
+  }
+
   async function answer(a: SurveyAnswer) {
     const next = [...answers, a];
     setAnswers(next); setOther(null); setReading(null);
-    if (cards && next.length === cards.length) {
-      setBusy(true);
-      try { setResult(await api.submitSurvey(profile.id, next, getLang())); }
-      catch { setError(t("survey.saveFailed")); }
-      finally { setBusy(false); }
-    }
+    if (cards && next.length === cards.length) submit(next);
   }
 
   async function checkOther() {
@@ -51,7 +53,11 @@ export function Survey({ profile, userId, onDone, onSkip }: {
     <section>
       <div className="page-head"><h1>{t("survey.title")}</h1><p className="muted">{t("survey.sub")}</p></div>
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <p className="error" role="alert">{error}
+          {cards && answers.length === cards.length && !result && <> <button className="link" disabled={busy} onClick={() => submit(answers)}>{t("survey.retry")}</button></>}
+        </p>
+      )}
       {!cards && !error && <p className="muted">{t("a.loading")}</p>}
 
       {card && cards && (

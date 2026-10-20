@@ -217,3 +217,19 @@ def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatc
     monkeypatch.setattr(coach, "generate_json", fake_llm)
     reply = _ask(client, profile["id"], "Call me on 012-345 6789 about my top role").json()
     assert reply["mode"] == "gemini" and "012-345" not in seen["prompt"] and "[PHONE]" in seen["prompt"]
+
+
+def test_future_card_shows_proven_levels(client):
+    from app import store
+
+    pid = client.post("/api/profiles/demo/clerk").json()["id"]
+    store.set_skill_level(pid, "sql", 2)
+    card = client.post(f"/api/profiles/{pid}/cards", json={"role_id": "data_analyst"}).json()["card_id"]
+    assert {"name": "SQL", "level": 2, "level_name": "Working"} in client.get(f"/api/cards/{card}").json()["proven"]
+
+
+def test_no_leftover_sdg_choice_in_coach_or_questionnaire():
+    from app.services import coach, intake
+
+    assert "SDG goal" not in coach.PROMPT and "SDG goal" not in (coach.__doc__ or "")
+    assert not any("cause" in q.lower() for q in intake.SCRIPTED_QUESTIONS["en"])

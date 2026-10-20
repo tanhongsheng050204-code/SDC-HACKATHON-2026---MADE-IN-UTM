@@ -39,7 +39,7 @@ def test_preference_adds_a_visible_small_boost():
     people = matching.match(ref, {**CLERK, "preferences": {"people": 1.0, "field": 1.0}}, "baseline")["roles"]
     care = next(r for r in people if r["role_id"] == "care_worker")
     assert 0 < care["why"]["preference_points"] <= survey.PREFERENCE_BOOST
-    assert {"dim": "people", "label": "working with people"} in care["why"]["matched_preferences"]
+    assert any(m["dim"] == "people" and m["label"] == "working with people" for m in care["why"]["matched_preferences"])
     for role in people:
         why = role["why"]
         assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] + why["entry_points"] - role["score"]) < 1e-3
@@ -112,3 +112,25 @@ def test_survey_bank_lists_every_card_for_the_review_kit(client):
     bank = client.get("/api/survey/bank").json()
     assert len(bank["cards"]) == len(get_reference().survey_cards)
     assert {d["id"] for d in bank["dimensions"]} == {"people", "structured", "field", "shifts", "team"}
+
+
+def test_duplicate_cards_are_refused_not_a_server_error(client):
+    pid = client.post("/api/profiles", json={"skills": CLERK["skills"]}).json()["id"]
+    twice = [{"card_id": "card-care_worker-2", "answer": "like"}, {"card_id": "card-care_worker-2", "answer": "dislike"}]
+    assert client.post(f"/api/profiles/{pid}/survey", json={"answers": twice}).status_code == 422
+
+
+def test_summary_is_short_and_says_what_it_is_based_on():
+    ref = get_reference()
+    prefs = {"people": 1.0, "team": 0.9, "field": 0.8, "shifts": 0.7, "structured": -0.6}
+    lines = survey.summary(ref, prefs, "en", answered=9)
+    assert len(lines) <= 3 and lines[0].startswith("Based on your answers to 9 cards")
+    assert "working with people" in lines[0]
+    assert survey.summary(ref, {}, "en", answered=9) == []
+
+
+def test_matched_preferences_carry_every_language():
+    roles = matching.match(get_reference(), {**CLERK, "preferences": {"people": 1.0}}, "baseline")["roles"]
+    care = next(r for r in roles if r["role_id"] == "care_worker")
+    labels = care["why"]["matched_preferences"][0]["labels"]
+    assert set(labels) == {"en", "ms", "zh"} and all(labels.values())

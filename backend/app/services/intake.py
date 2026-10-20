@@ -14,14 +14,12 @@ SCRIPTED_QUESTIONS = {
         "What tools or software do you use most days? For example Excel, a CRM, social media or a programming language.",
         "Tell me about something at work or school you're proud of. What did you do?",
         "Any courses, certificates or side projects?",
-        "Which causes matter to you? For example climate, health, education or fair work.",
     ],
     "ms": [
         "Apakah pekerjaan anda sekarang, atau apa yang anda sedang belajar?",
         "Alat atau perisian apa yang anda guna hampir setiap hari? Contohnya Excel, media sosial atau bahasa pengaturcaraan.",
         "Ceritakan sesuatu di tempat kerja atau sekolah yang anda banggakan. Apa yang anda lakukan?",
         "Ada kursus, sijil atau projek sampingan?",
-        "Isu apa yang penting bagi anda? Contohnya iklim, kesihatan, pendidikan atau pekerjaan yang adil.",
     ],
     # Drafted with AI assistance; needs a native speaker's check. Skills are matched against the
     # English dictionary, so tool names (Excel, Python ...) are found in Chinese answers too.
@@ -30,7 +28,6 @@ SCRIPTED_QUESTIONS = {
         "您平时最常用哪些工具或软件？例如 Excel、CRM、社交媒体或编程语言。",
         "说说一件您在工作或学校里感到自豪的事。您做了什么？",
         "有没有上过课程、考过证书或做过副业项目？",
-        "您关心哪些议题？例如气候、健康、教育或公平就业。",
     ],
 }
 DONE = {
