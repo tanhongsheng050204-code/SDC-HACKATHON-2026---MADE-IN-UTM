@@ -1,0 +1,306 @@
+# Manual test plan
+
+Every function in Laluan, as a checklist to run by hand. Tick each box when it behaves as expected; if it doesn't, write what happened in the **Notes** line of that section and add a row to [REVIEW_LOG.md](REVIEW_LOG.md).
+
+- **Where:** the live site <https://laluan-psi.vercel.app> (or <http://localhost:5173> locally).
+- **Before you start:** open the site once and wait for the API to wake (up to a minute on the free plan). Use a **desktop browser** first, then repeat section 17 on a phone.
+- **Test data:** only synthetic data. CVs to upload or paste are in `backend/data/eval/` (`cv1_clerk.txt` … `cv5_manager.txt`). The sample company is built in.
+- **Admin token:** Render → laluan-api → Environment → `ADMIN_TOKEN` (needed only for section 8.4).
+
+Tester: ______ · Date: ______ · Browser / device: ______
+
+---
+
+## 1. Landing page (`/`)
+
+- [ ] 1.1 Black announcement bar shows **“Judging Laluan? Open the demo profile in one click →”**; clicking it opens Aisyah's **Today** screen.
+- [ ] 1.2 Top bar: logo returns to the top of the landing page.
+- [ ] 1.3 Centre links **Who it's for · How it works · Trust · FAQ** each scroll to their section.
+- [ ] 1.4 Moon / sun button switches dark and light theme; the choice is remembered after a reload.
+- [ ] 1.5 **Get started** opens **My profile** (skills intake).
+- [ ] 1.6 **Continue** appears only if you opened a profile before, and reopens it.
+- [ ] 1.7 Hero: **Open the demo profile** opens Aisyah; **Start with my skills** opens intake.
+- [ ] 1.8 Hero shows the app preview (Aisyah, 50% fit, −25.9%, 2 steps).
+- [ ] 1.9 Three persona cards show photos and tags; **Open Aisyah's demo**, **Open the student demo** and **Open the workforce view** each go to the right place.
+- [ ] 1.10 Photo credit line under the cards names the three Unsplash photographers.
+- [ ] 1.11 “Starts from what you already have”: the CV shows blacked-out personal details → confirmed skills.
+- [ ] 1.12 “One afternoon with Laluan”: clicking each of the 6 times (14:00 … 14:40) changes the text and the picture on the right.
+- [ ] 1.13 Dark band: **See where the numbers come from** opens **Sources**.
+- [ ] 1.14 FAQ: each of the 6 questions opens and closes; the first one starts open; the **+** turns into **×**.
+- [ ] 1.15 Closing section buttons work (same as 1.7).
+- [ ] 1.16 Footer links: Worker demo, Student demo, Workforce view, Sources, Review kit open in the app; Proposal, How it works, Source code, AI declaration, Licence open GitHub in a new tab.
+- [ ] 1.17 Footer shows the AI model line and **Built by team Made in UTM**.
+
+Notes: ______
+
+## 2. Entry links and navigation
+
+- [ ] 2.1 `/?demo=clerk` opens Aisyah on **Today**; the address bar changes to `?view=home`.
+- [ ] 2.2 `/?demo=student` opens Wei Jie on **Today**.
+- [ ] 2.3 `/?demo=hr` opens the **Workforce view** without a profile.
+- [ ] 2.4 Browser **Back** and **Forward** move between screens you visited.
+- [ ] 2.5 Reload on a deep screen (e.g. a role's pathway) reopens the same screen and role.
+- [ ] 2.6 Choosing a scenario or year puts it in the address (`&scenario=accelerated&year=2028`); reloading keeps it.
+- [ ] 2.7 `/?view=roles` with no saved profile falls back to the landing page.
+- [ ] 2.8 Press **Tab** on any app screen: a **Skip to content** link appears first.
+
+Notes: ______
+
+## 3. App shell (sidebar and top bar)
+
+- [ ] 3.1 Sidebar groups: Today, My profile · Signals: Future Skills Radar, My job task by task, Sources · My future: Future roles, Pathway, SDG impact · Organisation: Workforce view.
+- [ ] 3.2 Without a profile, Today / Radar / Tasks / Future roles are greyed out; hovering says **“Add your skills first”**.
+- [ ] 3.3 Pathway and SDG impact stay greyed out until you open a role.
+- [ ] 3.4 Profile chip shows the name and number of skills.
+- [ ] 3.5 Top bar shows the screen title, the persona badge, **Ask the coach** and the theme button.
+- [ ] 3.6 Sidebar footer shows the AI model, “Estimates, not predictions. You decide.”, language picker and Lite mode.
+- [ ] 3.7 **Delete my profile** asks for confirmation; **Cancel** keeps it; **OK** deletes it and returns to the landing page.
+
+Notes: ______
+
+## 4. Today (home)
+
+- [ ] 4.1 Greeting matches the time of day (“Good morning / afternoon / evening, Aisyah.”) and shows today's date.
+- [ ] 4.2 Typing a question and pressing **Ask** opens the coach already answering it.
+- [ ] 4.3 Four cards: Top match (AI operations specialist, 50% fit), Your current role (−25.9%, Declining), Robust picks (3), Skills on your profile (6).
+- [ ] 4.4 Scenario switch (Slow / Baseline / Accelerated) changes the top-5 list and outlooks.
+- [ ] 4.5 Clicking a role in the top 5 opens its detail.
+- [ ] 4.6 **See all 13 roles →** opens Future roles.
+- [ ] 4.7 Next steps: each **Open** button goes to Pathway, Radar and My job respectively.
+- [ ] 4.8 Source line at the bottom names the WEF snapshot.
+
+Notes: ______
+
+## 5. My profile: skills intake
+
+### 5.1 Upload CV
+- [ ] 5.1.1 Upload `cv1_clerk.txt` → goes to **Check your skills** with skills found.
+- [ ] 5.1.2 Upload a PDF and a DOCX CV → both work.
+- [ ] 5.1.3 Upload an image or `.xlsx` → error **“Upload a PDF, DOCX or TXT file”**.
+- [ ] 5.1.4 Upload a file over 5 MB → error **“File is larger than 5 MB”**.
+- [ ] 5.1.5 Upload a scanned (image-only) PDF → error mentions scanned PDFs are not supported.
+
+### 5.2 Paste CV
+- [ ] 5.2.1 Counter shows how many more characters are needed; **Read my skills** is disabled under 50 characters.
+- [ ] 5.2.2 Paste `cv3_service.txt` → **Read my skills** → skills appear on the next screen.
+- [ ] 5.2.3 Names, emails and phone numbers in the pasted CV are **not** saved anywhere you can see later.
+
+### 5.3 Questionnaire
+- [ ] 5.3.1 A first question appears; answering it brings the next question.
+- [ ] 5.3.2 “Skills found so far” counter rises as you answer.
+- [ ] 5.3.3 At the end, **Continue with N skills** goes to the review screen.
+- [ ] 5.3.4 Switch the language to 中文 or BM first → questions come in that language.
+
+### 5.4 Pick skills
+- [ ] 5.4.1 Filter box narrows the list (try “excel”).
+- [ ] 5.4.2 Clicking a skill highlights it; button says **Pick at least 3 skills** until 3 are chosen, then **Continue with N skills**.
+
+Notes: ______
+
+## 6. Check your skills (review)
+
+- [ ] 6.1 Each skill chip has **×** to remove it.
+- [ ] 6.2 **Add a skill we missed** adds a skill from the list.
+- [ ] 6.3 Current job dropdown and years of experience can be set.
+- [ ] 6.4 SDG goals can be ticked and unticked.
+- [ ] 6.5 With zero skills: message and **Back to my skills** button; **Save and continue** disabled.
+- [ ] 6.6 **Save and continue** → goes to the Future Skills Radar; sidebar now shows the new profile.
+- [ ] 6.7 Picking SDG 13 here moves climate roles up on Future roles with “Serves your goals: SDG 13”.
+
+Notes: ______
+
+## 7. Future Skills Radar
+
+- [ ] 7.1 Three columns: ▲ Rising, ▬ Steady, ▼ Declining (or the “no skill trends yet” notice if no refresh has been approved).
+- [ ] 7.2 Your own skills have a **Yours** badge.
+- [ ] 7.3 **Show only my skills** hides the others.
+- [ ] 7.4 “N skills have no data in these sources” opens to list them.
+- [ ] 7.5 AI capability momentum bars appear after a refresh.
+- [ ] 7.6 Source line shows snapshot and dates; **See my future roles** opens Future roles.
+
+Notes: ______
+
+## 8. Future roles
+
+### 8.1 Header and controls
+- [ ] 8.1.1 Four KPI cards: Top match, Robust picks, Your current role, Forecast data (dated, “Cited sources”).
+- [ ] 8.1.2 Scenario switch re-ranks the cards; ▲/▼ arrows show movement compared with baseline.
+- [ ] 8.1.3 Year slider 2026–2030 works with the mouse and with the arrow keys; numbers change.
+- [ ] 8.1.4 One-time tip appears; **Got it** hides it for good (also after reload).
+- [ ] 8.1.5 No “illustrative data” banner (the WEF data is in use).
+
+### 8.2 Role cards
+- [ ] 8.2.1 Each card: rank, title, fit bar and %, outlook word + arrow, estimate range to the year, SDG tiles, source line.
+- [ ] 8.2.2 **Robust pick** and **Your current role** badges appear on the right cards.
+- [ ] 8.2.3 Declining roles (administrative assistant, data entry clerk) sit at the bottom.
+- [ ] 8.2.4 SDG tile numbers are readable on every colour (dark text on light tiles).
+
+### 8.3 Edge states
+- [ ] 8.3.1 A profile with skills unrelated to any role shows **“None of these roles is a close match yet…”**.
+
+### 8.4 Admin: refresh trend data (needs the admin token)
+- [ ] 8.4.1 Wrong or empty token → **Admin token required.**
+- [ ] 8.4.2 Correct token + your name → **Refresh trend data** shows progress lines (about a minute).
+- [ ] 8.4.3 When it finishes: **“1 waiting for review”** and a table of roles that would change, with Now / Proposed / Change.
+- [ ] 8.4.4 Users still see the old forecast until approved (open another tab to check).
+- [ ] 8.4.5 **Reject** is disabled until a reason is typed; rejecting keeps the old forecast.
+- [ ] 8.4.6 Run again and **Approve and publish** → “Approved by …”, rankings move, and **“Your plan changed because the trend data changed”** lists the moved roles; **Dismiss** hides it.
+- [ ] 8.4.7 **Collect again (slower)** fetches fresh counts instead of reusing today's.
+- [ ] 8.4.8 Sources page now lists the new snapshot with your name.
+
+Notes: ______
+
+## 9. Role detail and pathway
+
+- [ ] 9.1 **← Future roles** goes back.
+- [ ] 9.2 **Why this rank?** shows fit × 0.6, outlook × 0.4 and the SDG bonus, which add up to the score.
+- [ ] 9.3 Outlook table shows all three scenarios.
+- [ ] 9.4 **In Malaysia today**: median pay (RM 2,693 for clerks), change in employees since 2019, WEF outlook, and a note when they disagree; DOSM source link opens.
+- [ ] 9.5 Job links **MYFutureJobs, JobStreet, LinkedIn** open job searches in a new tab.
+- [ ] 9.6 **You have** / **You need** chips; core skills marked “(core)”; O\*NET code link opens.
+- [ ] 9.7 For a role you fully cover (Aisyah → Administrative assistant): **“You already have every skill…”** with **Choose a stretch role** and **See my impact**.
+- [ ] 9.8 **Build my pathway** shows “Building your plan…”, then the plan.
+- [ ] 9.9 Readiness card: %, bar, “Started at …”, steps done, hours left.
+- [ ] 9.10 Each step: skills, course link, provider, hours, level, reason, cost badge (Free / Free to audit / **Paid · RM …**), **HRD Corp** badge where known, price note and dates.
+- [ ] 9.11 Sustainability and ESG analyst: GRI step shows **Paid · RM 8,000** and **HRD Corp claimable**.
+- [ ] 9.12 Ticking **I finished this** raises readiness, adds a ★ skill badge, and changes rankings on Future roles; unticking reverses it.
+- [ ] 9.13 Grounding badge says every sentence is backed by the catalogue (or lists the sentences to check).
+- [ ] 9.14 **Print summary** opens a clean print view without the sidebar.
+- [ ] 9.15 **See my impact** opens SDG impact.
+
+### 9.16 Future Card
+- [ ] 9.16.1 **Create my Future Card** shows a QR code, **Open the card ↗** and **Copy link**.
+- [ ] 9.16.2 **Copy link** says “Link copied”; the link opens the read-only card in a new tab.
+- [ ] 9.16.3 Scanning the QR with a phone opens the same card.
+- [ ] 9.16.4 The card shows the role, readiness, outlook range, steps and hours, next skills, first step, SDG tiles and source; it does **not** show the full skill list.
+- [ ] 9.16.5 **Make your own plan** goes to the landing page.
+- [ ] 9.16.6 After **Delete my profile**, the card link shows **“This Future Card no longer exists…”**.
+- [ ] 9.16.7 A made-up link (`/?card=abc`) shows the same “no longer exists” message.
+
+Notes: ______
+
+## 10. SDG impact
+
+- [ ] 10.1 Heading reads “Your impact as a / an …” with the right article.
+- [ ] 10.2 One card per SDG for the role, with target and reason.
+- [ ] 10.3 **Skills that serve a goal**: each skill with its SDG reason, marked **In your plan** or **You have this**.
+- [ ] 10.4 **← Pathway** goes back.
+
+Notes: ______
+
+## 11. My job, task by task
+
+- [ ] 11.1 Choosing a job lists its O\*NET tasks with **AI likely to automate / AI assists you / Stays human** and a reason.
+- [ ] 11.2 The split bar and percentages start from all tasks; ticking tasks changes them to **your** tasks.
+- [ ] 11.3 Changing the job clears the ticks.
+- [ ] 11.4 AI operations specialist shows **no tasks** (no O\*NET occupation) instead of made-up ones.
+- [ ] 11.5 Source line shows the O\*NET code link and “checked by our team so far: N of M”.
+- [ ] 11.6 Ticks survive moving to another screen and back (same browser tab).
+- [ ] 11.7 **See roles you could move into** opens Future roles.
+
+Notes: ______
+
+## 12. AI coach
+
+- [ ] 12.1 **Ask the coach** opens the drawer on the right (full screen on a phone).
+- [ ] 12.2 Suggested questions work: “Why is this my top role?”, “How long will the plan take?”, “Is my current job at risk?”, “What if AI adoption is faster?”.
+- [ ] 12.3 Each answer has a **Sources (N)** list that opens, and a grounding badge.
+- [ ] 12.4 “What if AI adoption is faster?” offers **Suggested change**; **Apply** switches to Accelerated and shows a toast “Applied: …”; **Dismiss** hides the suggestion and changes nothing.
+- [ ] 12.5 Ask *“Which jobs help the climate?”* → it lists roles serving SDG 13 and offers to add SDG 13 to your goals; **Apply** adds it and re-ranks Future roles.
+- [ ] 12.6 **Esc** or **×** closes the coach.
+- [ ] 12.7 The footer note says the coach only suggests and nothing changes until you press Apply.
+
+Notes: ______
+
+## 13. Workforce view (HR)
+
+- [ ] 13.1 Empty state shows until a team is loaded.
+- [ ] 13.2 **Use the sample company (synthetic, 160 people)** → KPIs (160 people, people in declining roles, learning hours, forecast date).
+- [ ] 13.3 Risk heatmap by role with Slow / Baseline / Accelerated columns coloured by outlook.
+- [ ] 13.4 **Cheapest reskilling moves** table with from → to, people, hours each, fit, SDG tiles.
+- [ ] 13.5 SDG totals cards.
+- [ ] 13.6 Switching scenario re-analyses.
+- [ ] 13.7 **Upload CSV** with a `role,skills` file works.
+- [ ] 13.8 A CSV with a `name`, `email`, `ic` or `staff_id` column is refused: **“Remove columns that identify people before uploading: …”**.
+- [ ] 13.9 Rows with unknown roles are listed under **Rows skipped**.
+
+Example CSV to paste for 13.8:
+
+```csv
+name,role,skills
+Ali,Data entry clerk,Excel; data entry
+```
+
+Notes: ______
+
+## 14. Sources
+
+- [ ] 14.1 Table lists every snapshot, newest first; the WEF one is **In use** and **Cited**; the illustrative seed is marked **Illustrative**.
+- [ ] 14.2 Source links open the WEF report.
+- [ ] 14.3 “Other data in Laluan” lists DOSM, O\*NET, courses, SDGs, prices, trend refresh.
+- [ ] 14.4 **Open the review kit** opens the review kit.
+
+Notes: ______
+
+## 15. Review kit (`/?view=review-kit`)
+
+- [ ] 15.1 Name field is remembered.
+- [ ] 15.2 **Translations**: BM / 中文 switch; each string has **OK** and **Fix**; Fix shows a box for a better version; the counter updates; **Copy** and **Download translation-check-ms.md** work.
+- [ ] 15.3 **Mark the CVs**: 5 CV tabs; CV text on the left, skill chips by category on the right; filter works; ticks are counted per CV and remembered; the app's own answers are **never** shown; **Download person_marked.json** works.
+- [ ] 15.4 **Review the pathways**: Aisyah and Wei Jie with top 5 roles and plan; Yes / Partly / No and comments; **Download pathway-review.md** contains the table for EVALUATION.md.
+
+Notes: ______
+
+## 16. Settings and accessibility
+
+- [ ] 16.1 Language **EN / BM / 中文** changes the sidebar, headings, buttons and notices; role, course and task names stay in English.
+- [ ] 16.2 Language choice is remembered after a reload.
+- [ ] 16.3 **Lite mode** switches to system fonts and hides the landing photos and decorations; content stays the same.
+- [ ] 16.4 Dark theme looks right on every screen (no white boxes, readable text).
+- [ ] 16.5 Keyboard only: every button, tab, chip and link can be reached with **Tab** and has a visible focus ring; segmented switches and the slider work with the keyboard.
+- [ ] 16.6 With “reduce motion” on in the operating system, animations stop.
+
+Notes: ______
+
+## 17. Phone (about 375 px wide)
+
+- [ ] 17.1 Landing: no text cut off on the right, no sideways scrolling, menu links hidden, buttons usable.
+- [ ] 17.2 App: sidebar becomes a scrolling strip at the top.
+- [ ] 17.3 Today, Future roles, pathway and workforce tables fit or scroll inside their box.
+- [ ] 17.4 Coach opens full screen.
+
+Notes: ______
+
+## 18. Errors and server states
+
+- [ ] 18.1 First visit after the API has slept: blue **“Waking up the server…”** notice, then the page loads by itself.
+- [ ] 18.2 With the backend stopped (local run): red **“Can't reach the Laluan server…”** with **Try again**.
+- [ ] 18.3 Opening the demo while the backend is down: **“Couldn't open the demo profile…”** with **Dismiss**.
+- [ ] 18.4 A screen error shows “Something went wrong on this screen” with **Reload**, and the sidebar still works.
+
+Notes: ______
+
+## 19. Privacy and fairness (check through the API docs at <https://laluan-api.onrender.com/docs>)
+
+- [ ] 19.1 `GET /api/health` shows status ok, the model mode and the snapshot in use.
+- [ ] 19.2 `POST /api/profiles` with an extra field like `"age": 30` or `"gender": "female"` is rejected.
+- [ ] 19.3 After uploading a CV, nothing in `GET /api/profiles/{id}` contains the CV text, name, email or phone.
+- [ ] 19.4 `GET /api/signals/pending` without the `X-Admin-Token` header returns 401.
+
+Notes: ______
+
+## 20. For developers (local)
+
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (71).
+- [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
+- [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
+- [ ] 20.4 `python scripts/refresh_malaysia.py` prints DOSM pay and employee changes for 9 groups.
+- [ ] 20.5 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.
+- [ ] 20.6 `python scripts/eval_extraction.py` prints the recall table (after `person_marked.json` is filled).
+- [ ] 20.7 `python scripts/check_links.py` checks every course link.
+
+Notes: ______
+
+---
+
+**Summary:** ___ of 20 sections fully passed · Issues found: ___ (logged in REVIEW_LOG.md rows ___)

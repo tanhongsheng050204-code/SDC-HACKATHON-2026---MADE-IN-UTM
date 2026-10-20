@@ -157,6 +157,8 @@ GitHub Actions runs both on every push and pull request ([ci.yml](.github/workfl
 
 Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`), `refresh_malaysia.py` (downloads the latest DOSM pay and employment figures; DOSM updates them yearly).
 
+A full manual checklist of every feature is in [MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md).
+
 Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md); the **Review kit** (`/?view=review-kit`) makes both quick.
 
 ## Limits of this prototype
