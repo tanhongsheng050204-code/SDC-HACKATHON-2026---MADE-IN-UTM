@@ -14,7 +14,7 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import scrub
-from app.services import (cards, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
+from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
                           tasks, workforce)
 from app.trends import refresh, review
 
@@ -459,6 +459,20 @@ def survey_submit(profile_id: str, body: SurveyIn, user: str | None = User):
     store.set_preferences(profile_id, prefs)
     result = matching.match(ref, {**profile, "preferences": prefs}, "baseline")
     return {"preferences": prefs, "summary": survey.summary(ref, prefs, body.language), "also_like": result["also_like"]}
+
+
+@router.get("/class/sample", response_class=PlainTextResponse)
+def class_sample():
+    """A synthetic class of 40 students in three programmes, for trying the career-centre view."""
+    return classview.sample_path().read_text(encoding="utf-8")
+
+
+@router.post("/class/analyse")
+def class_analyse(body: WorkforceRequest):
+    try:
+        return classview.analyse(get_reference(), body.csv, body.scenario)
+    except workforce.WorkforceError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @router.get("/profiles/{profile_id}/pathway")
