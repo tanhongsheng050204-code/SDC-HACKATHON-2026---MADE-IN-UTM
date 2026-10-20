@@ -7,7 +7,7 @@ import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onServerWaking, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -45,6 +45,8 @@ function MainApp({ demo }: { demo: string | null }) {
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
+  const [waking, setWaking] = useState(false);
+  useEffect(() => onServerWaking(setWaking), []);
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
@@ -119,7 +121,7 @@ function MainApp({ demo }: { demo: string | null }) {
       const p = await api.demoProfile(key);
       save(KEYS.profile, p.id); setProfile(p);
       go("home", { role: undefined });
-    } catch { setError("Can't reach the server. Is the backend running on port 8000?"); }
+    } catch { setError(t("shell.demoFailed")); }
   }
 
   async function resume(wanted?: Route) {
@@ -165,7 +167,8 @@ function MainApp({ demo }: { demo: string | null }) {
   const themeButton = <ThemeButton theme={theme} onToggle={toggleTheme} />;
   const banners = (
     <>
-      {offline && <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>}
+      {waking && <div className="banner info" role="status">{t("shell.waking")}</div>}
+      {offline && !waking && <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>}
       {error && <div className="banner error" role="alert">{error} <button className="link" onClick={() => setError(null)}>{t("a.dismiss")}</button></div>}
     </>
   );

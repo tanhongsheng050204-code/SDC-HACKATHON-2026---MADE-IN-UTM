@@ -87,8 +87,38 @@ export interface Pathway {
   uncovered_skills: string[];
 }
 
+// The hosted API sleeps when idle (free plan) and takes up to a minute to wake. While it does,
+// requests fail to connect or get 502/503/504, so we retry for a while and let the shell show
+// a "waking up" notice instead of an error.
+const WAKE_STATUSES = new Set([502, 503, 504]);
+const WAKE_LIMIT_MS = 75_000;
+type WakeListener = (waking: boolean) => void;
+const wakeListeners = new Set<WakeListener>();
+export function onServerWaking(listener: WakeListener) {
+  wakeListeners.add(listener);
+  return () => { wakeListeners.delete(listener); };
+}
+const setWaking = (waking: boolean) => wakeListeners.forEach((l) => l(waking));
+
+async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
+  const started = Date.now();
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const response = await fetch(url, init);
+      if (!WAKE_STATUSES.has(response.status) || Date.now() - started > WAKE_LIMIT_MS) {
+        if (attempt > 0) setWaking(false);
+        return response;
+      }
+    } catch (e) {
+      if (Date.now() - started > WAKE_LIMIT_MS) { setWaking(false); throw e; }
+    }
+    setWaking(true);
+    await new Promise((r) => setTimeout(r, Math.min(2000 + attempt * 1000, 6000)));
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${BASE}/api${path}`, {
+  const response = await fetchAwake(`${BASE}/api${path}`, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
@@ -121,14 +151,14 @@ export const api = {
   upload: async (file: File) => {
     const form = new FormData();
     form.append("file", file);
-    const response = await fetch(`${BASE}/api/intake/upload`, { method: "POST", body: form });
+    const response = await fetchAwake(`${BASE}/api/intake/upload`, { method: "POST", body: form });
     const body = await response.json();
     if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Upload failed");
     return body as { skills: string[]; unmatched: string[]; mode: string; characters: number };
   },
-  workforceSample: async () => (await fetch(`${BASE}/api/workforce/sample`)).text(),
+  workforceSample: async () => (await fetchAwake(`${BASE}/api/workforce/sample`)).text(),
   workforce: async (csv: string, scenario: Scenario) => {
-    const response = await fetch(`${BASE}/api/workforce/analyse`, {
+    const response = await fetchAwake(`${BASE}/api/workforce/analyse`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ csv, scenario }),
     });
     const body = await response.json();

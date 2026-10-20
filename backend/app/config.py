@@ -29,6 +29,7 @@ class Settings:
     database_path: Path
     data_dir: Path
     cors_origins: tuple[str, ...]
+    cors_origin_regex: str | None
     contact_email: str
 
     @property
@@ -60,4 +61,6 @@ def get_settings() -> Settings:
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
             if o.strip()
         ),
+        # Hosts like Vercel serve one site under several addresses (per-deploy URLs, team alias).
+        cors_origin_regex=os.environ.get("CORS_ORIGIN_REGEX") or None,
     )

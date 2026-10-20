@@ -115,3 +115,31 @@ def test_intake_turn_in_chinese_still_finds_english_tool_names(client):
         {"role": "assistant", "content": first["next_question"]},
         {"role": "user", "content": "我是客服，每天用 Excel 做报表。"}]}).json()
     assert "excel" in reply["skills_found"]
+
+
+def test_cors_allows_listed_origins_and_the_pattern(tmp_path, monkeypatch):
+    """Vercel serves one site under several addresses; all of them must reach the API."""
+    import importlib
+
+    from fastapi.testclient import TestClient
+
+    import app.main
+    from app.config import get_settings
+
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "test.db"))
+    monkeypatch.setenv("CORS_ORIGINS", "https://laluan-psi.vercel.app")
+    monkeypatch.setenv("CORS_ORIGIN_REGEX", r"https://laluan(-[a-z0-9]+)*\.vercel\.app")
+    get_settings.cache_clear()
+    try:
+        with TestClient(importlib.reload(app.main).app) as c:
+            def allowed(origin: str) -> str | None:
+                return c.get("/api/health", headers={"Origin": origin}).headers.get("access-control-allow-origin")
+
+            assert allowed("https://laluan-psi.vercel.app") == "https://laluan-psi.vercel.app"
+            assert allowed("https://laluan-team-1000011.vercel.app") == "https://laluan-team-1000011.vercel.app"
+            assert allowed("https://evil.example.com") is None
+            assert allowed("https://laluan.vercel.app.evil.com") is None
+    finally:
+        monkeypatch.delenv("CORS_ORIGIN_REGEX")
+        get_settings.cache_clear()
+        importlib.reload(app.main)

@@ -45,6 +45,8 @@ const STRINGS = {
   "shell.deleteConfirm": { en: "Delete your profile, progress and Future Cards? This can't be undone.", ms: "Padam profil, kemajuan dan Kad Masa Depan anda? Tindakan ini tidak boleh dibatalkan.", zh: "删除您的资料、进度和未来卡片？此操作无法撤销。" },
   "shell.needsProfile": { en: "Add your skills first", ms: "Tambah kemahiran anda dahulu", zh: "请先添加您的技能" },
   "shell.skip": { en: "Skip to content", ms: "Langkau ke kandungan", zh: "跳到正文" },
+  "shell.waking": { en: "Waking up the server. The free hosting sleeps when idle, so this first step can take up to a minute.", ms: "Pelayan sedang dihidupkan. Hos percuma tidur apabila tidak digunakan, jadi langkah pertama ini boleh mengambil masa sehingga seminit.", zh: "正在唤醒服务器。免费主机闲置时会休眠，第一次操作可能需要一分钟。" },
+  "shell.demoFailed": { en: "Couldn't open the demo profile. The server didn't answer; try again in a moment.", ms: "Tidak dapat membuka profil demo. Pelayan tidak menjawab; cuba lagi sebentar lagi.", zh: "无法打开示范资料，服务器没有响应，请稍后再试。" },
   "shell.retry": { en: "Try again", ms: "Cuba lagi", zh: "重试" },
   // landing
   "landing.judge": { en: "Judging Laluan?", ms: "Menilai Laluan?", zh: "评审 Laluan？" },

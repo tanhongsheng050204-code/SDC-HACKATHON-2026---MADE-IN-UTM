@@ -12,6 +12,9 @@ services:
     envVars:
       - key: CORS_ORIGINS
         value: https://laluan-psi.vercel.app,http://localhost:5173
+      # Every other address Vercel gives this project (per-deploy and team URLs).
+      - key: CORS_ORIGIN_REGEX
+        value: https://laluan(-[a-z0-9]+)*\.vercel\.app
       - key: ADMIN_TOKEN
         generateValue: true
       - key: GEMINI_API_KEY
