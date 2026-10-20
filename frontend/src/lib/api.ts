@@ -3,6 +3,7 @@ import { getToken, signOut } from "./auth";
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export type Scenario = "slow" | "baseline" | "accelerated";
+export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string }
 export type Audience = "worker" | "graduate" | "switcher";
 
 export interface Skill { id: string; name: string; category: string }
@@ -19,6 +20,7 @@ export interface RoleMatch {
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
   carry_over: { skill_id: string; name: string }[];
   rank_without_extra?: number;
+  pay: Pay; pay_change_rm: number | null;
   why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number; entry_points: number;
     matched_preferences: { dim: string; label: string }[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
@@ -85,6 +87,7 @@ export interface FutureCard {
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   robust_pick: boolean; next_skills: string[]; steps: number; hours: number; first_step: string | null;
   sdgs: Sdg[]; source: { snapshot_id: string; imported: string; note: string | null };
+  pay: Pay; pay_change_rm: number | null;
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
 export interface CoachReply {

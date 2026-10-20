@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ShareCard } from "../components/ShareCard";
+import { PayLine } from "../components/PayLine";
 import { SignalXray } from "../components/SignalXray";
 import { api, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
@@ -54,6 +55,7 @@ export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfil
       </table>
 
       <p className="source">{t("xray.hint")}</p>
+      <PayLine pay={role.pay} change={role.pay_change_rm} />
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year} onClose={() => setXray(null)} />}
       <div className="job-links"><span className="muted">See open jobs:</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}

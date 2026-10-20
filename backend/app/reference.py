@@ -30,6 +30,7 @@ class Reference:
     skill_levels: list[dict]
     work_dimensions: list[dict]
     survey_cards: dict[str, dict]
+    salaries: dict
 
     @property
     def latest_snapshot(self) -> dict:
@@ -81,6 +82,7 @@ def get_reference() -> Reference:
         skill_levels=_read(data_dir / "skill_levels.json"),
         work_dimensions=_read(data_dir / "work_dimensions.json"),
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
+        salaries=_read(data_dir / "salaries.json"),
     )
 
 

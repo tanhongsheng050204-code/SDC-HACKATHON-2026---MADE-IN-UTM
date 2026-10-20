@@ -10,7 +10,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 
 > The API runs on Render's free plan, which sleeps after about 15 minutes without visitors. The first click after a quiet spell can take up to a minute; the app shows “Waking up the server…” while it waits.
 >
-> **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
+> **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. Pay figures are **DOSM Salaries & Wages Survey Report 2025**, Appendix table A10: monthly medians for Malaysian citizens by occupation group, shown as group medians, never as job offers. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
 ## What it does
 

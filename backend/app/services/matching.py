@@ -97,6 +97,22 @@ def _sdg_view(ref: Reference, tags: list[dict]) -> list[dict]:
     return [{**ref.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"]} for t in tags]
 
 
+def pay(ref: Reference, role_id: str) -> dict:
+    """The DOSM median for the role's occupation group: a group figure, never a job offer."""
+    group = next(g for g in ref.salaries["groups"] if g["id"] == ref.roles[role_id]["masco_major"])
+    return {"group": group["name"], "median_rm": group["median_rm"], "mean_rm": group["mean_rm"],
+            "year": ref.salaries["year"], "source": ref.salaries["source"], "table": ref.salaries["table"],
+            "source_url": ref.salaries["source_url"]}
+
+
+def pay_change(ref: Reference, role_id: str, current_id: str | None) -> int | None:
+    """Difference in group medians; None without a current role or within the same group (DOSM
+    has no finer figure, so we don't invent one)."""
+    if current_id not in ref.roles or ref.roles[current_id]["masco_major"] == ref.roles[role_id]["masco_major"]:
+        return None
+    return pay(ref, role_id)["median_rm"] - pay(ref, current_id)["median_rm"]
+
+
 def _skills_source(ref: Reference, role_id: str) -> dict:
     """Where a role's skill list comes from: the team's list, checked against an O*NET occupation."""
     entry = ref.tasks["roles"].get(role_id, {})
@@ -182,6 +198,8 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},
             "skills_source": _skills_source(ref, role_id),
+            "pay": pay(ref, role_id),
+            "pay_change_rm": pay_change(ref, role_id, current_id),
             **({"rank_without_extra": without_extra[role_id]} if extra_skills else {}),
         })
     also_like = sorted((r for r in roles if r["rank"] > ROBUST_TOP_N and not r["at_risk"]

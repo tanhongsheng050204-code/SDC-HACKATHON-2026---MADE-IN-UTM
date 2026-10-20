@@ -477,3 +477,7 @@ main:focus { outline: none; }
 .what-if summary { cursor: pointer; font-weight: 600; }
 .fit > div { transition: width .4s ease; }
 @media (prefers-reduced-motion: reduce) { .fit > div { transition: none; } }
+
+/* Pay jump */
+.pay-card { margin: 12px 0; gap: 6px; }
+.pay { font-size: .82rem; }

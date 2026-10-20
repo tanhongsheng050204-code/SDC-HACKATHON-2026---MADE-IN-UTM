@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PayLine } from "../components/PayLine";
 import { LogoMark } from "../components/Brand";
 import { Sdgs } from "../components/Sdgs";
 import { api, FutureCard } from "../lib/api";
@@ -37,6 +38,7 @@ export function CardPage({ cardId }: { cardId: string }) {
                 <span className="badge">about {card.hours} hours left</span></div>
             </div>
             {card.robust_pick && <p><span className="badge gold">Robust pick</span> Stays in the top five under every AI-adoption scenario.</p>}
+            <PayLine pay={card.pay} change={card.pay_change_rm} />
             <p className="muted">Range across scenarios: {signed(card.estimate_range.low)}% to {signed(card.estimate_range.high)}% jobs. An estimate, not a prediction.</p>
             {card.next_skills.length > 0 && <p><strong>Next skills:</strong> {card.next_skills.join(", ")}</p>}
             {card.first_step && <p><strong>First step:</strong> {card.first_step}</p>}

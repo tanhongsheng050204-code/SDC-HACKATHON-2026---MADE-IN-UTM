@@ -1,0 +1,20 @@
+{
+  "source": "DOSM, Salaries & Wages Survey Report, Malaysia, 2025 (released 21 September 2026)",
+  "source_url": "https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf",
+  "table": "Appendix table A10 (report page 77): median and mean monthly salaries & wages by occupation, Malaysian citizens, MASCO 2020 major groups",
+  "year": 2025,
+  "checked": "2026-10-20",
+  "note": "Group medians for Malaysian citizens, not job offers. The report's text (page 29) gives Professionals RM6,153, but its Exhibit 4 and table A10 give RM6,124; we use the table (DECISIONS.md).",
+  "groups": [
+    {"id": "1", "name": "Managers", "median_rm": 6186, "mean_rm": 7344},
+    {"id": "2", "name": "Professionals", "median_rm": 6124, "mean_rm": 6747},
+    {"id": "3", "name": "Technicians and associate professionals", "median_rm": 3852, "mean_rm": 4256},
+    {"id": "4", "name": "Clerical support workers", "median_rm": 2693, "mean_rm": 3029},
+    {"id": "5", "name": "Service and sales workers", "median_rm": 2035, "mean_rm": 2687},
+    {"id": "6", "name": "Skilled agricultural, forestry, livestock and fishery workers", "median_rm": 1992, "mean_rm": 2658},
+    {"id": "7", "name": "Craft and related trades workers", "median_rm": 2173, "mean_rm": 2619},
+    {"id": "8", "name": "Plant and machine-operators and assemblers", "median_rm": 2083, "mean_rm": 2488},
+    {"id": "9", "name": "Elementary occupations", "median_rm": 1758, "mean_rm": 2184},
+    {"id": "all", "name": "All employees", "median_rm": 2940, "mean_rm": 3803}
+  ]
+}

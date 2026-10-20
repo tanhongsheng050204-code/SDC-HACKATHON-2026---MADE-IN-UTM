@@ -135,3 +135,19 @@ def test_every_role_has_entry_level():
     ref = get_reference()
     assert all(isinstance(role.get("entry_level"), bool) for role in ref.roles.values())
     assert any(role["entry_level"] for role in ref.roles.values())
+
+
+DOSM_2025_MEDIANS = {"1": 6186, "2": 6124, "3": 3852, "4": 2693, "5": 2035, "6": 1992, "7": 2173, "8": 2083,
+                     "9": 1758, "all": 2940}  # DOSM Salaries & Wages Survey Report 2025, Appendix table A10
+
+
+def test_salaries_match_dosm_table_a10():
+    salaries = get_reference().salaries
+    assert {g["id"]: g["median_rm"] for g in salaries["groups"]} == DOSM_2025_MEDIANS
+    assert salaries["year"] == 2025 and "A10" in salaries["table"] and salaries["source_url"].startswith("https://storage.dosm.gov.my")
+
+
+def test_every_role_maps_to_a_dosm_group():
+    ref = get_reference()
+    groups = {g["id"] for g in ref.salaries["groups"]}
+    assert all(role["masco_major"] in groups - {"all"} for role in ref.roles.values())

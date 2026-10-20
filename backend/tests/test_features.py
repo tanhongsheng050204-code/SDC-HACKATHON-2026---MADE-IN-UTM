@@ -145,6 +145,7 @@ def test_every_recommendation_carries_a_source(client):
     assert analyst["skills_source"]["onet_code"] == "15-2051.01"
     plan = client.get(f"/api/profiles/{profile['id']}/pathway", params={"role": "data_analyst"}).json()
     assert all("checked" in s["course"] and s["course"]["provider"] for s in plan["steps"])
+    assert all(r["pay"]["source"] and r["pay"]["table"] for r in roles)
 
 
 # ---------- Future Card ----------
