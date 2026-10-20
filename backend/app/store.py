@@ -16,6 +16,7 @@ from contextlib import contextmanager
 from app.config import get_settings
 
 SCHEMA_VERSION = 9
+APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -152,6 +153,12 @@ def init_db() -> None:
                 if statement.strip():
                     conn.execute(statement)
             conn.execute("INSERT INTO schema_version (version) VALUES (?)", (version,))
+        if get_settings().database_url:
+            # Supabase serves the public schema over its REST API with a key shipped in the app.
+            # Row-level security with no policies closes every table to that API; the backend
+            # connects as the owner and is unaffected. Re-applied each start, so it is never missed.
+            for table in APP_TABLES:
+                conn.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY")
 
 
 def _now() -> str:

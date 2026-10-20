@@ -93,5 +93,11 @@ def test_postgres_round_trip(monkeypatch):
         with store._connect() as conn:
             left = conn.execute("SELECT COUNT(*) AS n FROM skill_progress WHERE profile_id=?", (pid,)).fetchone()["n"]
         assert left == 0  # cascade
+        # Supabase serves the public schema over its REST API with a public key: every app table
+        # must have row-level security on (no policies = closed to everyone but the backend).
+        with store._connect() as conn:
+            open_tables = conn.execute(
+                "SELECT tablename FROM pg_tables WHERE schemaname='public' AND NOT rowsecurity").fetchall()
+        assert [r["tablename"] for r in open_tables] == []
     finally:
         get_settings.cache_clear()
