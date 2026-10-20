@@ -457,3 +457,11 @@ main:focus { outline: none; }
 .card.lead { margin: 14px 0; gap: 8px; }
 .carry { font-size: .82rem; }
 .lp-switch { margin-top: 14px; }
+
+/* Signal X-ray */
+.dialog.xray { width: min(640px, 100%); }
+.xray-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.xray-table th, .xray-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.xray-table td { white-space: nowrap; text-align: right; }
+.xray-table small { display: block; color: var(--ink-soft); font-weight: 400; font-size: .76rem; }
+.xray-link { font-weight: 600; }

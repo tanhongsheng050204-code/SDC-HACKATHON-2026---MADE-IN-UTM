@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ShareCard } from "../components/ShareCard";
+import { SignalXray } from "../components/SignalXray";
 import { api, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { t } from "../lib/i18n";
@@ -12,6 +13,7 @@ export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfil
   const [plan, setPlan] = useState<Pathway | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [xray, setXray] = useState<Scenario | null>(null);
 
   async function build() {
     setBusy(true); setError(null);
@@ -46,10 +48,13 @@ export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfil
         <caption>Outlook in each scenario (current: {scenario})</caption>
         <tbody>{SCENARIOS.map((s) => {
           const o = role.outlook[s.id];
-          return <tr key={s.id}><th scope="row">{s.label}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td><td>{o.index > 0 ? "+" : ""}{o.index}%</td></tr>;
+          return <tr key={s.id}><th scope="row">{s.label}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td>
+            <td><button className="link xray-link" onClick={() => setXray(s.id)} aria-label={`${t("xray.title")}: ${s.label}`}>{o.index > 0 ? "+" : ""}{o.index}% 🔍</button></td></tr>;
         })}</tbody>
       </table>
 
+      <p className="source">{t("xray.hint")}</p>
+      {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year} onClose={() => setXray(null)} />}
       <div className="job-links"><span className="muted">See open jobs:</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
       </div>

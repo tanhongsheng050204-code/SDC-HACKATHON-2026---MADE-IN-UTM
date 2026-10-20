@@ -15,7 +15,7 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import scrub
 from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
-                          tasks, workforce)
+                          tasks, workforce, xray)
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -73,6 +73,16 @@ def role_detail(role_id: str):
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
     }
+
+
+@router.get("/roles/{role_id}/xray")
+def role_xray(role_id: str, scenario: Scenario = "baseline", year: int | None = None,
+              adoption: float | None = Query(default=None, ge=0.5, le=2.0)):
+    """How this role's outlook number is built, step by step, with sources."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return xray.explain(ref, role_id, scenario, year, adoption)
 
 
 @router.get("/roles/{role_id}/tasks")

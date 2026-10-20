@@ -131,6 +131,11 @@ export interface ClassResult {
   problems: string[];
 }
 
+export interface Xray {
+  role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
+  steps: { label: string; value: number; running_total: number; source: string; cap: string | null }[];
+}
+
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -309,5 +314,7 @@ export const api = {
       method: "POST", body: JSON.stringify({ text, language }) }),
   submitSurvey: (id: string, answers: SurveyAnswer[], language: string) =>
     request<SurveyResult>(`/profiles/${id}/survey`, { method: "POST", body: JSON.stringify({ answers, language }) }),
+  xray: (roleId: string, scenario: Scenario, year?: number, adoption?: number) =>
+    request<Xray>(`/roles/${encodeURIComponent(roleId)}/xray?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption ? `&adoption=${adoption}` : ""}`),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };
