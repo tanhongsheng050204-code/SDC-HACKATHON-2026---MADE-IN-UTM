@@ -11,6 +11,30 @@ Scenario = Literal["slow", "baseline", "accelerated"]
 _CONTACT = re.compile(r"@|\d{6,}")
 
 
+class SignalIn(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    role_id: str
+    net_growth_pct: float = Field(ge=-100, le=500)
+    automation_exposure: float = Field(ge=0, le=1)
+    ai_complementarity: float = Field(ge=0, le=1)
+    note: str | None = Field(default=None, max_length=500)
+
+
+class SnapshotIn(BaseModel):
+    """An imported snapshot. The ID becomes a file name, so only letters, digits, - and _."""
+    model_config = ConfigDict(extra="allow")
+
+    snapshot_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$")
+    source: str = Field(min_length=1, max_length=500)
+    source_url: str = Field(max_length=500)
+    published: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}")
+    imported: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}")
+    horizon_year: int = Field(ge=2025, le=2100)
+    illustrative: bool
+    signals: list[SignalIn] = Field(min_length=1, max_length=500)
+
+
 class ExtractRequest(BaseModel):
     text: str = Field(min_length=50, max_length=20_000)
 
@@ -18,6 +42,17 @@ class ExtractRequest(BaseModel):
 class CompleteRequest(BaseModel):
     course_id: str = Field(min_length=1, max_length=80)
     done: bool = True
+
+
+class CoachRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    question: str = Field(min_length=1, max_length=500)
+    scenario: Scenario = "baseline"
+    role_id: str | None = Field(default=None, max_length=80)
+
+
+class CardRequest(BaseModel):
+    role_id: str = Field(min_length=1, max_length=80)
 
 
 class WorkforceRequest(BaseModel):

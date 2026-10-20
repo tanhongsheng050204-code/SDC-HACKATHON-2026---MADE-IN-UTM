@@ -6,3 +6,6 @@ __pycache__/
 node_modules/
 dist/
 *.tsbuildinfo
+.playwright-mcp/
+.vercel/
+.env.local

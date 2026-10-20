@@ -63,3 +63,12 @@ def test_every_skill_and_role_has_an_sdg_with_target():
     for tags in [*ref.sdg_map["roles"].values(), *ref.sdg_map["skills"].values()]:
         for tag in tags:
             assert tag.get("target", "").startswith(f"{tag['sdg']}."), tag
+
+
+def test_tasks_cover_every_role_with_valid_labels():
+    ref = get_reference()
+    assert set(ref.tasks["roles"]) == set(ref.roles)
+    for role_id, entry in ref.tasks["roles"].items():
+        assert bool(entry["onet_code"]) == bool(entry["tasks"]), role_id
+        for t in entry["tasks"]:
+            assert t["label"] in {"automate", "assist", "human"} and t["reason"] and t["text"], t["id"]

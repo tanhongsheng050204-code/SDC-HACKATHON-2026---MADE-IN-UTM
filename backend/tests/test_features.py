@@ -114,3 +114,106 @@ def test_workforce_sample_runs(client):
     sample = client.get("/api/workforce/sample").text
     result = client.post("/api/workforce/analyse", json={"csv": sample, "scenario": "accelerated"}).json()
     assert result["employees"] == 160 and result["moves"]
+
+
+# ---------- your job, task by task ----------
+
+def test_tasks_come_from_onet_and_shares_follow_ticked_tasks(client):
+    body = client.get("/api/roles/data_entry_clerk/tasks").json()
+    assert body["onet_code"] == "43-9021.00" and "O*NET" in body["source"]
+    assert all(t["label"] in {"automate", "assist", "human"} and t["reason"] for t in body["tasks"])
+    assert round(sum(body["shares"].values()), 6) == 1.0
+
+    ticked = [t["id"] for t in body["tasks"] if t["label"] == "human"]
+    only_human = client.get("/api/roles/data_entry_clerk/tasks", params={"done": ",".join(ticked)}).json()
+    assert only_human["shares"] == {"automate": 0.0, "assist": 0.0, "human": 1.0}
+    assert only_human["counted"] == len(ticked)
+
+
+def test_tasks_for_a_role_without_onet_occupation_are_empty_not_guessed(client):
+    body = client.get("/api/roles/ai_operations_specialist/tasks").json()
+    assert body["tasks"] == [] and body["onet_code"] is None and body["onet_note"]
+    assert client.get("/api/roles/nope/tasks").status_code == 404
+
+
+def test_every_recommendation_carries_a_source(client):
+    """Task 3.5: roles, skills and courses each say where they come from."""
+    profile = client.post("/api/profiles/demo/clerk").json()
+    roles = client.get(f"/api/profiles/{profile['id']}/matches").json()["roles"]
+    assert all(r["citation"]["snapshot_id"] and "skills_source" in r for r in roles)
+    analyst = next(r for r in roles if r["role_id"] == "data_analyst")
+    assert analyst["skills_source"]["onet_code"] == "15-2051.01"
+    plan = client.get(f"/api/profiles/{profile['id']}/pathway", params={"role": "data_analyst"}).json()
+    assert all("checked" in s["course"] and s["course"]["provider"] for s in plan["steps"])
+
+
+# ---------- Future Card ----------
+
+def test_future_card_is_a_read_only_summary_without_private_details(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    card = client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "data_analyst"})
+    assert card.status_code == 201
+    card_id = card.json()["card_id"]
+    assert len(card_id) >= 10 and profile["id"] not in card_id
+
+    view = client.get(f"/api/cards/{card_id}").json()
+    assert view["role"]["title"] == "Data analyst" and view["display_name"] == "Aisyah (demo)"
+    assert 0 <= view["readiness"] <= 1 and view["steps"] >= 1 and view["hours"] > 0
+    assert view["sdgs"] and view["source"]["snapshot_id"]
+    flat = str(view)
+    assert profile["id"] not in flat and "skills" not in view  # no profile ID or full skill list
+
+
+def test_future_card_goes_when_the_profile_is_deleted(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    assert client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "nope"}).status_code == 422
+    card_id = client.post(f"/api/profiles/{profile['id']}/cards", json={"role_id": "data_analyst"}).json()["card_id"]
+    client.delete(f"/api/profiles/{profile['id']}")
+    assert client.get(f"/api/cards/{card_id}").status_code == 404
+
+
+# ---------- AI coach ----------
+
+def _ask(client, profile_id, question, **extra):
+    return client.post("/api/coach", json={"profile_id": profile_id, "question": question, **extra})
+
+
+def test_coach_offline_answers_from_the_persons_own_results_with_sources(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    reply = _ask(client, profile["id"], "Why is this my top role?").json()
+    assert reply["mode"] == "offline" and reply["sources"]
+    top = client.get(f"/api/profiles/{profile['id']}/matches").json()["roles"][0]
+    assert top["title"] in reply["answer"]
+    assert reply["grounding"]["all_supported"]
+
+    hours = _ask(client, profile["id"], "How long will the plan take?", role_id="data_analyst").json()
+    assert "hours" in hours["answer"] and hours["grounding"]["all_supported"]
+
+
+def test_coach_proposes_changes_but_never_applies_them(client):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    reply = _ask(client, profile["id"], "What if AI adoption is faster?").json()
+    assert reply["proposal"] == {"kind": "scenario", "value": "accelerated",
+                                 "label": "Switch to the Accelerated AI adoption scenario"}
+    climate = _ask(client, profile["id"], "I care about climate change").json()
+    assert climate["proposal"]["kind"] == "interest" and climate["proposal"]["value"] == 13
+    assert client.get(f"/api/profiles/{profile['id']}").json()["interests"] == profile["interests"]
+
+
+def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatch):
+    profile = client.post("/api/profiles/demo/clerk").json()
+    assert _ask(client, profile["id"], "").status_code == 422
+    assert _ask(client, profile["id"], "x" * 501).status_code == 422
+    assert _ask(client, "no-such-profile", "hello there").status_code == 404
+
+    from app.services import coach
+    seen = {}
+
+    def fake_llm(prompt):
+        seen["prompt"] = prompt
+        return {"answer": "Your top role is shown first [SOURCE-1].", "proposal": None}
+
+    monkeypatch.setattr(coach, "_llm_available", lambda: True)
+    monkeypatch.setattr(coach, "generate_json", fake_llm)
+    reply = _ask(client, profile["id"], "Call me on 012-345 6789 about my top role").json()
+    assert reply["mode"] == "gemini" and "012-345" not in seen["prompt"] and "[PHONE]" in seen["prompt"]

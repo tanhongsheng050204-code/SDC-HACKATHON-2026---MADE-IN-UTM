@@ -5,14 +5,15 @@ import json
 
 from fastapi import APIRouter, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
+from pydantic import ValidationError
 
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
-                         WorkforceRequest)
+from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
+                         SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import documents, intake, matching, pathway, skills, workforce
+from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
 from app.trends import refresh
 
 router = APIRouter(prefix="/api")
@@ -64,6 +65,15 @@ def role_detail(role_id: str):
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
     }
+
+
+@router.get("/roles/{role_id}/tasks")
+def role_tasks(role_id: str, done: str = Query(default="", max_length=2_000)):
+    """The role's O*NET tasks with automate / assist / human labels; `done` = ticked task IDs."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return tasks.for_role(ref, role_id, {d for d in done.split(",") if d})
 
 
 @router.get("/scenarios")
@@ -132,20 +142,23 @@ def radar(profile_id: str | None = None):
 
 
 @router.post("/signals/import", status_code=201)
-def import_snapshot(snapshot: dict, x_admin_token: str = Header(default="")):
+def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
     settings = get_settings()
-    _require_admin(x_admin_token)
+    _require_admin(x_admin_token)  # before validation, so strangers learn nothing about the format
+    try:
+        snapshot = SnapshotIn.model_validate(body).model_dump(exclude_none=True)
+    except ValidationError as error:
+        raise HTTPException(422, error.errors(include_url=False, include_input=False)) from error
     ref = get_reference()
-    required = {"snapshot_id", "source", "source_url", "published", "imported", "horizon_year",
-                "illustrative", "signals"}
-    if missing := required - snapshot.keys():
-        raise HTTPException(422, f"Missing fields: {', '.join(sorted(missing))}")
     if snapshot["imported"] <= ref.latest_snapshot["imported"]:
         raise HTTPException(422, "imported date must be later than the latest snapshot")
     for s in snapshot["signals"]:
-        if s.get("role_id") not in ref.roles:
-            raise HTTPException(422, f"Unknown role in signals: {s.get('role_id')}")
-    path = settings.data_dir / "signals" / f"{snapshot['snapshot_id']}.json"
+        if s["role_id"] not in ref.roles:
+            raise HTTPException(422, f"Unknown role in signals: {s['role_id']}")
+    folder = (settings.data_dir / "signals").resolve()
+    path = (folder / f"{snapshot['snapshot_id']}.json").resolve()
+    if path.parent != folder:  # belt and braces: the ID pattern already rules this out
+        raise HTTPException(422, "Invalid snapshot_id")
     if path.exists():
         raise HTTPException(409, "Snapshot already exists")
     path.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
@@ -230,6 +243,33 @@ def complete_course(profile_id: str, body: CompleteRequest):
     if body.done:
         done.append(body.course_id)
     return store.set_completed(profile_id, done)
+
+
+@router.post("/profiles/{profile_id}/cards", status_code=201)
+def create_card(profile_id: str, body: CardRequest):
+    """A Future Card: a read-only link to a summary of this person's move to one role."""
+    _profile_or_404(profile_id)
+    if body.role_id not in get_reference().roles:
+        raise HTTPException(422, "Unknown role")
+    return {"card_id": store.create_card(profile_id, body.role_id)}
+
+
+@router.get("/cards/{card_id}")
+def get_card(card_id: str):
+    card = store.get_card(card_id)
+    profile = store.get_profile(card["profile_id"]) if card else None
+    if card is None or profile is None or card["role_id"] not in get_reference().roles:
+        raise HTTPException(404, "Card not found")
+    return cards.view(get_reference(), profile, card)
+
+
+@router.post("/coach")
+def ask_coach(body: CoachRequest):
+    """A cited answer about the person's own results, plus at most one change they can apply."""
+    ref = get_reference()
+    if body.role_id is not None and body.role_id not in ref.roles:
+        raise HTTPException(422, "Unknown role")
+    return coach.answer(ref, _profile_or_404(body.profile_id), body.question, body.scenario, body.role_id)
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

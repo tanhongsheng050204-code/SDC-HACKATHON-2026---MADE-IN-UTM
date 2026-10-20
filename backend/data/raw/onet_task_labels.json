@@ -1,0 +1,149 @@
+{
+  "_about": "Which O*NET tasks we show for each role, and whether AI is likely to automate the task, assist the person doing it, or leave it to people. Labels and reasons were drafted with AI assistance and MUST be reviewed by the team: set reviewed_by in tasks.json after checking. Task text is copied verbatim from O*NET by scripts/build_tasks.py.",
+  "onet_version": "30.0",
+  "roles": {
+    "data_entry_clerk": {
+      "onet_code": "43-9021.00",
+      "tasks": [
+        {"task_id": 11402, "label": "automate", "reason": "Document-reading AI already extracts and checks fields from invoices and forms."},
+        {"task_id": 11403, "label": "automate", "reason": "Comparing entries with source documents is rule-based and is done by validation software."},
+        {"task_id": 11404, "label": "automate", "reason": "Digital filing and records systems store documents automatically."},
+        {"task_id": 11405, "label": "assist", "reason": "Software flags likely errors, but a person decides the correction and when to escalate."},
+        {"task_id": 11407, "label": "human", "reason": "Planning one's own work and materials stays with the person."}
+      ]
+    },
+    "admin_assistant": {
+      "onet_code": "43-6014.00",
+      "tasks": [
+        {"task_id": 20281, "label": "automate", "reason": "Entering and updating database records is increasingly done by forms, integrations and document AI."},
+        {"task_id": 2797, "label": "assist", "reason": "Grammar and style tools check text; a person judges tone and company context."},
+        {"task_id": 20284, "label": "assist", "reason": "Generative AI drafts notes and reports; a person checks facts and sends them."},
+        {"task_id": 2790, "label": "assist", "reason": "Voice assistants route routine calls; people handle the rest."},
+        {"task_id": 2791, "label": "human", "reason": "Welcoming visitors in person depends on presence and judgement."},
+        {"task_id": 20289, "label": "human", "reason": "Training colleagues needs patience, trust and knowing the team."}
+      ]
+    },
+    "customer_service_rep": {
+      "onet_code": "43-4051.00",
+      "tasks": [
+        {"task_id": 2578, "label": "automate", "reason": "Contact-centre software logs and summarises interactions automatically."},
+        {"task_id": 2583, "label": "automate", "reason": "Charges and billing follow rules that systems apply."},
+        {"task_id": 2584, "label": "automate", "reason": "Standard forms and account changes are handled by self-service and workflow tools."},
+        {"task_id": 18565, "label": "assist", "reason": "Chatbots answer routine questions; people handle complex or upset customers with AI-suggested answers."},
+        {"task_id": 2581, "label": "assist", "reason": "Notifications can be drafted and sent by AI; sensitive news still needs a person."},
+        {"task_id": 2582, "label": "human", "reason": "Deciding how to handle an unresolved complaint takes judgement and ownership."}
+      ]
+    },
+    "data_analyst": {
+      "onet_code": "15-2051.01",
+      "onet_note": "Closest O*NET occupation: Business Intelligence Analysts.",
+      "tasks": [
+        {"task_id": 16150, "label": "automate", "reason": "Standard reports are generated on a schedule by BI tools."},
+        {"task_id": 16146, "label": "assist", "reason": "AI gathers and summarises sources; a person judges which are reliable."},
+        {"task_id": 16139, "label": "assist", "reason": "AI helps write queries and dashboard code; the analyst designs and maintains them."},
+        {"task_id": 16144, "label": "assist", "reason": "AI speeds up building tools; deciding what to build stays with the analyst."},
+        {"task_id": 16141, "label": "human", "reason": "Linking trends to business strategy needs context and accountability."},
+        {"task_id": 16149, "label": "human", "reason": "Recommending action is a judgement the analyst owns."}
+      ]
+    },
+    "ai_ml_engineer": {
+      "onet_code": "15-2051.00",
+      "onet_note": "Closest O*NET occupation: Data Scientists.",
+      "tasks": [
+        {"task_id": 21826, "label": "assist", "reason": "AI coding tools speed up data cleaning; the engineer checks the result."},
+        {"task_id": 21823, "label": "assist", "reason": "Analysis is faster with AI help, but the engineer designs and verifies it."},
+        {"task_id": 21824, "label": "assist", "reason": "AutoML tries feature sets; the engineer judges what is valid and fair."},
+        {"task_id": 21827, "label": "assist", "reason": "Metrics are computed automatically; choosing the right one is a judgement."},
+        {"task_id": 21831, "label": "human", "reason": "Framing the right problem needs business understanding."},
+        {"task_id": 21829, "label": "human", "reason": "Explaining results and limits to decision makers stays with people."}
+      ]
+    },
+    "ai_operations_specialist": {
+      "onet_code": null,
+      "onet_note": "A new role with no O*NET occupation yet, so we do not show tasks for it rather than guess.",
+      "tasks": []
+    },
+    "software_developer": {
+      "onet_code": "15-1252.00",
+      "tasks": [
+        {"task_id": 21670, "label": "assist", "reason": "AI coding assistants propose fixes; developers review and own them."},
+        {"task_id": 21669, "label": "assist", "reason": "AI writes test and documentation drafts; developers decide what must be tested."},
+        {"task_id": 21667, "label": "assist", "reason": "AI generates code; design and trade-offs stay with the developer."},
+        {"task_id": 21668, "label": "assist", "reason": "Tools measure performance; setting the standard is a decision."},
+        {"task_id": 21662, "label": "human", "reason": "Understanding what users need and what is feasible needs conversation and judgement."},
+        {"task_id": 21664, "label": "human", "reason": "Working out designs with other people is collaborative."}
+      ]
+    },
+    "cybersecurity_analyst": {
+      "onet_code": "15-1212.00",
+      "tasks": [
+        {"task_id": 5316, "label": "automate", "reason": "Threat feeds and endpoint tools update protection automatically."},
+        {"task_id": 5317, "label": "automate", "reason": "Access changes are increasingly handled by identity-management workflows."},
+        {"task_id": 5320, "label": "assist", "reason": "Scanners find weaknesses; the analyst judges risk and impact."},
+        {"task_id": 5322, "label": "assist", "reason": "AI drafts policies; the analyst makes them fit the organisation."},
+        {"task_id": 5314, "label": "assist", "reason": "Planning protection uses AI analysis but needs human priorities."},
+        {"task_id": 5313, "label": "human", "reason": "Changing people's security habits needs trust and teaching."}
+      ]
+    },
+    "digital_marketing_specialist": {
+      "onet_code": "13-1161.01",
+      "onet_note": "Closest O*NET occupation: Search Marketing Strategists.",
+      "tasks": [
+        {"task_id": 16186, "label": "automate", "reason": "Trend and competitor monitoring is done by analytics platforms."},
+        {"task_id": 16185, "label": "automate", "reason": "Product catalogues are kept current by feeds and AI tagging."},
+        {"task_id": 16187, "label": "assist", "reason": "Forecasts come from tools; the specialist sets assumptions."},
+        {"task_id": 16179, "label": "assist", "reason": "AI drafts campaign ideas and copy; the specialist chooses and pitches."},
+        {"task_id": 16182, "label": "human", "reason": "Strategy depends on brand, customers and judgement."},
+        {"task_id": 16188, "label": "human", "reason": "Partnerships rely on relationships."}
+      ]
+    },
+    "ux_designer": {
+      "onet_code": "15-1255.00",
+      "onet_note": "Closest O*NET occupation: Web and Digital Interface Designers.",
+      "tasks": [
+        {"task_id": 21690, "label": "automate", "reason": "Search indexing is done by software."},
+        {"task_id": 21691, "label": "assist", "reason": "AI generates prototype drafts; the designer shapes them."},
+        {"task_id": 21692, "label": "assist", "reason": "Site builders and AI speed up building; quality is the designer's call."},
+        {"task_id": 21693, "label": "assist", "reason": "AI can draft style guides from examples."},
+        {"task_id": 21688, "label": "human", "reason": "Talking to users and reading their reactions needs empathy."},
+        {"task_id": 21689, "label": "human", "reason": "Resolving conflicting needs is negotiation."}
+      ]
+    },
+    "renewable_energy_technician": {
+      "onet_code": "47-2231.00",
+      "onet_note": "Closest O*NET occupation: Solar Photovoltaic Installers.",
+      "tasks": [
+        {"task_id": 17749, "label": "assist", "reason": "Design software proposes layouts from site data; the technician checks the site."},
+        {"task_id": 17750, "label": "assist", "reason": "Drones and mapping tools speed up diagrams."},
+        {"task_id": 17744, "label": "assist", "reason": "Monitoring systems test output; the technician fixes faults."},
+        {"task_id": 17740, "label": "human", "reason": "Physical assembly on varied sites is hard to automate."},
+        {"task_id": 17742, "label": "human", "reason": "Installation on roofs and sites needs hands-on skill and safety judgement."},
+        {"task_id": 17745, "label": "human", "reason": "Weather sealing is manual work on each site."}
+      ]
+    },
+    "sustainability_analyst": {
+      "onet_code": "13-1199.05",
+      "onet_note": "Closest O*NET occupation: Sustainability Specialists.",
+      "tasks": [
+        {"task_id": 15969, "label": "assist", "reason": "AI summarises regulations and reports; the analyst checks what applies."},
+        {"task_id": 15976, "label": "assist", "reason": "AI drafts reports and charts from data."},
+        {"task_id": 15972, "label": "assist", "reason": "AI drafts applications; the analyst tailors and stands behind them."},
+        {"task_id": 15968, "label": "assist", "reason": "AI compares policies against standards; changes need human sign-off."},
+        {"task_id": 15971, "label": "human", "reason": "Choosing what to measure reflects values and context."},
+        {"task_id": 15970, "label": "human", "reason": "Investigating violations needs site visits and judgement."}
+      ]
+    },
+    "care_worker": {
+      "onet_code": "31-1122.00",
+      "onet_note": "Closest O*NET occupation: Personal Care Aides.",
+      "tasks": [
+        {"task_id": 2371, "label": "assist", "reason": "Voice notes and apps speed up care records."},
+        {"task_id": 2369, "label": "assist", "reason": "Sensors and apps track vital signs; the carer acts on them."},
+        {"task_id": 2370, "label": "human", "reason": "Personal care needs touch, dignity and trust."},
+        {"task_id": 2372, "label": "human", "reason": "Household tasks in varied homes remain manual."},
+        {"task_id": 2373, "label": "human", "reason": "Companionship is human by nature."},
+        {"task_id": 2376, "label": "human", "reason": "Case reviews depend on knowing the person."}
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+# Run the whole app with one command:  docker compose up --build
+# Then open http://localhost:8080 (API docs at http://localhost:8000/docs).
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment:
+      CORS_ORIGINS: http://localhost:8080
+    volumes:
+      - laluan-db:/app/var
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  laluan-db:

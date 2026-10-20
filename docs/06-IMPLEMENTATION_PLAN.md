@@ -40,29 +40,30 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 | # | Task | Owner | Done when |
 |---|---|---|---|
 | 3.1 | ✅ CV **file upload** (PDF/DOCX) + guided questionnaire tab | A + B | Text extracted in memory, scrubbed, never stored |
-| 3.2 | ◐ free / free-to-audit / paid labels shown; ⬜ RM prices, HRD Corp status and link checks need sourcing · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
+| 3.2 | ◐ free / free-to-audit / paid labels shown; ✅ 25 of 29 links opened and dated by `scripts/check_links.py` (4 generic Malaysian providers have no single course page); ⬜ RM prices, HRD Corp status, `reviewed_by` · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
 | 3.3 | ✅ Year slider (today → horizon year, never beyond), scenarios as presets | A + B | Re-ranks < 300 ms; keyboard works |
 | 3.4 | ✅ New visual design (white landing, sidebar app shell, stat cards, pill badges) | B | All screens restyled |
-| 3.5 | Source shown on every recommendation (roles ✅, skills, tasks, courses) | B | Spot check: nothing without a source |
+| 3.5 | ✅ Source shown on every recommendation (roles, skills with their O\*NET occupation, tasks, courses with link-check date, radar skills) | B | Spot check: nothing without a source |
 
 ## M4: good-to-haves, in this order (Day 3–4)
 
 1. ✅ HR workforce view (aggregate heatmap + cheapest moves; rejects personal columns)
 2. ✅ Automatic re-planning notice after a refresh ("Your plan changed because …")
-3. ⬜ Your job, task by task (O\*NET tasks, labels reviewed by the team)
+3. ✅ Your job, task by task (O\*NET 30.0 tasks; ⬜ labels reviewed by the team: fill `reviewed_by` in `tasks.json`)
 4. ✅ Progress tracking + skill badges
-5. BM + 中文 strings and lite mode
-6. AI coach (cited answers, proposals the user applies)
-7. Future Card + QR
+5. ✅ BM + 中文 strings (shell, landing, headings, main buttons, honesty notices, questionnaire; ⬜ native-speaker check, ⬜ remaining screen text) and lite mode
+6. ✅ AI coach (cited answers, proposals the user applies; works offline)
+7. ✅ Future Card + QR (also `/?demo=clerk`, `/?demo=student` and `/?demo=hr` links)
+8. ✅ Sources screen (S9), skill-level SDG tags on the Impact screen, screen/scenario/year kept in the URL so browser back and reload work
 
 ## M5: quality and evidence (Day 4)
 
 | Task | Done when |
 |---|---|
-| Error, empty and offline states | Each one seen once in the browser |
+| ◐ Error, empty and offline states (server-down banner, stale/illustrative data banner, no close roles, fully covered role, empty workforce and sources) | Each one seen once in the browser |
 | Accessibility | Keyboard-only run; contrast checked |
 | Privacy and fairness | Tests: CV never stored; scrub before every LLM call; demographic fields rejected; HR CSV with personal columns rejected |
-| Human evaluation | 5 **synthetic** CVs marked by a person; a lecturer or counsellor reviews both personas' pathways → EVALUATION.md |
+| Human evaluation | ◐ 5 synthetic CVs and `scripts/eval_extraction.py` ready in `backend/data/eval/`; ⬜ 5 **synthetic** CVs marked by a person; a lecturer or counsellor reviews both personas' pathways → EVALUATION.md |
 | Code walkthrough | Every teammate explains their modules from CODE_TO_EXPLAIN.md without notes |
 
 ## M6: release (Day 5)

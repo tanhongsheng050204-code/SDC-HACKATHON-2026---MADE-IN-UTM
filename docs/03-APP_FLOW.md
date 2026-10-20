@@ -19,16 +19,16 @@ different demo data; Organisation opens the HR view.
 | S1 | Intake | Upload CV (PDF/DOCX) / paste CV / questionnaire / pick skills | `POST /intake/upload`, `POST /intake/extract`, `POST /intake/turn`, `GET /skills` |
 | S2 | Review | Confirm skills, current job, years of experience, goals (SDGs) | `POST /profiles` |
 | S2b | **Future Skills Radar** | Which skills and roles are rising or declining, each with source and date; the user's own skills highlighted | `GET /radar?profile_id=` |
-| S3 | Your job, task by task | Tick tasks you do → % automate / assist / human | `GET /roles/{id}/tasks` ⬜ |
+| S3 | Your job, task by task | Tick tasks you do → % automate / assist / human | `GET /roles/{id}/tasks?done=` ✅ |
 | S4 | Future roles | Stat cards, scenario presets, year slider (today → horizon), ranked cards | `GET /profiles/{id}/matches?scenario=&year=` |
 | S5 | Role detail | Outlook over time, covered vs missing skills, **Why this rank?** | same + `GET /roles/{id}` |
 | S6 | Pathway | Job links, readiness meter, badges, steps with hours and cost labels, "I finished this" | `GET /profiles/{id}/pathway?role=`, `POST /profiles/{id}/complete` |
 | S7 | Impact | SDG tiles and reasons for the role and its skills | `GET /roles/{id}` |
-| S8 | Future Card | Shareable summary + QR | ⬜ |
+| S8 | Future Card | Shareable read-only summary + QR, opened at `/?card=ID` | `POST /profiles/{id}/cards`, `GET /cards/{card_id}` ✅ |
 | S9 | Sources | Every snapshot: source, date, reviewer | `GET /signals` |
 | H1 | HR workforce | Upload or paste anonymous CSV (or the synthetic sample) → heatmap, cheapest moves, hours, SDG totals | `POST /workforce/analyse`, `GET /workforce/sample` |
 | A1 | Admin | **Refresh trend data** (runs collectors, writes a new snapshot, shows what changed); approve / reject proposals | `POST /signals/refresh`, `GET /signals/refresh` (progress) |
-| — | Coach drawer | Opens from any screen; cited answers; **Apply** on proposed changes | `POST /coach` ⬜ |
+| — | Coach drawer | Opens from any screen; cited answers; **Apply** on proposed changes | `POST /coach` ✅ |
 
 ## Primary journey (worker)
 

@@ -1,0 +1,46 @@
+/* Public pages (landing, Future Card): announcement bar, top navigation and footer. */
+
+.site { background: var(--page); min-height: 100vh; }
+.announce { background: var(--ink); color: var(--page); text-align: center; font-size: .9rem; font-weight: 600; padding: 11px 16px; }
+.announce button { border: none; background: none; box-shadow: none; color: inherit; font: inherit; padding: 0 0 0 4px; min-height: 0; }
+.announce button:hover:not(:disabled) { background: none; text-decoration: underline; text-underline-offset: 3px; }
+
+.site-nav {
+  position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+  height: 60px; padding: 0 clamp(16px, 4.5vw, 48px); background: var(--page); border-bottom: 1px solid var(--line);
+}
+.site-nav .brand { justify-self: start; font-size: 1.08rem; }
+.site-links { display: flex; gap: 2px; }
+.site-links a { padding: 8px 13px; border-radius: 10px; color: var(--ink); font-size: .95rem; font-weight: 500; text-decoration: none; }
+.site-links a:hover { background: var(--surface-2); }
+.site-nav-actions { justify-self: end; display: flex; gap: 8px; align-items: center; }
+.site-nav-actions .btn.sm { font-size: .92rem; padding: .55rem 1rem; }
+@media (max-width: 900px) { .site-links { display: none; } .site-nav { grid-template-columns: 1fr auto; } }
+@media (max-width: 520px) { .site-nav-actions .lang-picker, .site-nav-actions .btn.quiet { display: none; } }
+
+.pill-tag {
+  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(16, 36, 31, .06); color: var(--ink-soft); font-size: .9rem; font-weight: 500; padding: 6px 15px;
+}
+.hero-rosette { position: absolute; width: 900px; height: 900px; left: 50%; top: -180px; transform: translateX(-50%); color: var(--accent); opacity: .07; pointer-events: none; }
+
+.site-footer { background: var(--page); border-top: 1px solid var(--line); }
+.site-footer-inner {
+  width: min(1180px, 100%); margin: 0 auto; padding: 56px clamp(16px, 4vw, 40px) 40px;
+  display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px;
+}
+.site-footer .brand { min-height: 0; font-size: .95rem; margin-bottom: 12px; }
+.footer-blurb { color: var(--ink-soft); max-width: 34ch; line-height: 1.6; }
+.site-footer h3 { font-size: .92rem; margin-bottom: 12px; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.site-footer a, .site-footer button.link { color: var(--ink-soft); text-decoration: none; font-weight: 400; font-size: .95rem; }
+.site-footer a:hover, .site-footer button.link:hover { color: var(--ink); }
+.footer-base {
+  width: min(1180px, 100%); margin: 0 auto; padding: 16px clamp(16px, 4vw, 40px) 32px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; color: var(--ink-faint); font-size: .8rem;
+}
+.site-footer .lite-toggle { color: inherit; font-size: .8rem; }
+@media (max-width: 760px) { .site-footer-inner { grid-template-columns: 1fr 1fr; } .footer-about { grid-column: 1 / -1; } }
+.site-nav .btn { white-space: nowrap; }
+.footer-prefs { display: inline-flex; gap: 14px; align-items: center; }
+.site-footer button.link { padding: 0; line-height: inherit; font-family: inherit; text-align: left; }
