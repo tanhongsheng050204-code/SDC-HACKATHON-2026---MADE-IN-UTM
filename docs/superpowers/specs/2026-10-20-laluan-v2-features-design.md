@@ -21,7 +21,7 @@ The team chose: **skill tree, survey and login first.**
 | Phase | Target | Contents |
 |---|---|---|
 | 1 | Working by 25 Oct | Login + Supabase database, hosting on Replit, skill tree with proof checks, personalised survey, SDG choice removed, privacy step "send less", serving the four groups (section 11) |
-| 2 | After Phase 1 | RunPod: Whisper voice input and open-model CV reading; wider scrubber; "what gets sent" preview |
+| 2 | After Phase 1 (**built**; RunPod endpoints still to be created) | RunPod: Whisper voice input and open-model CV reading; wider scrubber; "what gets sent" preview |
 | 3 | After Phase 2 | Cited skill evidence via web search, emerging roles, "a day in this job", SDG reasons for every role/skill/emerging role |
 
 If Phase 1 runs late, the order inside it is: login + database, then skill tree, then survey, then the four-group work (section 11).

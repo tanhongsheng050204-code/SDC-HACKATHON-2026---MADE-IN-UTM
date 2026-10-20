@@ -16,7 +16,7 @@ different demo data; Organisation opens the HR view.
 | # | Screen | Purpose | API |
 |---|---|---|---|
 | S0 | Landing | One-line promise, persona switch, demo buttons | — |
-| S1 | Intake | Upload CV (PDF/DOCX) / paste CV / questionnaire / pick skills | `POST /intake/upload`, `POST /intake/extract`, `POST /intake/turn`, `GET /skills` |
+| S1 | Intake | Upload CV (PDF/DOCX) / paste CV / questionnaire / pick skills | `POST /intake/upload/preview` or `POST /intake/preview` (what gets sent), then `POST /intake/extract`; `POST /intake/turn`, `GET /skills`; `POST /voice/transcribe` for the mic |
 | S2 | Review | Confirm skills, current job, years of experience, goals (SDGs) | `POST /profiles` |
 | S2b | **Future Skills Radar** | Which skills and roles are rising or declining, each with source and date; the user's own skills highlighted | `GET /radar?profile_id=` |
 | S3 | Your job, task by task | Tick tasks you do → % automate / assist / human | `GET /roles/{id}/tasks?done=` ✅ |

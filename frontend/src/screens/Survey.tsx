@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { api, Profile, SurveyAnswer, SurveyCard, SurveyResult } from "../lib/api";
 import { getLang, t } from "../lib/i18n";
+import { MicButton } from "../components/MicButton";
 
 const textFor = (text: Record<string, string>) => text[getLang()] || text.en;
 
@@ -75,6 +76,7 @@ export function Survey({ profile, userId, onDone, onSkip }: {
               <label>{t("survey.otherLabel")}
                 <textarea rows={2} maxLength={300} value={other} onChange={(e) => { setOther(e.target.value); setReading(null); }} />
               </label>
+              <MicButton onText={(text) => { setOther((o) => `${(o ?? "").trimEnd()} ${text}`.trim().slice(0, 300)); setReading(null); }} />
               {!reading && <button className="btn quiet" disabled={busy || !other.trim()} onClick={checkOther}>{t("survey.check")}</button>}
               {reading && reading.reading && (
                 <div role="status">
