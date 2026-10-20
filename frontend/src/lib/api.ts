@@ -1,4 +1,4 @@
-import { getToken, signOut } from "./auth";
+import { freshToken, refreshToken, signOut } from "./auth";
 
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
@@ -175,22 +175,28 @@ export function onAuthExpired(listener: ExpiredListener) {
   return () => { expiredListeners.delete(listener); };
 }
 
-function withAuth(init?: RequestInit): RequestInit | undefined {
-  const token = getToken();
+function withToken(init: RequestInit | undefined, token: string | null): RequestInit | undefined {
   if (!token) return init;
   const headers = new Headers(init?.headers);
   headers.set("Authorization", `Bearer ${token}`);
   return { ...init, headers };
 }
 
-async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
+async function fetchAwake(url: string, original?: RequestInit): Promise<Response> {
   const started = Date.now();
-  const sentToken = Boolean(getToken());
-  init = withAuth(init);
+  let token = await freshToken();
+  let init = withToken(original, token);
+  let refreshed = false;
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await fetch(url, init);
-      if (response.status === 401 && sentToken) {
+      let response = await fetch(url, init);
+      if (response.status === 401 && token && !refreshed) {
+        // Refused login: refresh once and retry before deciding the session is really over.
+        refreshed = true;
+        token = await refreshToken().catch(() => null);
+        if (token) { init = withToken(original, token); response = await fetch(url, init); }
+      }
+      if (response.status === 401 && refreshed) {
         await signOut();
         expiredListeners.forEach((l) => l());
       }

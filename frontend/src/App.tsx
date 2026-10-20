@@ -9,7 +9,7 @@ import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from 
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
-import { authEnabled, getUserId, onAuth } from "./lib/auth";
+import { authEnabled, getUserId, onAuth, ready as authReady } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -127,7 +127,7 @@ function MainApp({ demo }: { demo: string | null }) {
     if (demo === "class") { setWorkforceTab("class"); go("workforce"); return; }
     // A reload on ?view=roles (or deeper) resumes the saved profile and the role in the URL.
     const wanted = readRoute();
-    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) resume(wanted);
+    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) authReady.then(() => resume(wanted));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -158,6 +158,7 @@ function MainApp({ demo }: { demo: string | null }) {
         } else if (local) {
           setProfile(local);
         }
+        setError(null);  // any "log in to open your profile" notice is answered now
       } catch { setError(t("auth.expired")); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +168,17 @@ function MainApp({ demo }: { demo: string | null }) {
     const p = await api.getProfile(id);
     save(KEYS.profile, p.id); setProfile(p); setRole(null);
     if (route.screen === "landing") go("home", { role: undefined });
+  }
+
+  // A profile made while logged in belongs to the account straight away.
+  async function profileSaved(p: Profile) {
+    save(KEYS.profile, p.id); setProfile(p); go("survey");
+    if (!userId) return;
+    try {
+      const claimed = await api.claim(p.id);
+      if (claimed.conflict) setConflict({ local: p.id, saved: claimed.conflict });
+      else setProfile(await api.getProfile(p.id));
+    } catch { setError(t("auth.expired")); }
   }
 
   async function resolveConflict(replace: boolean) {
@@ -194,7 +206,7 @@ function MainApp({ demo }: { demo: string | null }) {
       const p = await api.getProfile(storedId);
       setProfile(p);
       if (wanted?.role && (wanted.screen === "role" || wanted.screen === "impact" || wanted.screen === "tree")) {
-        const m = await api.matches(p.id, wanted.scenario, wanted.year);
+        const m = await api.matches(p.id, wanted.scenario, wanted.year, wanted.adoption);
         const found = m.roles.find((r) => r.role_id === wanted.role);
         if (found) { setRole(found); setRoute(wanted); return; }
       }
@@ -285,7 +297,7 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "intake" && <Intake audience={audience} onAudience={setAudience} onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (
               <Review initial={draftSkills} audience={audience} onBack={() => go("intake")}
-                onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("survey"); }} />
+                onSaved={profileSaved} />
             )}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
@@ -295,7 +307,7 @@ function MainApp({ demo }: { demo: string | null }) {
                 onAdoption={setAdoption} onYear={setYear} onOpen={openRole} onSurvey={() => go("survey")} />
             )}
             {screen === "role" && profile && role && (
-              <RoleDetail profile={profile} role={role} scenario={scenario} onProfile={setProfile}
+              <RoleDetail profile={profile} role={role} scenario={scenario} adoption={route.adoption} onProfile={setProfile}
                 onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}

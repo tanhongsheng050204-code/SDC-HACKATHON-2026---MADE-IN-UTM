@@ -15,6 +15,7 @@ async def lifespan(_: FastAPI):
     store.init_db()  # first: reference data reads approved snapshots from the database
     get_reference()  # fail fast on broken reference data
     yield
+    store.close_pools()
 
 
 app = FastAPI(title="Laluan API", version="0.1.0", lifespan=lifespan)

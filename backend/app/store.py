@@ -117,6 +117,13 @@ def _pool(url: str):
     return _pools[url]
 
 
+def close_pools() -> None:
+    """Close Postgres pools on shutdown, so worker threads stop cleanly."""
+    for pool in _pools.values():
+        pool.close()
+    _pools.clear()
+
+
 @contextmanager
 def _connect():
     settings = get_settings()
