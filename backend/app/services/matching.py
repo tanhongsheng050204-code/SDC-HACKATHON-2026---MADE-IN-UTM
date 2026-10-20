@@ -120,9 +120,10 @@ def _current_role_card(ref: Reference, role_id: str, skills: set[str], all_outlo
 
 
 def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = None,
-          adoption: float | None = None) -> dict:
+          adoption: float | None = None, extra_skills: frozenset[str] = frozenset()) -> dict:
     """`adoption` replaces the chosen scenario's AI adoption speed ("your own AI future"). The
-    other scenarios stay as published, and robust picks are always judged on the three presets."""
+    other scenarios stay as published, and robust picks are always judged on the three presets.
+    `extra_skills` are tried on for this call only ("What if I learn...?"); nothing is saved."""
     snapshot = ref.latest_snapshot
     signals = signals_from_snapshot(snapshot)
     year, fraction = year_fraction(snapshot, year)
@@ -130,7 +131,8 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
     all_outlooks = dict(presets)
     if adoption is not None:
         all_outlooks[scenario_id] = {rid: outlook(sig, scenario_id, adoption, fraction) for rid, sig in signals.items()}
-    skills = effective_skills(ref, profile)
+    own_skills = effective_skills(ref, profile)
+    skills = own_skills | set(extra_skills)
     prefs = profile.get("preferences") or {}
     audience = profile.get("audience")
     current_id = profile.get("current_role_id")
@@ -147,6 +149,9 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
               if all(preset_ranks[sid].get(role_id, 999) <= ROBUST_TOP_N
                      and presets[sid][role_id].label != "declining" for sid in preset_ranks)}
 
+    without_extra = ({role_id: i + 1 for i, (role_id, _) in
+                      enumerate(_ranked(ref, own_skills, all_outlooks[scenario_id], prefs, audience, exclude))}
+                     if extra_skills else {})
     roles = []
     for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id], prefs, audience, exclude):
         role = ref.roles[role_id]
@@ -177,6 +182,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},
             "skills_source": _skills_source(ref, role_id),
+            **({"rank_without_extra": without_extra[role_id]} if extra_skills else {}),
         })
     also_like = sorted((r for r in roles if r["rank"] > ROBUST_TOP_N and not r["at_risk"]
                         and r["why"]["preference_match"] >= ALSO_LIKE_MATCH and r["fit"] >= ALSO_LIKE_MIN_FIT),

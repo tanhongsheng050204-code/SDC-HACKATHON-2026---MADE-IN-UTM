@@ -6,7 +6,8 @@ import { Sdgs } from "./Sdgs";
 
 export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario: Scenario; onOpen: () => void }) {
   const o = role.outlook[scenario];
-  const move = role.rank_change_vs_baseline;
+  // With "What if I learn...?" on, show how far the tried skills move this role; otherwise vs baseline.
+  const move = role.rank_without_extra !== undefined ? role.rank_without_extra - role.rank : role.rank_change_vs_baseline;
   return (
     <button className={role.at_risk ? "card at-risk" : "card"} onClick={onOpen}>
       <div className="card-head">

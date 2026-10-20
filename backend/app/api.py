@@ -328,8 +328,14 @@ def delete_profile(profile_id: str, user: str | None = User):
 
 @router.get("/profiles/{profile_id}/matches")
 def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None,
-                    adoption: float | None = Query(default=None, ge=0.5, le=2.0), user: str | None = User):
-    return matching.match(get_reference(), _profile_for(profile_id, user), scenario, year, adoption)
+                    adoption: float | None = Query(default=None, ge=0.5, le=2.0),
+                    extra: str = Query(default="", max_length=600), user: str | None = User):
+    """`extra`: skills to try on ("What if I learn...?"), comma-separated, at most 10. Not saved."""
+    ref = get_reference()
+    tried = [s for s in dict.fromkeys(extra.split(",")) if s]
+    if len(tried) > 10 or any(s not in ref.skills for s in tried):
+        raise HTTPException(422, "Choose up to 10 known skills to try")
+    return matching.match(ref, _profile_for(profile_id, user), scenario, year, adoption, frozenset(tried))
 
 
 @router.get("/profiles/{profile_id}/tipping")

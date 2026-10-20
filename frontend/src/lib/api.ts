@@ -18,6 +18,7 @@ export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
   carry_over: { skill_id: string; name: string }[];
+  rank_without_extra?: number;
   why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number; entry_points: number;
     matched_preferences: { dim: string; label: string }[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
@@ -249,8 +250,8 @@ export const api = {
   demoProfile: (key: string) => request<Profile>(`/profiles/demo/${key}`, { method: "POST" }),
   getProfile: (id: string) => request<Profile>(`/profiles/${id}`),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
-  matches: (id: string, scenario: Scenario, year?: number, adoption?: number) =>
-    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}`),
+  matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
+    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),
   tipping: (id: string, year?: number) => request<Tipping>(`/profiles/${id}/tipping${year ? `?year=${year}` : ""}`),
   complete: (id: string, courseId: string, done: boolean) =>
     request<Profile>(`/profiles/${id}/complete`, { method: "POST", body: JSON.stringify({ course_id: courseId, done }) }),

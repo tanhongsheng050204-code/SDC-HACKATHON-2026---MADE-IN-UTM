@@ -471,3 +471,9 @@ main:focus { outline: none; }
 .adoption label { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
 .card.tipping { margin: 10px 0; gap: 6px; }
 .card.tipping ul { margin: 0; padding-left: 1.2rem; }
+
+/* What if I learn...? */
+.what-if { margin: 12px 0; }
+.what-if summary { cursor: pointer; font-weight: 600; }
+.fit > div { transition: width .4s ease; }
+@media (prefers-reduced-motion: reduce) { .fit > div { transition: none; } }
