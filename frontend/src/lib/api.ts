@@ -46,6 +46,12 @@ export interface Radar {
   skills: SkillTrend[];
   roles: { role_id: string; title: string; index: number; label: string }[];
 }
+export interface PendingPreview {
+  snapshot_id: string; imported: string; live_snapshot_id: string;
+  inputs: { source: string; url: string; retrieved: string }[];
+  roles: { role_id: string; title: string; before: number | null; after: number; label_before: string | null; label_after: string; change: number | null }[];
+  skills: Record<"rising" | "steady" | "declining" | "no_data", number>;
+}
 export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; snapshot_id: string | null; error: string | null }
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
@@ -170,6 +176,15 @@ export const api = {
     request<RefreshStatus>(`/signals/refresh?force=${force}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   refreshStatus: (token: string) =>
     request<RefreshStatus>("/signals/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  pending: (token: string) =>
+    request<{ snapshot_id: string; imported: string }[]>("/signals/pending", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  pendingPreview: (token: string, id: string) =>
+    request<PendingPreview>(`/signals/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  decide: (token: string, id: string, decision: "approve" | "reject", reviewer: string, reason?: string) =>
+    request<{ snapshot_id: string; state: string }>(`/signals/pending/${encodeURIComponent(id)}/${decision}`, {
+      method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },
+      body: JSON.stringify({ reviewer, reason: reason || null }),
+    }),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
   updateProfile: (p: Profile) =>

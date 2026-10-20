@@ -395,3 +395,9 @@ main:focus { outline: none; }
 .home-next { display: grid; gap: 10px; }
 .next-card { gap: 6px; padding: 14px 16px; }
 .next-tag { font-size: .78rem; color: var(--ink-soft); }
+
+/* ---------- Admin review of new trend data ---------- */
+.admin summary { display: flex; gap: 10px; align-items: center; }
+.review { display: grid; gap: 12px; padding: 16px; border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line)); border-radius: 12px; background: var(--gold-bg); }
+.review .heatmap { background: var(--surface); border-radius: 8px; }
+.review .badge { margin-left: 6px; }

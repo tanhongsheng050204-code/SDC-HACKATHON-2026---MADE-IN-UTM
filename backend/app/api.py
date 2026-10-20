@@ -10,11 +10,11 @@ from pydantic import ValidationError
 from app import store
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, Scenario,
-                         SnapshotIn, WorkforceRequest)
+from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+                         Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
-from app.trends import refresh
+from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
 
@@ -113,6 +113,41 @@ def refresh_status(x_admin_token: str = Header(default="")):
     """Progress and errors of the running refresh: admin only, like starting one."""
     _require_admin(x_admin_token)
     return refresh.status()
+
+
+@router.get("/signals/pending")
+def pending_snapshots(x_admin_token: str = Header(default="")):
+    """New snapshots waiting for an admin's decision."""
+    _require_admin(x_admin_token)
+    return review.list_pending()
+
+
+@router.get("/signals/pending/{snapshot_id}")
+def pending_preview(snapshot_id: str, x_admin_token: str = Header(default="")):
+    """Which roles would move, and by how much, if this snapshot were approved."""
+    _require_admin(x_admin_token)
+    try:
+        return review.preview(snapshot_id)
+    except review.NotFound:
+        raise HTTPException(404, "No snapshot waiting with that ID") from None
+
+
+@router.post("/signals/pending/{snapshot_id}/approve")
+def approve_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return review.approve(snapshot_id, body.reviewer)
+    except review.NotFound:
+        raise HTTPException(404, "No snapshot waiting with that ID") from None
+
+
+@router.post("/signals/pending/{snapshot_id}/reject")
+def reject_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return review.reject(snapshot_id, body.reviewer, body.reason or "")
+    except review.NotFound:
+        raise HTTPException(404, "No snapshot waiting with that ID") from None
 
 
 @router.get("/radar")

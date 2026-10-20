@@ -9,3 +9,4 @@ dist/
 .playwright-mcp/
 .vercel/
 .env.local
+backend/data/signals/pending/

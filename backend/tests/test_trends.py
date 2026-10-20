@@ -141,27 +141,66 @@ def data_copy(tmp_path, monkeypatch):
     return dst
 
 
-def test_refresh_endpoint_writes_a_snapshot_and_reranks(data_copy, client, monkeypatch):
+def _refresh(client) -> dict:
+    assert client.post("/api/signals/refresh").status_code == 401
+    assert client.post("/api/signals/refresh", headers=ADMIN).status_code == 202
+    for _ in range(200):
+        state = client.get("/api/signals/refresh", headers=ADMIN).json()
+        if state["state"] != "running":
+            break
+    assert state["state"] == "done", state
+    return state
+
+
+ADMIN = {"X-Admin-Token": "test-admin-token"}
+
+
+def test_refresh_waits_for_approval_then_reranks(data_copy, client, monkeypatch):
     monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research("document_understanding"))
     monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs({"sql": {"recent": 50, "prior": 10}}))
     pid = client.post("/api/profiles", json={"skills": CLERK["skills"]}).json()["id"]
     before = client.get(f"/api/profiles/{pid}/matches").json()
 
-    assert client.post("/api/signals/refresh").status_code == 401
-    assert client.post("/api/signals/refresh", headers={"X-Admin-Token": "test-admin-token"}).status_code == 202
-    for _ in range(200):
-        state = client.get("/api/signals/refresh", headers={"X-Admin-Token": "test-admin-token"}).json()
-        if state["state"] != "running":
-            break
-    assert state["state"] == "done", state
+    state = _refresh(client)
+    sid = state["snapshot_id"]
+    # Nothing changes for users until a person approves it.
+    waiting = client.get(f"/api/profiles/{pid}/matches").json()
+    assert waiting["signal_source"]["snapshot_id"] == before["signal_source"]["snapshot_id"]
+    assert client.get("/api/signals/pending").status_code == 401
+    assert [p["snapshot_id"] for p in client.get("/api/signals/pending", headers=ADMIN).json()] == [sid]
+    preview = client.get(f"/api/signals/pending/{sid}", headers=ADMIN).json()
+    clerk = next(r for r in preview["roles"] if r["role_id"] == "data_entry_clerk")
+    assert clerk["after"] < clerk["before"] and clerk["change"] < 0
+
+    assert client.post(f"/api/signals/pending/{sid}/approve", json={"reviewer": "Team Reviewer"}).status_code == 401
+    assert client.post(f"/api/signals/pending/{sid}/approve", json={"reviewer": "Team Reviewer"}, headers=ADMIN).status_code == 200
 
     after = client.get(f"/api/profiles/{pid}/matches").json()
-    assert after["signal_source"]["snapshot_id"] == state["snapshot_id"] != before["signal_source"]["snapshot_id"]
+    assert after["signal_source"]["snapshot_id"] == sid
     assert [r["score"] for r in after["roles"]] != [r["score"] for r in before["roles"]]
     radar = client.get("/api/radar", params={"profile_id": pid}).json()
     assert any(s["mine"] and s["label"] == "declining" for s in radar["skills"])
-    saved = json.loads((data_copy / "signals" / f"{state['snapshot_id']}.json").read_text())
-    assert saved["baseline_snapshot_id"] and saved["inputs"]
+    saved = json.loads((data_copy / "signals" / f"{sid}.json").read_text())
+    assert saved["baseline_snapshot_id"] and saved["inputs"] and saved["reviewed_by"] == "Team Reviewer"
+    assert client.get("/api/signals/pending", headers=ADMIN).json() == []
+
+
+def test_rejected_snapshot_is_kept_but_never_used(data_copy, client, monkeypatch):
+    monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research("document_understanding"))
+    monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs({}))
+    live = client.get("/api/signals").json()[0]["snapshot_id"]
+    sid = _refresh(client)["snapshot_id"]
+    decision = {"reviewer": "Team Reviewer", "reason": "Job-posting counts look too small this week"}
+    assert client.post(f"/api/signals/pending/{sid}/reject", json=decision, headers=ADMIN).status_code == 200
+    assert client.get("/api/signals").json()[0]["snapshot_id"] == live
+    kept = json.loads((data_copy / "signals" / "rejected" / f"{sid}.json").read_text())
+    assert kept["rejected_reason"].startswith("Job-posting")
+    assert client.post(f"/api/signals/pending/{sid}/approve", json={"reviewer": "Team Reviewer"}, headers=ADMIN).status_code == 404
+
+
+def test_review_rejects_odd_ids(client):
+    for bad in ["..%2F..%2Fapp", "a/b", "%2E%2E"]:
+        assert client.get(f"/api/signals/pending/{bad}", headers=ADMIN).status_code == 404
 
 
 def test_slower_than_average_capability_does_not_help_exposed_roles():
