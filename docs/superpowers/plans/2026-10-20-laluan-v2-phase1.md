@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add Google login with Supabase-backed storage, Replit single-deployment hosting, a skill tree with Gemini proof checks, and a personalised preference survey, and remove the user's SDG choice from ranking.
+**Goal:** Add Google login with Supabase-backed storage, Replit single-deployment hosting, a skill tree with Gemini proof checks, and a personalised preference survey, remove the user's SDG choice from ranking, and make the app demonstrably serve all four groups in the brief (working adults, graduates and switchers, HR, career centres).
 
 **Architecture:** The FastAPI backend keeps its current shape (`app/api.py` routes, `app/services/*` logic, `app/store.py` storage). `store.py` gains a Postgres path selected by `DATABASE_URL` (SQLite stays for tests and local runs). Supabase Auth issues tokens in the browser; the backend only verifies them. FastAPI also serves the built React app, so Replit runs one process.
 
@@ -23,6 +23,7 @@
 - Preference factor: `PREFERENCE_BOOST = 0.05`, replaces `SDG_BOOST`. "You might also like": up to 3 roles.
 - Survey: 8–10 cards; answers `like` | `dislike` | `other`. An "other" answer affects preferences only if the user confirmed the reading.
 - Pin new dependency versions: `@supabase/supabase-js` `2.45.4`; `psycopg[binary]>=3.2,<4`; `PyJWT[crypto]>=2.9,<3`.
+- Audiences: `audience` ∈ `"worker" | "graduate" | "switcher"`; worker and switcher need `current_role_id`. Graduate entry boost `ENTRY_BOOST = 0.05` on roles with `entry_level: true`. Class view: identifying columns rejected, counts under 3 shown as "fewer than 3", totals only.
 - Follow existing style: module docstrings explaining the why, small functions, no new frameworks.
 
 ## Review Focus
@@ -365,8 +366,92 @@
 
 ---
 
-### Task 14: Final check
+### Task 14: "Which describes you?" changes behaviour per group
+
+**Files:**
+- Modify: `backend/app/schemas.py`, `backend/app/store.py` (migration 9: `profiles` add `audience TEXT`), `backend/app/services/matching.py`, `backend/app/services/pathway.py`, `backend/app/api.py`, `backend/app/services/workforce.py` (drop the stale `"interests": []`), `backend/data/roles.json` (add `"entry_level": bool` to every role), `backend/data/demo_profiles.json` (`audience` on clerk = worker, student = graduate; new `switcher` demo), `backend/tests/test_data_integrity.py`
+- Test: `backend/tests/test_audiences.py` (create; Task 18 extends it)
+
+**Interfaces:**
+- Produces: `ProfileIn.audience: Literal["worker", "graduate", "switcher"] = "worker"`; validator: worker/switcher without `current_role_id` → 422 "Choose your current role". Profile dict gains `audience`.
+- Produces in `matching`: `ENTRY_BOOST = 0.05`; breakdown gains `entry_points` (graduate + `entry_level` role → 0.05, else 0.0); score = fit + outlook + preference + entry points. Each role row gains `carry_over: [{"skill_id", "name"}]` = covered skills that are also skills of the person's current role (empty when no current role). `match()` returns top-level `"current_role": <row> | None`. For `switcher` that row is removed from `roles` and excluded from robust picks; for other audiences it also stays in the list.
+- Produces in `pathway.build`: for `worker`, among courses covering the same skills, prefer `hrd_corp == "claimable"`.
+- Entry-level roles: data entry clerk, administrative assistant, customer service representative, data analyst, digital marketing specialist, renewable energy technician, care worker.
+- New demo `switcher`: "Farid (demo)", a synthetic customer service representative moving towards UX / UI design, `audience: "switcher"`, with `survey_answers` like the other demos.
+
+- [ ] **Step 1: Write failing tests:** `test_worker_and_switcher_need_a_current_role` (422), `test_graduate_gets_entry_boost_on_entry_roles_only`, `test_switcher_current_role_is_set_apart` (not in `roles`, not robust, present as `current_role`), `test_carry_over_lists_shared_skills`, `test_worker_pathway_prefers_claimable_courses`, integrity `test_every_role_has_entry_level`; update the breakdown-sum test to include `entry_points`.
+
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** **Step 4: Run** `python -m pytest -q` → PASS.
+
+- [ ] **Step 5: Commit** `git commit -m "Let people say whether they are working, graduating or switching, and adapt results"`
+
+---
+
+### Task 15: Audience in the app
+
+**Files:**
+- Modify: `frontend/src/screens/Intake.tsx` (first question, three large choices), `frontend/src/screens/Review.tsx` (current role required for worker/switcher), `frontend/src/screens/Home.tsx` (lead block per audience: worker → current-role outlook + "My job, task by task"; graduate → "Roles you can start in"; switcher → "Where you are now" card + top role with carry-over skills), `frontend/src/components/RoleCard.tsx` and `frontend/src/screens/RoleDetail.tsx` ("Skills you bring from <current role>" chips; "+ open to new graduates" line in Why this rank?), `frontend/src/screens/Roles.tsx` (switcher: current role card above the list), `frontend/src/components/Sidebar.tsx` (My profile: change "I'm …"), `frontend/src/screens/landing/*` (third demo "Farid, changing careers"), `frontend/src/App.tsx` (`?demo=switcher`), `frontend/src/lib/api.ts`, `frontend/src/lib/i18n.ts`
+
+**Interfaces:**
+- Consumes: Task 14 `audience`, `why.entry_points`, `carry_over`, `Matches.current_role`.
+
+- [ ] **Step 1: Implement.**
+- [ ] **Step 2: Verify** `npm run build`; open all three individual demos and confirm each Today screen leads with its own block; intake as "changing careers" won't continue without a current role.
+- [ ] **Step 3: Commit** `git commit -m "Show each group what matters to them first"`
+
+---
+
+### Task 16: Class view for career centres
+
+**Files:**
+- Create: `backend/app/services/classview.py`, `backend/data/sample_class.csv` (40 synthetic students, columns `programme,skills`, e.g. diploma in business, diploma in electrical, degree in computing)
+- Modify: `backend/app/api.py`, `backend/app/services/workforce.py` (expose `FORBIDDEN` and a skills-parsing helper for reuse instead of copying)
+- Test: `backend/tests/test_classview.py` (create)
+
+**Interfaces:**
+- Produces: `classview.SMALL = 3`; `classview.analyse(ref, text: str, scenario_id: str) -> dict` returning `{"scenario", "students": int, "programmes": [{"name", "students"}], "best_fit": [{"role_id", "title", "students", "outlook"}], "top_gaps": [{"skill_id", "name", "students", "course": {...} | None}], "courses": [{"course", "students_helped", "hours"}], "sdg_contribution": [...], "problems": [str], "signal_source": {...}}`, where every count below `SMALL` is the string `"fewer than 3"`. Each student is matched as `audience="graduate"`; `top_gaps` = missing skills of each student's top role, counted; `courses` = catalogue courses ranked by the number of students whose gap they close. Raises `workforce.WorkforceError` on identifying columns, a missing `skills` column, or no readable rows.
+- Routes: `GET /api/class/sample` (CSV text), `POST /api/class/analyse` with the existing `WorkforceRequest` body.
+
+- [ ] **Step 1: Write failing tests:** `test_class_view_is_totals_only` (`students == 40` for the sample; no list in the output has one entry per student), `test_small_counts_are_hidden` (4-student CSV where one role has 1 student → `"fewer than 3"`), `test_class_view_rejects_identifying_columns` (`name` column → 422), `test_top_gaps_come_with_courses`.
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** **Step 4: Run** `python -m pytest -q` → PASS.
+- [ ] **Step 5: Commit** `git commit -m "Add a class view so career centres can see a cohort's fit and gaps"`
+
+---
+
+### Task 17: Class view screen
+
+**Files:**
+- Modify: `frontend/src/screens/Workforce.tsx` (tabs "Company (HR)" and "Class (career centre)"; the class tab mirrors the HR layout: upload or sample, best-fit roles, top gaps with courses, courses helping most students, SDG contribution, the "totals only" notice), `frontend/src/App.tsx` (`?demo=class` opens the class tab with the sample), `frontend/src/screens/landing/*` (career-centre entry point), `frontend/src/lib/api.ts`, `frontend/src/lib/i18n.ts`
+
+- [ ] **Step 1: Implement.**
+- [ ] **Step 2: Verify** `npm run build`; `?demo=class` shows the sample with no student-level rows and "fewer than 3" renders as text.
+- [ ] **Step 3: Commit** `git commit -m "Add the career-centre class tab to the workforce screen"`
+
+---
+
+### Task 18: A guarantee test and a person's evaluation per group
+
+**Files:**
+- Modify: `backend/tests/test_audiences.py`, `docs/EVALUATION.md`, `frontend/src/screens/ReviewKit.tsx` (pathway tab covers the three demos plus the HR and class samples), `README.md` (feature table and suggested demo cover all four groups)
+
+**Interfaces:**
+- Consumes: demo profiles (Task 14), `workforce.analyse`, `classview.analyse`.
+
+- [ ] **Step 1: Write the group tests**, each through the API with the demo persona or sample file, so they test what judges see:
+  - `test_group_working_adult`: Aisyah's `current_role` carries an outlook label, and her top 5 has a non-declining role with fit ≥ 0.4 whose pathway has at least one step.
+  - `test_group_graduate`: Wei Jie's top 5 has at least one `entry_level` role with `why.entry_points > 0`.
+  - `test_group_switcher`: Farid's current role is not in the top 5, and his top role has ≥ 2 `carry_over` skills.
+  - `test_group_hr`: the sample analysis has no per-person rows; every move has `people ≥ 1` and `avg_hours`.
+  - `test_group_career_centre`: the class sample is totals only, has ≥ 3 `top_gaps`, each with a course.
+- [ ] **Step 2: Run** `python -m pytest tests/test_audiences.py -v` → PASS. If one fails, fix the data or logic in the owning task's files, never loosen the test, and record why in `docs/DECISIONS.md`.
+- [ ] **Step 3: Extend EVALUATION.md** section 2 to five rows (Aisyah, Wei Jie, Farid, HR sample, class sample); update the review kit's pathway tab to produce that table.
+- [ ] **Step 4: Run** `python -m pytest -q` and `npm run build` → pass.
+- [ ] **Step 5: Commit** `git commit -m "Guard each of the four groups with a test and a person's review"`
+
+---
+
+### Task 19: Final check
 
 - [ ] `cd backend && python -m pytest -q` → all pass. `cd frontend && npm run build` → succeeds.
-- [ ] Deploy to Replit with the Supabase secrets; run migrations by starting the app; open the clerk demo, student demo and HR view with no login; log in with Google from a second account; take the survey and one proof check; restart the deployment and confirm both are still there.
-- [ ] Update `docs/REVIEW_LOG.md` with what was checked and what still needs team review (prerequisites, work context, survey cards, BM / 中文).
+- [ ] Deploy to Replit with the Supabase secrets; start the app so migrations run; open the clerk, student, switcher, HR and class demos with no login; log in with Google from a second account; take the survey and one proof check; restart the deployment and confirm both are still there.
+- [ ] Update `docs/REVIEW_LOG.md` with what was checked and what still needs team review (prerequisites, work context, survey cards, entry-level flags, BM / 中文), and ask a lecturer or counsellor to fill EVALUATION.md section 2 through the review kit.

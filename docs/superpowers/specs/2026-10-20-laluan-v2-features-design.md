@@ -20,11 +20,11 @@ The team chose: **skill tree, survey and login first.**
 
 | Phase | Target | Contents |
 |---|---|---|
-| 1 | Working by 25 Oct | Login + Supabase database, hosting on Replit, skill tree with proof checks, personalised survey, SDG choice removed, privacy step "send less" |
+| 1 | Working by 25 Oct | Login + Supabase database, hosting on Replit, skill tree with proof checks, personalised survey, SDG choice removed, privacy step "send less", serving the four groups (section 11) |
 | 2 | After Phase 1 | RunPod: Whisper voice input and open-model CV reading; wider scrubber; "what gets sent" preview |
 | 3 | After Phase 2 | Cited skill evidence via web search, emerging roles, "a day in this job", SDG reasons for every role/skill/emerging role |
 
-If Phase 1 runs late, the order inside it is: login + database, then skill tree, then survey.
+If Phase 1 runs late, the order inside it is: login + database, then skill tree, then survey, then the four-group work (section 11).
 
 ## Goals
 
@@ -33,6 +33,7 @@ If Phase 1 runs late, the order inside it is: login + database, then skill tree,
 - The survey discovers preferences the user didn't state, and those preferences visibly affect results.
 - No raw CV text or voice audio reaches Google once Phase 2 is done.
 - The existing demo links (`?demo=clerk`, `?demo=student`, `?demo=hr`) keep working without login.
+- The app demonstrably works for each of the brief's four groups: working adults at risk, fresh graduates and career switchers, HR and L&D managers, TVET and university career centres. "Demonstrably" means behaviour that differs per group, an automated test per group that fails the build if that group stops being served, and a person's evaluation per group.
 
 ## Non-goals
 
@@ -178,3 +179,28 @@ Gemini stays the model. Protection in layers:
 - NER library, Whisper and open-model choice, serving stack on RunPod.
 - Screen placement of the skill tree and survey within the current navigation; translations for new strings in EN/BM/中文 (use the existing i18n setup; BM/中文 can go through the review kit).
 - Whether to keep `docker-compose.yml`.
+
+---
+
+## 11. Serving the four groups (Phase 1)
+
+**Decided:** add to Phase 1, so the system works for each group the brief names, not just as a generic suggestion engine. Before this, working adults and HR were served; graduates and switchers were treated exactly like workers; career centres had only the Future Card.
+
+**11.1 "Which describes you?" at the start.** One question before skills: *I'm working* (worker), *I'm studying or just graduated* (graduate), *I'm changing careers* (switcher). Stored on the profile as `audience`; changeable from My profile. It is a self-description of the person's situation, not a demographic, so it fits the fairness rule. It changes behaviour:
+- **Worker:** current role required; Today leads with the current role's outlook and task-level risk; pathway shows HRD Corp-claimable courses first **(my call)**.
+- **Graduate:** no current role needed. Roles marked `entry_level` in `roles.json` get a visible `+ open to new graduates` boost of 0.05 **(my call: same size as the other boosts)**; Today leads with "roles you can start in".
+- **Switcher:** current role required. The current role is moved out of the ranked list into its own "where you are now" card, so it never takes a top-5 or robust-pick slot. Each role shows **carry-over skills**: skills the person already has that the new role needs, named "from your work as <current role>".
+- `entry_level` is a team-reviewed flag on each role **(my call:** clerk, admin assistant, customer service, data analyst, digital marketing, renewable energy technician, care worker**)**.
+
+**11.2 Class view for career centres.** A second tab in the Workforce screen, "Class (career centre)". Input: an anonymous CSV with a `skills` column (optional `programme`). Output, totals only:
+- how many students fit each role best (top-1 counts), with outlook;
+- the most common missing skills across the class's top roles;
+- the courses that close a gap for the most students, with hours;
+- SDG contribution of the class's top roles.
+Same privacy rules as the HR view: identifying columns rejected; never a list of students. **(My call)** Any count under 3 shows as "fewer than 3". A synthetic 40-student sample class and a `?demo=class` link.
+
+**11.3 A guarantee test per group.** `backend/tests/test_audiences.py`, one synthetic persona per group, each asserting the outcome that group needs (worker: current-role risk visible and a non-declining reachable role in the top 5 with a pathway; graduate: at least one entry-level role in the top 5; switcher: current role not in top 5 and the top role shows at least 2 carry-over skills; HR: output has no per-person rows; career centre: totals only, small counts suppressed, top gaps have courses). These run in CI, so a change that breaks a group breaks the build.
+
+**11.4 A person's evaluation per group.** A third demo persona for switchers (synthetic). EVALUATION.md section 2 and the review kit's pathway tab cover all three individual personas plus the HR sample and the class sample, so a lecturer or counsellor signs off each group.
+
+**Later (Phase 2):** progress over time for HR and career centres, as totals of proven skills.
