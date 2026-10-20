@@ -20,7 +20,7 @@ def gemini(monkeypatch):
     """Stand-in for the model: returns queued replies and records every prompt."""
     calls = {"prompts": [], "replies": []}
 
-    def fake(prompt: str):
+    def fake(prompt: str, **_):
         calls["prompts"].append(prompt)
         reply = calls["replies"].pop(0) if calls["replies"] else _questions()
         if isinstance(reply, Exception):
@@ -28,6 +28,8 @@ def gemini(monkeypatch):
         return reply
 
     monkeypatch.setattr(proofcheck, "generate_json", fake)
+    # Keep option order fixed here so answers are predictable; shuffling has its own test.
+    monkeypatch.setattr(proofcheck, "_shuffled", lambda q: {**q, "explanation": str(q.get("explanation") or "")})
     return calls
 
 
@@ -140,3 +142,18 @@ def test_check_starts_are_rate_limited_even_for_demos(client, gemini, monkeypatc
     assert _start(client, pid).status_code == 201
     third = _start(client, pid)
     assert third.status_code == 429 and "hour" in third.json()["detail"]
+
+
+def test_options_are_shuffled_so_positions_give_nothing_away(monkeypatch):
+    from app.reference import get_reference
+
+    # The model tends to put the right answer in the same place, or rotate it predictably.
+    always_first = {"questions": [{"prompt": f"Q{i}?", "options": [f"right{i}", f"w{i}a", f"w{i}b", f"w{i}c"],
+                                   "answer": 0, "explanation": "."} for i in range(3)]}
+    monkeypatch.setattr(proofcheck, "generate_json", lambda prompt, **_: always_first)
+    positions = set()
+    for _ in range(30):
+        for q in proofcheck.generate(get_reference(), "sql", 1):
+            assert q["options"][q["answer"]].startswith("right")  # the key still points at the right option
+            positions.add(q["answer"])
+    assert len(positions) > 1

@@ -18,7 +18,7 @@ def prompts(monkeypatch):
     seen: list[tuple[str, str]] = []
 
     def recorder(module_name):
-        def fake(prompt):
+        def fake(prompt, **_):
             seen.append((module_name, prompt))
             return {"skills": [], "summary": "A short plan.", "answer": "See your results [SOURCE-1].",
                     "proposal": None, "questions": QUESTIONS, "dims": {}}

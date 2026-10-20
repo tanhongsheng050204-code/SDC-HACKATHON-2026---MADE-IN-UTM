@@ -24,10 +24,14 @@ def gemini_client():
     return _client(settings.gemini_api_key, settings.gemini_timeout_seconds * 1_000)
 
 
-def generate_json(prompt: str) -> dict | list:
-    """One structured Gemini call that returns parsed JSON. Raises on any failure."""
+def generate_json(prompt: str, timeout_seconds: int | None = None) -> dict | list:
+    """One structured Gemini call that returns parsed JSON. Raises on any failure.
+    `timeout_seconds` overrides the default for slow, longer jobs (e.g. writing proof-check questions)."""
     settings = get_settings()
-    response = gemini_client().models.generate_content(
+    if not settings.gemini_api_key:
+        raise RuntimeError("GEMINI_API_KEY is not configured")
+    client = gemini_client() if timeout_seconds is None else _client(settings.gemini_api_key, timeout_seconds * 1_000)
+    response = client.models.generate_content(
         model=settings.gemini_model,
         contents=prompt,
         config={"response_mime_type": "application/json", "temperature": 0.2},
