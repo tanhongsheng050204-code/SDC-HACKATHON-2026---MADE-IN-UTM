@@ -69,6 +69,18 @@ Open **[localhost:5173](http://localhost:5173)**. Vite proxies `/api` requests t
 
 The core demo works without an API key using bundled data, dictionary extraction, and template pathways. Installing dependencies, Gemini calls, trend collection, and opening external course or job links require internet access.
 
+### Or run everything with Docker
+
+With Docker Desktop running, from the repository root:
+
+```bash
+docker compose up --build
+```
+
+Open **[localhost:8080](http://localhost:8080)**; the API is on port 8000. Settings are read from `backend/.env` if it exists. Profiles are kept in a Docker volume between restarts (`docker compose down -v` clears them).
+
+On Windows, Docker cannot read files that OneDrive manages ("Files On-Demand"). If the build fails with `invalid file request`, clone the repository to a folder outside OneDrive.
+
 ## Suggested demo flow
 
 1. Open the worker demo and review Aisyah’s existing skills.
