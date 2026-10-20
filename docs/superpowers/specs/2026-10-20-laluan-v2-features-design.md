@@ -204,3 +204,16 @@ Same privacy rules as the HR view: identifying columns rejected; never a list of
 **11.4 A person's evaluation per group.** A third demo persona for switchers (synthetic). EVALUATION.md section 2 and the review kit's pathway tab cover all three individual personas plus the HR sample and the class sample, so a lecturer or counsellor signs off each group.
 
 **Later (Phase 2):** progress over time for HR and career centres, as totals of proven skills.
+
+---
+
+## 12. Innovation features (Phase 1, after section 11)
+
+**Decided:** real, working features only, nothing mocked; built after the skill tree, survey and login. Chosen to hit the rubric's innovation hooks ("how trend signals become forecasts", "how scenarios are modelled") and to make the demo concrete.
+
+- **Signal X-ray.** Tap any outlook number to see the chain: published baseline → job-posting demand points → AI research momentum points (each with its cap and source; "no trend refresh approved yet" when the live snapshot has none) → scenario swing → year scaling → the number shown. The X-ray must reproduce the ranked number exactly.
+- **Your own AI future + tipping points.** A slider for AI adoption speed, 0.5×–2×, next to the three presets; rankings recompute live. Laluan states the tipping points it finds, e.g. "Your job becomes Declining at 0.8× adoption" and "Data analyst overtakes AI operations specialist above 1.7× adoption". Only real crossings inside the range are stated.
+- **"What if I learn…?"** Tick skills you don't have and watch rankings and readiness move live. Nothing is saved; the skill only counts once proven in the skill tree.
+- **Pay jump in ringgit.** From DOSM, *Salaries & Wages Survey Report, Malaysia, 2025* (released 21 Sep 2026), Appendix table A10, Malaysian citizens, by MASCO 2020 major group: e.g. Clerical support workers median RM2,693 → Professionals median RM6,124, about +RM3,400 a month. Always labelled as group medians, not job offers; each role is mapped to one MASCO major group (team-reviewed); roles in the same group show no difference rather than an invented one. Source verified against the official PDF on 20 Oct 2026; the report's prose says RM6,153 for Professionals but its tables say RM6,124, so we use the table.
+
+**Phase 2 roadmap (not built now):** forecast history per role, regret-proof pick (worst-case rank across futures), impact trade-off card, study calendar with .ics, HRD Corp budget for HR. Voice input is already planned for Phase 2 (Whisper on RunPod, browser speech as backup).

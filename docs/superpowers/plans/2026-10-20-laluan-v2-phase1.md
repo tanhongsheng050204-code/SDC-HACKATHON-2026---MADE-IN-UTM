@@ -2,7 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add Google login with Supabase-backed storage, Replit single-deployment hosting, a skill tree with Gemini proof checks, and a personalised preference survey, remove the user's SDG choice from ranking, and make the app demonstrably serve all four groups in the brief (working adults, graduates and switchers, HR, career centres).
+**Goal:** Add Google login with Supabase-backed storage, Replit single-deployment hosting, a skill tree with Gemini proof checks, and a personalised preference survey, remove the user's SDG choice from ranking, make the app demonstrably serve all four groups in the brief (working adults, graduates and switchers, HR, career centres), then add four innovation features: Signal X-ray, your own AI future with tipping points, "What if I learn…?", and the pay jump in ringgit from DOSM.
+
+**Build order:** Tasks 1–5 login and storage → 6 → 7–9 skill tree → 10–12 survey → 13 → 14–18 four groups → 19–22 innovation features → 23. If time runs out, stop at a task boundary; every task leaves the app working.
 
 **Architecture:** The FastAPI backend keeps its current shape (`app/api.py` routes, `app/services/*` logic, `app/store.py` storage). `store.py` gains a Postgres path selected by `DATABASE_URL` (SQLite stays for tests and local runs). Supabase Auth issues tokens in the browser; the backend only verifies them. FastAPI also serves the built React app, so Replit runs one process.
 
@@ -450,8 +452,103 @@
 
 ---
 
-### Task 19: Final check
+### Task 19: Signal X-ray
+
+Tap any outlook number and see the chain that produced it.
+
+**Files:**
+- Create: `backend/app/services/xray.py`, `frontend/src/components/SignalXray.tsx`
+- Modify: `backend/app/api.py`, `frontend/src/lib/api.ts`, `frontend/src/components/RoleCard.tsx`, `frontend/src/screens/RoleDetail.tsx`, `frontend/src/lib/i18n.ts`
+- Test: `backend/tests/test_xray.py` (create)
+
+**Interfaces:**
+- Consumes: `scenario.outlook`, `scenario.year_fraction`, `scenario.AI_SWING`, builder constants `CAP_POINTS`; snapshot signal rows (trend-adjusted rows carry `baseline_growth_pct`, `demand_points`, `ai_points`; the WEF snapshot has only `net_growth_pct`).
+- Produces: `xray.explain(ref, role_id: str, scenario_id: str, year: int | None, adoption: float | None = None) -> dict` returning `{"role_id", "steps": [{"label", "value", "running_total", "source", "cap": str | None}], "final": float, "label": str}`. Steps in order: published baseline (source + snapshot id) → job-posting demand points (cap ±15, or "no trend refresh approved yet") → AI research momentum points (cap ±15, same fallback) → scenario swing `(adoption − 1) × 40 × (complementarity − exposure)` with both values and "team estimate" note → year scaling (fraction, base and horizon year) → final index and label. `final` must equal `scenario.outlook(...).index` for the same inputs.
+- Route: `GET /api/roles/{role_id}/xray?scenario=baseline&year=2030&adoption=` (adoption overrides the scenario, used by Task 20).
+
+- [ ] **Step 1: Write failing tests:** `test_xray_final_matches_the_ranked_outlook` (every role × every scenario, equals the `match()` outlook index), `test_xray_shows_trend_steps_when_snapshot_has_them` (approve a trend-adjusted snapshot via the Task 2 test helper and see non-zero demand/research steps with caps), `test_xray_says_when_no_refresh_is_approved`.
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement** backend, then a drawer opened from the outlook number on role cards and the role page, showing each step as a row with its source.
+- [ ] **Step 4: Run** `python -m pytest -q` → PASS; `npm run build` → succeeds.
+- [ ] **Step 5: Commit** `git commit -m "Add Signal X-ray: show how each forecast number is built"`
+
+---
+
+### Task 20: Your own AI future and tipping points
+
+**Files:**
+- Create: `backend/app/services/tipping.py`, `frontend/src/components/AdoptionSlider.tsx`
+- Modify: `backend/app/services/matching.py`, `backend/app/api.py`, `backend/app/schemas.py`, `frontend/src/screens/Roles.tsx`, `frontend/src/screens/Home.tsx`, `frontend/src/lib/api.ts`, `frontend/src/lib/route.ts` (`adoption` in the query string), `frontend/src/lib/i18n.ts`
+- Test: `backend/tests/test_tipping.py` (create)
+
+**Interfaces:**
+- Produces: `matching.match(ref, profile, scenario_id, year=None, adoption: float | None = None)`; when `adoption` is given, the chosen scenario's outlooks use it (label "Your AI future: 1.3× adoption"); the other scenarios stay as they are, so robust picks keep their meaning. `/profiles/{id}/matches` accepts `adoption` (0.5–2.0, `Query(ge=0.5, le=2.0)`).
+- Produces: `tipping.ADOPTION_RANGE = (0.5, 2.0)`, `tipping.STEP = 0.05`; `tipping.find(ref, profile, year: int | None) -> dict` returning `{"current_role": {"role_id", "declining_at": float | None, "declining_below": bool} | None, "overtakes": [{"role_id", "title", "overtakes_role_id", "overtakes_title", "above": float}]}`. `declining_at` is solved from the outlook formula (index = −10) and kept only inside the range. `overtakes` scans the range in `STEP`s and records where two of the baseline top-5 roles swap rank; at most 3, smallest adoption change from 1.0 first.
+- Copy, generated from those fields: "Your job becomes Declining at 0.8× adoption." / "Data analyst overtakes AI operations specialist above 1.7× adoption."
+- Route: `GET /api/profiles/{id}/tipping?year=`.
+
+- [ ] **Step 1: Write failing tests:** `test_custom_adoption_matches_preset_at_same_value` (adoption 1.6 == accelerated outlooks), `test_declining_point_solves_the_formula` (at `declining_at` the clerk's index is −10 ± 0.5), `test_overtake_is_real` (just below `above` the first role ranks lower, just above it higher), `test_adoption_out_of_range_is_refused` (422), `test_no_tipping_point_returns_none` (a role whose label never changes in range).
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement** backend, then a slider under the three scenario buttons on Roles (0.5×–2×, 0.05 steps; moving it selects "Your AI future"), live re-ranking (debounced 200 ms), and the tipping sentences on Roles and on Today for workers and switchers.
+- [ ] **Step 4: Run** `python -m pytest -q` → PASS; `npm run build` → succeeds.
+- [ ] **Step 5: Commit** `git commit -m "Let people set their own AI adoption speed and see their tipping points"`
+
+---
+
+### Task 21: "What if I learn…?"
+
+**Files:**
+- Modify: `backend/app/api.py` (`extra` on matches), `backend/app/services/matching.py`, `frontend/src/screens/Roles.tsx`, `frontend/src/screens/RoleDetail.tsx`, `frontend/src/components/RoleCard.tsx`, `frontend/src/lib/api.ts`, `frontend/src/lib/i18n.ts`
+- Test: `backend/tests/test_whatif.py` (create)
+
+**Interfaces:**
+- Produces: `GET /api/profiles/{id}/matches?extra=sql,python` (≤ 10 known skill ids, 422 otherwise). `match()` gains `extra_skills: set[str] = frozenset()` added to effective skills for this call only; nothing is saved. Each role row gains `rank_without_extra` when `extra` is given.
+- UI: a "What if I learn…?" picker on Roles and the role page listing skills the person doesn't have (role's missing skills first). Ticking one re-ranks live; cards show ▲3 / ▼1 rank moves and the readiness bar animates. "Add to my skill tree" goes to the tree for that role; nothing changes on the profile until a proof check is passed.
+
+- [ ] **Step 1: Write failing tests:** `test_what_if_moves_rank_without_saving` (data analyst rank improves with `extra=sql,python`; `GET /profiles/{id}` unchanged), `test_what_if_rejects_unknown_or_too_many_skills`.
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** **Step 4: Run** `python -m pytest -q` → PASS; `npm run build` → succeeds.
+- [ ] **Step 5: Commit** `git commit -m "Add a what-if skill picker that re-ranks roles live without saving"`
+
+---
+
+### Task 22: Pay jump in ringgit (DOSM)
+
+**Files:**
+- Create: `backend/data/salaries.json`
+- Modify: `backend/data/roles.json` (add `"masco_major"` to every role), `backend/app/reference.py`, `backend/app/services/matching.py`, `backend/app/services/cards.py` (Future Card shows the pay line), `frontend/src/screens/RoleDetail.tsx`, `frontend/src/components/RoleCard.tsx`, `frontend/src/lib/api.ts`, `frontend/src/lib/i18n.ts`, `backend/tests/test_data_integrity.py`, `README.md` (data note), `docs/DECISIONS.md`
+- Test: `backend/tests/test_pay.py` (create)
+
+**Data (verified 20 Oct 2026 against the official PDF):** DOSM, *Salaries & Wages Survey Report, Malaysia, 2025*, released 21 Sep 2026, Appendix table A10 (report page 77), Malaysian citizens, MASCO 2020 major groups, <https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf>. Copy these exact values into `salaries.json` as `{"source", "source_url", "table", "year": 2025, "note": "Group medians for Malaysian citizens, not job offers", "groups": [{"id", "name", "median_rm", "mean_rm"}]}`:
+
+| id | MASCO major group | Median 2025 (RM) | Mean 2025 (RM) |
+|---|---|---|---|
+| `1` | Managers | 6,186 | 7,344 |
+| `2` | Professionals | 6,124 | 6,747 |
+| `3` | Technicians and associate professionals | 3,852 | 4,256 |
+| `4` | Clerical support workers | 2,693 | 3,029 |
+| `5` | Service and sales workers | 2,035 | 2,687 |
+| `6` | Skilled agricultural, forestry, livestock and fishery workers | 1,992 | 2,658 |
+| `7` | Craft and related trades workers | 2,173 | 2,619 |
+| `8` | Plant and machine-operators and assemblers | 2,083 | 2,488 |
+| `9` | Elementary occupations | 1,758 | 2,184 |
+| `all` | All employees | 2,940 | 3,803 |
+
+The report's text on page 29 says Professionals RM6,153, but its own Exhibit 4 and table A10 say RM6,124. Use the table and record this in DECISIONS.md.
+
+Role → `masco_major` (my call, team to review): data entry clerk, administrative assistant, customer service representative → `4`; data analyst, AI and ML specialist, AI operations specialist, software developer, cybersecurity analyst, digital marketing specialist, UX / UI designer, sustainability and ESG analyst → `2`; renewable energy technician → `3`; care worker → `5`.
+
+**Interfaces:**
+- Produces: `Reference.salaries: dict`; each role row in `match()` gains `pay: {"group", "median_rm", "mean_rm", "year", "source", "table"}` and, when the person has a current role, `pay_change_rm: int | None` (= role median − current role median; `None` when both are in the same group, shown as "Same occupation group: DOSM has no finer figure").
+- UI copy: "Clerical support workers median RM2,693 → Professionals median RM6,124: about +RM3,400 a month. Group medians for Malaysian citizens (DOSM 2025), not job offers." Round the change to the nearest RM100 in copy.
+
+- [ ] **Step 1: Write failing tests:** integrity `test_every_role_maps_to_a_dosm_group` and `test_salaries_match_dosm_table_a10` (hard-coded expected medians above), `test_pay_change_for_clerk_to_analyst_is_3431`, `test_same_group_gives_no_pay_change`, extend `test_every_recommendation_carries_a_source` so every `pay` has `source` and `table`.
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** **Step 4: Run** `python -m pytest -q` → PASS; `npm run build` → succeeds.
+- [ ] **Step 5: Commit** `git commit -m "Show the pay difference in ringgit from DOSM group medians"`
+
+---
+
+### Task 23: Final check
 
 - [ ] `cd backend && python -m pytest -q` → all pass. `cd frontend && npm run build` → succeeds.
 - [ ] Deploy to Replit with the Supabase secrets; start the app so migrations run; open the clerk, student, switcher, HR and class demos with no login; log in with Google from a second account; take the survey and one proof check; restart the deployment and confirm both are still there.
+- [ ] Update `docs/REVIEW_LOG.md` with what was checked and what still needs team review (prerequisites, work context, survey cards, entry-level flags, MASCO mapping, BM / 中文), and ask a lecturer or counsellor to fill EVALUATION.md section 2 through the review kit.
+- [ ] Run the demo path once end to end: X-ray on Aisyah's current role, drag the adoption slider to her tipping point, "What if I learn SQL?", pay jump on the data analyst page.
 - [ ] Update `docs/REVIEW_LOG.md` with what was checked and what still needs team review (prerequisites, work context, survey cards, entry-level flags, BM / 中文), and ask a lecturer or counsellor to fill EVALUATION.md section 2 through the review kit.
