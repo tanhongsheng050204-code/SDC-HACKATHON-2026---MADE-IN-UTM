@@ -22,6 +22,6 @@ app.add_middleware(
     allow_origins=list(get_settings().cors_origins),
     allow_origin_regex=get_settings().cors_origin_regex,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Content-Type", "X-Admin-Token"],
+    allow_headers=["Content-Type", "X-Admin-Token", "Authorization"],
 )
 app.include_router(router)

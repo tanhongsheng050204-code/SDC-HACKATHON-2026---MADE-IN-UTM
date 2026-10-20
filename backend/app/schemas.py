@@ -51,6 +51,11 @@ class CoachRequest(BaseModel):
     role_id: str | None = Field(default=None, max_length=80)
 
 
+class ClaimRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    replace: bool = False
+
+
 class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 

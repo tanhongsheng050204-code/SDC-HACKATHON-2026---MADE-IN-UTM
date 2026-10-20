@@ -1,4 +1,5 @@
-"""Delete demo profiles not updated for 30 days (retention rule in docs/05-BACKEND_SCHEMA.md)."""
+"""Delete anonymous and demo profiles not updated for 30 days (retention rule in docs/05-BACKEND_SCHEMA.md).
+Profiles saved to an account stay until their owner deletes them."""
 
 import sys
 from pathlib import Path

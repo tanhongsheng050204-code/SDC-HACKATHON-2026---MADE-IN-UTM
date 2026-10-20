@@ -161,14 +161,15 @@ def _row(row) -> dict | None:
     }
 
 
-def create_profile(display_name, current_role_id, skills, interests, experience_years=None) -> dict:
+def create_profile(display_name, current_role_id, skills, interests, experience_years=None,
+                   is_demo: bool = False) -> dict:
     profile_id, now = str(uuid.uuid4()), _now()
     with _connect() as conn:
         conn.execute(
             "INSERT INTO profiles (id, display_name, current_role_id, skills, interests, "
-            "experience_years, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "experience_years, is_demo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (profile_id, display_name, current_role_id, json.dumps(skills),
-             json.dumps(interests), experience_years, now, now),
+             json.dumps(interests), experience_years, int(is_demo), now, now),
         )
     return get_profile(profile_id)
 
@@ -246,10 +247,23 @@ def get_card(card_id: str) -> dict | None:
     return dict(row) if row else None
 
 
+def profile_for_user(user_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT id FROM profiles WHERE user_id=?", (user_id,)).fetchone()
+    return get_profile(row["id"]) if row else None
+
+
+def attach_user(profile_id: str, user_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE profiles SET user_id=?, updated_at=? WHERE id=?", (user_id, _now(), profile_id))
+
+
 def purge_older_than(days: int = 30) -> int:
+    """Delete anonymous and demo profiles left alone for `days`. A profile saved to an account
+    stays until its owner deletes it."""
     cutoff = (dt.datetime.now(dt.UTC) - dt.timedelta(days=days)).isoformat(timespec="seconds")
     with _connect() as conn:
-        return conn.execute("DELETE FROM profiles WHERE updated_at < ?", (cutoff,)).rowcount
+        return conn.execute("DELETE FROM profiles WHERE updated_at < ? AND user_id IS NULL", (cutoff,)).rowcount
 
 
 # --- trend snapshots ----------------------------------------------------------------------------

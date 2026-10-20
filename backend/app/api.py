@@ -2,14 +2,15 @@
 
 import hmac
 
-from fastapi import APIRouter, File, Header, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
 from pydantic import ValidationError
 
 from app import store
+from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+from app.schemas import (CardRequest, ClaimRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
@@ -18,11 +19,17 @@ from app.trends import refresh, review
 router = APIRouter(prefix="/api")
 
 
-def _profile_or_404(profile_id: str) -> dict:
+def _profile_for(profile_id: str, user_id: str | None) -> dict:
+    """The profile, if this caller may use it. A profile saved to an account answers only to
+    that account; anonymous and demo profiles answer to anyone holding their random ID. Someone
+    else's profile looks exactly like a missing one."""
     profile = store.get_profile(profile_id)
-    if profile is None:
+    if profile is None or (profile["user_id"] is not None and profile["user_id"] != user_id):
         raise HTTPException(404, "Profile not found")
     return profile
+
+
+User = Depends(current_user)
 
 
 @router.get("/health")
@@ -158,11 +165,11 @@ def reject_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str =
 
 
 @router.get("/radar")
-def radar(profile_id: str | None = None):
+def radar(profile_id: str | None = None, user: str | None = User):
     """Future Skills Radar: which skills and roles are rising or declining, with sources."""
     ref = get_reference()
     snapshot = ref.latest_snapshot
-    mine = matching.effective_skills(ref, _profile_or_404(profile_id)) if profile_id else set()
+    mine = matching.effective_skills(ref, _profile_for(profile_id, user)) if profile_id else set()
     baseline = ref.scenarios["baseline"]
     signals = signals_from_snapshot(snapshot)
     roles = sorted(({"role_id": rid, "title": ref.roles[rid]["title"],
@@ -228,6 +235,39 @@ def intake_turn(body: IntakeTurnRequest):
     return intake.turn([m.model_dump() for m in body.messages], body.language)
 
 
+# --- account ---------------------------------------------------------------------------------
+
+def _require_user(user: str | None) -> str:
+    if user is None:
+        raise HTTPException(401, "Please log in")
+    return user
+
+
+@router.get("/me")
+def me(user: str | None = User):
+    owned = store.profile_for_user(_require_user(user))
+    return {"user_id": user, "profile_id": owned["id"] if owned else None}
+
+
+@router.post("/me/claim")
+def claim_profile(body: ClaimRequest, user: str | None = User):
+    """Save this browser's anonymous profile to the account. If the account already has a
+    different one, nothing changes unless the person chose to replace it: never a silent loss."""
+    user = _require_user(user)
+    profile = store.get_profile(body.profile_id)
+    owned = store.profile_for_user(user)
+    if owned is not None and profile is not None and owned["id"] == profile["id"]:
+        return {"profile_id": owned["id"]}
+    if profile is None or profile["user_id"] is not None or profile["is_demo"]:
+        raise HTTPException(404, "Profile not found")
+    if owned is not None:
+        if not body.replace:
+            raise HTTPException(409, {"existing_profile_id": owned["id"]})
+        store.delete_profile(owned["id"])
+    store.attach_user(profile["id"], user)
+    return {"profile_id": profile["id"]}
+
+
 # --- profiles --------------------------------------------------------------------------------
 
 @router.post("/profiles", status_code=201)
@@ -242,17 +282,19 @@ def create_demo_profile(key: str):
     if demo is None:
         raise HTTPException(404, "Unknown demo profile")
     profile = store.create_profile(demo["display_name"], demo["current_role_id"],
-                                   demo["skills"], demo["interests"], demo.get("experience_years"))
+                                   demo["skills"], demo["interests"], demo.get("experience_years"),
+                                   is_demo=True)
     return {**profile, "story": demo["story"]}
 
 
 @router.get("/profiles/{profile_id}")
-def get_profile(profile_id: str):
-    return _profile_or_404(profile_id)
+def get_profile(profile_id: str, user: str | None = User):
+    return _profile_for(profile_id, user)
 
 
 @router.put("/profiles/{profile_id}")
-def update_profile(profile_id: str, body: ProfileIn):
+def update_profile(profile_id: str, body: ProfileIn, user: str | None = User):
+    _profile_for(profile_id, user)
     profile = store.update_profile(profile_id, body.display_name, body.current_role_id,
                                    body.skills, body.interests, body.experience_years)
     if profile is None:
@@ -261,20 +303,22 @@ def update_profile(profile_id: str, body: ProfileIn):
 
 
 @router.delete("/profiles/{profile_id}", status_code=204)
-def delete_profile(profile_id: str):
+def delete_profile(profile_id: str, user: str | None = User):
+    _profile_for(profile_id, user)
     if not store.delete_profile(profile_id):
         raise HTTPException(404, "Profile not found")
 
 
 @router.get("/profiles/{profile_id}/matches")
-def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None):
-    return matching.match(get_reference(), _profile_or_404(profile_id), scenario, year)
+def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None,
+                    user: str | None = User):
+    return matching.match(get_reference(), _profile_for(profile_id, user), scenario, year)
 
 
 @router.post("/profiles/{profile_id}/complete")
-def complete_course(profile_id: str, body: CompleteRequest):
+def complete_course(profile_id: str, body: CompleteRequest, user: str | None = User):
     """Mark a pathway course finished (or not). Its skills then count as covered."""
-    profile = _profile_or_404(profile_id)
+    profile = _profile_for(profile_id, user)
     if body.course_id not in {c["id"] for c in get_reference().courses}:
         raise HTTPException(422, "Unknown course")
     done = [c for c in profile["completed_courses"] if c != body.course_id]
@@ -284,9 +328,9 @@ def complete_course(profile_id: str, body: CompleteRequest):
 
 
 @router.post("/profiles/{profile_id}/cards", status_code=201)
-def create_card(profile_id: str, body: CardRequest):
+def create_card(profile_id: str, body: CardRequest, user: str | None = User):
     """A Future Card: a read-only link to a summary of this person's move to one role."""
-    _profile_or_404(profile_id)
+    _profile_for(profile_id, user)
     if body.role_id not in get_reference().roles:
         raise HTTPException(422, "Unknown role")
     return {"card_id": store.create_card(profile_id, body.role_id)}
@@ -302,12 +346,12 @@ def get_card(card_id: str):
 
 
 @router.post("/coach")
-def ask_coach(body: CoachRequest):
+def ask_coach(body: CoachRequest, user: str | None = User):
     """A cited answer about the person's own results, plus at most one change they can apply."""
     ref = get_reference()
     if body.role_id is not None and body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
-    return coach.answer(ref, _profile_or_404(body.profile_id), body.question, body.scenario, body.role_id)
+    return coach.answer(ref, _profile_for(body.profile_id, user), body.question, body.scenario, body.role_id)
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)
@@ -325,8 +369,8 @@ def workforce_analyse(body: WorkforceRequest):
 
 
 @router.get("/profiles/{profile_id}/pathway")
-def profile_pathway(profile_id: str, role: str = Query(...)):
+def profile_pathway(profile_id: str, role: str = Query(...), user: str | None = User):
     ref = get_reference()
     if role not in ref.roles:
         raise HTTPException(404, "Role not found")
-    return pathway.build(ref, _profile_or_404(profile_id), role)
+    return pathway.build(ref, _profile_for(profile_id, user), role)

@@ -32,6 +32,8 @@ class Settings:
     cors_origins: tuple[str, ...]
     cors_origin_regex: str | None
     contact_email: str
+    supabase_url: str
+    supabase_jwt_secret: str  # legacy HS256 secret; empty = verify with the project's public keys
 
     @property
     def llm_mode(self) -> str:
@@ -58,6 +60,8 @@ def get_settings() -> Settings:
         database_url=os.environ.get("DATABASE_URL", ""),
         data_dir=Path(os.environ.get("DATA_DIR", str(BACKEND_DIR / "data"))),
         contact_email=os.environ.get("CONTACT_EMAIL", ""),
+        supabase_url=os.environ.get("SUPABASE_URL", ""),
+        supabase_jwt_secret=os.environ.get("SUPABASE_JWT_SECRET", ""),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
