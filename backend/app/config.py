@@ -27,10 +27,14 @@ class Settings:
     gemini_timeout_seconds: int
     admin_token: str
     database_path: Path
+    database_url: str  # Postgres (Supabase) when set; otherwise SQLite at database_path
     data_dir: Path
     cors_origins: tuple[str, ...]
     cors_origin_regex: str | None
     contact_email: str
+    supabase_url: str
+    supabase_jwt_secret: str  # legacy HS256 secret; empty = verify with the project's public keys
+    frontend_dist: Path | None  # built React app served at /, so one process hosts everything
 
     @property
     def llm_mode(self) -> str:
@@ -44,6 +48,12 @@ class Settings:
         return "No language model (offline rules and templates)"
 
 
+def _frontend_dist() -> Path | None:
+    configured = os.environ.get("FRONTEND_DIST")
+    path = Path(configured) if configured else BACKEND_DIR.parent / "frontend" / "dist"
+    return path if (path / "index.html").exists() else None
+
+
 @lru_cache
 def get_settings() -> Settings:
     _load_dotenv(BACKEND_DIR / ".env")
@@ -54,8 +64,12 @@ def get_settings() -> Settings:
         gemini_timeout_seconds=int(os.environ.get("GEMINI_TIMEOUT_SECONDS", "15")),
         admin_token=os.environ.get("ADMIN_TOKEN", ""),
         database_path=Path(os.environ.get("DATABASE_PATH", str(BACKEND_DIR / "laluan.db"))),
+        database_url=os.environ.get("DATABASE_URL", ""),
         data_dir=Path(os.environ.get("DATA_DIR", str(BACKEND_DIR / "data"))),
         contact_email=os.environ.get("CONTACT_EMAIL", ""),
+        supabase_url=os.environ.get("SUPABASE_URL", ""),
+        supabase_jwt_secret=os.environ.get("SUPABASE_JWT_SECRET", ""),
+        frontend_dist=_frontend_dist(),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")

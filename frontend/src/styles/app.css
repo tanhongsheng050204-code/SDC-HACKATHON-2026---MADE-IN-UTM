@@ -413,3 +413,79 @@ main:focus { outline: none; }
 .kit-persona ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; }
 .kit-question { border: none; padding: 0; background: none; }
 @media (max-width: 900px) { .kit-cv { grid-template-columns: 1fr; } }
+
+/* Modal dialog (login: which profile to keep) */
+.dialog-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px;
+  background: rgba(16, 36, 31, .45); }
+.dialog { width: min(440px, 100%); background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-pop); padding: 22px; }
+.dialog h2 { margin: 0 0 8px; font-size: 1.15rem; }
+.dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* Skill tree: rows of ring nodes, roots at the bottom, target role on top */
+.tree { display: grid; gap: 14px; margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.tree-target { justify-self: center; padding: 8px 14px; border: 2px dashed var(--accent); border-radius: var(--radius-btn); font-weight: 600; }
+.tree-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.tree-node { display: grid; justify-items: center; gap: 4px; width: 112px; padding: 10px 6px; border: 1px solid var(--line); border-radius: var(--radius-btn);
+  background: var(--surface); color: var(--ink); font: inherit; text-align: center; box-shadow: none; }
+.tree-node:hover:not(:disabled) { background: var(--hover); }
+.tree-node.locked { opacity: .5; }
+.tree-node small { color: var(--ink-soft); font-size: .74rem; }
+.tree-name { font-size: .84rem; font-weight: 600; line-height: 1.2; }
+.tree-foot { text-align: center; font-size: .82rem; }
+.skill-ring .ring-track { fill: none; stroke: var(--line-strong); stroke-width: 5; }
+.skill-ring .ring-fill { fill: none; stroke: var(--gold-bright); stroke-width: 5; stroke-linecap: round; }
+.skill-ring .ring-fill.done { stroke: var(--good); }
+.skill-ring .ring-mark { stroke: var(--surface); stroke-width: 2; }
+.proof-options { display: grid; gap: 8px; }
+.proof-options .btn { justify-content: flex-start; text-align: left; white-space: normal; }
+.proof-result ol { padding-left: 1.2rem; display: grid; gap: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 420px) { .tree-node { width: calc(50% - 6px); } }
+
+/* Survey */
+.survey-card { max-width: 640px; gap: 14px; }
+.survey-text { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+.survey-other { display: grid; gap: 10px; }
+.survey-other textarea { width: 100%; }
+.also-like { margin: 14px 0; }
+
+/* Audience choice and per-group lead blocks */
+.audience-choices { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 14px; }
+.card.audience { cursor: pointer; gap: 6px; }
+.card.audience:hover { background: var(--hover); }
+.card.lead { margin: 14px 0; gap: 8px; }
+.carry { font-size: .82rem; }
+.lp-switch { margin-top: 14px; }
+
+/* Signal X-ray */
+.dialog.xray { width: min(640px, 100%); }
+.xray-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.xray-table th, .xray-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.xray-table td { white-space: nowrap; text-align: right; }
+.xray-table small { display: block; color: var(--ink-soft); font-weight: 400; font-size: .76rem; }
+.xray-link { font-weight: 600; }
+
+/* Your own AI future */
+.adoption { display: grid; gap: 6px; margin: 12px 0; }
+.adoption label { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.card.tipping { margin: 10px 0; gap: 6px; }
+.card.tipping ul { margin: 0; padding-left: 1.2rem; }
+
+/* What if I learn...? */
+.what-if { margin: 12px 0; }
+.what-if summary { cursor: pointer; font-weight: 600; }
+.fit > div { transition: width .4s ease; }
+@media (prefers-reduced-motion: reduce) { .fit > div { transition: none; } }
+
+/* Pay jump */
+.pay-card { margin: 12px 0; gap: 6px; }
+.pay { font-size: .82rem; }
+
+/* Pathway = tree + courses */
+.tree-step { font-size: .7rem; font-weight: 700; color: var(--accent-strong); text-transform: uppercase; letter-spacing: .04em; }
+.tree-course { font-size: .72rem; color: var(--ink-soft); line-height: 1.2; }
+.tree-node.course-done .ring-track { stroke: var(--good); stroke-dasharray: none; }
+.tree-node.has-step:not(.course-done) .ring-track { stroke-dasharray: 3 3; }
+.path-head { display: grid; gap: 6px; margin-top: 12px; }
+.node-panel .actions { margin-top: 10px; }

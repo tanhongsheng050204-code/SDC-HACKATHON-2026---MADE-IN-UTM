@@ -1,4 +1,10 @@
-"""Profile store on SQLite. Profiles are reached only by their random UUID; there is no listing."""
+"""Profile store. Profiles are reached only by their random UUID; there is no listing.
+
+Two engines, one code path: SQLite for tests and local runs, Postgres (Supabase) in production
+when DATABASE_URL is set, because the free hosts wipe their disks on every restart. SQL here is
+written once with `?` placeholders and portable types (TEXT ids, no AUTOINCREMENT); the Postgres
+connection translates the placeholders.
+"""
 
 import datetime as dt
 import json
@@ -9,7 +15,7 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 9
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -34,14 +40,101 @@ _MIGRATIONS = {
     );
     CREATE INDEX IF NOT EXISTS cards_profile ON cards(profile_id);
     """,
+    5: """
+    ALTER TABLE profiles ADD COLUMN user_id TEXT;
+    ALTER TABLE profiles ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE profiles ADD COLUMN preferences TEXT NOT NULL DEFAULT '{}';
+    CREATE UNIQUE INDEX IF NOT EXISTS profiles_user ON profiles(user_id) WHERE user_id IS NOT NULL;
+    """,
+    6: """
+    CREATE TABLE IF NOT EXISTS skill_progress (
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        skill_id TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        proven_at TEXT NOT NULL,
+        PRIMARY KEY (profile_id, skill_id)
+    );
+    CREATE TABLE IF NOT EXISTS skill_checks (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        skill_id TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        questions TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        submitted_at TEXT,
+        correct INTEGER,
+        passed INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS skill_checks_lookup ON skill_checks(profile_id, skill_id, level);
+    """,
+    7: """
+    CREATE TABLE IF NOT EXISTS survey_responses (
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        card_id TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        note TEXT,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (profile_id, card_id)
+    );
+    """,
+    8: """
+    CREATE TABLE IF NOT EXISTS snapshots (
+        id TEXT PRIMARY KEY,
+        state TEXT NOT NULL,
+        imported TEXT NOT NULL,
+        body TEXT NOT NULL,
+        decided_by TEXT,
+        decided_at TEXT,
+        reason TEXT
+    );
+    """,
+    9: "ALTER TABLE profiles ADD COLUMN audience TEXT;",
 }
+
+
+class _PgConnection:
+    """psycopg connection that accepts the `?` placeholders the SQLite code uses."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql: str, params=()):
+        return self._conn.execute(sql.replace("?", "%s"), params)
+
+
+_pools: dict = {}
+
+
+def _pool(url: str):
+    """One small pool per process: opening a TLS connection to Supabase for every query would add
+    seconds to a survey submit. prepare_threshold=None keeps it safe on the transaction pooler."""
+    if url not in _pools:
+        from psycopg.rows import dict_row
+        from psycopg_pool import ConnectionPool
+
+        _pools[url] = ConnectionPool(url, min_size=1, max_size=5, open=True,
+                                     kwargs={"row_factory": dict_row, "prepare_threshold": None})
+    return _pools[url]
+
+
+def close_pools() -> None:
+    """Close Postgres pools on shutdown, so worker threads stop cleanly."""
+    for pool in _pools.values():
+        pool.close()
+    _pools.clear()
 
 
 @contextmanager
 def _connect():
-    conn = sqlite3.connect(get_settings().database_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")  # so deleting a profile deletes its cards
+    settings = get_settings()
+    if settings.database_url:
+        with _pool(settings.database_url).connection() as raw:  # commits on success, rolls back on error
+            yield _PgConnection(raw)
+        return
+    else:
+        conn = sqlite3.connect(settings.database_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")  # so deleting a profile deletes its cards
     try:
         yield conn
         conn.commit()
@@ -55,7 +148,9 @@ def init_db() -> None:
         row = conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()
         current = row["v"] or 0
         for version in range(current + 1, SCHEMA_VERSION + 1):
-            conn.executescript(_MIGRATIONS[version])
+            for statement in _MIGRATIONS[version].split(";"):
+                if statement.strip():
+                    conn.execute(statement)
             conn.execute("INSERT INTO schema_version (version) VALUES (?)", (version,))
 
 
@@ -63,7 +158,7 @@ def _now() -> str:
     return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
 
-def _row(row: sqlite3.Row | None) -> dict | None:
+def _row(row) -> dict | None:
     if row is None:
         return None
     return {
@@ -71,34 +166,38 @@ def _row(row: sqlite3.Row | None) -> dict | None:
         "display_name": row["display_name"],
         "current_role_id": row["current_role_id"],
         "skills": json.loads(row["skills"]),
-        "interests": json.loads(row["interests"]),
         "experience_years": row["experience_years"],
         "completed_courses": json.loads(row["completed_courses"]),
+        "user_id": row["user_id"],
+        "is_demo": bool(row["is_demo"]),
+        "preferences": json.loads(row["preferences"]),
+        "audience": row["audience"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
 
 
-def create_profile(display_name, current_role_id, skills, interests, experience_years=None) -> dict:
+def create_profile(display_name, current_role_id, skills, experience_years=None,
+                   is_demo: bool = False, audience: str | None = None) -> dict:
     profile_id, now = str(uuid.uuid4()), _now()
     with _connect() as conn:
         conn.execute(
             "INSERT INTO profiles (id, display_name, current_role_id, skills, interests, "
-            "experience_years, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "experience_years, is_demo, audience, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (profile_id, display_name, current_role_id, json.dumps(skills),
-             json.dumps(interests), experience_years, now, now),
+             "[]", experience_years, int(is_demo), audience, now, now),
         )
     return get_profile(profile_id)
 
 
-def update_profile(profile_id, display_name, current_role_id, skills, interests,
-                   experience_years=None) -> dict | None:
+def update_profile(profile_id, display_name, current_role_id, skills,
+                   experience_years=None, audience: str | None = None) -> dict | None:
     with _connect() as conn:
         cursor = conn.execute(
-            "UPDATE profiles SET display_name=?, current_role_id=?, skills=?, interests=?, "
-            "experience_years=?, updated_at=? WHERE id=?",
-            (display_name, current_role_id, json.dumps(skills), json.dumps(interests),
-             experience_years, _now(), profile_id),
+            "UPDATE profiles SET display_name=?, current_role_id=?, skills=?, "
+            "experience_years=?, audience=?, updated_at=? WHERE id=?",
+            (display_name, current_role_id, json.dumps(skills),
+             experience_years, audience, _now(), profile_id),
         )
         if cursor.rowcount == 0:
             return None
@@ -116,12 +215,37 @@ def set_completed(profile_id: str, completed: list[str]) -> dict | None:
 
 def get_profile(profile_id: str) -> dict | None:
     with _connect() as conn:
-        return _row(conn.execute("SELECT * FROM profiles WHERE id=?", (profile_id,)).fetchone())
+        profile = _row(conn.execute("SELECT * FROM profiles WHERE id=?", (profile_id,)).fetchone())
+        if profile is not None:
+            rows = conn.execute("SELECT skill_id, level FROM skill_progress WHERE profile_id=?",
+                                (profile_id,)).fetchall()
+            profile["skill_levels"] = {r["skill_id"]: r["level"] for r in rows}
+    return profile
 
 
 def delete_profile(profile_id: str) -> bool:
     with _connect() as conn:
         return conn.execute("DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount > 0
+
+
+def set_skill_level(profile_id: str, skill_id: str, level: int) -> None:
+    """Record a proven level. A lower level never replaces a higher one."""
+    with _connect() as conn:
+        row = conn.execute("SELECT level FROM skill_progress WHERE profile_id=? AND skill_id=?",
+                           (profile_id, skill_id)).fetchone()
+        if row is None:
+            conn.execute("INSERT INTO skill_progress (profile_id, skill_id, level, proven_at) VALUES (?, ?, ?, ?)",
+                         (profile_id, skill_id, level, _now()))
+        elif level > row["level"]:
+            conn.execute("UPDATE skill_progress SET level=?, proven_at=? WHERE profile_id=? AND skill_id=?",
+                         (level, _now(), profile_id, skill_id))
+        conn.execute("UPDATE profiles SET updated_at=? WHERE id=?", (_now(), profile_id))
+
+
+def set_preferences(profile_id: str, prefs: dict[str, float]) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE profiles SET preferences=?, updated_at=? WHERE id=?",
+                     (json.dumps(prefs), _now(), profile_id))
 
 
 def create_card(profile_id: str, role_id: str) -> str:
@@ -139,7 +263,107 @@ def get_card(card_id: str) -> dict | None:
     return dict(row) if row else None
 
 
+def profile_for_user(user_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT id FROM profiles WHERE user_id=?", (user_id,)).fetchone()
+    return get_profile(row["id"]) if row else None
+
+
+def attach_user(profile_id: str, user_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE profiles SET user_id=?, updated_at=? WHERE id=?", (user_id, _now(), profile_id))
+
+
 def purge_older_than(days: int = 30) -> int:
+    """Delete anonymous and demo profiles left alone for `days`. A profile saved to an account
+    stays until its owner deletes it."""
     cutoff = (dt.datetime.now(dt.UTC) - dt.timedelta(days=days)).isoformat(timespec="seconds")
     with _connect() as conn:
-        return conn.execute("DELETE FROM profiles WHERE updated_at < ?", (cutoff,)).rowcount
+        return conn.execute("DELETE FROM profiles WHERE updated_at < ? AND user_id IS NULL", (cutoff,)).rowcount
+
+
+# --- trend snapshots ----------------------------------------------------------------------------
+# Snapshots imported or built at runtime, and every review decision, live here rather than in
+# files: hosted containers lose runtime file writes on redeploy, and the approval log is evidence.
+
+def save_snapshot(snapshot: dict, state: str) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO snapshots (id, state, imported, body) VALUES (?, ?, ?, ?)",
+                     (snapshot["snapshot_id"], state, snapshot["imported"], json.dumps(snapshot)))
+
+
+def get_snapshot(snapshot_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM snapshots WHERE id=?", (snapshot_id,)).fetchone()
+    if row is None:
+        return None
+    return {"state": row["state"], "body": json.loads(row["body"]), "decided_by": row["decided_by"],
+            "decided_at": row["decided_at"], "reason": row["reason"]}
+
+
+def list_snapshots(state: str) -> list[dict]:
+    """Snapshot bodies in one state. Empty before the database exists (reference data can load
+    before the app has initialised the database, e.g. in scripts and unit tests)."""
+    try:
+        with _connect() as conn:
+            rows = conn.execute("SELECT body FROM snapshots WHERE state=?", (state,)).fetchall()
+    except Exception as error:
+        missing_table = (isinstance(error, sqlite3.OperationalError) and "no such table" in str(error)) or \
+            type(error).__name__ == "UndefinedTable"
+        if missing_table:
+            return []
+        raise
+    return [json.loads(r["body"]) for r in rows]
+
+
+def decide_snapshot(snapshot_id: str, state: str, decided_by: str, body: dict, reason: str | None = None) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE snapshots SET state=?, decided_by=?, decided_at=?, reason=?, body=? WHERE id=?",
+                     (state, decided_by, _now(), reason, json.dumps(body), snapshot_id))
+
+
+# --- proof checks -------------------------------------------------------------------------------
+
+def create_check(profile_id: str, skill_id: str, level: int, questions: list[dict]) -> str:
+    check_id = secrets.token_urlsafe(12)
+    with _connect() as conn:
+        conn.execute("INSERT INTO skill_checks (id, profile_id, skill_id, level, questions, created_at) "
+                     "VALUES (?, ?, ?, ?, ?, ?)", (check_id, profile_id, skill_id, level, json.dumps(questions), _now()))
+    return check_id
+
+
+def get_check(check_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM skill_checks WHERE id=?", (check_id,)).fetchone()
+    if row is None:
+        return None
+    return {"id": row["id"], "profile_id": row["profile_id"], "skill_id": row["skill_id"], "level": row["level"],
+            "questions": json.loads(row["questions"]), "submitted_at": row["submitted_at"]}
+
+
+def submit_check(check_id: str, correct: int, passed: bool) -> bool:
+    """Record the result once. False if this attempt was already graded."""
+    with _connect() as conn:
+        return conn.execute("UPDATE skill_checks SET submitted_at=?, correct=?, passed=? "
+                            "WHERE id=? AND submitted_at IS NULL",
+                            (_now(), correct, int(passed), check_id)).rowcount == 1
+
+
+def attempted_today(profile_id: str, skill_id: str, level: int) -> bool:
+    today = dt.datetime.now(dt.UTC).date().isoformat()
+    with _connect() as conn:
+        row = conn.execute("SELECT COUNT(*) AS n FROM skill_checks WHERE profile_id=? AND skill_id=? AND level=? "
+                           "AND created_at >= ?", (profile_id, skill_id, level, today)).fetchone()
+    return row["n"] > 0
+
+
+# --- survey -----------------------------------------------------------------------------------
+
+def save_survey(profile_id: str, answers: list[dict]) -> None:
+    """Replace this profile's survey answers (a retake starts fresh)."""
+    now = _now()
+    with _connect() as conn:
+        conn.execute("DELETE FROM survey_responses WHERE profile_id=?", (profile_id,))
+        for a in answers:
+            conn.execute("INSERT INTO survey_responses (profile_id, card_id, answer, note, created_at) VALUES (?, ?, ?, ?, ?)",
+                         (profile_id, a["card_id"], a["answer"], a.get("note"), now))

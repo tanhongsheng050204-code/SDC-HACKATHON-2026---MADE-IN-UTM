@@ -10,21 +10,25 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 
 > The API runs on Render's free plan, which sleeps after about 15 minutes without visitors. The first click after a quiet spell can take up to a minute; the app shows “Waking up the server…” while it waits.
 >
-> **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
+> **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. Pay figures are **DOSM Salaries & Wages Survey Report 2025**, Appendix table A10: monthly medians for Malaysian citizens by occupation group, shown as group medians, never as job offers. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
 ## What it does
 
 | Feature | What you can do |
 | --- | --- |
-| **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers are removed before any AI reads the text, and the file is never stored. You confirm the skill list before it is saved. |
+| **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers are removed before any AI reads the text, and the file is never stored. Only that one extraction step sees CV text: afterwards the language model receives only skill names, role titles and your scrubbed questions (a test checks this). Use a paid-tier Gemini key for any public deployment; Google does not use paid-tier requests to improve its products. You confirm the skill list before it is saved. Profiles you don't save to an account are deleted after 30 days; log in with Google to keep yours until you delete it. |
 | **Today** | Your home screen after opening a profile: top match, how your current role is trending, robust picks, your best five roles and next steps. Ask the coach straight from here. |
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
 | **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
-| **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. Goals you pick give a small ranking boost. |
-| **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario, a goal), but nothing changes until you press **Apply**. |
+| **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. The SDG links explain each role; they are not a ranking preference. |
+| **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario), but nothing changes until you press **Apply**. |
 | **Future Card** | A read-only summary with a QR code to show a counsellor, employer or family. It never shows the full skill list. |
+| **Who you are** | The first question is *I'm working*, *I'm studying or just graduated* or *I'm changing careers*. Workers see their job's risk first and HRD Corp-claimable courses first; graduates see roles open to new graduates (a visible boost); switchers see the skills they bring from their current job, and their current role is kept out of the ranking. |
+| **Skill tree** | Skills you have at the bottom, your target role on top. Prove each level (Basic, Working, Advanced) with three questions Gemini writes on the spot; two right fills the next part of the ring. The server keeps the answers and grades. |
+| **What I enjoy** | A short survey of real tasks and settings from the roles you match. Like, dislike or say it in your own words; Laluan names the preferences your answers reveal, gives a small visible boost to roles that fit them and suggests roles you might not have considered. |
+| **Class view** | For TVET and university career centres: an anonymous class list in, the roles the class fits, the skills most students still need and the courses that help most students out. Totals only; groups under three are hidden. |
 | **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
 | **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
@@ -95,12 +99,14 @@ On Windows, Docker can't read files managed by OneDrive (“Files On-Demand”).
 
 ## Deployment
 
-| Part | Where | How |
-| --- | --- | --- |
-| Frontend | [Vercel](https://laluan-psi.vercel.app) | Vite build of `frontend/`. `VITE_API_URL` is set to the API address in the Vercel project. |
-| API | [Render](https://laluan-api.onrender.com/api/health), free plan, Singapore | Docker image from `backend/Dockerfile`, described in [`render.yaml`](render.yaml) (a Render Blueprint). |
+One **Replit Deployment** runs everything: FastAPI serves the API under `/api` and the built React app at `/` (see [`.replit`](.replit)). Data lives in **Supabase**: Postgres for profiles, progress and trend snapshots, and Supabase Auth for Google login, so nothing is lost when the deployment restarts.
 
-The Render service was created from the public repository URL, so it does not redeploy on every push: use **Manual sync** on the blueprint (or **Manual Deploy** on the service) after backend changes. Profiles and refreshed snapshots are reset whenever the container is replaced.
+1. Import the repository into Replit and add the secrets listed in `.replit` (Secrets tab). `VITE_SUPABASE_*` must be set before the build, because Vite bakes them into the app.
+2. In Supabase: enable the **Google** provider (Authentication → Providers) with a Google Cloud OAuth client (scopes `openid`, `email`, `profile`; authorised redirect = the Supabase callback URL), and add the Replit address and `http://localhost:5173` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in.
+3. `DATABASE_URL` is the Supabase *Session pooler* connection string. Tables are created on first start.
+4. Deploy (Autoscale, or Reserved VM to avoid a cold start during a demo).
+
+The older Vercel + Render setup above stays live until the Replit address replaces it.
 
 ## Configuration
 
@@ -116,7 +122,12 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `CORS_ORIGINS` | Comma-separated frontend addresses, default `http://localhost:5173`. |
 | `CORS_ORIGIN_REGEX` | Optional pattern for hosts that serve one site under many addresses, e.g. Vercel's per-deploy URLs. |
 | `CONTACT_EMAIL` | Optional contact address sent with OpenAlex requests. |
+| `DATABASE_URL` | Postgres connection string (Supabase). Empty means the local SQLite file below. |
 | `DATABASE_PATH` | SQLite file, default `backend/laluan.db`. |
+| `SUPABASE_URL` | Supabase project URL; login tokens are verified against its public keys. |
+| `SUPABASE_JWT_SECRET` | Only for Supabase projects still on the legacy shared JWT secret. |
+| `FRONTEND_DIST` | Built frontend to serve at `/`, default `frontend/dist` when it exists. |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Build-time, for the frontend's Google login. Without them the login button is hidden. |
 | `DATA_DIR` | Reference data, default `backend/data`. |
 
 For a separately hosted frontend, set `VITE_API_URL` (see [frontend/.env.example](frontend/.env.example)) to the backend address without `/api`, and add the frontend address to `CORS_ORIGINS`.
@@ -192,10 +203,10 @@ frontend/
 docs/                   requirements, design, plan, decisions, review log, AI declaration
   submission/           SDC preliminary proposal and technical tools declaration
 docker-compose.yml      run everything locally
-render.yaml             API deployment on Render
+.replit                 Replit deployment (API + built app in one process)
 ```
 
-Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, optional **Google Gemini**; deployed on **Vercel** and **Render** (Docker).
+Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite** locally / **Supabase Postgres + Auth** in production, optional **Google Gemini**; deployed on **Replit**.
 
 ## Project documents
 

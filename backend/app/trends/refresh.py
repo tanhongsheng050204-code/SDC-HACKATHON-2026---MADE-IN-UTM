@@ -65,8 +65,8 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
         ref.job_terms, now.date(), progress=_log), force)
     _log("Building new snapshot")
     snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now)
-    out: Path = review.save_pending(snapshot)
-    _log(f"Saved {out.name} for review. Users keep the current forecast until an admin approves it.")
+    review.save_pending(snapshot)
+    _log(f"Saved {snapshot['snapshot_id']} for review. Users keep the current forecast until an admin approves it.")
     return snapshot
 
 

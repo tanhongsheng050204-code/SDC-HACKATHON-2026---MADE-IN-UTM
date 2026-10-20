@@ -39,16 +39,6 @@ DONE = {
     "zh": "谢谢！请核对我们找到的技能，然后查看您的未来职位。",
 }
 
-# Words in the last answer that point to an SDG interest.
-INTEREST_WORDS = {
-    3: ("health", "kesihatan", "care", "健康"), 4: ("education", "pendidikan", "teaching", "教育"),
-    5: ("gender", "women", "wanita", "性别", "女性"), 7: ("energy", "tenaga", "solar", "能源"),
-    8: ("fair work", "jobs", "pekerjaan", "就业"), 10: ("inequality", "poverty", "b40", "贫困", "不平等"),
-    12: ("waste", "recycling", "consumption", "回收", "废物"),
-    13: ("climate", "iklim", "environment", "alam sekitar", "气候", "环境"),
-}
-
-
 def _lang(language: str) -> str:
     lang = language.strip().lower()
     if lang in {"ms", "bm", "malay", "bahasa melayu"}:
@@ -66,15 +56,10 @@ def turn(messages: list[dict], language: str = "en") -> dict:
         for skill_id in skills.dictionary_extract(scrub(answer)):
             if skill_id not in found:
                 found.append(skill_id)
-    interests = []
-    if len(answers) >= len(SCRIPTED_QUESTIONS[lang]):
-        last = answers[-1].casefold()
-        interests = [sdg for sdg, words in INTEREST_WORDS.items() if any(w in last for w in words)]
     complete = len(answers) >= len(questions)
     return {
         "next_question": DONE[lang] if complete else questions[len(answers)],
         "is_complete": complete,
         "skills_found": found,
-        "interests": interests,
         "mode": "scripted",
     }

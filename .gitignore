@@ -10,3 +10,6 @@ dist/
 .vercel/
 .env.local
 backend/data/signals/pending/
+
+# Brainstorming mockups and plan-execution scratch
+.superpowers/

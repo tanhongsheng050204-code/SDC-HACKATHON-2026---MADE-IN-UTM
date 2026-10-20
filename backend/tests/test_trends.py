@@ -6,13 +6,14 @@ from pathlib import Path
 import httpx
 import pytest
 
+from app import store
 from app.reference import get_reference
 from app.services import matching
 from app.trends import builder, jobs, research
 
 TODAY = dt.date(2026, 10, 19)
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-         "current_role_id": "data_entry_clerk", "interests": []}
+         "current_role_id": "data_entry_clerk"}
 
 
 def fake_research(rising: str = "document_understanding") -> dict:
@@ -180,8 +181,11 @@ def test_refresh_waits_for_approval_then_reranks(data_copy, client, monkeypatch)
     assert [r["score"] for r in after["roles"]] != [r["score"] for r in before["roles"]]
     radar = client.get("/api/radar", params={"profile_id": pid}).json()
     assert any(s["mine"] and s["label"] == "declining" for s in radar["skills"])
-    saved = json.loads((data_copy / "signals" / f"{sid}.json").read_text())
+    stored = store.get_snapshot(sid)  # in the database, so a redeploy keeps the decision
+    saved = stored["body"]
+    assert stored["state"] == "approved" and stored["decided_by"] == "Team Reviewer"
     assert saved["baseline_snapshot_id"] and saved["inputs"] and saved["reviewed_by"] == "Team Reviewer"
+    assert not (data_copy / "signals" / f"{sid}.json").exists()
     assert client.get("/api/signals/pending", headers=ADMIN).json() == []
 
 
@@ -193,8 +197,9 @@ def test_rejected_snapshot_is_kept_but_never_used(data_copy, client, monkeypatch
     decision = {"reviewer": "Team Reviewer", "reason": "Job-posting counts look too small this week"}
     assert client.post(f"/api/signals/pending/{sid}/reject", json=decision, headers=ADMIN).status_code == 200
     assert client.get("/api/signals").json()[0]["snapshot_id"] == live
-    kept = json.loads((data_copy / "signals" / "rejected" / f"{sid}.json").read_text())
-    assert kept["rejected_reason"].startswith("Job-posting")
+    kept = store.get_snapshot(sid)
+    assert kept["state"] == "rejected" and kept["reason"].startswith("Job-posting")
+    assert kept["body"]["rejected_reason"].startswith("Job-posting")
     assert client.post(f"/api/signals/pending/{sid}/approve", json={"reviewer": "Team Reviewer"}, headers=ADMIN).status_code == 404
 
 

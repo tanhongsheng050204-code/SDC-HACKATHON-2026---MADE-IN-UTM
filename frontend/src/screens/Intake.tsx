@@ -1,12 +1,34 @@
 import { useEffect, useState } from "react";
 import { Icon } from "../components/Icon";
-import { api, ChatTurn, Skill } from "../lib/api";
+import { api, Audience, ChatTurn, Skill } from "../lib/api";
 import { getLang, t } from "../lib/i18n";
 
 type Tab = "upload" | "cv" | "chat" | "pick";
 
-export function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
+const AUDIENCES: { id: Audience; label: string; hint: string }[] = [
+  { id: "worker", label: "aud.worker", hint: "aud.workerHint" },
+  { id: "graduate", label: "aud.graduate", hint: "aud.graduateHint" },
+  { id: "switcher", label: "aud.switcher", hint: "aud.switcherHint" },
+];
+
+export function Intake({ audience, onAudience, onDone }: {
+  audience: Audience | null; onAudience: (a: Audience) => void; onDone: (skills: string[]) => void;
+}) {
   const [tab, setTab] = useState<Tab>("upload");
+  if (!audience) {
+    return (
+      <section>
+        <div className="page-head"><h1>{t("aud.title")}</h1><p className="muted">{t("aud.sub")}</p></div>
+        <div className="audience-choices" role="radiogroup" aria-label={t("aud.title")}>
+          {AUDIENCES.map((a) => (
+            <button key={a.id} role="radio" aria-checked={false} className="card audience" onClick={() => onAudience(a.id)}>
+              <strong>{t(a.label as never)}</strong><span className="muted">{t(a.hint as never)}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
   const tabs: { id: Tab; label: string }[] = [
     { id: "upload", label: t("in.upload") },
     { id: "cv", label: t("in.paste") },

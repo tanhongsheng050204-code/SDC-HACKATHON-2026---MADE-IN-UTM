@@ -1,10 +1,17 @@
 import os
+import tempfile
 
 import pytest
 
-# Offline and isolated for every test run: no key, a throwaway database.
+# Offline and isolated for every test run: no key, a throwaway database. The default database
+# path matters too: tests that read reference data without the client fixture must never touch
+# backend/laluan.db.
 os.environ["GEMINI_API_KEY"] = ""
 os.environ["ADMIN_TOKEN"] = "test-admin-token"
+os.environ["DATABASE_PATH"] = os.path.join(tempfile.mkdtemp(prefix="laluan-test-"), "default.db")
+os.environ["DATABASE_URL"] = ""
+os.environ["SUPABASE_JWT_SECRET"] = "test-jwt-secret-long-enough-for-hs256"
+os.environ["SUPABASE_URL"] = ""
 
 
 @pytest.fixture

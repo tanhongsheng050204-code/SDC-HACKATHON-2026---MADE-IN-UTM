@@ -1,0 +1,16 @@
+# Replit: one process serves the API (/api) and the built React app (/).
+# Secrets (Replit "Secrets" tab): GEMINI_API_KEY, ADMIN_TOKEN, DATABASE_URL, SUPABASE_URL,
+# SUPABASE_JWT_SECRET (legacy projects only), VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY.
+modules = ["python-3.12", "nodejs-20"]
+run = "cd frontend && npm ci && npm run build && cd ../backend && pip install -r requirements.txt && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[deployment]
+# Reserved VM: one always-on instance. The app keeps reference data and the trend-refresh job in
+# process memory, so it must not be split across Autoscale instances (DECISIONS.md).
+deploymentTarget = "gce"
+build = ["sh", "-c", "cd frontend && npm ci && npm run build && cd ../backend && pip install -r requirements.txt"]
+run = ["sh", "-c", "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

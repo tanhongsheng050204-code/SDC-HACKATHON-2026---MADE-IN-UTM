@@ -2,19 +2,21 @@ import { ReactNode } from "react";
 import type { Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
+import { AccountButton } from "./AccountButton";
 import { LogoMark } from "./Brand";
 import { Icon, IconName } from "./Icon";
 
 interface Item { id: Screen; label: string; icon: IconName; enabled: boolean }
 
-export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome, onDelete }: {
-  current: Screen; profile: Profile | null; hasRole: boolean; model: string | null; prefs: ReactNode;
+export function Sidebar({ current, profile, hasRole, model, prefs, userId, onGo, onHome, onDelete }: {
+  current: Screen; profile: Profile | null; hasRole: boolean; model: string | null; prefs: ReactNode; userId: string | null;
   onGo: (s: Screen) => void; onHome: () => void; onDelete: () => void;
 }) {
   const groups: { label: string | null; items: Item[] }[] = [
     { label: null, items: [
       { id: "home", label: t("nav.home"), icon: "home", enabled: !!profile },
       { id: "intake", label: t("nav.profile"), icon: "user", enabled: true },
+      { id: "survey", label: t("nav.survey"), icon: "list", enabled: !!profile },
     ] },
     { label: t("nav.signals"), items: [
       { id: "radar", label: t("nav.radar"), icon: "radar", enabled: !!profile },
@@ -23,7 +25,7 @@ export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome,
     ] },
     { label: t("nav.future"), items: [
       { id: "roles", label: t("nav.roles"), icon: "briefcase", enabled: !!profile },
-      { id: "role", label: t("nav.pathway"), icon: "route", enabled: hasRole },
+      { id: "tree", label: t("nav.pathway"), icon: "route", enabled: hasRole },
       { id: "impact", label: t("nav.impact"), icon: "globe", enabled: hasRole },
     ] },
     { label: t("nav.org"), items: [{ id: "workforce", label: t("nav.workforce"), icon: "users", enabled: true }] },
@@ -58,6 +60,7 @@ export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome,
         {model && <p className="side-note">{t("shell.model")}: {model}</p>}
         <p className="side-note">{t("shell.estimates")}</p>
         <div className="side-prefs">{prefs}</div>
+        <AccountButton userId={userId} className="side-link" />
         {profile && <button className="side-link danger" onClick={onDelete}><Icon name="trash" />{t("shell.delete")}</button>}
       </div>
     </aside>

@@ -43,7 +43,7 @@ courses, numbers or promises, and remind them the decision is theirs when advisi
 You may propose ONE change the person can apply: switching scenario ("slow", "baseline",
 "accelerated") or adding an SDG goal (number 1-17). Propose only if the question asks for it.
 
-Return JSON: {{"answer": "...", "proposal": null | {{"kind": "scenario" | "interest", "value": ...}}}}
+Return JSON: {{"answer": "...", "proposal": null | {{"kind": "scenario", "value": ...}}}}
 
 Sources:
 {sources}
@@ -84,8 +84,8 @@ def _sources(ref: Reference, profile: dict, scenario: str, role_id: str | None) 
     sources = [
         f"Your top roles under the {scenario_label} scenario: {top}.",
         f"{focus['title']} ranks #{focus['rank']} with score {why['score']}: skill fit {_pct(why['fit'])} gives "
-        f"{why['fit_points']} points, the outlook gives {why['outlook_points']} points and your goals give "
-        f"{why['sdg_points']} points. The {focus['title']} outlook by scenario: {outlooks}. "
+        f"{why['fit_points']} points, the outlook gives {why['outlook_points']} points and your work preferences give "
+        f"{why['preference_points']} points. The {focus['title']} outlook by scenario: {outlooks}. "
         f"Skills you have for {focus['title']}: {', '.join(s['name'] for s in focus['covered']) or 'none yet'}. "
         f"Skills you need for {focus['title']}: {', '.join(s['name'] for s in focus['missing']) or 'none'}.",
         (f"Your pathway to {focus['title']} has {len(plan['steps'])} steps and about {plan.get('hours_left', 0)} hours "
@@ -98,9 +98,7 @@ def _sources(ref: Reference, profile: dict, scenario: str, role_id: str | None) 
 
 
 def _proposal(kind: str, value, ref: Reference) -> dict:
-    if kind == "scenario":
-        return {"kind": kind, "value": value, "label": f"Switch to the {ref.scenarios[value]['label']} scenario"}
-    return {"kind": kind, "value": value, "label": f"Add SDG {value} {ref.sdgs[value]['name']} to your goals"}
+    return {"kind": kind, "value": value, "label": f"Switch to the {ref.scenarios[value]['label']} scenario"}
 
 
 def _offline(question: str, ref: Reference, profile: dict, scenario: str, sources: list[str], ctx: dict) -> dict:
@@ -116,9 +114,8 @@ def _offline(question: str, ref: Reference, profile: dict, scenario: str, source
                        if any(t["sdg"] == number for t in tags)]
             sources.append(f"Roles that serve SDG {number} {ref.sdgs[number]['name']}: {', '.join(serving) or 'none'}.")
             n = len(sources)
-            proposal = None if number in (profile.get("interests") or []) else _proposal("interest", number, ref)
             return {"answer": f"Roles that serve SDG {number} {ref.sdgs[number]['name']}: {', '.join(serving) or 'none'} [SOURCE-{n}].",
-                    "cited": [n], "proposal": proposal}
+                    "cited": [n], "proposal": None}
     intent = next((name for name, words in INTENTS.items() if any(w in q for w in words)), None)
     if intent == "hours":
         answer = (f"Your pathway to {focus['title']} has {len(plan['steps'])} steps and about "
@@ -141,7 +138,7 @@ def _offline(question: str, ref: Reference, profile: dict, scenario: str, source
         why = focus["why"]
         return {"answer": f"{focus['title']} ranks #{focus['rank']} with score {why['score']}: skill fit "
                           f"{_pct(why['fit'])} gives {why['fit_points']} points, the outlook gives "
-                          f"{why['outlook_points']} points and your goals give {why['sdg_points']} points [SOURCE-2].",
+                          f"{why['outlook_points']} points and your work preferences give {why['preference_points']} points [SOURCE-2].",
                 "cited": [2], "proposal": None}
     return {"answer": f"Your top roles under the {ctx['scenario_label']} scenario: "
                       + sources[0].split(": ", 1)[1] + " [SOURCE-1]",
@@ -153,8 +150,6 @@ def _valid_proposal(raw, ref: Reference) -> dict | None:
         return None
     kind, value = raw.get("kind"), raw.get("value")
     if kind == "scenario" and value in ref.scenarios:
-        return _proposal(kind, value, ref)
-    if kind == "interest" and isinstance(value, int) and value in ref.sdgs:
         return _proposal(kind, value, ref)
     return None
 

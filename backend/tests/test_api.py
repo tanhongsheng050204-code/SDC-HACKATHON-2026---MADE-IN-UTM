@@ -10,7 +10,7 @@ def test_primary_journey(client):
     assert {"data_entry", "excel", "customer_service"} <= set(extracted["skills"])
 
     created = client.post("/api/profiles", json={
-        "current_role_id": "data_entry_clerk", "skills": extracted["skills"], "interests": [8]})
+        "current_role_id": "data_entry_clerk", "skills": extracted["skills"]})
     assert created.status_code == 201
     pid = created.json()["id"]
 
@@ -111,7 +111,7 @@ def test_snapshot_import_rejects_unsafe_ids_and_bad_numbers(client):
                        headers=admin).status_code == 422
 
 
-def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch):
+def test_snapshot_import_is_stored_as_approved(client, tmp_path, monkeypatch):
     import shutil
 
     from app.config import get_settings
@@ -124,8 +124,13 @@ def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch
     get_reference.cache_clear()
     response = client.post("/api/signals/import", json=_snapshot(), headers={"X-Admin-Token": "test-admin-token"})
     assert response.status_code == 201
-    assert (data / "signals" / "2099-01-01-test.json").exists()
+    from app import store
+
+    assert not (data / "signals" / "2099-01-01-test.json").exists()
+    assert store.get_snapshot("2099-01-01-test")["state"] == "approved"
     assert client.get("/api/health").json()["snapshot"] == "2099-01-01-test"
+    again = client.post("/api/signals/import", json=_snapshot(imported="2099-02-01"), headers={"X-Admin-Token": "test-admin-token"})
+    assert again.status_code == 409
 
 
 def test_intake_turn_in_chinese_still_finds_english_tool_names(client):
@@ -170,3 +175,36 @@ def test_evaluation_cvs_are_the_synthetic_files_only(client):
     assert [c["name"] for c in cvs] == [f"cv{i}_{n}.txt" for i, n in
                                         enumerate(["clerk", "student", "service", "technician", "manager"], 1)]
     assert all(len(c["text"]) > 200 and set(c) == {"name", "text"} for c in cvs)
+
+
+def test_built_app_is_served_beside_the_api(tmp_path, monkeypatch):
+    dist = tmp_path / "dist"
+    (dist / "assets").mkdir(parents=True)
+    (dist / "index.html").write_text("<!doctype html><title>Laluan</title>", encoding="utf-8")
+    (dist / "assets" / "app.js").write_text("console.log('laluan')", encoding="utf-8")
+    monkeypatch.setenv("FRONTEND_DIST", str(dist))
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "t.db"))
+    import importlib
+
+    from fastapi.testclient import TestClient
+
+    from app import main
+    from app.config import get_settings
+    from app.reference import get_reference
+
+    get_settings.cache_clear()
+    get_reference.cache_clear()
+    with TestClient(importlib.reload(main).app) as c:
+        assert "<title>Laluan</title>" in c.get("/").text
+        assert "<title>Laluan</title>" in c.get("/anything", params={"view": "roles"}).text
+        assert c.get("/assets/app.js").text == "console.log('laluan')"
+        assert c.get("/api/health").json()["status"] == "ok"
+        assert c.get("/api/no-such-route").status_code == 404
+    get_settings.cache_clear()
+    monkeypatch.delenv("FRONTEND_DIST")
+    importlib.reload(main)
+
+
+def test_profile_rejects_interests_field(client):
+    body = {"skills": ["excel"], "interests": [13]}
+    assert client.post("/api/profiles", json=body).status_code == 422

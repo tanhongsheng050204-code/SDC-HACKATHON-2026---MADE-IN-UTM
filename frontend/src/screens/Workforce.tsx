@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { ClassView } from "./ClassView";
 import { SdgTile, Sdgs } from "../components/Sdgs";
 import { api, Scenario, Workforce as WorkforceData } from "../lib/api";
 import { percent, signed } from "../lib/format";
@@ -8,7 +9,24 @@ import { HEAT, SCENARIOS } from "../lib/labels";
 
 // H1: aggregate view for HR teams. The backend refuses files with personal columns; this screen
 // only ever shows totals by role.
-export function Workforce() {
+// Two audiences share this screen: HR teams (a company) and career centres (a class).
+export function Workforce({ initialTab = "company" }: { initialTab?: "company" | "class" }) {
+  const [tab, setTab] = useState<"company" | "class">(initialTab);
+  return (
+    <section>
+      <div className="page-head">
+        <h1>{t("h.workforce")}</h1>
+      </div>
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={tab === "company"} onClick={() => setTab("company")}>{t("class.tabCompany")}</button>
+        <button role="tab" aria-selected={tab === "class"} onClick={() => setTab("class")}>{t("class.tabClass")}</button>
+      </div>
+      {tab === "company" ? <Company /> : <ClassView loadSample={initialTab === "class"} />}
+    </section>
+  );
+}
+
+function Company() {
   const [csv, setCsv] = useState("");
   const [scenario, setScenario] = useState<Scenario>("baseline");
   const [result, setResult] = useState<WorkforceData | null>(null);
@@ -36,9 +54,8 @@ export function Workforce() {
   }
 
   return (
-    <section>
-      <div className="page-head">
-        <h1>{t("h.workforce")}</h1>
+    <>
+      <div>
         <p className="muted">For HR and learning teams: see which roles in your company AI puts at risk and the cheapest reskilling moves. Results are totals by role, never a ranking of individual people, and must not be used for hiring or firing decisions.</p>
       </div>
       <div className="card">
@@ -59,7 +76,7 @@ export function Workforce() {
         <div className="empty-state"><p>No team loaded yet. Paste a CSV, upload one, or try the synthetic sample company.</p></div>
       )}
       {result && <Results result={result} scenario={scenario} onScenario={(s) => { setScenario(s); analyse(csv, s); }} />}
-    </section>
+    </>
   );
 }
 

@@ -1,6 +1,10 @@
+import { freshToken, refreshToken, signOut } from "./auth";
+
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export type Scenario = "slow" | "baseline" | "accelerated";
+export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string }
+export type Audience = "worker" | "graduate" | "switcher";
 
 export interface Skill { id: string; name: string; category: string }
 export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
@@ -8,12 +12,17 @@ export interface SkillRef { skill_id: string; name: string; weight: number; sdgs
 export interface RoleOption { id: string; title: string }
 export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
-  skills: string[]; interests: number[]; experience_years: number | null; completed_courses: string[]; story?: string;
+  skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;
+  audience?: Audience | null; user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
 }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
-  why: { fit: number; score: number; fit_points: number; outlook_points: number; sdg_points: number; matched_sdgs: number[] };
+  carry_over: { skill_id: string; name: string }[];
+  rank_without_extra?: number;
+  pay: Pay; pay_change_rm: number | null;
+  why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number; entry_points: number;
+    matched_preferences: { dim: string; label: string }[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   citation: { snapshot_id: string; imported: string; note: string | null };
   skills_source: { onet_code: string | null; onet_note: string | null };
@@ -33,7 +42,8 @@ export interface RoleInfo {
 }
 export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
-  year: number; year_range: [number, number];
+  year: number; year_range: [number, number]; also_like: AlsoLike[];
+  current_role: (Pick<RoleMatch, "role_id" | "title" | "summary" | "fit" | "outlook" | "at_risk"> & { is_current_role: true }) | null;
 }
 export interface SkillTrend {
   skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
@@ -77,19 +87,70 @@ export interface FutureCard {
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   robust_pick: boolean; next_skills: string[]; steps: number; hours: number; first_step: string | null;
   sdgs: Sdg[]; source: { snapshot_id: string; imported: string; note: string | null };
+  pay: Pay; pay_change_rm: number | null;
 }
-export interface CoachProposal { kind: "scenario" | "interest"; value: string | number; label: string }
+export interface CoachProposal { kind: "scenario"; value: string; label: string }
 export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   proposal: CoachProposal | null; suggestions: string[];
 }
-export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[]; interests: number[] }
+export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[] }
 export interface Course {
   id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null;
   price_rm?: number | null; price_note?: string; price_checked?: string;
   hrd_corp?: "claimable" | "check" | "not_needed"; hrd_note?: string;
 }
+export interface TreeNode {
+  skill_id: string; name: string; level: number; from_cv: boolean; unlocked: boolean;
+  prereqs: string[]; depth: number; in_role: boolean;
+  course: { id: string; title: string; url: string; hours: number; cost: string } | null;
+  step: number | null; course_done: boolean;
+}
+export interface SkillTree {
+  role: { role_id: string; title: string }; nodes: TreeNode[];
+  readiness: number; hours_left: number; total_steps: number;
+}
+export interface CheckStart {
+  check_id: string; skill_id: string; level: number; level_name: string;
+  questions: { prompt: string; options: string[] }[];
+}
+export interface CheckResult {
+  passed: boolean; correct: number; level: number; level_name: string; answers: number[];
+  explanations: string[]; course: { id: string; title: string; url: string } | null;
+}
+
+export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }
+export interface WorkDimension { id: string; plus: Record<string, string>; minus: Record<string, string> }
+export interface SurveyAnswer { card_id: string; answer: "like" | "dislike" | "other"; note?: string; dims?: Record<string, number> }
+export interface AlsoLike {
+  role_id: string; title: string; rank: number; fit: number; preference_match: number;
+  matched_preferences: { dim: string; label: string }[];
+}
+export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
+
+type Count = number | "fewer than 3";
+export interface ClassResult {
+  scenario: { id: Scenario; label: string; description: string };
+  students: Count; programmes: { name: string; students: Count }[];
+  best_fit: { role_id: string; title: string; students: Count; outlook: Record<Scenario, { index: number; label: string }> }[];
+  top_gaps: { skill_id: string; name: string; students: Count; course: { id: string; title: string; url: string } | null }[];
+  courses: { course: { id: string; title: string; provider: string; url: string; hours: number; cost: string }; students_helped: Count; hours: number }[];
+  sdg_contribution: (Sdg & { students: Count })[];
+  problems: string[];
+}
+
+export interface Xray {
+  role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
+  steps: { label: string; value: number; running_total: number; source: string; cap: string | null }[];
+}
+
+export interface Tipping {
+  current_role: { role_id: string; title: string; declining_at: number | null; declining_below: boolean; label_now: string } | null;
+  overtakes: { role_id: string; title: string; overtakes_role_id: string; overtakes_title: string; at: number; direction: "above" | "below" }[];
+  range: [number, number]; step: number;
+}
+
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -97,7 +158,7 @@ export interface Pathway {
   uncovered_skills: string[];
 }
 
-// The hosted API sleeps when idle (free plan) and takes up to a minute to wake. While it does,
+// The hosted API can sleep when idle (free plans, Replit Autoscale) and take up to a minute to wake. While it does,
 // requests fail to connect or get 502/503/504, so we retry for a while and let the shell show
 // a "waking up" notice instead of an error.
 const WAKE_STATUSES = new Set([502, 503, 504]);
@@ -110,12 +171,44 @@ export function onServerWaking(listener: WakeListener) {
 }
 const setWaking = (waking: boolean) => wakeListeners.forEach((l) => l(waking));
 
-async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
+// A login that expired (or was revoked) gets a 401: sign out and tell the shell, but keep the
+// profile ID in this browser so nothing is lost.
+type ExpiredListener = () => void;
+const expiredListeners = new Set<ExpiredListener>();
+export function onAuthExpired(listener: ExpiredListener) {
+  expiredListeners.add(listener);
+  return () => { expiredListeners.delete(listener); };
+}
+
+function withToken(init: RequestInit | undefined, token: string | null): RequestInit | undefined {
+  if (!token) return init;
+  const headers = new Headers(init?.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+  return { ...init, headers };
+}
+
+async function fetchAwake(url: string, original?: RequestInit): Promise<Response> {
   const started = Date.now();
+  let token = await freshToken();
+  let init = withToken(original, token);
+  let refreshed = false;
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await fetch(url, init);
-      if (!WAKE_STATUSES.has(response.status) || Date.now() - started > WAKE_LIMIT_MS) {
+      let response = await fetch(url, init);
+      if (response.status === 401 && token && !refreshed) {
+        // Refused login: refresh once and retry before deciding the session is really over.
+        refreshed = true;
+        token = await refreshToken().catch(() => null);
+        if (token) { init = withToken(original, token); response = await fetch(url, init); }
+      }
+      if (response.status === 401 && refreshed) {
+        await signOut();
+        expiredListeners.forEach((l) => l());
+      }
+      // The API's own errors are JSON (e.g. 503 "proof checks are unavailable"); a sleeping host
+      // answers with an HTML page. Only the latter means "wait and retry".
+      const ownError = (response.headers.get("content-type") ?? "").includes("application/json");
+      if (!WAKE_STATUSES.has(response.status) || ownError || Date.now() - started > WAKE_LIMIT_MS) {
         if (attempt > 0) setWaking(false);
         return response;
       }
@@ -125,6 +218,14 @@ async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
     setWaking(true);
     await new Promise((r) => setTimeout(r, Math.min(2000 + attempt * 1000, 6000)));
   }
+}
+
+// Like request(), but an error carries the server's own message (e.g. "try again tomorrow").
+async function requestDetail<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetchAwake(`${BASE}/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : `Something went wrong (${response.status})`);
+  return body as T;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -137,6 +238,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  me: () => request<{ user_id: string; profile_id: string | null }>("/me"),
+  claim: async (profileId: string, replace = false) => {
+    const response = await fetchAwake(`${BASE}/api/me/claim`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ profile_id: profileId, replace }),
+    });
+    const body = await response.json();
+    if (response.status === 409) return { conflict: body.detail.existing_profile_id as string };
+    if (!response.ok) throw new Error(`${response.status}`);
+    return { profile_id: body.profile_id as string };
+  },
   health: () => request<{ status: string; llm_model: string; snapshot_imported: string }>("/health"),
   skills: () => request<Skill[]>("/skills"),
   sdgs: () => request<Sdg[]>("/sdgs"),
@@ -153,8 +264,9 @@ export const api = {
   demoProfile: (key: string) => request<Profile>(`/profiles/demo/${key}`, { method: "POST" }),
   getProfile: (id: string) => request<Profile>(`/profiles/${id}`),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
-  matches: (id: string, scenario: Scenario, year?: number) =>
-    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}`),
+  matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
+    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),
+  tipping: (id: string, year?: number) => request<Tipping>(`/profiles/${id}/tipping${year ? `?year=${year}` : ""}`),
   complete: (id: string, courseId: string, done: boolean) =>
     request<Profile>(`/profiles/${id}/complete`, { method: "POST", body: JSON.stringify({ course_id: courseId, done }) }),
   turn: (messages: { role: "user" | "assistant"; content: string }[], language = "en") =>
@@ -176,6 +288,15 @@ export const api = {
     if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Couldn't read that file");
     return body as Workforce;
   },
+  classSample: async () => (await fetchAwake(`${BASE}/api/class/sample`)).text(),
+  classAnalyse: async (csv: string, scenario: Scenario) => {
+    const response = await fetchAwake(`${BASE}/api/class/analyse`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ csv, scenario }),
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Couldn't read that file");
+    return body as ClassResult;
+  },
   radar: (id: string) => request<Radar>(`/radar?profile_id=${id}`),
   refreshStart: (token: string, force: boolean) =>
     request<RefreshStatus>(`/signals/refresh?force=${force}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
@@ -195,11 +316,27 @@ export const api = {
   updateProfile: (p: Profile) =>
     request<Profile>(`/profiles/${p.id}`, { method: "PUT", body: JSON.stringify({
       display_name: p.display_name, current_role_id: p.current_role_id, skills: p.skills,
-      interests: p.interests, experience_years: p.experience_years }) }),
+      experience_years: p.experience_years, audience: p.audience ?? null }) }),
   coach: (profileId: string, question: string, scenario: Scenario, roleId?: string) =>
     request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null }) }),
   createCard: (id: string, roleId: string) =>
     request<{ card_id: string }>(`/profiles/${id}/cards`, { method: "POST", body: JSON.stringify({ role_id: roleId }) }),
   card: (cardId: string) => request<FutureCard>(`/cards/${encodeURIComponent(cardId)}`),
+  tree: (id: string, role: string) => request<SkillTree>(`/profiles/${id}/tree?role=${encodeURIComponent(role)}`),
+  startCheck: (id: string, skillId: string, language: string) =>
+    requestDetail<CheckStart>(`/profiles/${id}/skills/${encodeURIComponent(skillId)}/checks`, {
+      method: "POST", body: JSON.stringify({ language }) }),
+  submitCheck: (checkId: string, profileId: string, answers: number[]) =>
+    requestDetail<CheckResult>(`/checks/${encodeURIComponent(checkId)}`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId, answers }) }),
+  survey: (id: string) => request<{ cards: SurveyCard[]; dimensions: WorkDimension[] }>(`/profiles/${id}/survey`),
+  surveyBank: () => request<{ cards: SurveyCard[]; dimensions: WorkDimension[] }>("/survey/bank"),
+  interpret: (text: string, language: string) =>
+    request<{ dims: Record<string, number>; reading: string | null }>("/survey/interpret", {
+      method: "POST", body: JSON.stringify({ text, language }) }),
+  submitSurvey: (id: string, answers: SurveyAnswer[], language: string) =>
+    request<SurveyResult>(`/profiles/${id}/survey`, { method: "POST", body: JSON.stringify({ answers, language }) }),
+  xray: (roleId: string, scenario: Scenario, year?: number, adoption?: number) =>
+    request<Xray>(`/roles/${encodeURIComponent(roleId)}/xray?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption ? `&adoption=${adoption}` : ""}`),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

@@ -66,7 +66,17 @@ function Output({ text, filename }: { text: string; filename: string }) {
 type Verdict = { ms?: "ok" | "fix"; zh?: "ok" | "fix"; msFix?: string; zhFix?: string };
 
 function Translations({ reviewer }: { reviewer: string }) {
-  const rows = useMemo(allStrings, []);
+  const interfaceRows = useMemo(allStrings, []);
+  // Survey cards and preference labels live in the reference data, so fetch them to check too.
+  const [dataRows, setDataRows] = useState<{ key: string; en: string; ms: string; zh: string }[]>([]);
+  useEffect(() => {
+    api.surveyBank().then((b) => setDataRows([
+      ...b.cards.map((c) => ({ key: c.id, en: c.text.en, ms: c.text.ms, zh: c.text.zh })),
+      ...b.dimensions.flatMap((d) => (["plus", "minus"] as const).map((pole) =>
+        ({ key: `dim.${d.id}.${pole}`, en: d[pole].en, ms: d[pole].ms, zh: d[pole].zh }))),
+    ])).catch(() => undefined);
+  }, []);
+  const rows = useMemo(() => [...interfaceRows, ...dataRows], [interfaceRows, dataRows]);
   const [lang, setLang] = useState<"ms" | "zh">("ms");
   const [verdicts, setVerdicts] = useStored<Record<string, Verdict>>("laluan.kit.translations", {});
   const set = (key: string, patch: Verdict) => setVerdicts({ ...verdicts, [key]: { ...verdicts[key], ...patch } });
@@ -178,11 +188,15 @@ function CvMarking({ reviewer }: { reviewer: string }) {
 
 // ---------- 3. Pathway review ----------
 
-const PERSONAS = [{ key: "clerk", label: "Aisyah (clerk)" }, { key: "student", label: "Wei Jie (student)" }];
+const PERSONAS = [{ key: "clerk", label: "Aisyah (working adult)" }, { key: "student", label: "Wei Jie (graduate)" },
+  { key: "switcher", label: "Farid (career switcher)" }];
+// The two group views, reviewed from their synthetic samples.
+const GROUPS = [{ key: "hr", label: "HR sample company (160 people)" }, { key: "class", label: "Career-centre sample class (40 students)" }];
 type Answer = { roles?: string; pathway?: string; comment?: string };
 
 function PathwayReview({ reviewer }: { reviewer: string }) {
   const [data, setData] = useState<Record<string, { story: string; matches: Matches; plan: Pathway | null }>>({});
+  const [groups, setGroups] = useState<Record<string, string[]>>({});
   const [answers, setAnswers] = useStored<Record<string, Answer>>("laluan.kit.pathways", {});
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -197,11 +211,18 @@ function PathwayReview({ reviewer }: { reviewer: string }) {
           api.deleteProfile(profile.id).catch(() => undefined);
         }
         setData(out);
+        const hr = await api.workforce(await api.workforceSample(), "baseline");
+        const cls = await api.classAnalyse(await api.classSample(), "baseline");
+        setGroups({
+          hr: hr.moves.slice(0, 3).map((m) => `${m.from_role} → ${m.to_role}: ${m.people} people, about ${m.avg_hours} h each`),
+          class: [...cls.best_fit.slice(0, 3).map((r) => `Best fit: ${r.title} (${r.students} students)`),
+                  ...cls.top_gaps.slice(0, 3).map((g) => `Gap: ${g.name} (${g.students} students) → ${g.course?.title ?? "no course"}`)],
+        });
       } catch { setError("Couldn't load the demo results. Check the connection and reload."); }
     })();
   }, []);
   if (error) return <p className="error" role="alert">{error}</p>;
-  if (!Object.keys(data).length) return <p className="muted">Loading both personas' results…</p>;
+  if (!Object.keys(data).length) return <p className="muted">Loading the demo results…</p>;
 
   const set = (key: string, patch: Answer) => setAnswers({ ...answers, [key]: { ...answers[key], ...patch } });
   const output = [
@@ -212,11 +233,15 @@ function PathwayReview({ reviewer }: { reviewer: string }) {
       const d = data[p.key]; const a = answers[p.key] ?? {};
       return `| ${p.label} | ${d.matches.roles.slice(0, 3).map((r) => r.title).join(", ")} | ${a.roles ?? ""} | ${a.pathway ?? ""} | ${(a.comment ?? "").replace(/\n/g, " ")} | |`;
     }),
+    ...GROUPS.map((g) => {
+      const a = answers[g.key] ?? {};
+      return `| ${g.label} | ${(groups[g.key] ?? []).slice(0, 2).join("; ")} | ${a.roles ?? ""} | ${a.pathway ?? ""} | ${(a.comment ?? "").replace(/\n/g, " ")} | |`;
+    }),
   ].join("\n");
 
   return (
     <>
-      <p className="muted">For a lecturer or career counsellor. These are the app's real results for the two synthetic demo people, under the baseline scenario. Would you give this advice?</p>
+      <p className="muted">For a lecturer or career counsellor. These are the app's real results for the three synthetic demo people and the two sample groups, under the baseline scenario. Would you give this advice?</p>
       {PERSONAS.map((p) => {
         const d = data[p.key]; const a = answers[p.key] ?? {};
         return (
@@ -239,6 +264,20 @@ function PathwayReview({ reviewer }: { reviewer: string }) {
             <Question label="Is the pathway sensible for this person?" value={a.pathway} onChange={(v) => set(p.key, { pathway: v })} />
             <label>Comments: what would you change?
               <textarea rows={3} value={a.comment ?? ""} onChange={(e) => set(p.key, { comment: e.target.value })} />
+            </label>
+          </div>
+        );
+      })}
+      {GROUPS.map((g) => {
+        const a = answers[g.key] ?? {};
+        return (
+          <div key={g.key} className="card kit-persona">
+            <h2>{g.label}</h2>
+            <ul>{(groups[g.key] ?? []).map((line) => <li key={line}>{line}</li>)}</ul>
+            <Question label="Do you agree with these results?" value={a.roles} onChange={(v) => set(g.key, { roles: v })} />
+            <Question label="Would they help this group decide on reskilling?" value={a.pathway} onChange={(v) => set(g.key, { pathway: v })} />
+            <label>Comments: what would you change?
+              <textarea rows={3} value={a.comment ?? ""} onChange={(e) => set(g.key, { comment: e.target.value })} />
             </label>
           </div>
         );

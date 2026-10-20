@@ -29,4 +29,6 @@ def view(ref: Reference, profile: dict, card: dict) -> dict:
         "first_step": plan["steps"][0]["course"]["title"] if plan["steps"] else None,
         "sdgs": role_match["sdgs"],
         "source": role_match["citation"],
+        "pay": role_match["pay"],
+        "pay_change_rm": role_match["pay_change_rm"],
     }
