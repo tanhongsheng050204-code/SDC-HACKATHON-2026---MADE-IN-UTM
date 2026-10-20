@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
-import { api, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
-import { jobLinks, onetUrl, percent } from "../lib/format";
+import { api, MalaysiaPay, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
+import { jobLinks, onetUrl, percent, signed } from "../lib/format";
 import { t } from "../lib/i18n";
 import { COST, HRD, OUTLOOK_TEXT, priceText, SCENARIOS } from "../lib/labels";
 
@@ -12,6 +12,8 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
   const [plan, setPlan] = useState<Pathway | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [local, setLocal] = useState<MalaysiaPay | null>(null);
+  useEffect(() => { api.role(role.role_id).then((r) => setLocal(r.malaysia)).catch(() => setLocal(null)); }, [role.role_id]);
 
   async function build() {
     setBusy(true); setError(null);
@@ -48,6 +50,8 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
           return <tr key={s.id}><th scope="row">{s.label}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td><td>{o.index > 0 ? "+" : ""}{o.index}%</td></tr>;
         })}</tbody>
       </table>
+
+      {local && <InMalaysia pay={local} wefChange={role.outlook.baseline.index} />}
 
       <div className="job-links"><span className="muted">See open jobs:</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
@@ -132,5 +136,29 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
         })}
       </ol>
     </>
+  );
+}
+
+// Local reality next to the global forecast: DOSM pay and employee numbers for the role's MASCO
+// group. The two can disagree (Malaysian clerical jobs still grew after 2019); we show both.
+function InMalaysia({ pay, wefChange }: { pay: MalaysiaPay; wefChange: number }) {
+  const change = pay.employees_change_pct;
+  return (
+    <div className="card in-malaysia">
+      <div className="card-row"><h3>In Malaysia today</h3><span className="badge">{pay.label}</span></div>
+      <div className="kpis">
+        <div className="kpi"><span className="kpi-label">Median monthly pay, {pay.year}</span><strong>RM {pay.median_rm.toLocaleString("en-MY")}</strong>
+          <span className="badge">mean RM {pay.mean_rm.toLocaleString("en-MY")}</span></div>
+        <div className="kpi"><span className="kpi-label">Employees in this group since {pay.trend_from}</span>
+          <strong>{change === null ? "–" : `${signed(change)}%`}</strong>
+          <span className="badge">{Math.round(pay.employees_thousands).toLocaleString("en-MY")} thousand in {pay.year}</span></div>
+        <div className="kpi"><span className="kpi-label">WEF global outlook to 2030</span><strong>{signed(wefChange)}%</strong>
+          <span className="badge">baseline scenario</span></div>
+      </div>
+      {change !== null && (change > 0) !== (wefChange > 0) && (
+        <p className="muted">These point in different directions: employment in this group has {change > 0 ? "grown" : "fallen"} in Malaysia since {pay.trend_from}, while the global forecast expects the role to {wefChange > 0 ? "grow" : "shrink"}. The group is broad, and forecasts look ahead while these figures look back.</p>
+      )}
+      <p className="source">Source: <a href={pay.source_url} target="_blank" rel="noreferrer">{pay.source}</a> ({pay.licence}), retrieved {pay.retrieved}. {pay.note} The role is matched to the whole MASCO group, so pay for the role itself may differ.</p>
+    </div>
   );
 }

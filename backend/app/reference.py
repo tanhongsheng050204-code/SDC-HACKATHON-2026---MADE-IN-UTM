@@ -25,6 +25,7 @@ class Reference:
     capabilities: list[dict]
     job_terms: dict[str, str]
     tasks: dict  # {"source", "source_url", "labels_note", "roles": {role_id: {...}}}
+    malaysia_pay: dict  # DOSM pay and employees by MASCO group (app/trends/malaysia.py)
 
     @property
     def latest_snapshot(self) -> dict:
@@ -68,6 +69,7 @@ def get_reference() -> Reference:
         capabilities=_read(data_dir / "capabilities.json")["capabilities"],
         job_terms=_read(data_dir / "job_terms.json")["terms"],
         tasks=_tasks(data_dir / "tasks.json"),
+        malaysia_pay=_read(data_dir / "malaysia_pay.json"),
     )
 
 

@@ -64,7 +64,18 @@ def role_detail(role_id: str):
                              for t in ref.skill_sdgs(rs["skill_id"])]
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
+        "malaysia": _malaysia(ref, role),
     }
+
+
+def _malaysia(ref, role: dict) -> dict | None:
+    """Typical Malaysian pay and the change in employees for the role's occupation group (DOSM)."""
+    pay = ref.malaysia_pay
+    group = pay["groups"].get(role.get("masco_group", ""))
+    if not group:
+        return None
+    return {"group": role["masco_group"], **group,
+            **{k: pay[k] for k in ("year", "trend_from", "source", "source_url", "licence", "retrieved", "note")}}
 
 
 @router.get("/roles/{role_id}/tasks")

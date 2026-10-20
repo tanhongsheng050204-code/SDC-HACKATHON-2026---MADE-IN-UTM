@@ -30,6 +30,11 @@ export interface RoleInfo {
   id: string; title: string; summary: string;
   skills: { skill_id: string; weight: number }[];
   sdgs: Sdg[]; skill_sdgs: Record<string, Sdg[]>;
+  malaysia: MalaysiaPay | null;
+}
+export interface MalaysiaPay {
+  group: string; label: string; median_rm: number; mean_rm: number; employees_thousands: number; employees_change_pct: number | null;
+  year: number; trend_from: number; source: string; source_url: string; licence: string; retrieved: string; note: string;
 }
 export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];

@@ -72,3 +72,24 @@ def test_tasks_cover_every_role_with_valid_labels():
         assert bool(entry["onet_code"]) == bool(entry["tasks"]), role_id
         for t in entry["tasks"]:
             assert t["label"] in {"automate", "assist", "human"} and t["reason"] and t["text"], t["id"]
+
+
+def test_every_role_has_malaysian_pay_from_dosm():
+    ref = get_reference()
+    pay = ref.malaysia_pay
+    assert pay["licence"] == "CC BY 4.0" and pay["year"] >= 2024 and pay["trend_from"] == 2019
+    for role in ref.roles.values():
+        group = pay["groups"][role["masco_group"]]
+        assert 1000 < group["median_rm"] < 20000 and group["employees_change_pct"] is not None, role["id"]
+
+
+def test_dosm_summary_compares_with_2019():
+    import datetime as dt
+
+    from app.trends import malaysia
+    csv_text = ("date,sex,occupation,recipients,wages_median,wages_mean\n"
+                "2019-01-01,both,clerical,100,2000,2200\n2020-01-01,both,clerical,80,2000,2200\n"
+                "2025-01-01,both,clerical,110,2700,3000\n2025-01-01,male,clerical,50,2800,3100\n")
+    summary = malaysia.summarise(csv_text, dt.date(2026, 10, 20))
+    clerical = summary["groups"]["clerical"]
+    assert summary["year"] == 2025 and clerical["median_rm"] == 2700 and clerical["employees_change_pct"] == 10.0

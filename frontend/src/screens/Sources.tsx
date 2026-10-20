@@ -44,6 +44,7 @@ export function Sources({ onReviewKit }: { onReviewKit: () => void }) {
       <div className="card">
         <h2>Other data in Laluan</h2>
         <ul className="plain-list">
+          <li><strong>Malaysian pay and jobs:</strong> Department of Statistics Malaysia, <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">Annual Salaries &amp; Wages by Occupation</a> (CC BY 4.0), by MASCO occupation group; refreshed with <code>scripts/refresh_malaysia.py</code>.</li>
           <li><strong>Tasks:</strong> O*NET 30.0 task statements (US Department of Labor), labelled automate / assist / human by our team with AI help.</li>
           <li><strong>Skills per role:</strong> the Laluan team's list, checked against O*NET occupations where one exists.</li>
           <li><strong>Courses:</strong> the Laluan catalogue; each link shows the date we last opened it.</li>
