@@ -14,7 +14,8 @@ import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
-import { Landing } from "./screens/Landing";
+import { Home } from "./screens/Home";
+import { Landing } from "./screens/landing/Landing";
 import { Radar } from "./screens/Radar";
 import { Review } from "./screens/Review";
 import { RoleDetail } from "./screens/RoleDetail";
@@ -23,7 +24,7 @@ import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["radar", "tasks", "roles", "role", "impact"];
+const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -45,6 +46,7 @@ function MainApp({ demo }: { demo: string | null }) {
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
+  const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
   const { theme, toggle: toggleTheme } = useTheme();
   const { lite, setLite } = useLite();
@@ -116,7 +118,7 @@ function MainApp({ demo }: { demo: string | null }) {
     try {
       const p = await api.demoProfile(key);
       save(KEYS.profile, p.id); setProfile(p);
-      go("roles", { role: undefined });
+      go("home", { role: undefined });
     } catch { setError("Can't reach the server. Is the backend running on port 8000?"); }
   }
 
@@ -130,7 +132,7 @@ function MainApp({ demo }: { demo: string | null }) {
         const found = m.roles.find((r) => r.role_id === wanted.role);
         if (found) { setRole(found); setRoute(wanted); return; }
       }
-      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" ? wanted : { ...route, screen: "roles" };
+      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" ? wanted : { ...route, screen: "home" };
       setRoute(r); writeRoute(r, "replace");
     } catch {
       save(KEYS.profile, null);
@@ -169,32 +171,30 @@ function MainApp({ demo }: { demo: string | null }) {
   );
 
   if (screen === "landing") {
+    const nav = (
+      <nav className="site-nav" aria-label="Main">
+        <button className="brand" onClick={() => go("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+        <div className="site-links">
+          <a href="#people">{t("landing.navPeople")}</a>
+          <a href="#journey">{t("landing.navJourney")}</a>
+          <a href="#trust">{t("landing.navTrust")}</a>
+          <a href="#faq">{t("landing.navFaq")}</a>
+        </div>
+        <div className="site-nav-actions">
+          {themeButton}
+          {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
+          <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
+        </div>
+      </nav>
+    );
     return (
-      <div className="site">
-        <div className="announce">{t("landing.judge")} <button onClick={() => openDemo("clerk")}>{t("landing.judgeCta")}</button></div>
-        <nav className="site-nav" aria-label="Main">
-          <button className="brand" onClick={() => go("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
-          <div className="site-nav-actions">
-            <LangPicker lang={lang} onChange={changeLang} />
-            {themeButton}
-            {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
-            <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
-          </div>
-        </nav>
-        {banners}
-        <Landing onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} />
-        <footer className="site-footer">
-          <span>{t("landing.footer")}</span>
-          {model && <span>{t("shell.model")}: {model}</span>}
-          <button className="link" onClick={() => go("sources")}>{t("nav.sources")}</button>
-          <LiteToggle lite={lite} onChange={setLite} />
-        </footer>
-      </div>
+      <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
+        onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} onSources={() => go("sources")} />
     );
   }
 
   const titles: Record<Screen, string> = {
-    landing: "", intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
+    landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
     roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"),
   };
   return (
@@ -207,13 +207,17 @@ function MainApp({ demo }: { demo: string | null }) {
           <span className="workbar-title">{titles[screen]}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
-            {profile && <button className="btn sm" onClick={() => setCoachOpen(true)} aria-expanded={coachOpen}><Icon name="chat" />{t("shell.coach")}</button>}
+            {profile && <button className="btn sm" onClick={() => { setCoachQuestion(undefined); setCoachOpen(true); }} aria-expanded={coachOpen}><Icon name="chat" />{t("shell.coach")}</button>}
             {themeButton}
           </div>
         </header>
         {banners}
         <main id="main" tabIndex={-1}>
           <ScreenBoundary key={screen}>
+            {screen === "home" && profile && (
+              <Home profile={profile} scenario={scenario} onScenario={setScenario} onOpenRole={openRole} onGo={(s) => go(s)}
+                onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
+            )}
             {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (
               <Review initial={draftSkills} onBack={() => go("intake")}
@@ -236,7 +240,7 @@ function MainApp({ demo }: { demo: string | null }) {
         </main>
       </div>
       {coachOpen && profile && (
-        <Coach profile={profile} scenario={scenario} roleId={role?.role_id}
+        <Coach profile={profile} scenario={scenario} roleId={role?.role_id} initialQuestion={coachQuestion}
           onApply={applyProposal} onClose={() => setCoachOpen(false)} />
       )}
       {toast && <div className="toast" role="status">{toast}</div>}

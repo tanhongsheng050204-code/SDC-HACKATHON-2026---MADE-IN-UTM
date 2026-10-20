@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, CoachProposal, CoachReply, Profile, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
 
@@ -7,8 +7,8 @@ interface Turn { question: string; reply: CoachReply | null; error?: string; dis
 const STARTERS = ["Why is this my top role?", "How long will the plan take?", "Is my current job at risk?", "What if AI adoption is faster?"];
 
 // The coach only proposes. A proposal changes nothing until the person presses Apply.
-export function Coach({ profile, scenario, roleId, onApply, onClose }: {
-  profile: Profile; scenario: Scenario; roleId?: string; onApply: (p: CoachProposal) => Promise<void>; onClose: () => void;
+export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onClose }: {
+  profile: Profile; scenario: Scenario; roleId?: string; initialQuestion?: string; onApply: (p: CoachProposal) => Promise<void>; onClose: () => void;
 }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
@@ -19,6 +19,15 @@ export function Coach({ profile, scenario, roleId, onApply, onClose }: {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // A question typed on the Today screen opens the coach already asking it (once, even in dev mode).
+  const asked = useRef<string | null>(null);
+  useEffect(() => {
+    if (!initialQuestion || asked.current === initialQuestion) return;
+    asked.current = initialQuestion;
+    ask(initialQuestion);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestion]);
 
   function mark(i: number, patch: Partial<Turn>) {
     setTurns((all) => all.map((x, j) => (j === i ? { ...x, ...patch } : x)));

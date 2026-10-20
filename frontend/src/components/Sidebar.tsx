@@ -12,7 +12,10 @@ export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome,
   onGo: (s: Screen) => void; onHome: () => void; onDelete: () => void;
 }) {
   const groups: { label: string | null; items: Item[] }[] = [
-    { label: null, items: [{ id: "intake", label: t("nav.profile"), icon: "user", enabled: true }] },
+    { label: null, items: [
+      { id: "home", label: t("nav.home"), icon: "home", enabled: !!profile },
+      { id: "intake", label: t("nav.profile"), icon: "user", enabled: true },
+    ] },
     { label: t("nav.signals"), items: [
       { id: "radar", label: t("nav.radar"), icon: "radar", enabled: !!profile },
       { id: "tasks", label: t("nav.tasks"), icon: "list", enabled: !!profile },
