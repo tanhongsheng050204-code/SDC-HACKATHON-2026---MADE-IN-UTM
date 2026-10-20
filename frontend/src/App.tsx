@@ -48,6 +48,7 @@ function MainApp({ demo }: { demo: string | null }) {
   const [role, setRole] = useState<RoleMatch | null>(null);
   const [draftSkills, setDraftSkills] = useState<string[]>([]);
   const [audience, setAudience] = useState<Audience | null>(null);
+  const [workforceTab, setWorkforceTab] = useState<"company" | "class">("company");
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -119,6 +120,7 @@ function MainApp({ demo }: { demo: string | null }) {
     entryHandled = true;
     if (demo === "clerk" || demo === "student" || demo === "switcher") { openDemo(demo); return; }
     if (demo === "hr") { go("workforce"); return; }
+    if (demo === "class") { setWorkforceTab("class"); go("workforce"); return; }
     // A reload on ?view=roles (or deeper) resumes the saved profile and the role in the URL.
     const wanted = readRoute();
     if (NEEDS_PROFILE.includes(wanted.screen) && storedId) resume(wanted);
@@ -247,7 +249,7 @@ function MainApp({ demo }: { demo: string | null }) {
     );
     return (
       <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
-        onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
+        onStart={() => go("intake")} onDemo={(k) => (k === "class" ? (setWorkforceTab("class"), go("workforce")) : openDemo(k))} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
     );
   }
 
@@ -300,7 +302,7 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
             {screen === "review-kit" && <ReviewKit />}
-            {screen === "workforce" && <Workforce />}
+            {screen === "workforce" && <Workforce initialTab={workforceTab} />}
           </ScreenBoundary>
         </main>
       </div>

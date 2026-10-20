@@ -120,6 +120,17 @@ export interface AlsoLike {
 }
 export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
 
+type Count = number | "fewer than 3";
+export interface ClassResult {
+  scenario: { id: Scenario; label: string; description: string };
+  students: Count; programmes: { name: string; students: Count }[];
+  best_fit: { role_id: string; title: string; students: Count; outlook: Record<Scenario, { index: number; label: string }> }[];
+  top_gaps: { skill_id: string; name: string; students: Count; course: { id: string; title: string; url: string } | null }[];
+  courses: { course: { id: string; title: string; provider: string; url: string; hours: number; cost: string }; students_helped: Count; hours: number }[];
+  sdg_contribution: (Sdg & { students: Count })[];
+  problems: string[];
+}
+
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -249,6 +260,15 @@ export const api = {
     const body = await response.json();
     if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Couldn't read that file");
     return body as Workforce;
+  },
+  classSample: async () => (await fetchAwake(`${BASE}/api/class/sample`)).text(),
+  classAnalyse: async (csv: string, scenario: Scenario) => {
+    const response = await fetchAwake(`${BASE}/api/class/analyse`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ csv, scenario }),
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Couldn't read that file");
+    return body as ClassResult;
   },
   radar: (id: string) => request<Radar>(`/radar?profile_id=${id}`),
   refreshStart: (token: string, force: boolean) =>

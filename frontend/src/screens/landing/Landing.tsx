@@ -75,6 +75,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             ))}
           </div>
           <p className="lp-switch">{t("landing.switcher")} <button className="link" onClick={() => onDemo("switcher")}>{t("landing.switcherCta")}</button></p>
+          <p className="lp-switch">{t("landing.centre")} <button className="link" onClick={() => onDemo("class")}>{t("landing.centreCta")}</button></p>
           <p className="lp-credit">Illustrative photos from Unsplash by Gema Saputera, Mimi Thian and Vitaly Gariev. The people shown are not the demo personas.</p>
         </section>
 
@@ -151,6 +152,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
               <li><button className="link" onClick={() => onDemo("clerk")}>Worker demo</button></li>
               <li><button className="link" onClick={() => onDemo("student")}>Student demo</button></li>
               <li><button className="link" onClick={() => onDemo("switcher")}>Career-switcher demo</button></li>
+              <li><button className="link" onClick={() => onDemo("class")}>Career-centre class view</button></li>
               <li><button className="link" onClick={onHr}>Workforce view</button></li>
             </ul>
           </div>
