@@ -15,8 +15,8 @@ COPY app ./app
 COPY data ./data
 COPY scripts ./scripts
 
-# Run as a normal user. data/ stays writable so "Refresh trend data" can save new snapshots;
-# var/ holds the SQLite file. Both reset when the container is replaced.
+# Run as a normal user. data/ stays writable for the refresh job's raw-count cache; snapshots and
+# review decisions go to the database. var/ holds the local SQLite file (unused when DATABASE_URL is set).
 RUN useradd --create-home laluan && mkdir -p var && chown -R laluan:laluan /app/data /app/var
 USER laluan
 

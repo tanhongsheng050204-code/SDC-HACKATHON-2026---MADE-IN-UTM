@@ -111,7 +111,7 @@ def test_snapshot_import_rejects_unsafe_ids_and_bad_numbers(client):
                        headers=admin).status_code == 422
 
 
-def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch):
+def test_snapshot_import_is_stored_as_approved(client, tmp_path, monkeypatch):
     import shutil
 
     from app.config import get_settings
@@ -124,8 +124,13 @@ def test_snapshot_import_writes_inside_signals_dir(client, tmp_path, monkeypatch
     get_reference.cache_clear()
     response = client.post("/api/signals/import", json=_snapshot(), headers={"X-Admin-Token": "test-admin-token"})
     assert response.status_code == 201
-    assert (data / "signals" / "2099-01-01-test.json").exists()
+    from app import store
+
+    assert not (data / "signals" / "2099-01-01-test.json").exists()
+    assert store.get_snapshot("2099-01-01-test")["state"] == "approved"
     assert client.get("/api/health").json()["snapshot"] == "2099-01-01-test"
+    again = client.post("/api/signals/import", json=_snapshot(imported="2099-02-01"), headers={"X-Admin-Token": "test-admin-token"})
+    assert again.status_code == 409
 
 
 def test_intake_turn_in_chinese_still_finds_english_tool_names(client):

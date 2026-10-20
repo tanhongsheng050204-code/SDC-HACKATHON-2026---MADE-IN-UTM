@@ -1,7 +1,6 @@
 """HTTP routes. Screens and the endpoints they call are listed in docs/03-APP_FLOW.md."""
 
 import hmac
-import json
 
 from fastapi import APIRouter, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
@@ -186,7 +185,6 @@ def radar(profile_id: str | None = None):
 
 @router.post("/signals/import", status_code=201)
 def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
-    settings = get_settings()
     _require_admin(x_admin_token)  # before validation, so strangers learn nothing about the format
     try:
         snapshot = SnapshotIn.model_validate(body).model_dump(exclude_none=True)
@@ -198,13 +196,10 @@ def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
     for s in snapshot["signals"]:
         if s["role_id"] not in ref.roles:
             raise HTTPException(422, f"Unknown role in signals: {s['role_id']}")
-    folder = (settings.data_dir / "signals").resolve()
-    path = (folder / f"{snapshot['snapshot_id']}.json").resolve()
-    if path.parent != folder:  # belt and braces: the ID pattern already rules this out
-        raise HTTPException(422, "Invalid snapshot_id")
-    if path.exists():
+    taken = {s["snapshot_id"] for s in ref.snapshots}
+    if snapshot["snapshot_id"] in taken or store.get_snapshot(snapshot["snapshot_id"]):
         raise HTTPException(409, "Snapshot already exists")
-    path.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
+    store.save_snapshot(snapshot, "approved")
     reload_reference()
     return {"snapshot_id": snapshot["snapshot_id"]}
 

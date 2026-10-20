@@ -250,3 +250,41 @@ def purge_older_than(days: int = 30) -> int:
     cutoff = (dt.datetime.now(dt.UTC) - dt.timedelta(days=days)).isoformat(timespec="seconds")
     with _connect() as conn:
         return conn.execute("DELETE FROM profiles WHERE updated_at < ?", (cutoff,)).rowcount
+
+
+# --- trend snapshots ----------------------------------------------------------------------------
+# Snapshots imported or built at runtime, and every review decision, live here rather than in
+# files: hosted containers lose runtime file writes on redeploy, and the approval log is evidence.
+
+def save_snapshot(snapshot: dict, state: str) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO snapshots (id, state, imported, body) VALUES (?, ?, ?, ?)",
+                     (snapshot["snapshot_id"], state, snapshot["imported"], json.dumps(snapshot)))
+
+
+def get_snapshot(snapshot_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM snapshots WHERE id=?", (snapshot_id,)).fetchone()
+    if row is None:
+        return None
+    return {"state": row["state"], "body": json.loads(row["body"]), "decided_by": row["decided_by"],
+            "decided_at": row["decided_at"], "reason": row["reason"]}
+
+
+def list_snapshots(state: str) -> list[dict]:
+    """Snapshot bodies in one state. Empty before the database exists (reference data can load
+    before the app has initialised the database, e.g. in scripts and unit tests)."""
+    try:
+        with _connect() as conn:
+            rows = conn.execute("SELECT body FROM snapshots WHERE state=?", (state,)).fetchall()
+    except Exception as error:  # sqlite3.OperationalError / psycopg UndefinedTable
+        if "snapshots" in str(error):
+            return []
+        raise
+    return [json.loads(r["body"]) for r in rows]
+
+
+def decide_snapshot(snapshot_id: str, state: str, decided_by: str, body: dict, reason: str | None = None) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE snapshots SET state=?, decided_by=?, decided_at=?, reason=?, body=? WHERE id=?",
+                     (state, decided_by, _now(), reason, json.dumps(body), snapshot_id))

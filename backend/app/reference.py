@@ -1,7 +1,8 @@
 """Reference data: skills, roles, courses, SDGs, scenarios and dated signal snapshots.
 
 All of it is versioned JSON under backend/data/, read once and kept in memory. Snapshots are
-immutable: a refresh adds a new file, and the latest by `imported` date is the one used.
+immutable: committed ones are files; ones imported or approved at runtime are rows in the database.
+The latest by `imported` date is the one used.
 """
 
 import json
@@ -42,7 +43,11 @@ def _read(path: Path):
 
 
 def load_snapshots(data_dir: Path) -> list[dict]:
+    """The committed snapshot files plus every snapshot approved at runtime (kept in the database)."""
+    from app import store
+
     snapshots = [_read(p) for p in sorted((data_dir / "signals").glob("*.json"))]
+    snapshots += store.list_snapshots("approved")
     if not snapshots:
         raise RuntimeError(f"No signal snapshots in {data_dir / 'signals'}")
     return sorted(snapshots, key=lambda s: (s["imported"], s["snapshot_id"]))

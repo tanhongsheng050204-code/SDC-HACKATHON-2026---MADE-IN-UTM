@@ -11,8 +11,8 @@ from app.reference import get_reference
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    store.init_db()  # first: reference data reads approved snapshots from the database
     get_reference()  # fail fast on broken reference data
-    store.init_db()
     yield
 
 
