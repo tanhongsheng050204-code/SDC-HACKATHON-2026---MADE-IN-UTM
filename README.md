@@ -26,7 +26,8 @@ Built for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon
 | **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario, a goal), but nothing changes until you press **Apply**. |
 | **Future Card** | A read-only summary with a QR code to show a counsellor, employer or family. It never shows the full skill list. |
 | **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
-| **Sources** | Every forecast snapshot the app has used, with source, dates and status. |
+| **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
+| **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
 | **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
 
 ## Suggested demo (about 3 minutes)
@@ -129,11 +130,14 @@ The scenario engine adjusts each role's baseline growth for AI-adoption speed, h
 
 The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**) and skill mentions from Hacker News **“Who is hiring?”** threads. Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot to `backend/data/signals/` and keeps the old ones, so rankings can be compared before and after.
 
-Run it from **Admin: refresh trend data** on the Future roles screen (needs `ADMIN_TOKEN`), or from `backend/`:
+**A person approves every update.** A refresh only saves the new snapshot for review. Under **Admin: refresh trend data** on the Future roles screen, an admin sees which roles would move and by how much, then approves it (their name is stored with the snapshot and shown on the Sources page) or rejects it with a reason (kept in `backend/data/signals/rejected/`). Users see nothing new until it is approved.
+
+Run a refresh from that panel (needs `ADMIN_TOKEN`), or from `backend/`:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/refresh_trends.py          # reuse today's counts if present
 .\.venv\Scripts\python.exe scripts/refresh_trends.py --force  # collect again
+.\.venv\Scripts\python.exe scripts/refresh_trends.py --approve-as "Your name"  # you checked the output: publish it
 ```
 
 On macOS/Linux use `.venv/bin/python`. Starting the app does not schedule refreshes; use cron or Task Scheduler if needed.
@@ -143,7 +147,7 @@ Research activity and Hacker News posts are rough proxies for demand. A refresh 
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 65 tests: API, services, trends, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 67 tests: API, services, trends, review, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 

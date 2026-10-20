@@ -60,7 +60,7 @@ and roles are rising or declining. ✅
 |---|---|---|
 | Employer / HR view: workforce skills-gap heatmap and reskilling plan | Anonymous CSV → heatmap, cheapest moves, learning hours, SDG totals; **aggregate only, no per-employee ranking** | ✅ |
 | Automatic re-planning when trend data changes | After a refresh: "Your plan changed because …" with the roles that moved | ✅ |
-| Inclusive design: EN / BM / 中文, low-bandwidth, mobile-friendly | Responsive now; "lite mode" (no web fonts); BM + 中文 strings | Medium |
+| Inclusive design: EN / BM / 中文, low-bandwidth, mobile-friendly | Responsive (checked at 375 px); "lite mode" (no web fonts or photos); BM + 中文 interface strings, native-speaker check pending | ✅ |
 | Learner motivation: progress tracking, skill badges | Tick steps → readiness meter; a badge per skill earned | ✅ |
 | Fairness checks | No age, gender or background inputs; API rejects them; tests prove names don't change rankings | ✅ |
 | SDG contribution for a person, company or region | Person ✅ (Impact screen); company ✅ (HR view); region out of scope | ✅ |
@@ -88,7 +88,7 @@ questions about the user's own results, with citations, and proposes changes the
 | Worker | Roles screen | I switch scenario or year | Rankings change; each card shows a low–high estimate |
 | Worker | I chose SDG 13 | Roles load | Climate roles move up and say "Serves your goals: SDG 13" |
 | Worker | A target role | I build my pathway | Ordered steps from the catalogue with hours, RM cost and free / HRD Corp flags |
-| Admin | New arXiv and job-posting data | I run the refresh | A new dated snapshot; rankings change; affected users see "Your plan changed because …" |
+| Admin | New arXiv and job-posting data | I run the refresh and approve the preview | A new dated snapshot with my name on it; rankings change; affected users see "Your plan changed because …". If I reject it, nothing changes |
 | HR manager | An anonymous CSV of roles and skills | I upload it | A heatmap by role and the cheapest reskilling moves; columns with names, emails or IC numbers are rejected |
 
 ## Hardest risks and fallbacks (rubric: Feasibility)

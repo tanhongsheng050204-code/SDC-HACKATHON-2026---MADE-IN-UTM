@@ -27,7 +27,7 @@ different demo data; Organisation opens the HR view.
 | S8 | Future Card | Shareable read-only summary + QR, opened at `/?card=ID` | `POST /profiles/{id}/cards`, `GET /cards/{card_id}` ✅ |
 | S9 | Sources | Every snapshot: source, date, reviewer | `GET /signals` |
 | H1 | HR workforce | Upload or paste anonymous CSV (or the synthetic sample) → heatmap, cheapest moves, hours, SDG totals | `POST /workforce/analyse`, `GET /workforce/sample` |
-| A1 | Admin | **Refresh trend data** (runs collectors, writes a new snapshot, shows what changed); approve / reject proposals | `POST /signals/refresh`, `GET /signals/refresh` (progress) |
+| A1 | Admin | **Refresh trend data** (runs collectors, saves a snapshot for review); preview which roles would move, then **approve** (name recorded) or **reject** (reason kept) ✅ | `POST /signals/refresh`, `GET /signals/refresh`, `GET /signals/pending/{id}`, `POST /signals/pending/{id}/approve` · `/reject` |
 | — | Coach drawer | Opens from any screen; cited answers; **Apply** on proposed changes | `POST /coach` ✅ |
 
 ## Primary journey (worker)
@@ -46,7 +46,7 @@ S4 drag slider / pick scenario → open role → S5 → **Build my pathway** →
 | Build pathway | Role has missing skills | "Building your plan…" | Steps + badge | Template plan (always works offline) |
 | Coach: ask | 1–500 chars | Typing dots | Cited answer or a proposal card | "The coach is offline" + suggested questions |
 | Coach: Apply | — | Spinner on the card | Plan or filters update; toast "Applied" | Nothing changes; error toast |
-| Refresh trend data | Admin token | Progress message per source | New snapshot; "What changed" list; users see "Your plan changed because …" | Source down: last good snapshot kept, date shown |
+| Refresh trend data | Admin token | Progress message per source | Snapshot waits for review with a before/after table; after **Approve**, users see "Your plan changed because …" | Source down: last good snapshot kept, date shown |
 | HR: upload CSV | CSV with `role,skills`; no name column accepted | Progress bar | Heatmap | Row-level errors listed |
 
 ## Navigation
