@@ -32,7 +32,7 @@ def test_init_db_is_idempotent(db):
     store.init_db()
     with store._connect() as conn:
         version = conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()["v"]
-    assert version == store.SCHEMA_VERSION == 8
+    assert version == store.SCHEMA_VERSION
 
 
 def test_skill_level_keeps_the_highest(db):

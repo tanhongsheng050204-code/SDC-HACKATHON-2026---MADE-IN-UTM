@@ -37,7 +37,8 @@
         "card_id": "card-care_worker-1",
         "answer": "dislike"
       }
-    ]
+    ],
+    "audience": "worker"
   },
   "student": {
     "display_name": "Wei Jie (demo)",
@@ -72,6 +73,44 @@
       },
       {
         "card_id": "card-data_analyst-3",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "dislike"
+      }
+    ],
+    "audience": "graduate"
+  },
+  "switcher": {
+    "display_name": "Farid (demo)",
+    "story": "29, customer service representative at a telco call centre in Cyberjaya. He wants to move into designing apps, building on what he knows about frustrated customers.",
+    "audience": "switcher",
+    "current_role_id": "customer_service_rep",
+    "experience_years": 6,
+    "skills": [
+      "customer_service",
+      "communication",
+      "empathy",
+      "problem_solving",
+      "genai_tools",
+      "content_writing"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-ux_designer-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-2",
         "answer": "dislike"
       },
       {

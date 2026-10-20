@@ -94,7 +94,7 @@ def test_users_no_longer_choose_sdgs():
 def test_score_breakdown_adds_up_and_range_covers_every_scenario():
     for role in matching.match(get_reference(), CLERK, "accelerated")["roles"]:
         why = role["why"]
-        assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] - role["score"]) < 1e-3
+        assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] + why["entry_points"] - role["score"]) < 1e-3
         indexes = [o["index"] for o in role["outlook"].values()]
         assert role["estimate_range"]["low"] == min(indexes)
         assert role["estimate_range"]["high"] == max(indexes)

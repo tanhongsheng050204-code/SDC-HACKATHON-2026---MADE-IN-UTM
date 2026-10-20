@@ -3,7 +3,7 @@
 import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.reference import get_reference
 
@@ -131,6 +131,14 @@ class ProfileIn(BaseModel):
     current_role_id: str | None = None
     skills: list[str] = Field(min_length=1, max_length=60)
     experience_years: int | None = Field(default=None, ge=0, le=60)
+    # The person's situation, not a demographic: it changes what Laluan shows first.
+    audience: Literal["worker", "graduate", "switcher"] | None = None
+
+    @model_validator(mode="after")
+    def working_needs_a_role(self):
+        if self.audience in ("worker", "switcher") and not self.current_role_id:
+            raise ValueError("Choose your current role, so we can show what carries over")
+        return self
 
     @field_validator("display_name")
     @classmethod

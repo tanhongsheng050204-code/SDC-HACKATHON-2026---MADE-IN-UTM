@@ -15,7 +15,7 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -88,6 +88,7 @@ _MIGRATIONS = {
         reason TEXT
     );
     """,
+    9: "ALTER TABLE profiles ADD COLUMN audience TEXT;",
 }
 
 
@@ -155,32 +156,33 @@ def _row(row) -> dict | None:
         "user_id": row["user_id"],
         "is_demo": bool(row["is_demo"]),
         "preferences": json.loads(row["preferences"]),
+        "audience": row["audience"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
 
 
 def create_profile(display_name, current_role_id, skills, experience_years=None,
-                   is_demo: bool = False) -> dict:
+                   is_demo: bool = False, audience: str | None = None) -> dict:
     profile_id, now = str(uuid.uuid4()), _now()
     with _connect() as conn:
         conn.execute(
             "INSERT INTO profiles (id, display_name, current_role_id, skills, interests, "
-            "experience_years, is_demo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "experience_years, is_demo, audience, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (profile_id, display_name, current_role_id, json.dumps(skills),
-             "[]", experience_years, int(is_demo), now, now),
+             "[]", experience_years, int(is_demo), audience, now, now),
         )
     return get_profile(profile_id)
 
 
 def update_profile(profile_id, display_name, current_role_id, skills,
-                   experience_years=None) -> dict | None:
+                   experience_years=None, audience: str | None = None) -> dict | None:
     with _connect() as conn:
         cursor = conn.execute(
             "UPDATE profiles SET display_name=?, current_role_id=?, skills=?, "
-            "experience_years=?, updated_at=? WHERE id=?",
+            "experience_years=?, audience=?, updated_at=? WHERE id=?",
             (display_name, current_role_id, json.dumps(skills),
-             experience_years, _now(), profile_id),
+             experience_years, audience, _now(), profile_id),
         )
         if cursor.rowcount == 0:
             return None

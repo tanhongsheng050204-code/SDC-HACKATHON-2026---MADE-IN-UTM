@@ -42,7 +42,7 @@ def test_preference_adds_a_visible_small_boost():
     assert {"dim": "people", "label": "working with people"} in care["why"]["matched_preferences"]
     for role in people:
         why = role["why"]
-        assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] - role["score"]) < 1e-3
+        assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] + why["entry_points"] - role["score"]) < 1e-3
     assert all(r["why"]["preference_points"] == 0 for r in plain)
 
 

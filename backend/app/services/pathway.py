@@ -14,7 +14,7 @@ from app.services.matching import effective_skills, fit_and_gap
 LEVEL_ORDER = {"intro": 0, "intermediate": 1, "advanced": 2}
 
 
-def _choose_courses(ref: Reference, missing: list[dict]) -> list[tuple[dict, list[str]]]:
+def _choose_courses(ref: Reference, missing: list[dict], prefer_claimable: bool = False) -> list[tuple[dict, list[str]]]:
     remaining = [rs["skill_id"] for rs in missing]
     chosen: list[tuple[dict, list[str]]] = []
     for skill_id in list(remaining):
@@ -25,7 +25,9 @@ def _choose_courses(ref: Reference, missing: list[dict]) -> list[tuple[dict, lis
             continue
         best = min(
             candidates,
-            key=lambda c: (-len(set(c["skills"]) & set(remaining)), LEVEL_ORDER[c["level"]], c["hours"]),
+            key=lambda c: (-len(set(c["skills"]) & set(remaining)),
+                           0 if prefer_claimable and c.get("hrd_corp") == "claimable" else 1,
+                           LEVEL_ORDER[c["level"]], c["hours"]),
         )
         taught = [s for s in remaining if s in best["skills"]]
         chosen.append((best, taught))
@@ -60,7 +62,7 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True) -
     done = set(profile.get("completed_courses") or [])
     steps = []
     for n, (course, taught) in enumerate(
-        sorted(_choose_courses(ref, missing), key=lambda ct: LEVEL_ORDER[ct[0]["level"]]), start=1
+        sorted(_choose_courses(ref, missing, prefer_claimable=(profile.get("audience") or "worker") == "worker"), key=lambda ct: LEVEL_ORDER[ct[0]["level"]]), start=1
     ):
         weight = max(rs["weight"] for rs in missing if rs["skill_id"] in taught)
         steps.append({

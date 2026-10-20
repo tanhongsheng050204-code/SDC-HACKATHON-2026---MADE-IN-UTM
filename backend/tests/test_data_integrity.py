@@ -129,3 +129,9 @@ def test_every_role_has_survey_cards():
     ref = get_reference()
     covered = {r for card in ref.survey_cards.values() for r in card["role_ids"]}
     assert covered == set(ref.roles)
+
+
+def test_every_role_has_entry_level():
+    ref = get_reference()
+    assert all(isinstance(role.get("entry_level"), bool) for role in ref.roles.values())
+    assert any(role["entry_level"] for role in ref.roles.values())
