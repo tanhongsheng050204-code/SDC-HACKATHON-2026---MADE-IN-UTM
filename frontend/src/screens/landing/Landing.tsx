@@ -8,9 +8,9 @@ import { Journey } from "./Journey";
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
 
 const PEOPLE = [
-  { key: "clerk", who: "A clerk whose job is changing", text: "Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices. She sees which of her skills carry over and a plan for the role she can reach first.", cta: "Open Aisyah's demo", chips: ["Data entry ▼", "Excel ▲", "AI operations"] },
-  { key: "student", who: "A student choosing a direction", text: "Wei Jie is a final-year business student who cares about climate change. He compares roles under three futures, keeps the ones that hold up in all of them, and picks free courses first.", cta: "Open the student demo", chips: ["Robust pick", "Free courses", "SDG 12, 13"] },
-  { key: "hr", who: "An HR team planning ahead", text: "Upload an anonymous list of roles and skills. See which roles AI puts at risk and the cheapest moves for each group, never a ranking of people.", cta: "Open the workforce view", chips: ["160 people", "Heatmap", "Learning hours"] },
+  { key: "clerk", photo: "worker", alt: "A woman in a hijab working at her laptop", who: "A clerk whose job is changing", text: "Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices. She sees which of her skills carry over and a plan for the role she can reach first.", cta: "Open Aisyah's demo", chips: ["Data entry ▼", "Excel ▲", "AI operations"] },
+  { key: "student", photo: "student", alt: "Two students working together at a laptop", who: "A student choosing a direction", text: "Wei Jie is a final-year business student who cares about climate change. He compares roles under three futures, keeps the ones that hold up in all of them, and picks free courses first.", cta: "Open the student demo", chips: ["Robust pick", "Free courses", "SDG 12, 13"] },
+  { key: "hr", photo: "hr-team", alt: "Colleagues reviewing work on a laptop in an office", who: "An HR team planning ahead", text: "Upload an anonymous list of roles and skills. See which roles AI puts at risk and the cheapest moves for each group, never a ranking of people.", cta: "Open the workforce view", chips: ["160 people", "Heatmap", "Learning hours"] },
 ];
 
 const PRINCIPLES = [
@@ -64,8 +64,9 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           <div className="lp-people">
             {PEOPLE.map((p) => (
               <article key={p.key} className="lp-person">
-                <div className={`lp-person-art ${p.key}`} aria-hidden="true">
-                  {p.chips.map((c) => <span key={c}>{c}</span>)}
+                <div className={`lp-person-art ${p.key}`}>
+                  <img src={`/images/people/${p.photo}.webp`} alt={p.alt} width={880} height={748} loading="lazy" decoding="async" />
+                  <div className="lp-person-tags" aria-hidden="true">{p.chips.map((c) => <span key={c}>{c}</span>)}</div>
                 </div>
                 <h3>{p.who}</h3>
                 <p>{p.text}</p>
@@ -73,6 +74,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
               </article>
             ))}
           </div>
+          <p className="lp-credit">Illustrative photos from Unsplash by Gema Saputera, Mimi Thian and Vitaly Gariev. The people shown are not the demo personas.</p>
         </section>
 
         <section className="lp-frame lp-split">
