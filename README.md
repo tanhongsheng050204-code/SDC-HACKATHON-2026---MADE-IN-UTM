@@ -2,7 +2,7 @@
 
 **A career GPS for the AI era.** Laluan (Malay for “path”) shows workers and students how AI could change their work, which of their skills carry over, and a reskilling plan toward roles with a better outlook. You make the call; Laluan shows the evidence.
 
-Built for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon. It combines explainable role matching, three AI-adoption scenarios, dated trend signals, cited reskilling pathways and links to the UN Sustainable Development Goals (SDGs), plus an aggregate view for HR teams.
+Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon. It combines explainable role matching, three AI-adoption scenarios, dated trend signals, cited reskilling pathways and links to the UN Sustainable Development Goals (SDGs), plus an aggregate view for HR teams.
 
 ## Try it
 
@@ -206,6 +206,16 @@ Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, opt
 6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones and what's done
 
 How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md)
+
+## Team
+
+**Made in UTM**
+
+| Member | Role |
+| --- | --- |
+| ______ | ______ |
+| ______ | ______ |
+| ______ | ______ |
 
 ## Credits and licence
 

@@ -142,7 +142,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
         <div className="site-footer-inner">
           <div className="footer-about">
             <span className="brand"><LogoMark size={22} /><span>Laluan</span></span>
-            <p className="footer-blurb">{t("landing.tag")}. A prototype for the XMUM hackathon (Domain 1, Future-Ready Workforce), shown with synthetic people.</p>
+            <p className="footer-blurb">{t("landing.tag")}. Built by team Made in UTM for the XMUM hackathon (Domain 1, Future-Ready Workforce), shown with synthetic people.</p>
           </div>
           <div>
             <h3>Product</h3>
