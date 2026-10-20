@@ -4,9 +4,9 @@ import type { Scenario } from "./api";
 
 export type Screen =
   | "landing" | "home" | "intake" | "review" | "radar" | "tasks"
-  | "roles" | "role" | "impact" | "sources" | "workforce";
+  | "roles" | "role" | "impact" | "sources" | "workforce" | "review-kit";
 
-const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "sources", "workforce"];
+const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "sources", "workforce", "review-kit"];
 const SCENARIO_IDS: Scenario[] = ["slow", "baseline", "accelerated"];
 
 export interface Route { screen: Screen; scenario: Scenario; year?: number; role?: string }

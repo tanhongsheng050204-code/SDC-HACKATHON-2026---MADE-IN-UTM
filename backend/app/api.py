@@ -86,6 +86,14 @@ def list_sdgs():
     return list(get_reference().sdgs.values())
 
 
+@router.get("/eval/cvs")
+def evaluation_cvs():
+    """The five synthetic CVs for the human evaluation (all invented; see data/eval/README.md).
+    Only the text: the app's own extraction is not sent, so the person marking is not led by it."""
+    folder = get_settings().data_dir / "eval"
+    return [{"name": p.name, "text": p.read_text(encoding="utf-8")} for p in sorted(folder.glob("cv*.txt"))]
+
+
 @router.get("/signals")
 def list_snapshots():
     """Every snapshot, newest first, without the per-role rows."""

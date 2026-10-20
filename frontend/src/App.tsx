@@ -18,6 +18,7 @@ import { Home } from "./screens/Home";
 import { Landing } from "./screens/landing/Landing";
 import { Radar } from "./screens/Radar";
 import { Review } from "./screens/Review";
+import { ReviewKit } from "./screens/ReviewKit";
 import { RoleDetail } from "./screens/RoleDetail";
 import { Roles } from "./screens/Roles";
 import { Sources } from "./screens/Sources";
@@ -192,13 +193,13 @@ function MainApp({ demo }: { demo: string | null }) {
     );
     return (
       <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
-        onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} onSources={() => go("sources")} />
+        onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
     );
   }
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"),
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
@@ -237,7 +238,8 @@ function MainApp({ demo }: { demo: string | null }) {
                 onImpact={() => go("impact")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
-            {screen === "sources" && <Sources />}
+            {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
+            {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce />}
           </ScreenBoundary>
         </main>
