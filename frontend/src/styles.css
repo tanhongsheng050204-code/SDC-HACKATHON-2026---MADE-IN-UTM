@@ -11,7 +11,7 @@
   --ink: #10241F;
   --ink-2: #3E4A46;
   --ink-soft: #5A6B66;
-  --ink-faint: #7E8C88;
+  --ink-faint: #5E6D69;
   --line: #E6EAE8;
   --line-strong: #DDE2E0;
   --accent: #086759; --accent-strong: #075C51; --accent-soft: rgba(8, 103, 89, .08);
@@ -29,7 +29,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --canvas: #0C1714; --page: #0C1714; --surface: #12201C; --surface-2: #182924; --hover: #1D2D28;
-    --ink: #EAF2EF; --ink-2: #C9D6D1; --ink-soft: #A7B8B2; --ink-faint: #7E918B;
+    --ink: #EAF2EF; --ink-2: #C9D6D1; --ink-soft: #A7B8B2; --ink-faint: #8FA19B;
     --line: #22332D; --line-strong: #2A3C36;
     --accent: #2BB59F; --accent-strong: #5FD3BF; --accent-soft: rgba(43, 181, 159, .14);
     --good-bg: rgba(61, 214, 140, .14); --good: #6FE0AB;
@@ -42,7 +42,7 @@
 }
 :root[data-theme="dark"] {
   --canvas: #0C1714; --page: #0C1714; --surface: #12201C; --surface-2: #182924; --hover: #1D2D28;
-  --ink: #EAF2EF; --ink-2: #C9D6D1; --ink-soft: #A7B8B2; --ink-faint: #7E918B;
+  --ink: #EAF2EF; --ink-2: #C9D6D1; --ink-soft: #A7B8B2; --ink-faint: #8FA19B;
   --line: #22332D; --line-strong: #2A3C36;
   --accent: #2BB59F; --accent-strong: #5FD3BF; --accent-soft: rgba(43, 181, 159, .14);
   --good-bg: rgba(61, 214, 140, .14); --good: #6FE0AB;
@@ -380,3 +380,38 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; font
 :root[data-lite="1"] { --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; }
 :root[data-lite="1"] .lv-preview, :root[data-lite="1"] .hero-rosette { display: none; }
 :root[data-lite="1"] *, :root[data-lite="1"] *::before, :root[data-lite="1"] *::after { transition: none !important; animation: none !important; }
+
+/* ---------- Landing: persona links and how it works ---------- */
+.persona-links { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
+.how-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.how-steps li { display: grid; gap: 6px; padding: 20px 0 0; border-top: 2px solid var(--ink); }
+.how-steps span { color: var(--ink-soft); }
+.privacy-line { margin-top: 28px; max-width: 60ch; }
+@media (max-width: 860px) { .how-steps { grid-template-columns: 1fr; } }
+
+/* ---------- Shell helpers ---------- */
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 70; padding: 8px 14px; border-radius: 8px; background: var(--ink); color: var(--page); font-weight: 600; }
+.skip-link:focus { top: 12px; }
+main:focus { outline: none; }
+.back-link { justify-self: start; text-decoration: none; }
+
+/* ---------- Empty, loading and tip states ---------- */
+.empty-state { display: grid; gap: 12px; justify-items: start; padding: 20px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); background: var(--surface); }
+.tip { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; max-width: 520px; padding: 10px 14px; border-radius: 10px; background: var(--accent-soft); font-size: .88rem; }
+.skeleton { min-height: 220px; background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.grid.is-updating { opacity: .55; transition: opacity .15s ease; }
+.progress { height: 4px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
+.progress span { display: block; width: 40%; height: 100%; background: var(--accent); animation: slide 1.1s ease-in-out infinite; }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.counter { font-size: .78rem; }
+.typing::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+/* ---------- Impact and sources ---------- */
+.skill-sdgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+@media (min-width: 900px) { .skill-sdgs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.skill-sdg { display: flex; gap: 10px; align-items: flex-start; font-size: .9rem; color: var(--ink-2); }
+.sources-table tbody th { white-space: normal; }
+.sources-table td:nth-child(2) { white-space: normal; min-width: 220px; }
+.plain-list { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }

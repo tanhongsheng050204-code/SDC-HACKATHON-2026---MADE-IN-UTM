@@ -25,6 +25,12 @@ export interface SignalSource {
   snapshot_id: string; source: string; source_url: string; published: string;
   imported: string; horizon_year: number; illustrative: boolean;
 }
+export interface Snapshot extends SignalSource { signal_count: number; reviewed_by?: string | null; inputs?: { source: string; url: string; retrieved: string }[] }
+export interface RoleInfo {
+  id: string; title: string; summary: string;
+  skills: { skill_id: string; weight: number }[];
+  sdgs: Sdg[]; skill_sdgs: Record<string, Sdg[]>;
+}
 export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
   year: number; year_range: [number, number];
@@ -95,6 +101,8 @@ export const api = {
   skills: () => request<Skill[]>("/skills"),
   sdgs: () => request<Sdg[]>("/sdgs"),
   roles: () => request<RoleOption[]>("/roles"),
+  role: (id: string) => request<RoleInfo>(`/roles/${encodeURIComponent(id)}`),
+  snapshots: () => request<Snapshot[]>("/signals"),
   extract: (text: string) =>
     request<{ skills: string[]; unmatched: string[]; mode: string }>("/intake/extract", {
       method: "POST", body: JSON.stringify({ text }),
