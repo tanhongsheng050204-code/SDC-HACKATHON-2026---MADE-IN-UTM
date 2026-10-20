@@ -13,7 +13,7 @@ from app.reference import get_reference, reload_reference
 from app.schemas import (CardRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
+from app.services import cards, coach, documents, explore, intake, matching, pathway, skills, tasks, workforce
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -285,6 +285,25 @@ def delete_profile(profile_id: str):
 @router.get("/profiles/{profile_id}/matches")
 def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None):
     return matching.match(get_reference(), _profile_or_404(profile_id), scenario, year)
+
+
+@router.get("/profiles/{profile_id}/explore")
+def profile_explore(profile_id: str,
+                    adoption: float = Query(1.0, ge=explore.MIN_ADOPTION, le=explore.MAX_ADOPTION),
+                    add: str = Query("", max_length=500), year: int | None = None):
+    """Your own AI-adoption speed, skills you might learn, and the tipping points between futures."""
+    return explore.explore(get_reference(), _profile_or_404(profile_id), adoption,
+                           [s for s in add.split(",") if s], year)
+
+
+@router.get("/profiles/{profile_id}/roles/{role_id}/insight")
+def role_insight(profile_id: str, role_id: str, scenario: Scenario = "baseline", year: int | None = None):
+    """How the role's forecast is built (x-ray), and what speaks for and against it for this person."""
+    ref = get_reference()
+    profile = _profile_or_404(profile_id)
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return {"xray": explore.xray(ref, role_id, scenario, year), **explore.case(ref, profile, role_id, scenario)}
 
 
 @router.post("/profiles/{profile_id}/complete")
