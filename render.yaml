@@ -1,0 +1,18 @@
+# Render blueprint for the API. New > Blueprint on render.com, pick this repository.
+# The frontend is hosted on Vercel and calls this service through VITE_API_URL.
+services:
+  - type: web
+    name: laluan-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://laluan-psi.vercel.app,http://localhost:5173
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
