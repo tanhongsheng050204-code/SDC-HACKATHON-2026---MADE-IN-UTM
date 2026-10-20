@@ -51,7 +51,27 @@ def test_intake_turn(client):
 def test_snapshot_import_requires_admin(client):
     assert client.post("/api/signals/import", json={}).status_code == 401
     listed = client.get("/api/signals").json()
-    assert listed[0]["illustrative"] is True and listed[0]["signal_count"] >= 10
+    # The live forecast is the cited WEF snapshot; the illustrative seed is kept for history.
+    assert listed[0]["illustrative"] is False and listed[0]["signal_count"] == 13
+    assert "Future of Jobs Report 2025" in listed[0]["source"]
+    assert any(s["illustrative"] for s in listed[1:])
+
+
+def test_wef_snapshot_matches_the_extracted_figure():
+    """Every growth figure in the snapshot is the value read from WEF Figure 2.3, and says so."""
+    import csv
+    import json
+    import re
+    from pathlib import Path
+
+    data = Path(__file__).resolve().parents[1] / "data"
+    wef = {r["occupation"]: float(r["net_growth_pct"])
+           for r in csv.DictReader((data / "raw" / "wef_foj2025_figure_2_3.csv").open(encoding="utf-8"))}
+    snapshot = json.loads((data / "signals" / "2026-10-20-wef-foj-2025.json").read_text(encoding="utf-8"))
+    for s in snapshot["signals"]:
+        occupation, quoted = re.search(r"\(p\. 21\): (.+?) ([+-][\d.]+)% net growth", s["note"]).groups()
+        assert wef[occupation] == s["net_growth_pct"] == float(quoted), s["role_id"]
+        assert "team's estimates" in s["note"]
 
 
 def test_fairness_demographic_fields_are_rejected(client):
@@ -143,3 +163,10 @@ def test_cors_allows_listed_origins_and_the_pattern(tmp_path, monkeypatch):
         monkeypatch.delenv("CORS_ORIGIN_REGEX")
         get_settings.cache_clear()
         importlib.reload(app.main)
+
+
+def test_evaluation_cvs_are_the_synthetic_files_only(client):
+    cvs = client.get("/api/eval/cvs").json()
+    assert [c["name"] for c in cvs] == [f"cv{i}_{n}.txt" for i, n in
+                                        enumerate(["clerk", "student", "service", "technician", "manager"], 1)]
+    assert all(len(c["text"]) > 200 and set(c) == {"name", "text"} for c in cvs)

@@ -8,6 +8,7 @@ export const KEYS = {
   sliderTip: "laluan.sliderTipSeen",
   tasksDone: "laluan.tasksDone",
   adminToken: "laluan.adminToken",
+  reviewer: "laluan.reviewer",
 } as const;
 
 type Area = "local" | "session";

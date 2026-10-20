@@ -3,9 +3,9 @@
 import { LogoMark } from "../../components/Brand";
 
 const ROLES = [
-  { title: "AI operations specialist", fit: 50, outlook: "▲ Emerging", tone: "good" },
-  { title: "Sustainability and ESG analyst", fit: 29, outlook: "▲ Growing", tone: "good" },
+  { title: "AI operations specialist", fit: 50, outlook: "▲ Growing", tone: "good" },
   { title: "Data analyst", fit: 24, outlook: "▲ Growing", tone: "good" },
+  { title: "UX / UI designer", fit: 25, outlook: "▲ Growing", tone: "good" },
   { title: "Data entry clerk", fit: 88, outlook: "▼ Declining", tone: "risk" },
 ];
 
@@ -29,11 +29,11 @@ export function HeroPreview() {
           <div className="lp-kpis">
             <div><small>Top match</small><b>AI operations</b><em className="good">50% fit</em></div>
             <div><small>Robust picks</small><b>3</b><em>every scenario</em></div>
-            <div><small>Current role</small><b>−30%</b><em className="risk">▼ Declining</em></div>
+            <div><small>Current role</small><b>−25.9%</b><em className="risk">▼ Declining</em></div>
             <div><small>Plan</small><b>2 steps</b><em>about 12 h</em></div>
           </div>
           <div className="lp-card">
-            <p><b>Not without a plan.</b> Data entry is declining in every scenario to 2030, but four of your six skills
+            <p><b>Not without a plan.</b> The WEF expects data-entry jobs to shrink by about a quarter by 2030, but four of your six skills
               already count toward AI operations work. The gap is three skills.</p>
             <ol className="lp-roles">
               {ROLES.map((r) => (

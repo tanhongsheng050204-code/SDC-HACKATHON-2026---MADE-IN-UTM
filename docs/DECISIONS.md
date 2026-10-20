@@ -25,6 +25,11 @@
 | 19 | A skill needs ≥ 20 job-posting mentions before its trend counts | Use every count | 0 → 1 mentions produced ±100% swings |
 | 20 | Refreshes write new snapshots and never edit the baseline | Update in place | History shows how forecasts changed; refreshes never compound |
 | 21 | Year slider stops at the sources' horizon year (2030) | Slider to 2035 | Extending past the forecast would be inventing numbers |
-| 22 | Courses show free / free to audit / paid, and "check with the provider" for price and HRD Corp status | Show RM prices and HRD Corp flags now | We have no sourced prices or HRD Corp listings yet; the rules forbid invented figures |
+| 22 | Courses show an RM price and HRD Corp status only where the provider publishes them; otherwise "ask the provider" | Estimate the missing prices | The rules forbid invented figures. Updated 2026-10-20 with sourced prices for SEDA, GRI (via PwC Malaysia) and GHG Protocol |
 | 23 | Workforce view returns totals by role only and refuses files that identify people | Per-employee results | Human-centred rule: the tool must not drive hiring or firing |
 | 24 | Finished courses add their skills to the profile for matching | Separate badge list only | Readiness and rankings should move as the person learns |
+| 25 | Baseline growth from WEF FoJ 2025 **Figure 2.3**, read from the chart's vector markers | Only the roles named in Figure 2.2's text; or press articles' rounded numbers | Figure 2.3 covers every occupation but prints no numbers. Reading marker positions against the chart's own gridlines gives about ±0.5 points, and matched every press-quoted figure (−26, −20, −31, −34) |
+| 26 | Global WEF figures for a Malaysia-first app | Wait for a Malaysian source | No Malaysian source gives occupation-level growth to 2030. Global figures are labelled as such; the trend refresh adds job-posting signals over time |
+| 27 | AI operations specialist uses WEF's **Process Automation Specialists** (+35.0) | Digital Transformation Specialists (+35.4) | Closest in tasks (running and monitoring automated workflows); the two differ by 0.4 points. Noted on the role |
+| 28 | Automation exposure and AI complementarity stay team estimates | Derive them from the WEF report | The report gives no per-occupation exposure scores; every role's note says these two values are ours |
+| 29 | The review kit produces files; nothing is stored on the server | Collect answers in the database | Reviewers' work must end up in the repo as evidence, and the free host resets its database |

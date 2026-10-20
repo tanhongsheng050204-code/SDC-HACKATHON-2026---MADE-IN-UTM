@@ -55,6 +55,12 @@ class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 
 
+class ReviewDecision(BaseModel):
+    """An admin's decision on a new snapshot. The name is stored with the snapshot."""
+    reviewer: str = Field(min_length=2, max_length=60)
+    reason: str | None = Field(default=None, max_length=500)
+
+
 class WorkforceRequest(BaseModel):
     csv: str = Field(min_length=10, max_length=1_000_000)
     scenario: Scenario = "baseline"

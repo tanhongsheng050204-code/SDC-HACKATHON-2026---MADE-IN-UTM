@@ -21,6 +21,17 @@ export const COST: Record<string, { label: string; tone: string }> = {
   paid: { label: "Paid", tone: "gold" },
 };
 
+export const HRD: Record<string, { label: string; tone: string }> = {
+  claimable: { label: "HRD Corp claimable", tone: "good" },
+  check: { label: "HRD Corp: ask the provider", tone: "" },
+};
+
+export function priceText(price: number | null | undefined, cost: string) {
+  if (price === 0) return cost === "free_audit" ? "Free to audit" : "Free";
+  if (price == null) return "Paid · ask for the price";
+  return `Paid · RM ${price.toLocaleString("en-MY", { minimumFractionDigits: price % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
 export const TASK_LABEL: Record<TaskLabel, { text: string; tone: string; help: string }> = {
   automate: { text: "AI likely to automate", tone: "risk", help: "Software can already do most of this." },
   assist: { text: "AI assists you", tone: "gold", help: "AI speeds it up; you stay in charge." },

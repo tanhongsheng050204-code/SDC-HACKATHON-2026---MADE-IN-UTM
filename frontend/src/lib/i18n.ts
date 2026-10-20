@@ -129,6 +129,11 @@ const STRINGS = {
 
 export type StringKey = keyof typeof STRINGS;
 
+/** Every string in every language, for the translation check in the review kit. */
+export function allStrings(): { key: string; en: string; ms: string; zh: string }[] {
+  return Object.entries(STRINGS).map(([key, v]) => ({ key, ...(v as Record<Lang, string>) }));
+}
+
 function initial(): Lang {
   try {
     const saved = localStorage.getItem(KEY);

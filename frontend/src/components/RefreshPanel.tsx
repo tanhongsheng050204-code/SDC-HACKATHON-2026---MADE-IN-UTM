@@ -1,15 +1,30 @@
-import { useState } from "react";
-import { api, Matches, RefreshStatus, Scenario } from "../lib/api";
+import { useEffect, useState } from "react";
+import { api, Matches, PendingPreview, RefreshStatus, Scenario } from "../lib/api";
 import { signed } from "../lib/format";
 import { KEYS, load, save } from "../lib/storage";
 
+// New trend data never reaches users on its own: a refresh saves a snapshot for review, and an
+// admin approves it (with their name) or rejects it (with a reason) after seeing what would change.
 export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
   const [token, setToken] = useState(() => load(KEYS.adminToken, "session") ?? "");
+  const [reviewer, setReviewer] = useState(() => load(KEYS.reviewer) ?? "");
   const [status, setStatus] = useState<RefreshStatus | null>(null);
+  const [preview, setPreview] = useState<PendingPreview | null>(null);
+  const [reason, setReason] = useState("");
+  const [decided, setDecided] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadPending(t = token) {
+    if (!t) return;
+    try {
+      const waiting = await api.pending(t);
+      setPreview(waiting.length ? await api.pendingPreview(t, waiting[0].snapshot_id) : null);
+    } catch { /* wrong token or offline: the buttons below report it */ }
+  }
+  useEffect(() => { loadPending(); }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
   async function start(force: boolean) {
-    setError(null);
+    setError(null); setDecided(null);
     save(KEYS.adminToken, token, "session");
     try { setStatus(await api.refreshStart(token, force)); }
     catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't start the refresh."); return; }
@@ -20,24 +35,74 @@ export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
       catch { setError("Lost contact with the server during the refresh. The previous forecast is still in use."); return; }
       setStatus(s);
       if (s.state !== "running") {
-        if (s.state === "done") await onDone();
+        if (s.state === "done") await loadPending();
         return;
       }
     }
   }
 
+  async function decide(decision: "approve" | "reject") {
+    if (!preview) return;
+    setError(null);
+    save(KEYS.reviewer, reviewer.trim());
+    try {
+      await api.decide(token, preview.snapshot_id, decision, reviewer.trim(), reason.trim());
+      setDecided(decision === "approve"
+        ? `Approved by ${reviewer.trim()}. Everyone now sees ${preview.snapshot_id}.`
+        : `Rejected by ${reviewer.trim()}. Users keep ${preview.live_snapshot_id}; the snapshot is kept for the record.`);
+      setPreview(null); setReason(""); setStatus(null);
+      if (decision === "approve") await onDone();
+    } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
+  }
+
   const running = status?.state === "running";
+  const moved = preview?.roles.filter((r) => r.change !== null && Math.abs(r.change) >= 0.5) ?? [];
   return (
-    <details className="card admin">
-      <summary>Admin: refresh trend data</summary>
-      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy) and job-posting counts, then saves a new dated forecast. Older forecasts are kept.</p>
-      <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} /></label>
+    <details className="card admin" open={!!preview || undefined}>
+      <summary>Admin: refresh trend data{preview && <span className="badge gold">1 waiting for review</span>}</summary>
+      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy) and job-posting counts and builds a new dated forecast. <strong>Nothing changes for users until a person approves it.</strong> Older forecasts are kept.</p>
+      <div className="two-col">
+        <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
+        <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
+      </div>
       <div className="actions">
-        <button className="primary" disabled={running || !token} onClick={() => start(false)}>{running ? "Refreshing…" : "Refresh trend data"}</button>
-        <button disabled={running || !token} onClick={() => start(true)}>Collect again (slower)</button>
+        <button className="primary" disabled={running || !token || !!preview} onClick={() => start(false)}>{running ? "Refreshing…" : "Refresh trend data"}</button>
+        <button disabled={running || !token || !!preview} onClick={() => start(true)}>Collect again (slower)</button>
       </div>
       {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
       {status?.state === "failed" && <p className="error" role="alert">Refresh failed: {status.error}. The previous forecast is still in use.</p>}
+
+      {preview && (
+        <div className="review">
+          <p className="eyebrow">Waiting for review · {preview.snapshot_id}</p>
+          <h3>{moved.length === 0 ? "No role's outlook moves by more than half a point" : `${moved.length} roles would change (baseline scenario, to the horizon year)`}</h3>
+          {moved.length > 0 && (
+            <div className="table-wrap">
+              <table className="heatmap">
+                <thead><tr><th>Role</th><th>Now</th><th>Proposed</th><th>Change</th></tr></thead>
+                <tbody>
+                  {moved.map((r) => (
+                    <tr key={r.role_id}>
+                      <th scope="row">{r.title}</th>
+                      <td>{r.before !== null ? `${signed(r.before)}%` : "new"}</td>
+                      <td>{signed(r.after)}%{r.label_after !== r.label_before && <span className="badge">{r.label_after}</span>}</td>
+                      <td className={r.change! < 0 ? "hm-risk" : "hm-good"}>{signed(r.change!)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="muted">Skill trends: {preview.skills.rising} rising, {preview.skills.steady} steady, {preview.skills.declining} declining, {preview.skills.no_data} without data.
+            {preview.inputs.map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}</p>
+          <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. job-posting counts look too small this month" /></label>
+          <div className="actions">
+            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decide("approve")}>Approve and publish</button>
+            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decide("reject")}>Reject</button>
+          </div>
+        </div>
+      )}
+      {decided && <p className="badge good" role="status">{decided}</p>}
       {error && <p className="error" role="alert">{error}</p>}
     </details>
   );

@@ -1,5 +1,7 @@
 """Run a trend refresh: collect (or reuse today's raw counts), build, save a new snapshot.
 
+The snapshot is saved for review, not published: an admin approves it first (app/trends/review.py).
+
 Used by the admin "Refresh trend data" button (in a background thread, with progress the UI
 polls) and by scripts/refresh_trends.py. Raw counts are saved per day under data/raw/ so a
 refresh can be traced, and a second refresh on the same day reuses them unless forced.
@@ -12,8 +14,8 @@ import threading
 from pathlib import Path
 
 from app.config import get_settings
-from app.reference import get_reference, reload_reference
-from app.trends import builder, jobs, research
+from app.reference import get_reference
+from app.trends import builder, jobs, research, review
 
 _lock = threading.Lock()
 _status: dict = {"state": "idle", "steps": [], "snapshot_id": None, "error": None}
@@ -63,10 +65,8 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
         ref.job_terms, now.date(), progress=_log), force)
     _log("Building new snapshot")
     snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now)
-    out: Path = get_settings().data_dir / "signals" / f"{snapshot['snapshot_id']}.json"
-    out.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
-    reload_reference()
-    _log(f"Saved {out.name}")
+    out: Path = review.save_pending(snapshot)
+    _log(f"Saved {out.name} for review. Users keep the current forecast until an admin approves it.")
     return snapshot
 
 

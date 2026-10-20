@@ -1,0 +1,102 @@
+{
+  "snapshot_id": "2026-10-20-wef-foj-2025",
+  "source": "WEF Future of Jobs Report 2025, Figure 2.3 (net job growth 2025-2030, read from the chart by scripts/extract_wef_figure.py)",
+  "source_url": "https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf",
+  "published": "2025-01-07",
+  "imported": "2026-10-20",
+  "horizon_year": 2030,
+  "illustrative": false,
+  "signals": [
+    {
+      "role_id": "data_entry_clerk",
+      "net_growth_pct": -25.9,
+      "automation_exposure": 0.9,
+      "ai_complementarity": 0.1,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Data Entry Clerks -25.9% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "admin_assistant",
+      "net_growth_pct": -20.1,
+      "automation_exposure": 0.7,
+      "ai_complementarity": 0.3,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Administrative Assistants and Executive Secretaries -20.1% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "customer_service_rep",
+      "net_growth_pct": -2.8,
+      "automation_exposure": 0.6,
+      "ai_complementarity": 0.4,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Client Information and Customer Service Workers -2.8% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "data_analyst",
+      "net_growth_pct": 41.5,
+      "automation_exposure": 0.3,
+      "ai_complementarity": 0.7,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Data Analysts and Scientists +41.5% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "ai_ml_engineer",
+      "net_growth_pct": 82.0,
+      "automation_exposure": 0.1,
+      "ai_complementarity": 0.95,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): AI and Machine Learning Specialists +82% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "ai_operations_specialist",
+      "net_growth_pct": 35.0,
+      "automation_exposure": 0.2,
+      "ai_complementarity": 0.9,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Process Automation Specialists +35% net growth 2025-2030, global employer survey. No WEF category for AI operations; closest is Process Automation Specialists (Digital Transformation Specialists: +35.4). Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "software_developer",
+      "net_growth_pct": 57.3,
+      "automation_exposure": 0.35,
+      "ai_complementarity": 0.75,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Software and Applications Developers +57.3% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "cybersecurity_analyst",
+      "net_growth_pct": 39.0,
+      "automation_exposure": 0.15,
+      "ai_complementarity": 0.7,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Information Security Analysts +39% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "digital_marketing_specialist",
+      "net_growth_pct": 29.2,
+      "automation_exposure": 0.45,
+      "ai_complementarity": 0.55,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Digital Marketing and Strategy Specialists +29.2% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "ux_designer",
+      "net_growth_pct": 47.8,
+      "automation_exposure": 0.35,
+      "ai_complementarity": 0.5,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): UI and UX Designers +47.8% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "renewable_energy_technician",
+      "net_growth_pct": 33.6,
+      "automation_exposure": 0.1,
+      "ai_complementarity": 0.2,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Renewable Energy Technicians +33.6% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "sustainability_analyst",
+      "net_growth_pct": 33.7,
+      "automation_exposure": 0.25,
+      "ai_complementarity": 0.5,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Sustainability Specialists +33.7% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    },
+    {
+      "role_id": "care_worker",
+      "net_growth_pct": 18.8,
+      "automation_exposure": 0.05,
+      "ai_complementarity": 0.15,
+      "note": "WEF FoJ 2025, Figure 2.3 (p. 21): Personal Care Aides +18.8% net growth 2025-2030, global employer survey. Automation exposure and AI complementarity are the team's estimates, not WEF figures."
+    }
+  ]
+}

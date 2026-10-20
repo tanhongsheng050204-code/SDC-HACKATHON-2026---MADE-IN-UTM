@@ -170,7 +170,7 @@ button.card:hover:not(:disabled) { background: var(--surface); border-color: var
 
 /* ---------- Forms ---------- */
 label { display: grid; gap: 6px; font-weight: 500; font-size: .9rem; }
-textarea, select, input[type="number"], input[type="password"], input[type="text"] { width: 100%; font: 400 .95rem/1.5 var(--font); padding: 10px 12px; min-height: 42px; border: 1px solid var(--line-strong); border-radius: var(--radius-btn); background: var(--surface); color: var(--ink); }
+textarea, select, input[type="number"], input[type="password"], input[type="text"], input[type="search"] { width: 100%; font: 400 .95rem/1.5 var(--font); padding: 10px 12px; min-height: 42px; border: 1px solid var(--line-strong); border-radius: var(--radius-btn); background: var(--surface); color: var(--ink); }
 textarea { min-height: 200px; resize: vertical; }
 fieldset { border: 1px solid var(--line); border-radius: var(--radius-card); padding: 16px 18px; margin: 0; background: var(--surface); }
 legend { font-weight: 600; padding: 0 6px; }
@@ -395,3 +395,21 @@ main:focus { outline: none; }
 .home-next { display: grid; gap: 10px; }
 .next-card { gap: 6px; padding: 14px 16px; }
 .next-tag { font-size: .78rem; color: var(--ink-soft); }
+
+/* ---------- Admin review of new trend data ---------- */
+.admin summary { display: flex; gap: 10px; align-items: center; }
+.review { display: grid; gap: 12px; padding: 16px; border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line)); border-radius: 12px; background: var(--gold-bg); }
+.review .heatmap { background: var(--surface); border-radius: 8px; }
+.review .badge { margin-left: 6px; }
+.step-badges { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- Review kit ---------- */
+.kit-output pre { margin: 0; max-height: 260px; overflow: auto; padding: 12px; border-radius: 8px; background: var(--surface-2); font-size: .8rem; white-space: pre-wrap; }
+.kit-table td { white-space: normal; vertical-align: top; min-width: 140px; }
+.kit-verdict { display: flex; gap: 6px; }
+.kit-cv { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.kit-cv-text { margin: 0; white-space: pre-wrap; font: 400 .88rem/1.6 var(--font); max-height: 70vh; overflow: auto; }
+.kit-skills { max-height: 70vh; overflow: auto; }
+.kit-persona ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; }
+.kit-question { border: none; padding: 0; background: none; }
+@media (max-width: 900px) { .kit-cv { grid-template-columns: 1fr; } }
