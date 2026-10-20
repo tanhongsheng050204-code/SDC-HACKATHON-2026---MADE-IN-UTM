@@ -271,7 +271,7 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.tree"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
@@ -315,7 +315,8 @@ function MainApp({ demo }: { demo: string | null }) {
               <Survey profile={profile} userId={userId} onDone={(p) => { setProfile(p); go("roles"); }} onSkip={() => go("home")} />
             )}
             {screen === "tree" && profile && role && (
-              <SkillTree profile={profile} roleId={role.role_id} userId={userId} onProfile={setProfile} onBack={() => go("role")} />
+              <SkillTree profile={profile} role={role} userId={userId} onProfile={setProfile}
+                onImpact={() => go("impact")} onBack={() => go("role")} />
             )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
             {screen === "review-kit" && <ReviewKit />}

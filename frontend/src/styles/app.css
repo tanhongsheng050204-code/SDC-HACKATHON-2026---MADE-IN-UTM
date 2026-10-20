@@ -481,3 +481,11 @@ main:focus { outline: none; }
 /* Pay jump */
 .pay-card { margin: 12px 0; gap: 6px; }
 .pay { font-size: .82rem; }
+
+/* Pathway = tree + courses */
+.tree-step { font-size: .7rem; font-weight: 700; color: var(--accent-strong); text-transform: uppercase; letter-spacing: .04em; }
+.tree-course { font-size: .72rem; color: var(--ink-soft); line-height: 1.2; }
+.tree-node.course-done .ring-track { stroke: var(--good); stroke-dasharray: none; }
+.tree-node.has-step:not(.course-done) .ring-track { stroke-dasharray: 3 3; }
+.path-head { display: grid; gap: 6px; margin-top: 12px; }
+.node-panel .actions { margin-top: 10px; }

@@ -48,3 +48,18 @@ def test_basic_level_counts_toward_fit(client):
 def test_tree_unknown_role_is_404(client):
     pid = client.post("/api/profiles", json={"skills": ["excel"]}).json()["id"]
     assert client.get(f"/api/profiles/{pid}/tree", params={"role": "astronaut"}).status_code == 404
+
+
+def test_nodes_carry_their_pathway_step_and_course_progress(client):
+    pid = client.post("/api/profiles", json={"skills": ["excel", "communication"]}).json()["id"]
+    plan = client.get(f"/api/profiles/{pid}/pathway", params={"role": "data_analyst"}).json()
+    tree = client.get(f"/api/profiles/{pid}/tree", params={"role": "data_analyst"}).json()
+    for step in plan["steps"]:
+        for skill in step["skills"]:
+            node = _node(tree, skill["skill_id"])
+            assert node["step"] == step["step"] and node["course"]["id"] == step["course"]["id"]
+    assert _node(tree, "excel")["step"] is None  # already have it: no step
+    first = plan["steps"][0]
+    client.post(f"/api/profiles/{pid}/complete", json={"course_id": first["course"]["id"], "done": True})
+    tree = client.get(f"/api/profiles/{pid}/tree", params={"role": "data_analyst"}).json()
+    assert all(_node(tree, s["skill_id"])["course_done"] for s in first["skills"])

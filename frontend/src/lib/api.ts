@@ -103,9 +103,14 @@ export interface Course {
 }
 export interface TreeNode {
   skill_id: string; name: string; level: number; from_cv: boolean; unlocked: boolean;
-  prereqs: string[]; depth: number; in_role: boolean; course: { id: string; title: string; url: string } | null;
+  prereqs: string[]; depth: number; in_role: boolean;
+  course: { id: string; title: string; url: string; hours: number; cost: string } | null;
+  step: number | null; course_done: boolean;
 }
-export interface SkillTree { role: { role_id: string; title: string }; nodes: TreeNode[] }
+export interface SkillTree {
+  role: { role_id: string; title: string }; nodes: TreeNode[];
+  readiness: number; hours_left: number; total_steps: number;
+}
 export interface CheckStart {
   check_id: string; skill_id: string; level: number; level_name: string;
   questions: { prompt: string; options: string[] }[];

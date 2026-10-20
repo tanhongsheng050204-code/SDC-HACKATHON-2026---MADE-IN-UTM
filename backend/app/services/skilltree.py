@@ -8,6 +8,7 @@ through proof checks (app/services/proofcheck.py).
 
 
 from app.reference import Reference
+from app.services import pathway
 from app.services.matching import effective_skills
 
 
@@ -31,7 +32,7 @@ def _depth(ref: Reference, skill_id: str, memo: dict[str, int]) -> int:
 
 def course_for(ref: Reference, skill_id: str) -> dict | None:
     course = next((c for c in ref.courses if skill_id in c["skills"]), None)
-    return {"id": course["id"], "title": course["title"], "url": course["url"]} if course else None
+    return {k: course[k] for k in ("id", "title", "url", "hours", "cost")} if course else None
 
 
 def is_unlocked(ref: Reference, profile: dict, skill_id: str) -> bool:
@@ -44,6 +45,10 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
     have = effective_skills(ref, profile)
     levels = profile.get("skill_levels") or {}
     cv = set(profile.get("skills") or [])
+    done = set(profile.get("completed_courses") or [])
+    # The pathway's ordered courses, pinned to the nodes they teach: one screen for both.
+    plan = pathway.build(ref, profile, role_id, summarize=False)
+    steps = {k["skill_id"]: (s["step"], s["course"]) for s in plan["steps"] for k in s["skills"]}
     memo: dict[str, int] = {}
     nodes = []
     for skill_id in _closure(ref, [rs["skill_id"] for rs in role["skills"]]):
@@ -57,7 +62,11 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
             "prereqs": prereqs,
             "depth": _depth(ref, skill_id, memo),
             "in_role": any(rs["skill_id"] == skill_id for rs in role["skills"]),
-            "course": course_for(ref, skill_id),
+            "course": ({k: steps[skill_id][1][k] for k in ("id", "title", "url", "hours", "cost")}
+                       if skill_id in steps else course_for(ref, skill_id)),
+            "step": steps[skill_id][0] if skill_id in steps else None,
+            "course_done": skill_id in steps and steps[skill_id][1]["id"] in done,
         })
     nodes.sort(key=lambda n: (n["depth"], n["name"]))
-    return {"role": {"role_id": role_id, "title": role["title"]}, "nodes": nodes}
+    return {"role": {"role_id": role_id, "title": role["title"]}, "nodes": nodes,
+            "readiness": plan["readiness"], "hours_left": plan.get("hours_left", 0), "total_steps": len(plan["steps"])}

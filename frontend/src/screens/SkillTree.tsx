@@ -1,31 +1,50 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
+import { PathwayList } from "../components/PathwayList";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
-import { api, Profile, SkillTree as Tree, TreeNode } from "../lib/api";
+import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
+import { percent } from "../lib/format";
 import { t } from "../lib/i18n";
 
 const LEVELS = ["", "Basic", "Working", "Advanced"];
 
-// The classic tree: skills you have at the bottom, the target role on top. Each ring fills as a
-// level is proven by a proof check.
-export function SkillTree({ profile, roleId, userId, onProfile, onBack }: {
-  profile: Profile; roleId: string; userId: string | null;
-  onProfile: (p: Profile) => void; onBack: () => void;
+// My pathway: the skill tree is the map (skills you have at the bottom, the role on top), each
+// node carries the course that teaches it, and the ring fills as levels are proven. The List tab
+// is the same plan as ordered courses, for hours, cost and printing.
+export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }: {
+  profile: Profile; role: RoleMatch; userId: string | null;
+  onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void;
 }) {
+  const [tab, setTab] = useState<"tree" | "list">("tree");
   const [tree, setTree] = useState<Tree | null>(null);
+  const [plan, setPlan] = useState<Pathway | null>(null);
   const [open, setOpen] = useState<TreeNode | null>(null);
+  const [proving, setProving] = useState<TreeNode | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   function load() {
-    api.tree(profile.id, roleId).then(setTree).catch(() => setError(t("tree.loadFailed")));
+    api.tree(profile.id, role.role_id).then(setTree).catch(() => setError(t("tree.loadFailed")));
   }
-  useEffect(load, [profile.id, roleId]);
+  useEffect(load, [profile.id, role.role_id, profile.completed_courses.length]);
+  useEffect(() => {
+    if (tab === "list" && !plan) api.pathway(profile.id, role.role_id).then(setPlan).catch(() => setError(t("tree.loadFailed")));
+  }, [tab, plan, profile.id, role.role_id]);
 
-  async function finished(passed: boolean) {
+  async function refreshProfile() {
+    try { onProfile(await api.getProfile(profile.id)); } catch { /* the tree already shows the change */ }
+  }
+  async function setCourse(courseId: string, done: boolean) {
+    try {
+      onProfile(await api.complete(profile.id, courseId, done));
+      setPlan(null);
+      if (tab === "list") setPlan(await api.pathway(profile.id, role.role_id));
+    } catch { setError(t("tree.loadFailed")); }
+  }
+  async function proven(passed: boolean) {
     if (!passed) return;
     load();
-    try { onProfile(await api.getProfile(profile.id)); } catch { /* the tree already shows the new level */ }
+    refreshProfile();
   }
 
   if (error) return <p className="error" role="alert">{error}</p>;
@@ -35,31 +54,79 @@ export function SkillTree({ profile, roleId, userId, onProfile, onBack }: {
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {tree.role.title}</button>
-      <div className="page-head"><h1>{t("tree.title")}</h1><p className="muted">{t("tree.sub")}</p></div>
+      <div className="page-head"><h1>{t("path.title")}: {tree.role.title}</h1><p className="muted">{t("path.sub")}</p></div>
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
-      <div className="tree">
-        <div className="tree-target">🎯 {tree.role.title}</div>
-        {depths.map((d) => (
-          <div key={d} className="tree-row">
-            {tree.nodes.filter((n) => n.depth === d).map((n) => {
-              const state = !n.unlocked ? t("tree.locked") : n.level ? LEVELS[n.level] : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
-              return (
-                <button key={n.skill_id} className={n.unlocked ? "tree-node" : "tree-node locked"}
-                  disabled={!n.unlocked || n.level >= 3} onClick={() => setOpen(n)}
-                  aria-label={`${n.name}: ${state}, ${n.level} / 3`}>
-                  <SkillRing level={n.level} />
-                  <span className="tree-name">{n.name}</span>
-                  <small>{state}</small>
-                </button>
-              );
-            })}
-          </div>
-        ))}
-        <p className="muted tree-foot">{t("tree.grows")}</p>
+
+      <div className="card path-head">
+        <div className="card-row"><strong>{t("path.readiness")}</strong><strong className="readiness-num">{percent(tree.readiness)}%</strong></div>
+        <div className="fit" role="img" aria-label={`${t("path.readiness")} ${percent(tree.readiness)}%`}><div style={{ width: `${tree.readiness * 100}%` }} /></div>
+        <span className="muted">{tree.total_steps} {t("path.step").toLowerCase()}s · {tree.hours_left} {t("path.hoursLeft")}</span>
       </div>
-      {open && (
-        <ProofCheck profileId={profile.id} node={open} isDemo={!!profile.is_demo}
-          onDone={finished} onClose={() => setOpen(null)} />
+
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={tab === "tree"} onClick={() => setTab("tree")}>{t("path.tabTree")}</button>
+        <button role="tab" aria-selected={tab === "list"} onClick={() => setTab("list")}>{t("path.tabList")}</button>
+      </div>
+
+      {tab === "tree" && (
+        <div className="tree">
+          <div className="tree-target">🎯 {tree.role.title}</div>
+          {depths.map((d) => (
+            <div key={d} className="tree-row">
+              {tree.nodes.filter((n) => n.depth === d).map((n) => {
+                const state = !n.unlocked ? t("tree.locked") : n.level ? LEVELS[n.level] : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
+                const cls = ["tree-node", n.unlocked ? "" : "locked", n.step ? "has-step" : "", n.course_done ? "course-done" : ""].join(" ").trim();
+                return (
+                  <button key={n.skill_id} className={cls} onClick={() => setOpen(n)}
+                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${n.name}: ${state}, ${n.level} / 3`}>
+                    {n.step && <span className="tree-step">{t("path.step")} {n.step}</span>}
+                    <SkillRing level={n.level} />
+                    <span className="tree-name">{n.name}</span>
+                    <small>{state}</small>
+                    {n.step && n.course && <span className="tree-course">{n.course_done ? "✓ " : ""}{n.course.title} · {n.course.hours} h</span>}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+          <p className="muted tree-foot">{t("tree.grows")}</p>
+        </div>
+      )}
+
+      {tab === "list" && (plan
+        ? <>
+            <PathwayList plan={plan} role={role} onToggle={setCourse} />
+            <div className="actions">
+              <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
+              <button onClick={() => window.print()}>{t("a.print")}</button>
+            </div>
+          </>
+        : <p className="muted">{t("a.loading")}</p>)}
+
+      {open && !proving && (
+        <div className="dialog-backdrop" onClick={() => setOpen(null)}>
+          <div className="dialog node-panel" role="dialog" aria-modal="true" aria-labelledby="node-title" onClick={(e) => e.stopPropagation()}>
+            <h2 id="node-title">{open.step ? `${t("path.step")} ${open.step}: ` : ""}{open.name}</h2>
+            <div className="card-row"><SkillRing level={open.level} /><span className="muted">{open.level ? LEVELS[open.level] : t("tree.notStarted")}</span></div>
+            {open.course
+              ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{open.course.title} ↗</a> · {open.course.hours} h</p>
+              : <p className="muted">{t("path.noCourse")}</p>}
+            {open.step && open.course && (
+              <label className="check"><input type="checkbox" checked={open.course_done}
+                onChange={(e) => { setCourse(open.course!.id, e.target.checked); setOpen({ ...open, course_done: e.target.checked }); }} /> {t("path.courseDone")}</label>
+            )}
+            {!open.unlocked && <p className="muted">{t("path.lockedNote")}</p>}
+            {open.level >= 3 && <p className="muted">{t("path.topLevel")}</p>}
+            <div className="dialog-actions">
+              <button className="btn ink" disabled={!open.unlocked || open.level >= 3} onClick={() => setProving(open)}>{t("path.prove")}</button>
+              <button className="btn quiet" onClick={() => setOpen(null)}>{t("tree.close")}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {proving && (
+        <ProofCheck profileId={profile.id} node={proving} isDemo={!!profile.is_demo}
+          onDone={proven} onClose={() => { setProving(null); setOpen(null); }} />
       )}
     </section>
   );
