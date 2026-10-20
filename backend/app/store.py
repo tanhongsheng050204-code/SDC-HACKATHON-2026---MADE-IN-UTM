@@ -101,21 +101,29 @@ class _PgConnection:
     def execute(self, sql: str, params=()):
         return self._conn.execute(sql.replace("?", "%s"), params)
 
-    def commit(self):
-        self._conn.commit()
 
-    def close(self):
-        self._conn.close()
+_pools: dict = {}
+
+
+def _pool(url: str):
+    """One small pool per process: opening a TLS connection to Supabase for every query would add
+    seconds to a survey submit. prepare_threshold=None keeps it safe on the transaction pooler."""
+    if url not in _pools:
+        from psycopg.rows import dict_row
+        from psycopg_pool import ConnectionPool
+
+        _pools[url] = ConnectionPool(url, min_size=1, max_size=5, open=True,
+                                     kwargs={"row_factory": dict_row, "prepare_threshold": None})
+    return _pools[url]
 
 
 @contextmanager
 def _connect():
     settings = get_settings()
     if settings.database_url:
-        import psycopg
-        from psycopg.rows import dict_row
-
-        conn = _PgConnection(psycopg.connect(settings.database_url, row_factory=dict_row))
+        with _pool(settings.database_url).connection() as raw:  # commits on success, rolls back on error
+            yield _PgConnection(raw)
+        return
     else:
         conn = sqlite3.connect(settings.database_path)
         conn.row_factory = sqlite3.Row
@@ -292,8 +300,10 @@ def list_snapshots(state: str) -> list[dict]:
     try:
         with _connect() as conn:
             rows = conn.execute("SELECT body FROM snapshots WHERE state=?", (state,)).fetchall()
-    except Exception as error:  # sqlite3.OperationalError / psycopg UndefinedTable
-        if "snapshots" in str(error):
+    except Exception as error:
+        missing_table = (isinstance(error, sqlite3.OperationalError) and "no such table" in str(error)) or \
+            type(error).__name__ == "UndefinedTable"
+        if missing_table:
             return []
         raise
     return [json.loads(r["body"]) for r in rows]

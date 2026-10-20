@@ -45,5 +45,8 @@ def current_user(authorization: str = Header(default="")) -> str | None:
         raise HTTPException(401, "Please log in again")
     try:
         return user_from_token(token)
-    except (jwt.InvalidTokenError, jwt.PyJWKClientError):
+    except jwt.PyJWKClientError:
+        # The key server is unreachable: not the person's fault, so don't sign them out.
+        raise HTTPException(503, "Login check is unavailable right now. Try again shortly.") from None
+    except jwt.InvalidTokenError:
         raise HTTPException(401, "Please log in again") from None

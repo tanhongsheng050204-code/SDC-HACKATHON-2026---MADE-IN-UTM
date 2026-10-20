@@ -90,3 +90,23 @@ def test_purge_keeps_owned_profiles(client):
         conn.execute("UPDATE profiles SET updated_at='2000-01-01T00:00:00+00:00'")
     assert store.purge_older_than(30) == 1
     assert store.get_profile(owned) is not None and store.get_profile(loose) is None
+
+
+def test_unreachable_key_server_is_503_not_401(client, monkeypatch):
+    """A Supabase key-server outage must not look like an expired login (which signs people out)."""
+    from app import auth
+    from app.config import get_settings
+
+    monkeypatch.setenv("SUPABASE_JWT_SECRET", "")
+    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
+    get_settings.cache_clear()
+
+    class Down:
+        def get_signing_key_from_jwt(self, _token):
+            raise jwt.PyJWKClientError("Fail to fetch data from the url")
+
+    monkeypatch.setattr(auth, "_jwks", lambda url: Down())
+    try:
+        assert client.get("/api/me", headers=token("user-a")).status_code == 503
+    finally:
+        get_settings.cache_clear()

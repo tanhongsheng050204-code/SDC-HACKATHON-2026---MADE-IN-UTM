@@ -9,7 +9,8 @@ localPort = 8000
 externalPort = 80
 
 [deployment]
-# Autoscale may sleep when idle; switch to Reserved VM in the Deployments tab for no cold start.
-deploymentTarget = "autoscale"
+# Reserved VM: one always-on instance. The app keeps reference data and the trend-refresh job in
+# process memory, so it must not be split across Autoscale instances (DECISIONS.md).
+deploymentTarget = "gce"
 build = ["sh", "-c", "cd frontend && npm ci && npm run build && cd ../backend && pip install -r requirements.txt"]
 run = ["sh", "-c", "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
