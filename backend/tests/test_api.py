@@ -175,3 +175,31 @@ def test_evaluation_cvs_are_the_synthetic_files_only(client):
     assert [c["name"] for c in cvs] == [f"cv{i}_{n}.txt" for i, n in
                                         enumerate(["clerk", "student", "service", "technician", "manager"], 1)]
     assert all(len(c["text"]) > 200 and set(c) == {"name", "text"} for c in cvs)
+
+
+def test_built_app_is_served_beside_the_api(tmp_path, monkeypatch):
+    dist = tmp_path / "dist"
+    (dist / "assets").mkdir(parents=True)
+    (dist / "index.html").write_text("<!doctype html><title>Laluan</title>", encoding="utf-8")
+    (dist / "assets" / "app.js").write_text("console.log('laluan')", encoding="utf-8")
+    monkeypatch.setenv("FRONTEND_DIST", str(dist))
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "t.db"))
+    import importlib
+
+    from fastapi.testclient import TestClient
+
+    from app import main
+    from app.config import get_settings
+    from app.reference import get_reference
+
+    get_settings.cache_clear()
+    get_reference.cache_clear()
+    with TestClient(importlib.reload(main).app) as c:
+        assert "<title>Laluan</title>" in c.get("/").text
+        assert "<title>Laluan</title>" in c.get("/anything", params={"view": "roles"}).text
+        assert c.get("/assets/app.js").text == "console.log('laluan')"
+        assert c.get("/api/health").json()["status"] == "ok"
+        assert c.get("/api/no-such-route").status_code == 404
+    get_settings.cache_clear()
+    monkeypatch.delenv("FRONTEND_DIST")
+    importlib.reload(main)

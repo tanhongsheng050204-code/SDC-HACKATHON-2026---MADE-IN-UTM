@@ -34,6 +34,7 @@ class Settings:
     contact_email: str
     supabase_url: str
     supabase_jwt_secret: str  # legacy HS256 secret; empty = verify with the project's public keys
+    frontend_dist: Path | None  # built React app served at /, so one process hosts everything
 
     @property
     def llm_mode(self) -> str:
@@ -45,6 +46,12 @@ class Settings:
         if self.gemini_api_key:
             return f"Google {self.gemini_model}"
         return "No language model (offline rules and templates)"
+
+
+def _frontend_dist() -> Path | None:
+    configured = os.environ.get("FRONTEND_DIST")
+    path = Path(configured) if configured else BACKEND_DIR.parent / "frontend" / "dist"
+    return path if (path / "index.html").exists() else None
 
 
 @lru_cache
@@ -62,6 +69,7 @@ def get_settings() -> Settings:
         contact_email=os.environ.get("CONTACT_EMAIL", ""),
         supabase_url=os.environ.get("SUPABASE_URL", ""),
         supabase_jwt_secret=os.environ.get("SUPABASE_JWT_SECRET", ""),
+        frontend_dist=_frontend_dist(),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")

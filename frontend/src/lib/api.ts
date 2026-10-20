@@ -97,7 +97,7 @@ export interface Pathway {
   uncovered_skills: string[];
 }
 
-// The hosted API sleeps when idle (free plan) and takes up to a minute to wake. While it does,
+// The hosted API can sleep when idle (free plans, Replit Autoscale) and take up to a minute to wake. While it does,
 // requests fail to connect or get 502/503/504, so we retry for a while and let the shell show
 // a "waking up" notice instead of an error.
 const WAKE_STATUSES = new Set([502, 503, 504]);

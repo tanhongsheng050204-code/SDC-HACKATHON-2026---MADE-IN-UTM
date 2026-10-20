@@ -95,12 +95,14 @@ On Windows, Docker can't read files managed by OneDrive (“Files On-Demand”).
 
 ## Deployment
 
-| Part | Where | How |
-| --- | --- | --- |
-| Frontend | [Vercel](https://laluan-psi.vercel.app) | Vite build of `frontend/`. `VITE_API_URL` is set to the API address in the Vercel project. |
-| API | [Render](https://laluan-api.onrender.com/api/health), free plan, Singapore | Docker image from `backend/Dockerfile`, described in [`render.yaml`](render.yaml) (a Render Blueprint). |
+One **Replit Deployment** runs everything: FastAPI serves the API under `/api` and the built React app at `/` (see [`.replit`](.replit)). Data lives in **Supabase**: Postgres for profiles, progress and trend snapshots, and Supabase Auth for Google login, so nothing is lost when the deployment restarts.
 
-The Render service was created from the public repository URL, so it does not redeploy on every push: use **Manual sync** on the blueprint (or **Manual Deploy** on the service) after backend changes. Profiles and refreshed snapshots are reset whenever the container is replaced.
+1. Import the repository into Replit and add the secrets listed in `.replit` (Secrets tab). `VITE_SUPABASE_*` must be set before the build, because Vite bakes them into the app.
+2. In Supabase: enable the **Google** provider (Authentication → Providers) with a Google Cloud OAuth client (scopes `openid`, `email`, `profile`; authorised redirect = the Supabase callback URL), and add the Replit address and `http://localhost:5173` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in.
+3. `DATABASE_URL` is the Supabase *Session pooler* connection string. Tables are created on first start.
+4. Deploy (Autoscale, or Reserved VM to avoid a cold start during a demo).
+
+The older Vercel + Render setup above stays live until the Replit address replaces it.
 
 ## Configuration
 
@@ -116,7 +118,12 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `CORS_ORIGINS` | Comma-separated frontend addresses, default `http://localhost:5173`. |
 | `CORS_ORIGIN_REGEX` | Optional pattern for hosts that serve one site under many addresses, e.g. Vercel's per-deploy URLs. |
 | `CONTACT_EMAIL` | Optional contact address sent with OpenAlex requests. |
+| `DATABASE_URL` | Postgres connection string (Supabase). Empty means the local SQLite file below. |
 | `DATABASE_PATH` | SQLite file, default `backend/laluan.db`. |
+| `SUPABASE_URL` | Supabase project URL; login tokens are verified against its public keys. |
+| `SUPABASE_JWT_SECRET` | Only for Supabase projects still on the legacy shared JWT secret. |
+| `FRONTEND_DIST` | Built frontend to serve at `/`, default `frontend/dist` when it exists. |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Build-time, for the frontend's Google login. Without them the login button is hidden. |
 | `DATA_DIR` | Reference data, default `backend/data`. |
 
 For a separately hosted frontend, set `VITE_API_URL` (see [frontend/.env.example](frontend/.env.example)) to the backend address without `/api`, and add the frontend address to `CORS_ORIGINS`.
@@ -192,10 +199,10 @@ frontend/
 docs/                   requirements, design, plan, decisions, review log, AI declaration
   submission/           SDC preliminary proposal and technical tools declaration
 docker-compose.yml      run everything locally
-render.yaml             API deployment on Render
+.replit                 Replit deployment (API + built app in one process)
 ```
 
-Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, optional **Google Gemini**; deployed on **Vercel** and **Render** (Docker).
+Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite** locally / **Supabase Postgres + Auth** in production, optional **Google Gemini**; deployed on **Replit**.
 
 ## Project documents
 

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, scaffold]
+    branches: [main, scaffold, v2-design]
   pull_request:
 
 permissions:
