@@ -301,3 +301,38 @@ def decide_snapshot(snapshot_id: str, state: str, decided_by: str, body: dict, r
     with _connect() as conn:
         conn.execute("UPDATE snapshots SET state=?, decided_by=?, decided_at=?, reason=?, body=? WHERE id=?",
                      (state, decided_by, _now(), reason, json.dumps(body), snapshot_id))
+
+
+# --- proof checks -------------------------------------------------------------------------------
+
+def create_check(profile_id: str, skill_id: str, level: int, questions: list[dict]) -> str:
+    check_id = secrets.token_urlsafe(12)
+    with _connect() as conn:
+        conn.execute("INSERT INTO skill_checks (id, profile_id, skill_id, level, questions, created_at) "
+                     "VALUES (?, ?, ?, ?, ?, ?)", (check_id, profile_id, skill_id, level, json.dumps(questions), _now()))
+    return check_id
+
+
+def get_check(check_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM skill_checks WHERE id=?", (check_id,)).fetchone()
+    if row is None:
+        return None
+    return {"id": row["id"], "profile_id": row["profile_id"], "skill_id": row["skill_id"], "level": row["level"],
+            "questions": json.loads(row["questions"]), "submitted_at": row["submitted_at"]}
+
+
+def submit_check(check_id: str, correct: int, passed: bool) -> bool:
+    """Record the result once. False if this attempt was already graded."""
+    with _connect() as conn:
+        return conn.execute("UPDATE skill_checks SET submitted_at=?, correct=?, passed=? "
+                            "WHERE id=? AND submitted_at IS NULL",
+                            (_now(), correct, int(passed), check_id)).rowcount == 1
+
+
+def attempted_today(profile_id: str, skill_id: str, level: int) -> bool:
+    today = dt.datetime.now(dt.UTC).date().isoformat()
+    with _connect() as conn:
+        row = conn.execute("SELECT COUNT(*) AS n FROM skill_checks WHERE profile_id=? AND skill_id=? AND level=? "
+                           "AND created_at >= ?", (profile_id, skill_id, level, today)).fetchone()
+    return row["n"] > 0

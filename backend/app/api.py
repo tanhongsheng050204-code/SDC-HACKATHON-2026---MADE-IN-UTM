@@ -10,10 +10,11 @@ from app import store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, ClaimRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import cards, coach, documents, intake, matching, pathway, skills, skilltree, tasks, workforce
+from app.services import (cards, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, tasks,
+                          workforce)
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -374,6 +375,49 @@ def profile_tree(profile_id: str, role: str = Query(...), user: str | None = Use
     if role not in ref.roles:
         raise HTTPException(404, "Role not found")
     return skilltree.build(ref, _profile_for(profile_id, user), role)
+
+
+@router.post("/profiles/{profile_id}/skills/{skill_id}/checks", status_code=201)
+def start_check(profile_id: str, skill_id: str, body: CheckStart, user: str | None = User):
+    """Three fresh questions for the next level of one skill. The answers stay on the server."""
+    ref = get_reference()
+    profile = _profile_for(profile_id, user)
+    if skill_id not in ref.skills:
+        raise HTTPException(404, "Skill not found")
+    level = (profile["skill_levels"].get(skill_id) or 0) + 1
+    if level > len(ref.skill_levels):
+        raise HTTPException(409, "Already at Advanced")
+    if not skilltree.is_unlocked(ref, profile, skill_id):
+        raise HTTPException(409, "Unlock the skills below first")
+    if not profile["is_demo"] and store.attempted_today(profile_id, skill_id, level):
+        raise HTTPException(429, "You can try this level again tomorrow")
+    try:
+        questions = proofcheck.generate(ref, skill_id, level, body.language)
+    except proofcheck.Unavailable as error:  # nothing stored, so today's attempt is not used up
+        raise HTTPException(503, str(error)) from None
+    check_id = store.create_check(profile_id, skill_id, level, questions)
+    return {"check_id": check_id, "skill_id": skill_id, "level": level,
+            "level_name": ref.skill_levels[level - 1]["name"],
+            "questions": [{"prompt": q["prompt"], "options": q["options"]} for q in questions]}
+
+
+@router.post("/checks/{check_id}")
+def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
+    ref = get_reference()
+    profile = _profile_for(body.profile_id, user)
+    check = store.get_check(check_id)
+    if check is None or check["profile_id"] != profile["id"]:
+        raise HTTPException(404, "Check not found")
+    correct, passed = proofcheck.grade(check["questions"], body.answers)
+    if not store.submit_check(check_id, correct, passed):
+        raise HTTPException(409, "This check was already marked")
+    if passed:
+        store.set_skill_level(profile["id"], check["skill_id"], check["level"])
+    return {"passed": passed, "correct": correct, "level": check["level"],
+            "level_name": ref.skill_levels[check["level"] - 1]["name"],
+            "answers": [q["answer"] for q in check["questions"]],
+            "explanations": [q["explanation"] for q in check["questions"]],
+            "course": None if passed else skilltree.course_for(ref, check["skill_id"])}
 
 
 @router.get("/profiles/{profile_id}/pathway")

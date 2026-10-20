@@ -29,7 +29,7 @@ def _depth(ref: Reference, skill_id: str, memo: dict[str, int]) -> int:
     return memo[skill_id]
 
 
-def _course(ref: Reference, skill_id: str) -> dict | None:
+def course_for(ref: Reference, skill_id: str) -> dict | None:
     course = next((c for c in ref.courses if skill_id in c["skills"]), None)
     return {"id": course["id"], "title": course["title"], "url": course["url"]} if course else None
 
@@ -57,7 +57,7 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
             "prereqs": prereqs,
             "depth": _depth(ref, skill_id, memo),
             "in_role": any(rs["skill_id"] == skill_id for rs in role["skills"]),
-            "course": _course(ref, skill_id),
+            "course": course_for(ref, skill_id),
         })
     nodes.sort(key=lambda n: (n["depth"], n["name"]))
     return {"role": {"role_id": role_id, "title": role["title"]}, "nodes": nodes}

@@ -56,6 +56,15 @@ class ClaimRequest(BaseModel):
     replace: bool = False
 
 
+class CheckStart(BaseModel):
+    language: Literal["en", "ms", "zh"] = "en"
+
+
+class CheckAnswers(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    answers: list[int] = Field(min_length=3, max_length=3)
+
+
 class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 
