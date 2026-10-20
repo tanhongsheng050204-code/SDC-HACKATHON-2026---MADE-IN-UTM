@@ -190,6 +190,7 @@ frontend/
   public/               favicon and landing page photos
   Dockerfile, nginx.conf
 docs/                   requirements, design, plan, decisions, review log, AI declaration
+  submission/           SDC preliminary proposal and technical tools declaration
 docker-compose.yml      run everything locally
 render.yaml             API deployment on Render
 ```
@@ -204,6 +205,8 @@ Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, opt
 4. [UI/UX Brief](docs/04-UI_UX_BRIEF.md): look and feel
 5. [Backend Schema](docs/05-BACKEND_SCHEMA.md): data and rules
 6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones and what's done
+
+SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md)
 
 How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md)
 
