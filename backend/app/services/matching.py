@@ -19,7 +19,7 @@ Outlooks are estimates: each role also carries the range across all scenarios.
 import datetime as dt
 
 from app.reference import Reference
-from app.services.scenario import Outlook, outlooks, signals_from_snapshot, year_fraction
+from app.services.scenario import Outlook, outlook, outlooks, signals_from_snapshot, year_fraction
 
 FIT_WEIGHT, OUTLOOK_WEIGHT = 0.6, 0.4
 PREFERENCE_BOOST = 0.05  # at most; same size as the SDG boost it replaced
@@ -119,11 +119,17 @@ def _current_role_card(ref: Reference, role_id: str, skills: set[str], all_outlo
     }
 
 
-def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = None) -> dict:
+def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = None,
+          adoption: float | None = None) -> dict:
+    """`adoption` replaces the chosen scenario's AI adoption speed ("your own AI future"). The
+    other scenarios stay as published, and robust picks are always judged on the three presets."""
     snapshot = ref.latest_snapshot
     signals = signals_from_snapshot(snapshot)
     year, fraction = year_fraction(snapshot, year)
-    all_outlooks = outlooks(signals, ref.scenarios, fraction)
+    presets = outlooks(signals, ref.scenarios, fraction)
+    all_outlooks = dict(presets)
+    if adoption is not None:
+        all_outlooks[scenario_id] = {rid: outlook(sig, scenario_id, adoption, fraction) for rid, sig in signals.items()}
     skills = effective_skills(ref, profile)
     prefs = profile.get("preferences") or {}
     audience = profile.get("audience")
@@ -131,11 +137,15 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
     # A career switcher is leaving their current role: it gets its own card, never a top-5 slot.
     exclude = current_id if audience == "switcher" else None
     carry_from = {rs["skill_id"] for rs in ref.roles[current_id]["skills"]} if current_id in ref.roles else set()
-    ranks = {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role, prefs, audience, exclude))}
-             for sid, by_role in all_outlooks.items()}
+    def rank_all(by_scenario: dict) -> dict:
+        return {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role, prefs, audience, exclude))}
+                for sid, by_role in by_scenario.items()}
+
+    ranks = rank_all(all_outlooks)
+    preset_ranks = ranks if adoption is None else rank_all(presets)
     robust = {role_id for role_id in ref.roles if role_id != exclude
-              if all(ranks[sid].get(role_id, 999) <= ROBUST_TOP_N
-                     and all_outlooks[sid][role_id].label != "declining" for sid in ranks)}
+              if all(preset_ranks[sid].get(role_id, 999) <= ROBUST_TOP_N
+                     and presets[sid][role_id].label != "declining" for sid in preset_ranks)}
 
     roles = []
     for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id], prefs, audience, exclude):
@@ -177,7 +187,10 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             ref, current_id, skills, all_outlooks, scenario_id, snapshot, signals)
     first_year = max(int(str(snapshot["published"])[:4]), min(dt.date.today().year, snapshot["horizon_year"]))
     return {
-        "scenario": ref.scenarios[scenario_id],
+        "scenario": (ref.scenarios[scenario_id] if adoption is None else
+                     {**ref.scenarios[scenario_id], "adoption": adoption, "custom": True,
+                      "label": f"Your AI future: {adoption:g}× adoption",
+                      "description": "Your own AI adoption speed. 1× is the published forecast; the three presets are 0.5×, 1× and 1.6×."}),
         "year": year,
         "year_range": [first_year, snapshot["horizon_year"]],
         "signal_source": {

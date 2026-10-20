@@ -15,7 +15,7 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import scrub
 from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
-                          tasks, workforce, xray)
+                          tasks, tipping, workforce, xray)
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -328,8 +328,14 @@ def delete_profile(profile_id: str, user: str | None = User):
 
 @router.get("/profiles/{profile_id}/matches")
 def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None,
-                    user: str | None = User):
-    return matching.match(get_reference(), _profile_for(profile_id, user), scenario, year)
+                    adoption: float | None = Query(default=None, ge=0.5, le=2.0), user: str | None = User):
+    return matching.match(get_reference(), _profile_for(profile_id, user), scenario, year, adoption)
+
+
+@router.get("/profiles/{profile_id}/tipping")
+def profile_tipping(profile_id: str, year: int | None = None, user: str | None = User):
+    """Where, on the AI-adoption slider, this person's picture changes."""
+    return tipping.find(get_reference(), _profile_for(profile_id, user), year)
 
 
 @router.post("/profiles/{profile_id}/complete")

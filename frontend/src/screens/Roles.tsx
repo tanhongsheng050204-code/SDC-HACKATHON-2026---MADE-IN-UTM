@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AdoptionSlider, TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
 import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
@@ -11,9 +12,10 @@ import { KEYS, load, save } from "../lib/storage";
 // Below this fit no role is a realistic short move, so we say so instead of implying one is.
 const CLOSE_FIT = 0.35;
 
-export function Roles({ profile, scenario, year, onScenario, onYear, onOpen, onSurvey }: {
-  profile: Profile; scenario: Scenario; year?: number;
-  onScenario: (s: Scenario) => void; onYear: (y: number) => void; onOpen: (r: RoleMatch) => void; onSurvey: () => void;
+export function Roles({ profile, scenario, year, adoption, onScenario, onAdoption, onYear, onOpen, onSurvey }: {
+  profile: Profile; scenario: Scenario; year?: number; adoption?: number;
+  onScenario: (s: Scenario) => void; onAdoption: (a: number | undefined) => void;
+  onYear: (y: number) => void; onOpen: (r: RoleMatch) => void; onSurvey: () => void;
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,17 +26,17 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen, onS
   useEffect(() => {
     let live = true;
     setLoading(true);
-    api.matches(profile.id, scenario, year)
+    api.matches(profile.id, scenario, year, adoption)
       .then((d) => { if (live) { setData(d); setError(null); } })
       // Keep the last list on screen; it is still correct for the previous choice.
       .catch(() => live && setError("Couldn't update the list. Showing your last results."))
       .finally(() => live && setLoading(false));
     return () => { live = false; };
-  }, [profile.id, profile.completed_courses.length, scenario, year]);
+  }, [profile.id, profile.completed_courses.length, scenario, year, adoption]);
 
   async function afterRefresh() {
     const before = data;
-    const after = await api.matches(profile.id, scenario, year);
+    const after = await api.matches(profile.id, scenario, year, adoption);
     setData(after);
     if (before) setChanges(compareMatches(before, after, scenario));
   }
@@ -51,9 +53,11 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen, onS
       {data && <Kpis data={data} scenario={scenario} />}
       <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
-          <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
+          <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
       </div>
+      <AdoptionSlider value={adoption} onChange={onAdoption} />
+      {data && <TippingPoints profileId={profile.id} year={year} />}
       {data && (
         <div className="year-slider">
           <label htmlFor="year">{t("k.lookAhead")} <strong>{data.year}</strong> <span className="badge">{t("k.estimate")}</span></label>

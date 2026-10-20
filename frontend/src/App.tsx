@@ -84,6 +84,10 @@ function MainApp({ demo }: { demo: string | null }) {
     const r = { ...route, scenario: s };
     setRoute(r); writeRoute(r, "replace");
   }
+  function setAdoption(a: number | undefined) {
+    const r = { ...route, adoption: a };
+    setRoute(r); writeRoute(r, "replace");
+  }
   function setYear(y: number) {
     const r = { ...route, year: y };
     setRoute(r); writeRoute(r, "replace");
@@ -286,8 +290,9 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
             {screen === "roles" && profile && (
-              <Roles profile={profile} scenario={scenario} year={route.year}
-                onScenario={setScenario} onYear={setYear} onOpen={openRole} onSurvey={() => go("survey")} />
+              <Roles profile={profile} scenario={scenario} year={route.year} adoption={route.adoption}
+                onScenario={(s) => { setRoute({ ...route, scenario: s, adoption: undefined }); writeRoute({ ...route, scenario: s, adoption: undefined }, "replace"); }}
+                onAdoption={setAdoption} onYear={setYear} onOpen={openRole} onSurvey={() => go("survey")} />
             )}
             {screen === "role" && profile && role && (
               <RoleDetail profile={profile} role={role} scenario={scenario} onProfile={setProfile}

@@ -136,6 +136,12 @@ export interface Xray {
   steps: { label: string; value: number; running_total: number; source: string; cap: string | null }[];
 }
 
+export interface Tipping {
+  current_role: { role_id: string; title: string; declining_at: number | null; declining_below: boolean; label_now: string } | null;
+  overtakes: { role_id: string; title: string; overtakes_role_id: string; overtakes_title: string; at: number; direction: "above" | "below" }[];
+  range: [number, number]; step: number;
+}
+
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -243,8 +249,9 @@ export const api = {
   demoProfile: (key: string) => request<Profile>(`/profiles/demo/${key}`, { method: "POST" }),
   getProfile: (id: string) => request<Profile>(`/profiles/${id}`),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
-  matches: (id: string, scenario: Scenario, year?: number) =>
-    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}`),
+  matches: (id: string, scenario: Scenario, year?: number, adoption?: number) =>
+    request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}`),
+  tipping: (id: string, year?: number) => request<Tipping>(`/profiles/${id}/tipping${year ? `?year=${year}` : ""}`),
   complete: (id: string, courseId: string, done: boolean) =>
     request<Profile>(`/profiles/${id}/complete`, { method: "POST", body: JSON.stringify({ course_id: courseId, done }) }),
   turn: (messages: { role: "user" | "assistant"; content: string }[], language = "en") =>

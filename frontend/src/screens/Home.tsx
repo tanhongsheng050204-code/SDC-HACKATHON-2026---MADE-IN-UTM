@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
@@ -61,6 +62,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
           <button className="btn quiet sm" onClick={() => onGo("tasks")}>{t("nav.tasks")} →</button>
         </div>
       )}
+      {data && audience !== "graduate" && current && <TippingPoints profileId={profile.id} />}
       {data && audience === "graduate" && entryRoles.length > 0 && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.gradTitle")}</span>

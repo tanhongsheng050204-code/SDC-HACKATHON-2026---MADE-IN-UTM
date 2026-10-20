@@ -465,3 +465,9 @@ main:focus { outline: none; }
 .xray-table td { white-space: nowrap; text-align: right; }
 .xray-table small { display: block; color: var(--ink-soft); font-weight: 400; font-size: .76rem; }
 .xray-link { font-weight: 600; }
+
+/* Your own AI future */
+.adoption { display: grid; gap: 6px; margin: 12px 0; }
+.adoption label { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.card.tipping { margin: 10px 0; gap: 6px; }
+.card.tipping ul { margin: 0; padding-left: 1.2rem; }
