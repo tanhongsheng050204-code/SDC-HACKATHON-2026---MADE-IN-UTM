@@ -13,3 +13,6 @@ backend/data/signals/pending/
 
 # Brainstorming mockups and plan-execution scratch
 .superpowers/
+
+# Local Claude Code settings, skills and preview config
+.claude/
