@@ -209,7 +209,7 @@ Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, opt
 5. [Backend Schema](docs/05-BACKEND_SCHEMA.md): data and rules
 6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones and what's done
 
-SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md)
+SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md) · [Data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf)
 
 How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md)
 
