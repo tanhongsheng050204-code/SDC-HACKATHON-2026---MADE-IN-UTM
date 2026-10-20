@@ -94,6 +94,20 @@ export interface Course {
   price_rm?: number | null; price_note?: string; price_checked?: string;
   hrd_corp?: "claimable" | "check" | "not_needed"; hrd_note?: string;
 }
+export interface TreeNode {
+  skill_id: string; name: string; level: number; from_cv: boolean; unlocked: boolean;
+  prereqs: string[]; depth: number; in_role: boolean; course: { id: string; title: string; url: string } | null;
+}
+export interface SkillTree { role: { role_id: string; title: string }; nodes: TreeNode[] }
+export interface CheckStart {
+  check_id: string; skill_id: string; level: number; level_name: string;
+  questions: { prompt: string; options: string[] }[];
+}
+export interface CheckResult {
+  passed: boolean; correct: number; level: number; level_name: string; answers: number[];
+  explanations: string[]; course: { id: string; title: string; url: string } | null;
+}
+
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -142,7 +156,10 @@ async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
         await signOut();
         expiredListeners.forEach((l) => l());
       }
-      if (!WAKE_STATUSES.has(response.status) || Date.now() - started > WAKE_LIMIT_MS) {
+      // The API's own errors are JSON (e.g. 503 "proof checks are unavailable"); a sleeping host
+      // answers with an HTML page. Only the latter means "wait and retry".
+      const ownError = (response.headers.get("content-type") ?? "").includes("application/json");
+      if (!WAKE_STATUSES.has(response.status) || ownError || Date.now() - started > WAKE_LIMIT_MS) {
         if (attempt > 0) setWaking(false);
         return response;
       }
@@ -152,6 +169,14 @@ async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
     setWaking(true);
     await new Promise((r) => setTimeout(r, Math.min(2000 + attempt * 1000, 6000)));
   }
+}
+
+// Like request(), but an error carries the server's own message (e.g. "try again tomorrow").
+async function requestDetail<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetchAwake(`${BASE}/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : `Something went wrong (${response.status})`);
+  return body as T;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -238,5 +263,12 @@ export const api = {
   createCard: (id: string, roleId: string) =>
     request<{ card_id: string }>(`/profiles/${id}/cards`, { method: "POST", body: JSON.stringify({ role_id: roleId }) }),
   card: (cardId: string) => request<FutureCard>(`/cards/${encodeURIComponent(cardId)}`),
+  tree: (id: string, role: string) => request<SkillTree>(`/profiles/${id}/tree?role=${encodeURIComponent(role)}`),
+  startCheck: (id: string, skillId: string, language: string) =>
+    requestDetail<CheckStart>(`/profiles/${id}/skills/${encodeURIComponent(skillId)}/checks`, {
+      method: "POST", body: JSON.stringify({ language }) }),
+  submitCheck: (checkId: string, profileId: string, answers: number[]) =>
+    requestDetail<CheckResult>(`/checks/${encodeURIComponent(checkId)}`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId, answers }) }),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

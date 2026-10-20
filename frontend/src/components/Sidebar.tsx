@@ -25,6 +25,7 @@ export function Sidebar({ current, profile, hasRole, model, prefs, userId, onGo,
     { label: t("nav.future"), items: [
       { id: "roles", label: t("nav.roles"), icon: "briefcase", enabled: !!profile },
       { id: "role", label: t("nav.pathway"), icon: "route", enabled: hasRole },
+      { id: "tree", label: t("nav.tree"), icon: "route", enabled: hasRole },
       { id: "impact", label: t("nav.impact"), icon: "globe", enabled: hasRole },
     ] },
     { label: t("nav.org"), items: [{ id: "workforce", label: t("nav.workforce"), icon: "users", enabled: true }] },

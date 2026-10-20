@@ -5,9 +5,9 @@ import { jobLinks, onetUrl, percent } from "../lib/format";
 import { t } from "../lib/i18n";
 import { COST, HRD, OUTLOOK_TEXT, priceText, SCENARIOS } from "../lib/labels";
 
-export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBack }: {
+export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfile, onBack }: {
   profile: Profile; role: RoleMatch; scenario: Scenario;
-  onImpact: () => void; onProfile: (p: Profile) => void; onBack: () => void;
+  onImpact: () => void; onTree: () => void; onProfile: (p: Profile) => void; onBack: () => void;
 }) {
   const [plan, setPlan] = useState<Pathway | null>(null);
   const [busy, setBusy] = useState(false);
@@ -71,7 +71,10 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
         </div>
       )}
       {role.missing.length > 0 && !plan && (
-        <button className="primary" disabled={busy} onClick={build}>{busy ? t("a.building") : t("a.build")}</button>
+        <div className="actions">
+          <button className="primary" disabled={busy} onClick={build}>{busy ? t("a.building") : t("a.build")}</button>
+          <button onClick={onTree}>{t("tree.open")}</button>
+        </div>
       )}
       {error && <p className="error" role="alert">{error}</p>}
       {plan && <Plan plan={plan} role={role} onToggle={toggle} />}

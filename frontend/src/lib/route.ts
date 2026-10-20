@@ -4,9 +4,9 @@ import type { Scenario } from "./api";
 
 export type Screen =
   | "landing" | "home" | "intake" | "review" | "radar" | "tasks"
-  | "roles" | "role" | "impact" | "sources" | "workforce" | "review-kit";
+  | "roles" | "role" | "impact" | "tree" | "sources" | "workforce" | "review-kit";
 
-const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "sources", "workforce", "review-kit"];
+const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "tree", "sources", "workforce", "review-kit"];
 const SCENARIO_IDS: Scenario[] = ["slow", "baseline", "accelerated"];
 
 export interface Route { screen: Screen; scenario: Scenario; year?: number; role?: string }
@@ -29,7 +29,7 @@ export function routeUrl(r: Route): string {
   const p = new URLSearchParams({ view: r.screen });
   if (r.scenario !== "baseline") p.set("scenario", r.scenario);
   if (r.year) p.set("year", String(r.year));
-  if (r.role && (r.screen === "role" || r.screen === "impact")) p.set("role", r.role);
+  if (r.role && (r.screen === "role" || r.screen === "impact" || r.screen === "tree")) p.set("role", r.role);
   return `${window.location.pathname}?${p}`;
 }
 

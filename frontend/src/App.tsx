@@ -22,12 +22,13 @@ import { Radar } from "./screens/Radar";
 import { Review } from "./screens/Review";
 import { ReviewKit } from "./screens/ReviewKit";
 import { RoleDetail } from "./screens/RoleDetail";
+import { SkillTree } from "./screens/SkillTree";
 import { Roles } from "./screens/Roles";
 import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact"];
+const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -99,7 +100,7 @@ function MainApp({ demo }: { demo: string | null }) {
       const r = readRoute();
       if (NEEDS_PROFILE.includes(r.screen) && !profileRef.current) r.screen = "landing";
       if (r.screen === "review") r.screen = "intake";
-      if ((r.screen === "role" || r.screen === "impact") && roleRef.current?.role_id !== r.role) r.screen = "roles";
+      if ((r.screen === "role" || r.screen === "impact" || r.screen === "tree") && roleRef.current?.role_id !== r.role) r.screen = "roles";
       setRoute(r);
     };
     window.addEventListener("popstate", onPop);
@@ -184,12 +185,12 @@ function MainApp({ demo }: { demo: string | null }) {
     try {
       const p = await api.getProfile(storedId);
       setProfile(p);
-      if (wanted?.role && (wanted.screen === "role" || wanted.screen === "impact")) {
+      if (wanted?.role && (wanted.screen === "role" || wanted.screen === "impact" || wanted.screen === "tree")) {
         const m = await api.matches(p.id, wanted.scenario, wanted.year);
         const found = m.roles.find((r) => r.role_id === wanted.role);
         if (found) { setRole(found); setRoute(wanted); return; }
       }
-      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" ? wanted : { ...route, screen: "home" };
+      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" && wanted.screen !== "tree" ? wanted : { ...route, screen: "home" };
       setRoute(r); writeRoute(r, "replace");
     } catch {
       // A profile saved to an account only opens when logged in: keep its ID and ask to log in.
@@ -250,7 +251,7 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.tree"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
@@ -286,9 +287,12 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "role" && profile && role && (
               <RoleDetail profile={profile} role={role} scenario={scenario} onProfile={setProfile}
-                onImpact={() => go("impact")} onBack={() => go("roles")} />
+                onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
+            {screen === "tree" && profile && role && (
+              <SkillTree profile={profile} roleId={role.role_id} userId={userId} onProfile={setProfile} onBack={() => go("role")} />
+            )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
             {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce />}

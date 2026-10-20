@@ -421,3 +421,24 @@ main:focus { outline: none; }
   border-radius: var(--radius-card); box-shadow: var(--shadow-pop); padding: 22px; }
 .dialog h2 { margin: 0 0 8px; font-size: 1.15rem; }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* Skill tree: rows of ring nodes, roots at the bottom, target role on top */
+.tree { display: grid; gap: 14px; margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.tree-target { justify-self: center; padding: 8px 14px; border: 2px dashed var(--accent); border-radius: var(--radius-btn); font-weight: 600; }
+.tree-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.tree-node { display: grid; justify-items: center; gap: 4px; width: 112px; padding: 10px 6px; border: 1px solid var(--line); border-radius: var(--radius-btn);
+  background: var(--surface); color: var(--ink); font: inherit; text-align: center; box-shadow: none; }
+.tree-node:hover:not(:disabled) { background: var(--hover); }
+.tree-node.locked { opacity: .5; }
+.tree-node small { color: var(--ink-soft); font-size: .74rem; }
+.tree-name { font-size: .84rem; font-weight: 600; line-height: 1.2; }
+.tree-foot { text-align: center; font-size: .82rem; }
+.skill-ring .ring-track { fill: none; stroke: var(--line-strong); stroke-width: 5; }
+.skill-ring .ring-fill { fill: none; stroke: var(--gold-bright); stroke-width: 5; stroke-linecap: round; }
+.skill-ring .ring-fill.done { stroke: var(--good); }
+.skill-ring .ring-mark { stroke: var(--surface); stroke-width: 2; }
+.proof-options { display: grid; gap: 8px; }
+.proof-options .btn { justify-content: flex-start; text-align: left; white-space: normal; }
+.proof-result ol { padding-left: 1.2rem; display: grid; gap: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 420px) { .tree-node { width: calc(50% - 6px); } }
