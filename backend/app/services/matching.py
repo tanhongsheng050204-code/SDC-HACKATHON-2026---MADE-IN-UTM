@@ -22,6 +22,8 @@ from app.reference import Reference
 from app.services.scenario import Outlook, outlooks, signals_from_snapshot, year_fraction
 
 FIT_WEIGHT, OUTLOOK_WEIGHT = 0.6, 0.4
+PREFERENCE_BOOST = 0.05  # at most; same size as the SDG boost it replaced
+ALSO_LIKE_N, ALSO_LIKE_MATCH, ALSO_LIKE_MIN_FIT = 3, 0.5, 0.25
 ROBUST_TOP_N = 5
 
 
@@ -44,18 +46,40 @@ def fit_and_gap(role: dict, skills: set[str]) -> tuple[float, list[dict], list[d
     return round(fit, 4), covered, missing
 
 
-def _breakdown(ref: Reference, role_id: str, skills: set[str], outlook: Outlook) -> dict:
+def preference_match(prefs: dict[str, float], context: dict[str, float]) -> float:
+    """-1..1: how well a role's work context fits the person's stated preferences."""
+    weight = sum(abs(p) for p in prefs.values())
+    if not weight:
+        return 0.0
+    return round(sum(p * context.get(d, 0.0) for d, p in prefs.items()) / weight, 4)
+
+
+def _matched_preferences(ref: Reference, prefs: dict[str, float], context: dict[str, float]) -> list[dict]:
+    out = []
+    for d in ref.work_dimensions:
+        p = prefs.get(d["id"], 0.0)
+        if p * context.get(d["id"], 0.0) >= 0.5:
+            out.append({"dim": d["id"], "label": d["plus" if p > 0 else "minus"]["en"]})
+    return out
+
+
+def _breakdown(ref: Reference, role_id: str, skills: set[str], outlook: Outlook, prefs: dict[str, float]) -> dict:
     fit, _, _ = fit_and_gap(ref.roles[role_id], skills)
+    context = ref.roles[role_id].get("work_context", {})
+    match = preference_match(prefs, context)
     parts = {
         "fit_points": round(FIT_WEIGHT * fit, 4),
         "outlook_points": round(OUTLOOK_WEIGHT * outlook.normalised, 4),
-        "preference_points": 0.0,
+        "preference_points": round(PREFERENCE_BOOST * max(0.0, match), 4),
     }
-    return {"fit": fit, "score": round(sum(parts.values()), 4), "matched_preferences": [], **parts}
+    return {"fit": fit, "score": round(sum(parts.values()), 4), "preference_match": match,
+            "matched_preferences": _matched_preferences(ref, prefs, context) if parts["preference_points"] else [],
+            **parts}
 
 
-def _ranked(ref: Reference, skills: set[str], by_role: dict[str, Outlook]) -> list[tuple[str, dict]]:
-    rows = [(role_id, _breakdown(ref, role_id, skills, by_role[role_id]))
+def _ranked(ref: Reference, skills: set[str], by_role: dict[str, Outlook],
+            prefs: dict[str, float]) -> list[tuple[str, dict]]:
+    rows = [(role_id, _breakdown(ref, role_id, skills, by_role[role_id], prefs))
             for role_id in ref.roles if role_id in by_role]
     return sorted(rows, key=lambda r: (by_role[r[0]].label == "declining", -r[1]["score"], r[0]))
 
@@ -82,14 +106,15 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
     year, fraction = year_fraction(snapshot, year)
     all_outlooks = outlooks(signals, ref.scenarios, fraction)
     skills = effective_skills(ref, profile)
-    ranks = {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role))}
+    prefs = profile.get("preferences") or {}
+    ranks = {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role, prefs))}
              for sid, by_role in all_outlooks.items()}
     robust = {role_id for role_id in ref.roles
               if all(ranks[sid].get(role_id, 999) <= ROBUST_TOP_N
                      and all_outlooks[sid][role_id].label != "declining" for sid in ranks)}
 
     roles = []
-    for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id]):
+    for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id], prefs):
         role = ref.roles[role_id]
         _, covered, missing = fit_and_gap(role, skills)
         indexes = [o[role_id].index for o in all_outlooks.values()]
@@ -117,6 +142,9 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
                          "note": signals[role_id].note},
             "skills_source": _skills_source(ref, role_id),
         })
+    also_like = sorted((r for r in roles if r["rank"] > ROBUST_TOP_N and not r["at_risk"]
+                        and r["why"]["preference_match"] >= ALSO_LIKE_MATCH and r["fit"] >= ALSO_LIKE_MIN_FIT),
+                       key=lambda r: (-r["why"]["preference_match"], r["rank"]))[:ALSO_LIKE_N]
     first_year = max(int(str(snapshot["published"])[:4]), min(dt.date.today().year, snapshot["horizon_year"]))
     return {
         "scenario": ref.scenarios[scenario_id],
@@ -132,4 +160,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "illustrative": snapshot["illustrative"],
         },
         "roles": roles,
+        "also_like": [{"role_id": r["role_id"], "title": r["title"], "rank": r["rank"], "fit": r["fit"],
+                       "preference_match": r["why"]["preference_match"],
+                       "matched_preferences": r["why"]["matched_preferences"]} for r in also_like],
     }

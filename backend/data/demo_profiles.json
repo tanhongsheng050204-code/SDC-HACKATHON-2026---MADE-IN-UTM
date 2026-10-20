@@ -11,11 +11,37 @@
       "scheduling",
       "communication",
       "genai_tools"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_entry_clerk-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_analyst-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ai_operations_specialist-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-2",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-care_worker-1",
+        "answer": "dislike"
+      }
     ]
   },
   "student": {
     "display_name": "Wei Jie (demo)",
-    "story": "22, final-year business student in Penang who did a marketing internship.",
+    "story": "22, final-year business student in Penang who did a marketing internship. He enjoys working with people and in a team, and likes varied, creative work more than routine.",
     "current_role_id": null,
     "experience_years": 0,
     "skills": [
@@ -26,6 +52,32 @@
       "statistics",
       "genai_tools",
       "project_management"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-digital_marketing_specialist-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-digital_marketing_specialist-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_analyst-3",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "dislike"
+      }
     ]
   }
 }

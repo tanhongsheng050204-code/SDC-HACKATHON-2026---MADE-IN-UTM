@@ -10,11 +10,12 @@ from app import store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import (cards, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, tasks,
-                          workforce)
+from app.services.deid import scrub
+from app.services import (cards, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
+                          tasks, workforce)
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -284,6 +285,11 @@ def create_demo_profile(key: str):
     profile = store.create_profile(demo["display_name"], demo["current_role_id"],
                                    demo["skills"], demo.get("experience_years"),
                                    is_demo=True)
+    answers = demo.get("survey_answers") or []
+    if answers:  # demos arrive with the survey done, so the preference line shows for judges
+        store.save_survey(profile["id"], answers)
+        store.set_preferences(profile["id"], survey.preferences(get_reference(), answers))
+        profile = store.get_profile(profile["id"])
     return {**profile, "story": demo["story"]}
 
 
@@ -418,6 +424,33 @@ def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
             "answers": [q["answer"] for q in check["questions"]],
             "explanations": [q["explanation"] for q in check["questions"]],
             "course": None if passed else skilltree.course_for(ref, check["skill_id"])}
+
+
+@router.get("/profiles/{profile_id}/survey")
+def survey_cards(profile_id: str, user: str | None = User):
+    """8-10 cards about real tasks and settings from the roles this person matches."""
+    ref = get_reference()
+    cards_ = survey.pick_cards(ref, _profile_for(profile_id, user))
+    return {"cards": [{"id": c["id"], "text": c["text"], "role_ids": c["role_ids"]} for c in cards_],
+            "dimensions": ref.work_dimensions}
+
+
+@router.post("/survey/interpret")
+def survey_interpret(body: InterpretRequest):
+    """How we read a free-text answer. Nothing is saved; the person confirms before it counts."""
+    return survey.interpret(get_reference(), body.text, body.language)
+
+
+@router.post("/profiles/{profile_id}/survey")
+def survey_submit(profile_id: str, body: SurveyIn, user: str | None = User):
+    ref = get_reference()
+    profile = _profile_for(profile_id, user)
+    answers = [{**a.model_dump(exclude_none=True), **({"note": scrub(a.note)} if a.note else {})} for a in body.answers]
+    prefs = survey.preferences(ref, answers)
+    store.save_survey(profile_id, answers)
+    store.set_preferences(profile_id, prefs)
+    result = matching.match(ref, {**profile, "preferences": prefs}, "baseline")
+    return {"preferences": prefs, "summary": survey.summary(ref, prefs, body.language), "also_like": result["also_like"]}
 
 
 @router.get("/profiles/{profile_id}/pathway")

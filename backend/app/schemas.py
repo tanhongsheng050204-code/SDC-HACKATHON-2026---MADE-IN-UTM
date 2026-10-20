@@ -65,6 +65,38 @@ class CheckAnswers(BaseModel):
     answers: list[int] = Field(min_length=3, max_length=3)
 
 
+class SurveyAnswer(BaseModel):
+    card_id: str = Field(min_length=1, max_length=80)
+    answer: Literal["like", "dislike", "other"]
+    note: str | None = Field(default=None, max_length=300)
+    dims: dict[str, int] | None = None  # an "other" answer's reading, sent only once confirmed
+
+    @field_validator("card_id")
+    @classmethod
+    def card_exists(cls, value: str) -> str:
+        if value not in get_reference().survey_cards:
+            raise ValueError(f"Unknown card: {value}")
+        return value
+
+    @field_validator("dims")
+    @classmethod
+    def dims_known(cls, value: dict[str, int] | None) -> dict[str, int] | None:
+        known = {d["id"] for d in get_reference().work_dimensions}
+        if value and any(d not in known or v not in (1, -1) for d, v in value.items()):
+            raise ValueError("Unknown preference dimension")
+        return value
+
+
+class SurveyIn(BaseModel):
+    answers: list[SurveyAnswer] = Field(min_length=1, max_length=12)
+    language: Literal["en", "ms", "zh"] = "en"
+
+
+class InterpretRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=300)
+    language: Literal["en", "ms", "zh"] = "en"
+
+
 class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 

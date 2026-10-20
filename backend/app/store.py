@@ -336,3 +336,15 @@ def attempted_today(profile_id: str, skill_id: str, level: int) -> bool:
         row = conn.execute("SELECT COUNT(*) AS n FROM skill_checks WHERE profile_id=? AND skill_id=? AND level=? "
                            "AND created_at >= ?", (profile_id, skill_id, level, today)).fetchone()
     return row["n"] > 0
+
+
+# --- survey -----------------------------------------------------------------------------------
+
+def save_survey(profile_id: str, answers: list[dict]) -> None:
+    """Replace this profile's survey answers (a retake starts fresh)."""
+    now = _now()
+    with _connect() as conn:
+        conn.execute("DELETE FROM survey_responses WHERE profile_id=?", (profile_id,))
+        for a in answers:
+            conn.execute("INSERT INTO survey_responses (profile_id, card_id, answer, note, created_at) VALUES (?, ?, ?, ?, ?)",
+                         (profile_id, a["card_id"], a["answer"], a.get("note"), now))
