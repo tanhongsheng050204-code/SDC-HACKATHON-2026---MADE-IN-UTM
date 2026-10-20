@@ -6,6 +6,8 @@ Built for **Domain 1: Aiversecity Future-Ready Workforce**, this hackathon proto
 
 > **Prototype data:** The bundled forecast snapshot is illustrative; its numbers are not verified WEF figures. Live trend collection adjusts that baseline and preserves its illustrative status. Use synthetic CVs and anonymous workforce data for demonstrations and evaluation.
 
+**Live demo:** [laluan-psi.vercel.app](https://laluan-psi.vercel.app) · [worker demo](https://laluan-psi.vercel.app/?demo=clerk) · [student demo](https://laluan-psi.vercel.app/?demo=student) · [HR view](https://laluan-psi.vercel.app/?demo=hr). The frontend is on Vercel and the API runs as a Docker container on Render's free plan, so the first request after a quiet spell can take about 30 seconds.
+
 ## Features
 
 | Feature | Current implementation |
