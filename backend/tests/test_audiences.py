@@ -62,3 +62,48 @@ def test_worker_pathway_prefers_claimable_courses():
     first = lambda p: [s["course"]["id"] for s in pathway.build(patched, p, "data_analyst", summarize=False)["steps"]]  # noqa: E731
     assert "sql_claimable_twin" in first({**profile, "audience": "worker"})
     assert "sql_claimable_twin" not in first({**profile, "audience": "graduate"})
+
+
+# --- One guarantee per group in the brief, through the API with the demo people judges see. ---
+
+def _demo(client, key):
+    pid = client.post(f"/api/profiles/demo/{key}").json()["id"]
+    return pid, client.get(f"/api/profiles/{pid}/matches").json()
+
+
+def test_group_working_adult(client):
+    pid, result = _demo(client, "clerk")
+    assert result["current_role"]["role_id"] == "data_entry_clerk"
+    assert result["current_role"]["outlook"]["baseline"]["label"] in {"declining", "stable", "growing", "emerging"}
+    reachable = [r for r in result["roles"][:5] if not r["at_risk"] and r["fit"] >= 0.4]
+    assert reachable, "a working adult at risk needs a reachable, non-declining role in the top five"
+    plan = client.get(f"/api/profiles/{pid}/pathway", params={"role": reachable[0]["role_id"]}).json()
+    assert plan["steps"]
+
+
+def test_group_graduate(client):
+    _, result = _demo(client, "student")
+    entry = [r for r in result["roles"][:5] if r["why"]["entry_points"] > 0]
+    assert entry, "a graduate needs at least one role they can start in among the top five"
+
+
+def test_group_switcher(client):
+    _, result = _demo(client, "switcher")
+    assert result["current_role"]["role_id"] == "customer_service_rep"
+    assert all(r["role_id"] != "customer_service_rep" for r in result["roles"][:5])
+    assert len(result["roles"][0]["carry_over"]) >= 2
+
+
+def test_group_hr(client):
+    sample = client.get("/api/workforce/sample").text
+    result = client.post("/api/workforce/analyse", json={"csv": sample}).json()
+    assert result["employees"] == 160 and len(result["roles"]) < 160
+    assert all("name" not in r and "person" not in r for r in result["roles"])
+    assert result["moves"] and all(m["people"] >= 1 and m["avg_hours"] >= 0 for m in result["moves"])
+
+
+def test_group_career_centre(client):
+    sample = client.get("/api/class/sample").text
+    result = client.post("/api/class/analyse", json={"csv": sample}).json()
+    assert result["students"] == 40 and len(result["best_fit"]) < 40
+    assert len(result["top_gaps"]) >= 3 and all(g["course"] for g in result["top_gaps"])

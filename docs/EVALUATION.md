@@ -22,8 +22,13 @@ Reviewer: ______ (role: lecturer / career counsellor) · Date: ______
 
 | Persona | Top 3 roles shown | Reviewer agrees? | Pathway sensible? | Reviewer comments | What we changed |
 |---|---|---|---|---|---|
-| Aisyah (clerk) | | | | | |
-| Wei Jie (student) | | | | | |
+| Aisyah (working adult) | | | | | |
+| Wei Jie (graduate) | | | | | |
+| Farid (career switcher) | | | | | |
+| HR sample company | | | | | |
+| Career-centre sample class | | | | | |
+
+One row per group in the brief: working adults, graduates and career switchers, HR and L&D teams, and TVET / university career centres. Each group also has an automated guarantee in `backend/tests/test_audiences.py` (`test_group_*`), so a change that stops serving a group fails the build.
 
 ## 3. Task labels
 
