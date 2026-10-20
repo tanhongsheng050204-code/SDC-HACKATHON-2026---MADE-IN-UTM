@@ -19,6 +19,10 @@ MIN_CARDS, MAX_CARDS = 8, 10
 STRONG = 0.5  # a preference worth naming
 
 SENTENCE = {"en": "You seem to prefer {label}.", "ms": "Anda nampaknya lebih suka {label}.", "zh": "您似乎更喜欢{label}。"}
+FIRST = {"en": "Based on your answers to {n} cards, you seem to prefer {label}.",
+         "ms": "Berdasarkan jawapan anda kepada {n} kad, anda nampaknya lebih suka {label}.",
+         "zh": "根据您对 {n} 张卡片的回答，您似乎更喜欢{label}。"}
+MAX_SENTENCES = 3
 READING = {"en": "You prefer {label}", "ms": "Anda lebih suka {label}", "zh": "您更喜欢{label}"}
 
 # Offline reading of an "Other" answer: plain words that point one way on a dimension.
@@ -101,10 +105,12 @@ def preferences(ref: Reference, answers: list[dict]) -> dict[str, float]:
     return {d: round(max(-1.0, min(1.0, totals[d] / counts[d])), 3) for d in totals if totals[d] != 0}
 
 
-def summary(ref: Reference, prefs: dict[str, float], language: str = "en") -> list[str]:
-    template = SENTENCE.get(language, SENTENCE["en"])
-    strong = sorted((d for d, v in prefs.items() if abs(v) >= STRONG), key=lambda d: -abs(prefs[d]))
-    return [template.format(label=pole_label(ref, d, prefs[d], language)) for d in strong]
+def summary(ref: Reference, prefs: dict[str, float], language: str = "en", answered: int = 0) -> list[str]:
+    """2-3 plain sentences, strongest preference first, saying what they are based on."""
+    first, rest = FIRST.get(language, FIRST["en"]), SENTENCE.get(language, SENTENCE["en"])
+    strong = sorted((d for d, v in prefs.items() if abs(v) >= STRONG), key=lambda d: -abs(prefs[d]))[:MAX_SENTENCES]
+    return [(first if i == 0 else rest).format(n=answered, label=pole_label(ref, d, prefs[d], language))
+            for i, d in enumerate(strong)]
 
 
 def _valid_dims(ref: Reference, raw) -> dict[str, int]:

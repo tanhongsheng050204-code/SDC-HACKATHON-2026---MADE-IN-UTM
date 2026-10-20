@@ -110,3 +110,11 @@ def test_unreachable_key_server_is_503_not_401(client, monkeypatch):
         assert client.get("/api/me", headers=token("user-a")).status_code == 503
     finally:
         get_settings.cache_clear()
+
+
+def test_replacing_a_saved_profile_is_one_step(client):
+    first, second = anonymous_profile(client), anonymous_profile(client)
+    store.attach_user(first, "user-z")
+    store.replace_owned_profile(first, second, "user-z")
+    assert store.get_profile(first) is None
+    assert store.profile_for_user("user-z")["id"] == second

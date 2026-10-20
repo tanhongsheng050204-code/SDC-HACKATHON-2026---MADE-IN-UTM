@@ -60,7 +60,8 @@ def _matched_preferences(ref: Reference, prefs: dict[str, float], context: dict[
     for d in ref.work_dimensions:
         p = prefs.get(d["id"], 0.0)
         if p * context.get(d["id"], 0.0) >= 0.5:
-            out.append({"dim": d["id"], "label": d["plus" if p > 0 else "minus"]["en"]})
+            pole = d["plus" if p > 0 else "minus"]
+            out.append({"dim": d["id"], "label": pole["en"], "labels": pole})
     return out
 
 

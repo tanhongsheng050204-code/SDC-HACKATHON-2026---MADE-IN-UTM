@@ -145,6 +145,8 @@ def _connect():
 
 def init_db() -> None:
     with _connect() as conn:
+        if get_settings().database_url:
+            conn.execute("SELECT pg_advisory_xact_lock(4242)")  # held until this transaction commits
         conn.execute("CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)")
         row = conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()
         current = row["v"] or 0
@@ -281,6 +283,13 @@ def attach_user(profile_id: str, user_id: str) -> None:
         conn.execute("UPDATE profiles SET user_id=?, updated_at=? WHERE id=?", (user_id, _now(), profile_id))
 
 
+def replace_owned_profile(old_id: str, new_id: str, user_id: str) -> None:
+    """Delete the account's saved profile and attach this one, in one transaction."""
+    with _connect() as conn:
+        conn.execute("DELETE FROM profiles WHERE id=? AND user_id=?", (old_id, user_id))
+        conn.execute("UPDATE profiles SET user_id=?, updated_at=? WHERE id=?", (user_id, _now(), new_id))
+
+
 def purge_older_than(days: int = 30) -> int:
     """Delete anonymous and demo profiles left alone for `days`. A profile saved to an account
     stays until its owner deletes it."""
@@ -356,8 +365,24 @@ def submit_check(check_id: str, correct: int, passed: bool) -> bool:
                             (_now(), correct, int(passed), check_id)).rowcount == 1
 
 
+MALAYSIA = dt.timezone(dt.timedelta(hours=8))  # no daylight saving
+
+
+def day_start_utc(now: dt.datetime | None = None) -> str:
+    """Midnight today in Malaysia, as the UTC timestamp format stored in the database."""
+    local = (now or dt.datetime.now(dt.UTC)).astimezone(MALAYSIA)
+    start = local.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(dt.UTC)
+    return start.isoformat(timespec="seconds")
+
+
+def checks_started_since(profile_id: str, since: str) -> int:
+    with _connect() as conn:
+        return conn.execute("SELECT COUNT(*) AS n FROM skill_checks WHERE profile_id=? AND created_at >= ?",
+                            (profile_id, since)).fetchone()["n"]
+
+
 def attempted_today(profile_id: str, skill_id: str, level: int) -> bool:
-    today = dt.datetime.now(dt.UTC).date().isoformat()
+    today = day_start_utc()
     with _connect() as conn:
         row = conn.execute("SELECT COUNT(*) AS n FROM skill_checks WHERE profile_id=? AND skill_id=? AND level=? "
                            "AND created_at >= ?", (profile_id, skill_id, level, today)).fetchone()

@@ -2,8 +2,8 @@
 
 Every answer is built from numbered sources made from this person's matches and pathway
 (SOURCE-1 ...), and the grounding check marks any sentence those sources do not support. The
-coach never changes anything itself: it may return one *proposal* (switch scenario, or add an
-SDG goal) that the person applies with a button.
+coach never changes anything itself: it may return one *proposal* (switch scenario) that the
+person applies with a button.
 
 With a Gemini key the model writes the answer from the sources; the question is scrubbed of
 contact details first. Without a key, or if the call fails, a rule-based answer quotes the
@@ -41,7 +41,7 @@ sentences, using ONLY facts in the numbered sources, which describe this person'
 Cite sources like [SOURCE-2]. If the sources do not answer it, say so. Never invent roles,
 courses, numbers or promises, and remind them the decision is theirs when advising.
 You may propose ONE change the person can apply: switching scenario ("slow", "baseline",
-"accelerated") or adding an SDG goal (number 1-17). Propose only if the question asks for it.
+"accelerated"). Propose only if the question asks for it.
 
 Return JSON: {{"answer": "...", "proposal": null | {{"kind": "scenario", "value": ...}}}}
 

@@ -91,6 +91,13 @@ class SurveyIn(BaseModel):
     answers: list[SurveyAnswer] = Field(min_length=1, max_length=12)
     language: Literal["en", "ms", "zh"] = "en"
 
+    @field_validator("answers")
+    @classmethod
+    def one_answer_per_card(cls, value: list[SurveyAnswer]) -> list[SurveyAnswer]:
+        if len({a.card_id for a in value}) != len(value):
+            raise ValueError("Each card can be answered once")
+        return value
+
 
 class InterpretRequest(BaseModel):
     text: str = Field(min_length=1, max_length=300)

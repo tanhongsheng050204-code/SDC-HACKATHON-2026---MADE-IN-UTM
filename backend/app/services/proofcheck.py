@@ -10,6 +10,7 @@ from app.llm import generate_json
 from app.reference import Reference
 
 QUESTIONS = 3
+STARTS_PER_HOUR = 10  # per profile, demos included: each start is a paid model call
 PASS_MARK = 2
 OPTIONS = 4
 LANGUAGES = {"en": "English", "ms": "Bahasa Malaysia", "zh": "Simplified Chinese"}

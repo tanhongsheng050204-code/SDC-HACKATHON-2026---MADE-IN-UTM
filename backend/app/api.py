@@ -1,5 +1,6 @@
 """HTTP routes. Screens and the endpoints they call are listed in docs/03-APP_FLOW.md."""
 
+import datetime as dt
 import hmac
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
@@ -275,8 +276,14 @@ def claim_profile(body: ClaimRequest, user: str | None = User):
     if owned is not None:
         if not body.replace:
             raise HTTPException(409, {"existing_profile_id": owned["id"]})
-        store.delete_profile(owned["id"])
-    store.attach_user(profile["id"], user)
+        store.replace_owned_profile(owned["id"], profile["id"], user)
+        return {"profile_id": profile["id"]}
+    try:
+        store.attach_user(profile["id"], user)
+    except Exception as error:  # another tab claimed for this account a moment earlier
+        if "unique" in str(error).lower() or "duplicate" in str(error).lower():
+            raise HTTPException(409, {"existing_profile_id": store.profile_for_user(user)["id"]}) from None
+        raise
     return {"profile_id": profile["id"]}
 
 
@@ -420,6 +427,9 @@ def start_check(profile_id: str, skill_id: str, body: CheckStart, user: str | No
         raise HTTPException(409, "Unlock the skills below first")
     if not profile["is_demo"] and store.attempted_today(profile_id, skill_id, level):
         raise HTTPException(429, "You can try this level again tomorrow")
+    hour_ago = (dt.datetime.now(dt.UTC) - dt.timedelta(hours=1)).isoformat(timespec="seconds")
+    if store.checks_started_since(profile_id, hour_ago) >= proofcheck.STARTS_PER_HOUR:
+        raise HTTPException(429, "That's a lot of checks in one hour. Take a break and try again later.")
     try:
         questions = proofcheck.generate(ref, skill_id, level, body.language)
     except proofcheck.Unavailable as error:  # nothing stored, so today's attempt is not used up
@@ -480,7 +490,7 @@ def survey_submit(profile_id: str, body: SurveyIn, user: str | None = User):
     store.save_survey(profile_id, answers)
     store.set_preferences(profile_id, prefs)
     result = matching.match(ref, {**profile, "preferences": prefs}, "baseline")
-    return {"preferences": prefs, "summary": survey.summary(ref, prefs, body.language), "also_like": result["also_like"]}
+    return {"preferences": prefs, "summary": survey.summary(ref, prefs, body.language, len(answers)), "also_like": result["also_like"]}
 
 
 @router.get("/class/sample", response_class=PlainTextResponse)

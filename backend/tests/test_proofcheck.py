@@ -123,3 +123,20 @@ def test_prompt_has_no_profile_details(client, gemini):
     _start(client, pid)
     assert gemini["prompts"] and all("Siti" not in p and "Nurhaliza" not in p for p in gemini["prompts"])
     assert "Spreadsheets" in gemini["prompts"][0] and "Basic" in gemini["prompts"][0]
+
+
+def test_day_starts_at_midnight_in_malaysia():
+    import datetime as dt
+
+    # 01:00 on 21 Oct in Kuala Lumpur is 17:00 on 20 Oct UTC: "today" began at 16:00 UTC on 20 Oct.
+    now = dt.datetime(2026, 10, 20, 17, 0, tzinfo=dt.UTC)
+    assert store.day_start_utc(now) == "2026-10-20T16:00:00+00:00"
+
+
+def test_check_starts_are_rate_limited_even_for_demos(client, gemini, monkeypatch):
+    monkeypatch.setattr(proofcheck, "STARTS_PER_HOUR", 2)
+    pid = client.post("/api/profiles/demo/clerk").json()["id"]
+    assert _start(client, pid).status_code == 201
+    assert _start(client, pid).status_code == 201
+    third = _start(client, pid)
+    assert third.status_code == 429 and "hour" in third.json()["detail"]
