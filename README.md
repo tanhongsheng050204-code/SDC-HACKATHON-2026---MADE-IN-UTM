@@ -1,32 +1,49 @@
 # Laluan: Future-Ready Workforce
 
-**A career GPS for the AI era.** Laluan (Malay for “path”) helps workers and students explore how AI could change their work, identify transferable skills, and build a reskilling pathway toward future roles.
+**A career GPS for the AI era.** Laluan (Malay for “path”) shows workers and students how AI could change their work, which of their skills carry over, and a reskilling plan toward roles with a better outlook. You make the call; Laluan shows the evidence.
 
-Built for **Domain 1: Aiversecity Future-Ready Workforce**, this hackathon prototype combines explainable role matching, three AI-adoption scenarios, dated trend signals, and connections to the UN Sustainable Development Goals (SDGs). An employer view supports aggregate workforce reskilling analysis.
+Built for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon. It combines explainable role matching, three AI-adoption scenarios, dated trend signals, cited reskilling pathways and links to the UN Sustainable Development Goals (SDGs), plus an aggregate view for HR teams.
 
-> **Prototype data:** The bundled forecast snapshot is illustrative; its numbers are not verified WEF figures. Live trend collection adjusts that baseline and preserves its illustrative status. Use synthetic CVs and anonymous workforce data for demonstrations and evaluation.
+## Try it
 
-**Live demo:** [laluan-psi.vercel.app](https://laluan-psi.vercel.app) · [worker demo](https://laluan-psi.vercel.app/?demo=clerk) · [student demo](https://laluan-psi.vercel.app/?demo=student) · [HR view](https://laluan-psi.vercel.app/?demo=hr). The frontend is on Vercel and the API runs as a Docker container on Render's free plan, so the first request after a quiet spell can take about 30 seconds.
+**[laluan-psi.vercel.app](https://laluan-psi.vercel.app)** · [Worker demo (Aisyah)](https://laluan-psi.vercel.app/?demo=clerk) · [Student demo (Wei Jie)](https://laluan-psi.vercel.app/?demo=student) · [HR workforce view](https://laluan-psi.vercel.app/?demo=hr) · [API docs](https://laluan-api.onrender.com/docs)
 
-## Features
+> The API runs on Render's free plan, which sleeps after about 15 minutes without visitors. The first click after a quiet spell can take up to a minute; the app shows “Waking up the server…” while it waits.
+>
+> **Prototype data:** the bundled forecast is illustrative seed data, not verified WEF figures, and every screen says so. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
-| Feature | Current implementation |
-|---|---|
-| Skills profile | Upload a PDF, DOCX, or TXT CV, paste text, answer the intake questionnaire, or select skills manually. Review extracted skills before saving. |
-| Task breakdown | Explore O*NET-referenced tasks labelled **automate**, **assist**, or **human**, with explanations and review status. |
-| Future-role matching | Compare ranked roles, covered and missing skills, score breakdowns, and robust picks across all three scenarios. |
-| Scenario exploration | Switch between **Slow**, **Baseline**, and **Accelerated** AI adoption and choose a year up to the snapshot horizon (currently 2030). |
-| Reskilling pathways | Find courses mapped to missing skills, source links, estimated hours, and cost categories. Completed courses add their mapped skills to subsequent matching. |
-| Future Skills Radar | Inspect research and job-posting signals, dated sources, and skill trends. Refreshing signals requires internet access. |
-| SDG impact | Explore role and skill mappings to SDGs; selected SDG interests contribute a small ranking boost. |
-| Future Cards | Create a read-only career summary link with a QR code. |
-| Workforce view | Analyse an anonymous CSV or the bundled synthetic company to see aggregate role risk and reskilling moves. |
+## What it does
 
-## Quick start
+| Feature | What you can do |
+| --- | --- |
+| **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers are removed before any AI reads the text, and the file is never stored. You confirm the skill list before it is saved. |
+| **Today** | Your home screen after opening a profile: top match, how your current role is trending, robust picks, your best five roles and next steps. Ask the coach straight from here. |
+| **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
+| **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
+| **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
+| **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
+| **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. Goals you pick give a small ranking boost. |
+| **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario, a goal), but nothing changes until you press **Apply**. |
+| **Future Card** | A read-only summary with a QR code to show a counsellor, employer or family. It never shows the full skill list. |
+| **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
+| **Sources** | Every forecast snapshot the app has used, with source, dates and status. |
+| **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
 
-Requirements: **Python 3.12+**, **Node.js 20+**, and **npm**. Start the backend and frontend in separate terminals, each beginning at the repository root.
+## Suggested demo (about 3 minutes)
 
-### 1. Backend
+1. Open the **worker demo**. Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices.
+2. On **Today**, ask the coach *“Is my current job at risk?”*.
+3. Open **My job, task by task** to see which of her tasks AI is likely to automate.
+4. Go to **Future roles**, switch between scenarios, drag the year slider and open **Why this rank?**.
+5. Open the top role, **Build my pathway**, and tick a course as finished: readiness and rankings update.
+6. **See my impact** for the SDG links, then **Create my Future Card** and scan the QR code.
+7. Finish with the **Workforce view** and the synthetic sample company.
+
+## Run it locally
+
+You need **Python 3.12+**, **Node.js 20+** and npm. Start the backend and frontend in two terminals from the repository root.
+
+### Backend
 
 Windows PowerShell:
 
@@ -34,8 +51,7 @@ Windows PowerShell:
 cd backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-# Optional configuration; skip if you already have a .env file.
-Copy-Item .env.example .env
+Copy-Item .env.example .env   # optional
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
@@ -45,16 +61,13 @@ macOS / Linux:
 cd backend
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-dev.txt
-# Optional configuration; skip if you already have a .env file.
-cp .env.example .env
+cp .env.example .env   # optional
 .venv/bin/python -m uvicorn app.main:app --reload --port 8000
 ```
 
-SQLite is initialised automatically at `backend/laluan.db`; no separate database service is required.
+SQLite is created automatically at `backend/laluan.db`; there is no separate database to set up.
 
-### 2. Frontend
-
-In a second terminal:
+### Frontend
 
 ```bash
 cd frontend
@@ -62,147 +75,135 @@ npm install
 npm run dev
 ```
 
-Open **[localhost:5173](http://localhost:5173)**. Vite proxies `/api` requests to the backend on port 8000.
+Open **[localhost:5173](http://localhost:5173)**. Vite forwards `/api` to the backend on port 8000. Shortcuts: [worker demo](http://localhost:5173/?demo=clerk) · [student demo](http://localhost:5173/?demo=student) · [HR view](http://localhost:5173/?demo=hr) · [API docs](http://localhost:8000/docs).
 
-- [Worker demo: Aisyah](http://localhost:5173/?demo=clerk)
-- [Student demo: Wei Jie](http://localhost:5173/?demo=student)
-- [API documentation](http://localhost:8000/docs)
-- [Health and active model mode](http://localhost:8000/api/health)
+Everything works without an API key, using the bundled data, a skill dictionary and template pathways. Gemini, trend collection and external course or job links need internet access.
 
-The core demo works without an API key using bundled data, dictionary extraction, and template pathways. Installing dependencies, Gemini calls, trend collection, and opening external course or job links require internet access.
+### Or with Docker
 
-### Or run everything with Docker
-
-With Docker Desktop running, from the repository root:
+With Docker Desktop running:
 
 ```bash
 docker compose up --build
 ```
 
-Open **[localhost:8080](http://localhost:8080)**; the API is on port 8000. Settings are read from `backend/.env` if it exists. Profiles are kept in a Docker volume between restarts (`docker compose down -v` clears them).
+Open **[localhost:8080](http://localhost:8080)** (API on port 8000). Settings come from `backend/.env` if it exists; profiles are kept in a Docker volume (`docker compose down -v` clears them).
 
-On Windows, Docker cannot read files that OneDrive manages ("Files On-Demand"). If the build fails with `invalid file request`, clone the repository to a folder outside OneDrive.
+On Windows, Docker can't read files managed by OneDrive (“Files On-Demand”). If the build fails with `invalid file request`, clone the repository to a folder outside OneDrive.
 
-## Suggested demo flow
+## Deployment
 
-1. Open the worker demo and review Aisyah’s existing skills.
-2. Inspect her current role’s task breakdown and the explanations for its AI labels.
-3. Compare recommended roles, open **Why this rank?**, and switch scenarios and years.
-4. Choose a role and review its skill gaps, course pathway, and SDG connections.
-5. Mark a course complete and inspect the updated readiness and matching results.
-6. Create a Future Card, then try the Workforce view with the synthetic company sample.
+| Part | Where | How |
+| --- | --- | --- |
+| Frontend | [Vercel](https://laluan-psi.vercel.app) | Vite build of `frontend/`. `VITE_API_URL` is set to the API address in the Vercel project. |
+| API | [Render](https://laluan-api.onrender.com/api/health), free plan, Singapore | Docker image from `backend/Dockerfile`, described in [`render.yaml`](render.yaml) (a Render Blueprint). |
+
+The Render service was created from the public repository URL, so it does not redeploy on every push: use **Manual sync** on the blueprint (or **Manual Deploy** on the service) after backend changes. Profiles and refreshed snapshots are reset whenever the container is replaced.
 
 ## Configuration
 
-Backend settings load from environment variables and `backend/.env`; existing environment variables take precedence. See [backend/.env.example](backend/.env.example).
+The backend reads environment variables and `backend/.env` (real environment variables win). See [backend/.env.example](backend/.env.example).
 
 | Variable | Purpose / default |
-|---|---|
-| `GEMINI_API_KEY` | Optional. Leave empty for offline rules and templates; set to enable Gemini-assisted features. |
-| `GEMINI_MODEL` | Generation model; defaults to `gemini-2.5-flash`. |
-| `GEMINI_EMBEDDING_MODEL` | Embedding model; defaults to `gemini-embedding-001`. |
-| `GEMINI_TIMEOUT_SECONDS` | Provider timeout; defaults to `15`. |
-| `ADMIN_TOKEN` | Required for HTTP signal import and refresh operations. Use a long random value. |
-| `CORS_ORIGINS` | Comma-separated frontend origins; defaults to `http://localhost:5173`. |
-| `CONTACT_EMAIL` | Optional contact address for OpenAlex requests. |
-| `DATABASE_PATH` | SQLite path; defaults to `backend/laluan.db`. |
-| `DATA_DIR` | Reference-data directory; defaults to `backend/data`. |
+| --- | --- |
+| `GEMINI_API_KEY` | Optional. Empty means offline rules and templates; set it to use Gemini for CV reading, coach answers and pathway summaries. The model in use is shown in the app. |
+| `GEMINI_MODEL` | Generation model, default `gemini-2.5-flash`. |
+| `GEMINI_EMBEDDING_MODEL` | Embedding model, default `gemini-embedding-001`. |
+| `GEMINI_TIMEOUT_SECONDS` | Provider timeout, default `15`. |
+| `ADMIN_TOKEN` | Needed for **Refresh trend data** and snapshot import. Use a long random value. |
+| `CORS_ORIGINS` | Comma-separated frontend addresses, default `http://localhost:5173`. |
+| `CORS_ORIGIN_REGEX` | Optional pattern for hosts that serve one site under many addresses, e.g. Vercel's per-deploy URLs. |
+| `CONTACT_EMAIL` | Optional contact address sent with OpenAlex requests. |
+| `DATABASE_PATH` | SQLite file, default `backend/laluan.db`. |
+| `DATA_DIR` | Reference data, default `backend/data`. |
 
-For a separately hosted frontend, copy [frontend/.env.example](frontend/.env.example) to `frontend/.env` and set `VITE_API_URL` to the backend origin, without an `/api` suffix. Add the frontend origin to `CORS_ORIGINS`. Restart or rebuild the frontend after changing its environment settings.
+For a separately hosted frontend, set `VITE_API_URL` (see [frontend/.env.example](frontend/.env.example)) to the backend address without `/api`, and add the frontend address to `CORS_ORIGINS`.
 
-## How matching works
+## How the ranking works
 
-Role ranking uses **60% weighted skill fit + 40% normalised outlook**, with a **0.05 boost** when a role serves one of the person’s selected SDGs. Roles classified as declining under the selected scenario rank below non-declining roles. Each result includes its score breakdown and source snapshot.
+Each role scores **0.6 × weighted skill fit + 0.4 × scaled outlook**, plus **0.05** if it serves an SDG the person picked. Roles that are declining under the chosen scenario rank below the rest. Every card shows this breakdown and the snapshot it came from.
 
-The scenario engine adjusts baseline growth using AI-adoption assumptions, automation exposure, and AI complementarity. Earlier years are interpolated linearly up to the source horizon. These are modelling assumptions, not validated predictions of an individual’s employment prospects. See [matching.py](backend/app/services/matching.py) and [scenario.py](backend/app/services/scenario.py).
+The scenario engine adjusts each role's baseline growth for AI-adoption speed, how exposed its tasks are to automation and how much AI complements it. Years before the horizon are interpolated. These are modelling assumptions, not predictions about any one person. See [matching.py](backend/app/services/matching.py) and [scenario.py](backend/app/services/scenario.py), and [CODE_TO_EXPLAIN.md](docs/CODE_TO_EXPLAIN.md) for a walkthrough.
 
-## Refresh trend signals
+## Trend signals
 
-The pipeline collects research counts from **arXiv**, with **OpenAlex** as a fallback, and skill mentions from Hacker News **“Who is hiring?”** threads. It stores raw inputs in `backend/data/raw/` and writes dated snapshots to `backend/data/signals/`, preserving the baseline for comparison.
+The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**) and skill mentions from Hacker News **“Who is hiring?”** threads. Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot to `backend/data/signals/` and keeps the old ones, so rankings can be compared before and after.
 
-For the in-app **Admin: refresh trend data** action, configure `ADMIN_TOKEN` in `backend/.env` and supply it in the admin interface. HTTP refresh and import operations require the `X-Admin-Token` header.
-
-Alternatively, run the local script from `backend/` (the script does not require the HTTP admin token):
-
-```powershell
-.\.venv\Scripts\python.exe scripts/refresh_trends.py
-# Recollect even if today's raw counts are already cached:
-.\.venv\Scripts\python.exe scripts/refresh_trends.py --force
-```
-
-On macOS/Linux, replace `.\.venv\Scripts\python.exe` with `.venv/bin/python`. Schedule refreshes externally with cron or Windows Task Scheduler if needed; starting the app does not schedule collection.
-
-Research activity and Hacker News postings are limited proxies for demand. Refreshing them does not turn an illustrative baseline into verified labour-market statistics.
-
-## Checks and evaluation
-
-Run backend tests from `backend/`:
+Run it from **Admin: refresh trend data** on the Future roles screen (needs `ADMIN_TOKEN`), or from `backend/`:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/refresh_trends.py          # reuse today's counts if present
+.\.venv\Scripts\python.exe scripts/refresh_trends.py --force  # collect again
 ```
 
-On macOS/Linux, use `.venv/bin/python -m pytest`.
+On macOS/Linux use `.venv/bin/python`. Starting the app does not schedule refreshes; use cron or Task Scheduler if needed.
 
-Check TypeScript and produce a frontend build from `frontend/`:
+Research activity and Hacker News posts are rough proxies for demand. A refresh does not turn the illustrative baseline into verified labour-market statistics.
 
-```bash
-npm run build
+## Tests and checks
+
+```powershell
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 65 tests: API, services, trends, data integrity, privacy
+cd frontend; npm run build                           # type check + production build
 ```
 
-Additional scripts in `backend/scripts/` support course-link checks (`check_links.py`), synthetic CV extraction evaluation (`eval_extraction.py`), and deletion of profiles not updated for 30 days (`cleanup.py`). Cleanup is a manual or externally scheduled operation.
+GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
 
-Human extraction scores and career-pathway review results remain to be recorded in [Evaluation](docs/EVALUATION.md). Automated checks do not establish career-guidance quality or verify external course pricing and availability.
+Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data).
 
-## Data and prototype limits
+Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md).
 
-- **Forecasts:** Replace the illustrative seed with verified, dated source figures before presenting forecasts as sourced statistics. The current bundled horizon is 2030.
-- **Task labels:** O*NET references identify task sources; automate/assist/human labels are project annotations. Team review is incomplete where `reviewed_by` is empty.
-- **Courses:** Cost categories, estimated hours, links, and availability need provider verification. Exact RM prices and HRD Corp eligibility are not established.
-- **CV handling:** Uploaded documents are processed in memory, and raw CV text is not stored by the application. Text is scrubbed before optional model calls; saved profiles and course progress are stored in SQLite. Use synthetic inputs for the hackathon.
-- **Profile access:** The prototype has no user account authentication. Profile access uses the profile UUID, which the frontend remembers locally; shared cards use a separate read-only link. Treat those links as sensitive.
-- **Workforce view:** Results are aggregate reskilling suggestions. The CSV parser rejects identifying column names, but input data still needs to be anonymous. Use the synthetic sample for demonstrations.
+## Limits of this prototype
 
-This is a local hackathon prototype. Hosted deployment, human evaluation, and production readiness are not established by this README.
+- **Forecasts:** the bundled snapshot is illustrative and must be replaced with cited figures before the numbers are presented as statistics. Horizon: 2030.
+- **Task labels:** tasks come from O\*NET 30.0; the automate / assist / human labels are our judgements, drafted with AI help and still being reviewed (`reviewed_by` in `backend/data/tasks.json`).
+- **Courses:** hours, cost labels and links need checking with each provider. Exact RM prices and HRD Corp eligibility are not confirmed.
+- **CVs:** read in memory and scrubbed before any model call; only confirmed skills, goals and course progress are saved.
+- **Accounts:** there are none. A profile is reached by its ID, which the browser remembers; Future Cards use a separate read-only link. Treat both links as private.
+- **Workforce view:** files with name, email, IC or staff-ID columns are refused, but the data should still be anonymous before upload.
 
 ## Project structure
 
 ```text
 backend/
   app/
-    api.py          # HTTP routes
-    services/       # Intake, matching, tasks, pathways, cards, workforce
-    trends/         # Research/job collectors and snapshot builder
-    store.py        # SQLite profiles, progress, and shared cards
-  data/             # Reference catalogues, signals, synthetic evaluation inputs
-  scripts/          # Trend refresh, data preparation, evaluation, cleanup
-  tests/            # API, service, trend, and data-integrity checks
+    api.py              HTTP routes
+    services/           intake, de-identification, matching, scenarios, pathways, coach, cards, workforce
+    trends/             research and job-posting collectors, snapshot builder
+    store.py            SQLite: profiles, progress, shared cards
+  data/                 roles, skills, courses, tasks, SDG map, forecast snapshots, synthetic eval CVs
+  scripts/              trend refresh, data builders, link checks, evaluation, cleanup
+  tests/
+  Dockerfile
 frontend/
   src/
-    App.tsx         # App shell and navigation between screens
-    screens/        # One file per screen (landing, intake, roles, pathway, workforce...)
-    components/     # Shared pieces: sidebar, role card, coach drawer, SDG tiles
-    lib/            # API client, URL state, translations, formatting helpers
-docs/               # Requirements, design, implementation plan, review evidence
+    App.tsx             app shell and navigation
+    screens/            one file per screen; landing/ holds the landing page
+    components/         sidebar, role card, coach drawer, SDG tiles, banners
+    lib/                API client, URL state, translations, helpers
+    styles/             app.css (app), site.css (public pages), landing.css
+  public/               favicon and landing page photos
+  Dockerfile, nginx.conf
+docs/                   requirements, design, plan, decisions, review log, AI declaration
+docker-compose.yml      run everything locally
+render.yaml             API deployment on Render
 ```
 
-Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, and optional **Google Gemini** generation and embeddings.
+Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite**, optional **Google Gemini**; deployed on **Vercel** and **Render** (Docker).
 
 ## Project documents
 
-Planning documents, in reading order:
+1. [PRD](docs/01-PRD.md): goals, requirements and success measures
+2. [TRD](docs/02-TRD.md): architecture, stack and security
+3. [App Flow](docs/03-APP_FLOW.md): screens and actions
+4. [UI/UX Brief](docs/04-UI_UX_BRIEF.md): look and feel
+5. [Backend Schema](docs/05-BACKEND_SCHEMA.md): data and rules
+6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones and what's done
 
-1. [PRD](docs/01-PRD.md) — goals, requirements, and success measures
-2. [TRD](docs/02-TRD.md) — architecture, stack, and security design
-3. [App Flow](docs/03-APP_FLOW.md) — screens and actions
-4. [UI/UX Brief](docs/04-UI_UX_BRIEF.md) — visual direction
-5. [Backend Schema](docs/05-BACKEND_SCHEMA.md) — data and rules
-6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md) — milestones and definition of done
+How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md)
 
-Supporting records: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md).
+## Credits and licence
 
-Planning documents include intended work and pending review; consult the implementation and evidence records for current behaviour.
+Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
 
-## License
-
-[Apache License 2.0](LICENSE).
+Code under the [Apache License 2.0](LICENSE).
