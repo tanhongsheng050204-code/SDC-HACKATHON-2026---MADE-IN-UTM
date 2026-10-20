@@ -1,4 +1,10 @@
-"""Profile store on SQLite. Profiles are reached only by their random UUID; there is no listing."""
+"""Profile store. Profiles are reached only by their random UUID; there is no listing.
+
+Two engines, one code path: SQLite for tests and local runs, Postgres (Supabase) in production
+when DATABASE_URL is set, because the free hosts wipe their disks on every restart. SQL here is
+written once with `?` placeholders and portable types (TEXT ids, no AUTOINCREMENT); the Postgres
+connection translates the placeholders.
+"""
 
 import datetime as dt
 import json
@@ -9,7 +15,7 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 8
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -34,14 +40,85 @@ _MIGRATIONS = {
     );
     CREATE INDEX IF NOT EXISTS cards_profile ON cards(profile_id);
     """,
+    5: """
+    ALTER TABLE profiles ADD COLUMN user_id TEXT;
+    ALTER TABLE profiles ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE profiles ADD COLUMN preferences TEXT NOT NULL DEFAULT '{}';
+    CREATE UNIQUE INDEX IF NOT EXISTS profiles_user ON profiles(user_id) WHERE user_id IS NOT NULL;
+    """,
+    6: """
+    CREATE TABLE IF NOT EXISTS skill_progress (
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        skill_id TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        proven_at TEXT NOT NULL,
+        PRIMARY KEY (profile_id, skill_id)
+    );
+    CREATE TABLE IF NOT EXISTS skill_checks (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        skill_id TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        questions TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        submitted_at TEXT,
+        correct INTEGER,
+        passed INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS skill_checks_lookup ON skill_checks(profile_id, skill_id, level);
+    """,
+    7: """
+    CREATE TABLE IF NOT EXISTS survey_responses (
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        card_id TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        note TEXT,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (profile_id, card_id)
+    );
+    """,
+    8: """
+    CREATE TABLE IF NOT EXISTS snapshots (
+        id TEXT PRIMARY KEY,
+        state TEXT NOT NULL,
+        imported TEXT NOT NULL,
+        body TEXT NOT NULL,
+        decided_by TEXT,
+        decided_at TEXT,
+        reason TEXT
+    );
+    """,
 }
+
+
+class _PgConnection:
+    """psycopg connection that accepts the `?` placeholders the SQLite code uses."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql: str, params=()):
+        return self._conn.execute(sql.replace("?", "%s"), params)
+
+    def commit(self):
+        self._conn.commit()
+
+    def close(self):
+        self._conn.close()
 
 
 @contextmanager
 def _connect():
-    conn = sqlite3.connect(get_settings().database_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")  # so deleting a profile deletes its cards
+    settings = get_settings()
+    if settings.database_url:
+        import psycopg
+        from psycopg.rows import dict_row
+
+        conn = _PgConnection(psycopg.connect(settings.database_url, row_factory=dict_row))
+    else:
+        conn = sqlite3.connect(settings.database_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")  # so deleting a profile deletes its cards
     try:
         yield conn
         conn.commit()
@@ -55,7 +132,9 @@ def init_db() -> None:
         row = conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()
         current = row["v"] or 0
         for version in range(current + 1, SCHEMA_VERSION + 1):
-            conn.executescript(_MIGRATIONS[version])
+            for statement in _MIGRATIONS[version].split(";"):
+                if statement.strip():
+                    conn.execute(statement)
             conn.execute("INSERT INTO schema_version (version) VALUES (?)", (version,))
 
 
@@ -63,7 +142,7 @@ def _now() -> str:
     return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
 
-def _row(row: sqlite3.Row | None) -> dict | None:
+def _row(row) -> dict | None:
     if row is None:
         return None
     return {
@@ -74,6 +153,9 @@ def _row(row: sqlite3.Row | None) -> dict | None:
         "interests": json.loads(row["interests"]),
         "experience_years": row["experience_years"],
         "completed_courses": json.loads(row["completed_courses"]),
+        "user_id": row["user_id"],
+        "is_demo": bool(row["is_demo"]),
+        "preferences": json.loads(row["preferences"]),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
@@ -116,12 +198,37 @@ def set_completed(profile_id: str, completed: list[str]) -> dict | None:
 
 def get_profile(profile_id: str) -> dict | None:
     with _connect() as conn:
-        return _row(conn.execute("SELECT * FROM profiles WHERE id=?", (profile_id,)).fetchone())
+        profile = _row(conn.execute("SELECT * FROM profiles WHERE id=?", (profile_id,)).fetchone())
+        if profile is not None:
+            rows = conn.execute("SELECT skill_id, level FROM skill_progress WHERE profile_id=?",
+                                (profile_id,)).fetchall()
+            profile["skill_levels"] = {r["skill_id"]: r["level"] for r in rows}
+    return profile
 
 
 def delete_profile(profile_id: str) -> bool:
     with _connect() as conn:
         return conn.execute("DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount > 0
+
+
+def set_skill_level(profile_id: str, skill_id: str, level: int) -> None:
+    """Record a proven level. A lower level never replaces a higher one."""
+    with _connect() as conn:
+        row = conn.execute("SELECT level FROM skill_progress WHERE profile_id=? AND skill_id=?",
+                           (profile_id, skill_id)).fetchone()
+        if row is None:
+            conn.execute("INSERT INTO skill_progress (profile_id, skill_id, level, proven_at) VALUES (?, ?, ?, ?)",
+                         (profile_id, skill_id, level, _now()))
+        elif level > row["level"]:
+            conn.execute("UPDATE skill_progress SET level=?, proven_at=? WHERE profile_id=? AND skill_id=?",
+                         (level, _now(), profile_id, skill_id))
+        conn.execute("UPDATE profiles SET updated_at=? WHERE id=?", (_now(), profile_id))
+
+
+def set_preferences(profile_id: str, prefs: dict[str, float]) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE profiles SET preferences=?, updated_at=? WHERE id=?",
+                     (json.dumps(prefs), _now(), profile_id))
 
 
 def create_card(profile_id: str, role_id: str) -> str:

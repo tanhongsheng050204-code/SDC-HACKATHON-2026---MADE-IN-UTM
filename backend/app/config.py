@@ -27,6 +27,7 @@ class Settings:
     gemini_timeout_seconds: int
     admin_token: str
     database_path: Path
+    database_url: str  # Postgres (Supabase) when set; otherwise SQLite at database_path
     data_dir: Path
     cors_origins: tuple[str, ...]
     cors_origin_regex: str | None
@@ -54,6 +55,7 @@ def get_settings() -> Settings:
         gemini_timeout_seconds=int(os.environ.get("GEMINI_TIMEOUT_SECONDS", "15")),
         admin_token=os.environ.get("ADMIN_TOKEN", ""),
         database_path=Path(os.environ.get("DATABASE_PATH", str(BACKEND_DIR / "laluan.db"))),
+        database_url=os.environ.get("DATABASE_URL", ""),
         data_dir=Path(os.environ.get("DATA_DIR", str(BACKEND_DIR / "data"))),
         contact_email=os.environ.get("CONTACT_EMAIL", ""),
         cors_origins=tuple(
