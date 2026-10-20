@@ -3,7 +3,7 @@ import { ShareCard } from "../components/ShareCard";
 import { api, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { t } from "../lib/i18n";
-import { COST, OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
+import { COST, HRD, OUTLOOK_TEXT, priceText, SCENARIOS } from "../lib/labels";
 
 export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBack }: {
   profile: Profile; role: RoleMatch; scenario: Scenario;
@@ -117,11 +117,15 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
           return (
             <li key={s.step} className={s.done ? "card is-done" : "card"}>
               <div className="card-row"><strong>{s.skills.map((k) => k.name).join(", ")}</strong>
-                <span className={`badge ${COST[c.cost]?.tone ?? ""}`}>{COST[c.cost]?.label ?? c.cost}</span></div>
+                <span className="step-badges">
+                  <span className={`badge ${COST[c.cost]?.tone ?? ""}`}>{c.cost === "paid" ? priceText(c.price_rm, c.cost) : COST[c.cost]?.label ?? c.cost}</span>
+                  {c.hrd_corp && HRD[c.hrd_corp] && <span className={`badge ${HRD[c.hrd_corp].tone}`} title={c.hrd_note}>{HRD[c.hrd_corp].label}</span>}
+                </span></div>
               <span>{c.url ? <a href={c.url} target="_blank" rel="noreferrer">{c.title}</a> : c.title} · {c.provider}</span>
               <span className="muted">About {c.hours} hours · {c.level} · {s.why}</span>
               <span className="source">From the Laluan course catalogue · {c.url ? (c.checked ? `link checked ${c.checked}` : "link not yet checked") : "no single course page: search the provider"}</span>
-              {c.cost === "paid" && <span className="source">Price and HRD Corp claimability: check with the provider or your employer before enrolling.</span>}
+              {c.price_note && <span className="source">{c.price_note}{c.hrd_note ? ` ${c.hrd_note}` : ""}{c.price_checked ? ` Price checked ${c.price_checked}.` : ""}</span>}
+              {c.cost === "paid" && <span className="source">Prices change: confirm with the provider, and ask your employer about an HRD Corp claim before enrolling.</span>}
               <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => onToggle(c.id, e.target.checked)} /> I finished this</label>
             </li>
           );

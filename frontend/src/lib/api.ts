@@ -85,7 +85,11 @@ export interface CoachReply {
   proposal: CoachProposal | null; suggestions: string[];
 }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[]; interests: number[] }
-export interface Course { id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null }
+export interface Course {
+  id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null;
+  price_rm?: number | null; price_note?: string; price_checked?: string;
+  hrd_corp?: "claimable" | "check" | "not_needed"; hrd_note?: string;
+}
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
@@ -139,6 +143,7 @@ export const api = {
   roles: () => request<RoleOption[]>("/roles"),
   role: (id: string) => request<RoleInfo>(`/roles/${encodeURIComponent(id)}`),
   snapshots: () => request<Snapshot[]>("/signals"),
+  evalCvs: () => request<{ name: string; text: string }[]>("/eval/cvs"),
   extract: (text: string) =>
     request<{ skills: string[]; unmatched: string[]; mode: string }>("/intake/extract", {
       method: "POST", body: JSON.stringify({ text }),
