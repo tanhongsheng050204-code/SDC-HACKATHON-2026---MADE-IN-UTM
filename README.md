@@ -21,6 +21,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
+| **In Malaysia today** | On every role: median monthly pay and the change in employees since 2019 for its occupation group, from the Department of Statistics Malaysia (OpenDOSM, CC BY 4.0), shown next to the WEF global outlook, with a note when the two disagree. |
 | **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
 | **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. Goals you pick give a small ranking boost. |
 | **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario, a goal), but nothing changes until you press **Apply**. |
@@ -148,13 +149,13 @@ Research activity and Hacker News posts are rough proxies for demand. A refresh 
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 69 tests: API, services, trends, review, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 71 tests: API, services, trends, review, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
 GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
 
-Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
+Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`), `refresh_malaysia.py` (downloads the latest DOSM pay and employment figures; DOSM updates them yearly).
 
 Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md); the **Review kit** (`/?view=review-kit`) makes both quick.
 
@@ -222,6 +223,6 @@ How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](do
 
 ## Credits and licence
 
-Job growth figures from the [WEF Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/). Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
+Malaysian pay and employment from the [Department of Statistics Malaysia (OpenDOSM)](https://open.dosm.gov.my/data-catalogue/wages_occupation), CC BY 4.0. Job growth figures from the [WEF Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/). Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
 
 Code under the [Apache License 2.0](LICENSE).

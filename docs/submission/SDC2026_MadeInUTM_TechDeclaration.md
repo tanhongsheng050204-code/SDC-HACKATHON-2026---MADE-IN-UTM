@@ -61,6 +61,7 @@ Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
 | Gemini API (Google): `gemini-2.5-flash`, `gemini-embedding-001` | Free tier, optional *(team to confirm whether a sponsor key is used)* | Reading skills from scrubbed CV text, coach answers, pathway summaries, embeddings for unfamiliar skill phrases. The app runs fully without it (offline rules and templates). |
 | arXiv API (Cornell University) | Free | Counting AI research papers per capability for trend signals |
 | OpenAlex API (OurResearch) | Free | Fallback paper counts when arXiv is busy |
+| OpenDOSM open data (Department of Statistics Malaysia) | Free | Downloading Malaysian pay and employee numbers by occupation group (CSV, refreshed yearly) |
 | Hacker News Search API (Algolia) | Free | Counting skill mentions in “Who is hiring?” threads |
 
 Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open in the browser; the app does not call those services.
@@ -90,6 +91,7 @@ No model is trained or fine-tuned by the team. The model in use is shown in the 
 
 | Dataset name | Source / URL | Type | Personal data? | Licence |
 | --- | --- | --- | --- | --- |
+| DOSM Annual Salaries & Wages by Occupation & Sex (2010–2025) | <https://open.dosm.gov.my/data-catalogue/wages_occupation> | Public (official statistics) | N (aggregates only) | CC BY 4.0 |
 | WEF Future of Jobs Report 2025, Figure 2.3 (net job growth 2025–2030, 126 occupations) | <https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf> | Public | N | WEF terms of use; cited on every role |
 | O\*NET 30.0 task statements | <https://www.onetcenter.org/> | Public | N | CC BY 4.0 |
 | UN SDG goals, targets and colours | <https://sdgs.un.org/goals> | Public | N | UN SDG guidelines |

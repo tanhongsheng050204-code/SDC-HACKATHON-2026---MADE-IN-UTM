@@ -109,5 +109,5 @@ training our own forecasting model, signal changes without human approval.
 
 1. Preliminary submission format, length limits and deadline (the brief refers to them but does not state them).
 2. Team size and roles.
-3. A citable Malaysian salary source, or drop salary from the pathway.
+3. ✅ A citable Malaysian salary source: DOSM Annual Salaries & Wages by Occupation (OpenDOSM, CC BY 4.0), shown per role by MASCO group.
 4. Final product name.
