@@ -53,13 +53,14 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 4. ✅ Progress tracking + skill badges
 5. ✅ BM + 中文 strings (shell, landing, headings, main buttons, honesty notices, questionnaire; ⬜ native-speaker check, ⬜ remaining screen text) and lite mode
 6. ✅ AI coach (cited answers, proposals the user applies; works offline)
-7. ✅ Future Card + QR (also `/?demo=clerk` and `/?demo=student` links)
+7. ✅ Future Card + QR (also `/?demo=clerk`, `/?demo=student` and `/?demo=hr` links)
+8. ✅ Sources screen (S9), skill-level SDG tags on the Impact screen, screen/scenario/year kept in the URL so browser back and reload work
 
 ## M5: quality and evidence (Day 4)
 
 | Task | Done when |
 |---|---|
-| Error, empty and offline states | Each one seen once in the browser |
+| ◐ Error, empty and offline states (server-down banner, stale/illustrative data banner, no close roles, fully covered role, empty workforce and sources) | Each one seen once in the browser |
 | Accessibility | Keyboard-only run; contrast checked |
 | Privacy and fairness | Tests: CV never stored; scrub before every LLM call; demographic fields rejected; HR CSV with personal columns rejected |
 | Human evaluation | ◐ 5 synthetic CVs and `scripts/eval_extraction.py` ready in `backend/data/eval/`; ⬜ 5 **synthetic** CVs marked by a person; a lecturer or counsellor reviews both personas' pathways → EVALUATION.md |
