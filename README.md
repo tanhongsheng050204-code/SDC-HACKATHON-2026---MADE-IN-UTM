@@ -10,7 +10,7 @@ Built for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon
 
 > The API runs on Render's free plan, which sleeps after about 15 minutes without visitors. The first click after a quiet spell can take up to a minute; the app shows “Waking up the server…” while it waits.
 >
-> **Prototype data:** the bundled forecast is illustrative seed data, not verified WEF figures, and every screen says so. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
+> **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
 ## What it does
 
@@ -27,6 +27,7 @@ Built for **Domain 1: Aiversecity Future-Ready Workforce** at the XMUM hackathon
 | **Future Card** | A read-only summary with a QR code to show a counsellor, employer or family. It never shows the full skill list. |
 | **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
+| **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
 | **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
 
@@ -142,26 +143,26 @@ Run a refresh from that panel (needs `ADMIN_TOKEN`), or from `backend/`:
 
 On macOS/Linux use `.venv/bin/python`. Starting the app does not schedule refreshes; use cron or Task Scheduler if needed.
 
-Research activity and Hacker News posts are rough proxies for demand. A refresh does not turn the illustrative baseline into verified labour-market statistics.
+Research activity and Hacker News posts are rough proxies for demand. A refresh adjusts the WEF baseline within capped limits; it does not replace it.
 
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 67 tests: API, services, trends, review, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 69 tests: API, services, trends, review, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
 GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
 
-Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data).
+Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
 
-Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md).
+Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md); the **Review kit** (`/?view=review-kit`) makes both quick.
 
 ## Limits of this prototype
 
-- **Forecasts:** the bundled snapshot is illustrative and must be replaced with cited figures before the numbers are presented as statistics. Horizon: 2030.
+- **Forecasts:** WEF figures are global, not Malaysia-specific, and come from an employer survey. AI operations specialist has no WEF category; it uses Process Automation Specialists as the closest match. The earlier illustrative seed is kept for history. Horizon: 2030.
 - **Task labels:** tasks come from O\*NET 30.0; the automate / assist / human labels are our judgements, drafted with AI help and still being reviewed (`reviewed_by` in `backend/data/tasks.json`).
-- **Courses:** hours, cost labels and links need checking with each provider. Exact RM prices and HRD Corp eligibility are not confirmed.
+- **Courses:** RM prices and HRD Corp status come from each provider's own page and are dated (`price_checked`). Three paid courses (NIOSH, electrical, caregiver) have no published fee, so the app says to ask the provider; only the GRI training is confirmed HRD Corp-claimable.
 - **CVs:** read in memory and scrubbed before any model call; only confirmed skills, goals and course progress are saved.
 - **Accounts:** there are none. A profile is reached by its ID, which the browser remembers; Future Cards use a separate read-only link. Treat both links as private.
 - **Workforce view:** files with name, email, IC or staff-ID columns are refused, but the data should still be anonymous before upload.
@@ -208,6 +209,6 @@ How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](do
 
 ## Credits and licence
 
-Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
+Job growth figures from the [WEF Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/). Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
 
 Code under the [Apache License 2.0](LICENSE).

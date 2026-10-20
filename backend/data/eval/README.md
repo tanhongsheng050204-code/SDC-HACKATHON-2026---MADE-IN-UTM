@@ -6,6 +6,8 @@ They differ on purpose: job, seniority, language mix and writing style, includin
 are not in the skill dictionary, so the evaluation measures real recall rather than a test we
 wrote the answers for.
 
+The easiest way is the app's **Review kit** (`/?view=review-kit`, tab 2): it shows each CV next to the skill list, never shows the app's answers, and downloads `person_marked.json`.
+
 How to evaluate:
 
 1. A teammate who did **not** write the skill dictionary reads each CV and lists the skills they

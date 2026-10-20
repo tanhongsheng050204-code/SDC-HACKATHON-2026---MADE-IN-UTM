@@ -1,6 +1,6 @@
 # Evaluation by people
 
-> To be filled in by the team (Implementation Plan, M5). **Use synthetic CVs only**: the hackathon rules forbid real personal data and real CVs. Write five varied CVs yourselves (different jobs, levels and writing styles).
+> To be filled in by the team (Implementation Plan, M5). The quickest way is the **Review kit** in the app (`/?view=review-kit`, also linked from Sources). Tab 2 lets a teammate mark the CVs without seeing the app's answers and downloads `person_marked.json`; tab 3 gives a lecturer or counsellor both personas' real results and produces the table for section 2. **Use synthetic CVs only**: the hackathon rules forbid real personal data and real CVs. Write five varied CVs yourselves (different jobs, levels and writing styles).
 
 ## 1. Skill extraction: 5 synthetic CVs
 

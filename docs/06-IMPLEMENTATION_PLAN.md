@@ -21,7 +21,7 @@ fairness tests, model name shown. 28 backend tests.
 
 | # | Task | Owner | Done when |
 |---|---|---|---|
-| 2.1 | **Baseline data**: WEF Future of Jobs 2025 growth figures and O\*NET skills/tasks for each role → CSV → `scripts/build_snapshot.py` | C | Every figure has a page or table reference; `illustrative: false`; reviewed |
+| 2.1 | ✅ **Baseline data** (WEF FoJ 2025 Figure 2.3, read by `scripts/extract_wef_figure.py`, cross-checked against press figures; ⬜ `reviewed_by`): WEF Future of Jobs 2025 growth figures and O\*NET skills/tasks for each role → CSV → `scripts/build_snapshot.py` | C | Every figure has a page or table reference; `illustrative: false`; reviewed |
 | 2.2 | ✅ **Research collector** (`app/trends/research.py`): arXiv, falling back to OpenAlex | A | Re-runnable; raw counts saved in `data/raw/research/<date>.json` |
 | 2.3 | ✅ **Job-posting collector** (`app/trends/jobs.py`): HN hiring threads, this year vs last | A | Re-runnable; raw counts saved in `data/raw/jobs/<date>.json`. Team to check the source's terms of use |
 | 2.4 | ✅ **Signal builder** (`app/trends/builder.py`): capability momentum → automation exposure of each role's tasks; skill-mention trend → skill demand; both adjust the WEF baseline within a capped range → new dated snapshot with skill-level and role-level signals | A | Formula documented in CODE_TO_EXPLAIN.md; tests; a refresh visibly changes rankings |
@@ -40,7 +40,7 @@ the Refresh button then reuses today's raw counts (fast) or collects new ones (a
 | # | Task | Owner | Done when |
 |---|---|---|---|
 | 3.1 | ✅ CV **file upload** (PDF/DOCX) + guided questionnaire tab | A + B | Text extracted in memory, scrubbed, never stored |
-| 3.2 | ◐ free / free-to-audit / paid labels shown; ✅ 25 of 29 links opened and dated by `scripts/check_links.py` (4 generic Malaysian providers have no single course page); ⬜ RM prices, HRD Corp status, `reviewed_by` · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
+| 3.2 | ✅ free / free-to-audit / paid labels; ✅ 27 of 29 links opened and dated; ✅ RM prices and HRD Corp status where the provider publishes them (3 paid courses say "ask the provider"); ⬜ `reviewed_by` · Course catalogue: RM cost, free / HRD Corp-claimable flags, every link opened | C | `checked` and `reviewed_by` filled |
 | 3.3 | ✅ Year slider (today → horizon year, never beyond), scenarios as presets | A + B | Re-ranks < 300 ms; keyboard works |
 | 3.4 | ✅ New visual design (white landing, sidebar app shell, stat cards, pill badges) | B | All screens restyled |
 | 3.5 | ✅ Source shown on every recommendation (roles, skills with their O\*NET occupation, tasks, courses with link-check date, radar skills) | B | Spot check: nothing without a source |
