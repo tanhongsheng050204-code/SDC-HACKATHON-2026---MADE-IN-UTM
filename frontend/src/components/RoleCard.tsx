@@ -24,6 +24,8 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
       </div>
       <p className="muted">Estimate to {role.estimate_range.year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
       {role.why.matched_preferences.length > 0 && <span className="badge good">{t("survey.fits")} {role.why.matched_preferences.map((m) => m.label).join(", ")}</span>}
+      {role.carry_over.length > 0 && <span className="muted carry">{t("lead.bring")}: {role.carry_over.map((s) => s.name).join(", ")}</span>}
+      {role.why.entry_points > 0 && <span className="badge gold">{t("lead.openToGrads")}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">Source: {role.citation.snapshot_id} (imported {role.citation.imported})</span>
     </button>

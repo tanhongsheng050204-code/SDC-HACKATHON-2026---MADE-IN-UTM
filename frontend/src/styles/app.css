@@ -449,3 +449,11 @@ main:focus { outline: none; }
 .survey-other { display: grid; gap: 10px; }
 .survey-other textarea { width: 100%; }
 .also-like { margin: 14px 0; }
+
+/* Audience choice and per-group lead blocks */
+.audience-choices { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 14px; }
+.card.audience { cursor: pointer; gap: 6px; }
+.card.audience:hover { background: var(--hover); }
+.card.lead { margin: 14px 0; gap: 8px; }
+.carry { font-size: .82rem; }
+.lp-switch { margin-top: 14px; }

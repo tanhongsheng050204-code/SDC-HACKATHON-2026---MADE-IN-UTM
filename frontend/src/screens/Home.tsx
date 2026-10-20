@@ -33,7 +33,9 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
 
   const name = profile.display_name?.replace(/\s*\(demo\)$/, "");
   const top = data?.roles[0];
-  const current = data?.roles.find((r) => r.is_current_role);
+  const current = data?.roles.find((r) => r.is_current_role) ?? data?.current_role ?? null;
+  const audience = profile.audience ?? "worker";
+  const entryRoles = data?.roles.filter((r) => r.why.entry_points > 0).slice(0, 3) ?? [];
   const robust = data?.roles.filter((r) => r.robust_pick) ?? [];
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short", year: "numeric" });
 
@@ -51,6 +53,34 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
       {error && <p className="error" role="alert">{error}</p>}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
 
+      {data && top && audience === "worker" && current && (
+        <div className="card lead">
+          <span className="kpi-label">{t("lead.workerTitle")}</span>
+          <strong>{current.title}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
+          <p className="muted">{t("lead.workerBody")}</p>
+          <button className="btn quiet sm" onClick={() => onGo("tasks")}>{t("nav.tasks")} →</button>
+        </div>
+      )}
+      {data && audience === "graduate" && entryRoles.length > 0 && (
+        <div className="card lead">
+          <span className="kpi-label">{t("lead.gradTitle")}</span>
+          <p className="muted">{t("lead.gradBody")}</p>
+          <div className="actions">{entryRoles.map((r) => (
+            <button key={r.role_id} className="btn quiet sm" onClick={() => onOpenRole(r)}>{r.title} · {percent(r.fit)}%</button>
+          ))}</div>
+        </div>
+      )}
+      {data && top && audience === "switcher" && current && (
+        <div className="card lead">
+          <span className="kpi-label">{t("lead.switchTitle")}</span>
+          <strong>{current.title}: {OUTLOOK_TEXT[current.outlook[scenario].label]} {signed(current.outlook[scenario].index)}%</strong>
+          <p className="muted">{t("lead.switchBody")} <strong>{top.title}</strong>:</p>
+          <div className="chips">{top.carry_over.length
+            ? top.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)
+            : <span className="muted">{t("lead.noCarry")}</span>}</div>
+          <button className="btn quiet sm" onClick={() => onOpenRole(top)}>{top.title} →</button>
+        </div>
+      )}
       {data && top && (
         <div className="home-kpis">
           <div className="kpi">
@@ -63,8 +93,8 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
             <strong>{current ? `${signed(current.outlook[scenario].index)}%` : t("k.notSet")}</strong>
             {current
               ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span>
-              : <span className="badge">Add it on My profile</span>}
-            <span className="kpi-foot">{current ? current.title : "Lets us compare your job with the alternatives"}</span>
+              : <span className="badge">{audience === "graduate" ? t("lead.openToGrads") : "Add it on My profile"}</span>}
+            <span className="kpi-foot">{current ? current.title : audience === "graduate" ? t("lead.gradBody") : "Lets us compare your job with the alternatives"}</span>
           </div>
           <div className="kpi">
             <span className="kpi-label">{t("k.robust")}</span><strong>{robust.length}</strong>

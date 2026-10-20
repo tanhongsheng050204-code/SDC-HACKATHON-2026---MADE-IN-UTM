@@ -36,6 +36,7 @@ export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfil
         <ul>
           <li>Skill fit {percent(role.why.fit)}% × 0.6 = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
           <li>Outlook in this scenario, scaled 0–1, × 0.4 = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
+          {role.why.entry_points > 0 && <li>{t("lead.openToGrads")}: <strong>+{role.why.entry_points.toFixed(2)}</strong></li>}
           {role.why.preference_points > 0 && <li>Fits your work preferences: <strong>+{role.why.preference_points.toFixed(2)}</strong>{role.why.matched_preferences.length > 0 && ` (${role.why.matched_preferences.map((m) => m.label).join(", ")})`}</li>}
         </ul>
         <p className="source">Outlook source: {role.citation.snapshot_id}, imported {role.citation.imported}{role.citation.note && ` · ${role.citation.note}`}</p>
@@ -54,6 +55,9 @@ export function RoleDetail({ profile, role, scenario, onImpact, onTree, onProfil
       </div>
 
       <div className="two-col">
+        {role.carry_over.length > 0 && (
+          <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {s.name}</span>)}</div></div>
+        )}
         <div><h2>You have</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div></div>
         <div><h2>You need</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing">{s.name}{s.weight === 3 ? " (core)" : ""}</span>)}</div></div>
       </div>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { api, Profile, RoleOption, Skill } from "../lib/api";
+import { api, Audience, Profile, RoleOption, Skill } from "../lib/api";
 import { t } from "../lib/i18n";
 
-export function Review({ initial, onSaved, onBack }: { initial: string[]; onSaved: (p: Profile) => void; onBack: () => void }) {
+export function Review({ initial, audience, onSaved, onBack }: {
+  initial: string[]; audience: Audience | null; onSaved: (p: Profile) => void; onBack: () => void;
+}) {
   const [skills, setSkills] = useState(initial);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [roles, setRoles] = useState<RoleOption[]>([]);
@@ -17,6 +19,7 @@ export function Review({ initial, onSaved, onBack }: { initial: string[]; onSave
     api.roles().then(setRoles).catch(() => undefined);
   }, []);
 
+  const needsRole = audience === "worker" || audience === "switcher";
   const name = (id: string) => allSkills.find((s) => s.id === id)?.name ?? id;
   const notYet = allSkills.filter((s) => !skills.includes(s.id));
 
@@ -24,7 +27,7 @@ export function Review({ initial, onSaved, onBack }: { initial: string[]; onSave
     setBusy(true); setError(null);
     try {
       onSaved(await api.createProfile({
-        display_name: null, current_role_id: currentRole || null, skills,
+        display_name: null, current_role_id: currentRole || null, skills, audience,
         experience_years: years === "" ? null : Number(years),
       }));
     } catch { setError("Couldn't save your profile. Try again."); }
@@ -65,7 +68,8 @@ export function Review({ initial, onSaved, onBack }: { initial: string[]; onSave
           <input type="number" min={0} max={60} value={years} onChange={(e) => setYears(e.target.value)} />
         </label>
       </div>
-      <button className="primary" disabled={busy || skills.length === 0} onClick={save}>{busy ? "Saving…" : t("a.continue")}</button>
+      {needsRole && !currentRole && <p className="muted" role="note">{t("aud.needRole")}</p>}
+      <button className="primary" disabled={busy || skills.length === 0 || (needsRole && !currentRole)} onClick={save}>{busy ? "Saving…" : t("a.continue")}</button>
       {error && <p className="error" role="alert">{error} <button className="link" onClick={save}>{t("shell.retry")}</button></p>}
     </section>
   );

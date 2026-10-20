@@ -5,7 +5,7 @@ import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components
 import { RoleCard } from "../components/RoleCard";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
-import { SCENARIOS } from "../lib/labels";
+import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
 
 // Below this fit no role is a realistic short move, so we say so instead of implying one is.
@@ -78,6 +78,13 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen, onS
       {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>
+      )}
+      {data && profile.audience === "switcher" && data.current_role && (
+        <div className="card lead">
+          <span className="kpi-label">{t("lead.switchTitle")}</span>
+          <strong>{data.current_role.title}: {OUTLOOK_TEXT[data.current_role.outlook[scenario].label]}</strong>
+          <p className="muted">{t("lead.switchList")}</p>
+        </div>
       )}
       {data && data.also_like.length > 0 && (
         <div className="card also-like">

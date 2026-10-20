@@ -8,7 +8,7 @@ import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onAuthExpired, onServerWaking, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getUserId, onAuth } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
@@ -47,6 +47,7 @@ function MainApp({ demo }: { demo: string | null }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
   const [draftSkills, setDraftSkills] = useState<string[]>([]);
+  const [audience, setAudience] = useState<Audience | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -116,7 +117,7 @@ function MainApp({ demo }: { demo: string | null }) {
   useEffect(() => {
     if (entryHandled) return;
     entryHandled = true;
-    if (demo === "clerk" || demo === "student") { openDemo(demo); return; }
+    if (demo === "clerk" || demo === "student" || demo === "switcher") { openDemo(demo); return; }
     if (demo === "hr") { go("workforce"); return; }
     // A reload on ?view=roles (or deeper) resumes the saved profile and the role in the URL.
     const wanted = readRoute();
@@ -275,9 +276,9 @@ function MainApp({ demo }: { demo: string | null }) {
               <Home profile={profile} scenario={scenario} onScenario={setScenario} onOpenRole={openRole} onGo={(s) => go(s)}
                 onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
-            {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
+            {screen === "intake" && <Intake audience={audience} onAudience={setAudience} onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (
-              <Review initial={draftSkills} onBack={() => go("intake")}
+              <Review initial={draftSkills} audience={audience} onBack={() => go("intake")}
                 onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("survey"); }} />
             )}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}

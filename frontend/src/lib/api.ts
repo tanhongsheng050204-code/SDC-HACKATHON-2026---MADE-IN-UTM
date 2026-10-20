@@ -3,6 +3,7 @@ import { getToken, signOut } from "./auth";
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export type Scenario = "slow" | "baseline" | "accelerated";
+export type Audience = "worker" | "graduate" | "switcher";
 
 export interface Skill { id: string; name: string; category: string }
 export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
@@ -11,12 +12,13 @@ export interface RoleOption { id: string; title: string }
 export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
   skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;
-  user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
+  audience?: Audience | null; user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
 }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
-  why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number;
+  carry_over: { skill_id: string; name: string }[];
+  why: { fit: number; score: number; fit_points: number; outlook_points: number; preference_points: number; entry_points: number;
     matched_preferences: { dim: string; label: string }[] };
   estimate_range: { low: number; high: number; horizon_year: number; year: number };
   citation: { snapshot_id: string; imported: string; note: string | null };
@@ -38,6 +40,7 @@ export interface RoleInfo {
 export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
   year: number; year_range: [number, number]; also_like: AlsoLike[];
+  current_role: (Pick<RoleMatch, "role_id" | "title" | "summary" | "fit" | "outlook" | "at_risk"> & { is_current_role: true }) | null;
 }
 export interface SkillTrend {
   skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
@@ -266,7 +269,7 @@ export const api = {
   updateProfile: (p: Profile) =>
     request<Profile>(`/profiles/${p.id}`, { method: "PUT", body: JSON.stringify({
       display_name: p.display_name, current_role_id: p.current_role_id, skills: p.skills,
-      experience_years: p.experience_years }) }),
+      experience_years: p.experience_years, audience: p.audience ?? null }) }),
   coach: (profileId: string, question: string, scenario: Scenario, roleId?: string) =>
     request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null }) }),
   createCard: (id: string, roleId: string) =>
