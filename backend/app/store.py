@@ -150,7 +150,6 @@ def _row(row) -> dict | None:
         "display_name": row["display_name"],
         "current_role_id": row["current_role_id"],
         "skills": json.loads(row["skills"]),
-        "interests": json.loads(row["interests"]),
         "experience_years": row["experience_years"],
         "completed_courses": json.loads(row["completed_courses"]),
         "user_id": row["user_id"],
@@ -161,7 +160,7 @@ def _row(row) -> dict | None:
     }
 
 
-def create_profile(display_name, current_role_id, skills, interests, experience_years=None,
+def create_profile(display_name, current_role_id, skills, experience_years=None,
                    is_demo: bool = False) -> dict:
     profile_id, now = str(uuid.uuid4()), _now()
     with _connect() as conn:
@@ -169,18 +168,18 @@ def create_profile(display_name, current_role_id, skills, interests, experience_
             "INSERT INTO profiles (id, display_name, current_role_id, skills, interests, "
             "experience_years, is_demo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (profile_id, display_name, current_role_id, json.dumps(skills),
-             json.dumps(interests), experience_years, int(is_demo), now, now),
+             "[]", experience_years, int(is_demo), now, now),
         )
     return get_profile(profile_id)
 
 
-def update_profile(profile_id, display_name, current_role_id, skills, interests,
+def update_profile(profile_id, display_name, current_role_id, skills,
                    experience_years=None) -> dict | None:
     with _connect() as conn:
         cursor = conn.execute(
-            "UPDATE profiles SET display_name=?, current_role_id=?, skills=?, interests=?, "
+            "UPDATE profiles SET display_name=?, current_role_id=?, skills=?, "
             "experience_years=?, updated_at=? WHERE id=?",
-            (display_name, current_role_id, json.dumps(skills), json.dumps(interests),
+            (display_name, current_role_id, json.dumps(skills),
              experience_years, _now(), profile_id),
         )
         if cursor.rowcount == 0:

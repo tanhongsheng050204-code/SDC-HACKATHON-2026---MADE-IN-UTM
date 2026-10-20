@@ -5,7 +5,7 @@ from app.reference import get_reference
 from app.services import documents, matching, pathway, scenario, workforce
 
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-         "current_role_id": "data_entry_clerk", "interests": []}
+         "current_role_id": "data_entry_clerk"}
 CV_TEXT = ("Data entry clerk at a logistics company for nine years. I use Microsoft Excel every day with "
            "pivot tables, write simple SQL queries and help with customer service on the phone.")
 
@@ -196,8 +196,7 @@ def test_coach_proposes_changes_but_never_applies_them(client):
     assert reply["proposal"] == {"kind": "scenario", "value": "accelerated",
                                  "label": "Switch to the Accelerated AI adoption scenario"}
     climate = _ask(client, profile["id"], "I care about climate change").json()
-    assert climate["proposal"]["kind"] == "interest" and climate["proposal"]["value"] == 13
-    assert client.get(f"/api/profiles/{profile['id']}").json()["interests"] == profile["interests"]
+    assert "Renewable energy technician" in climate["answer"] and climate["proposal"] is None
 
 
 def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatch):

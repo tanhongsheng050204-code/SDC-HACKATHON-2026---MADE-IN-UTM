@@ -17,7 +17,7 @@ def db(tmp_path, monkeypatch):
 
 
 def _new_profile() -> dict:
-    return store.create_profile(None, "data_entry_clerk", ["excel"], [], 3)
+    return store.create_profile(None, "data_entry_clerk", ["excel"], 3)
 
 
 def test_migrations_create_new_tables(db):

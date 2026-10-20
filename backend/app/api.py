@@ -272,8 +272,7 @@ def claim_profile(body: ClaimRequest, user: str | None = User):
 
 @router.post("/profiles", status_code=201)
 def create_profile(body: ProfileIn):
-    return store.create_profile(body.display_name, body.current_role_id, body.skills, body.interests,
-                                body.experience_years)
+    return store.create_profile(body.display_name, body.current_role_id, body.skills, body.experience_years)
 
 
 @router.post("/profiles/demo/{key}", status_code=201)
@@ -282,7 +281,7 @@ def create_demo_profile(key: str):
     if demo is None:
         raise HTTPException(404, "Unknown demo profile")
     profile = store.create_profile(demo["display_name"], demo["current_role_id"],
-                                   demo["skills"], demo["interests"], demo.get("experience_years"),
+                                   demo["skills"], demo.get("experience_years"),
                                    is_demo=True)
     return {**profile, "story": demo["story"]}
 
@@ -296,7 +295,7 @@ def get_profile(profile_id: str, user: str | None = User):
 def update_profile(profile_id: str, body: ProfileIn, user: str | None = User):
     _profile_for(profile_id, user)
     profile = store.update_profile(profile_id, body.display_name, body.current_role_id,
-                                   body.skills, body.interests, body.experience_years)
+                                   body.skills, body.experience_years)
     if profile is None:
         raise HTTPException(404, "Profile not found")
     return profile

@@ -13,7 +13,7 @@ from app.trends import builder, jobs, research
 
 TODAY = dt.date(2026, 10, 19)
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-         "current_role_id": "data_entry_clerk", "interests": []}
+         "current_role_id": "data_entry_clerk"}
 
 
 def fake_research(rising: str = "document_understanding") -> dict:

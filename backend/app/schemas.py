@@ -89,7 +89,6 @@ class ProfileIn(BaseModel):
     display_name: str | None = Field(default=None, max_length=60)
     current_role_id: str | None = None
     skills: list[str] = Field(min_length=1, max_length=60)
-    interests: list[int] = Field(default_factory=list, max_length=17)
     experience_years: int | None = Field(default=None, ge=0, le=60)
 
     @field_validator("display_name")
@@ -115,9 +114,3 @@ class ProfileIn(BaseModel):
             raise ValueError(f"Unknown skills: {', '.join(unknown)}")
         return list(dict.fromkeys(value))
 
-    @field_validator("interests")
-    @classmethod
-    def sdgs_exist(cls, value: list[int]) -> list[int]:
-        if any(n < 1 or n > 17 for n in value):
-            raise ValueError("Interests must be SDG numbers 1-17")
-        return list(dict.fromkeys(value))

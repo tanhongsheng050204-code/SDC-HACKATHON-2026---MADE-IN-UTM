@@ -4,15 +4,28 @@
     "story": "34, data-entry clerk at a logistics company in Shah Alam. Her team just started using an AI tool that reads invoices.",
     "current_role_id": "data_entry_clerk",
     "experience_years": 9,
-    "skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-    "interests": [8, 4]
+    "skills": [
+      "data_entry",
+      "excel",
+      "office_admin",
+      "scheduling",
+      "communication",
+      "genai_tools"
+    ]
   },
   "student": {
     "display_name": "Wei Jie (demo)",
-    "story": "22, final-year business student in Penang who did a marketing internship and cares about climate change.",
+    "story": "22, final-year business student in Penang who did a marketing internship.",
     "current_role_id": null,
     "experience_years": 0,
-    "skills": ["excel", "social_media_marketing", "content_writing", "communication", "statistics", "genai_tools", "project_management"],
-    "interests": [13, 12]
+    "skills": [
+      "excel",
+      "social_media_marketing",
+      "content_writing",
+      "communication",
+      "statistics",
+      "genai_tools",
+      "project_management"
+    ]
   }
 }

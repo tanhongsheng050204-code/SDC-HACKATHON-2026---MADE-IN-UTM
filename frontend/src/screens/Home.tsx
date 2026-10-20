@@ -22,7 +22,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
   useEffect(() => {
     api.matches(profile.id, scenario).then((d) => { setData(d); setError(null); })
       .catch(() => setError("Couldn't load your results. Check your connection and try again."));
-  }, [profile.id, profile.interests.join(","), profile.completed_courses.length, scenario]);
+  }, [profile.id, profile.completed_courses.length, scenario]);
 
   function submit(e: FormEvent) {
     e.preventDefault();

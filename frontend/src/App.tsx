@@ -209,14 +209,8 @@ function MainApp({ demo }: { demo: string | null }) {
 
   async function applyProposal(p: CoachProposal) {
     if (!profile) return;
-    if (p.kind === "scenario") {
-      const r = { ...route, scenario: p.value as Scenario, screen: "roles" as Screen };
-      setRoute(r); writeRoute(r, "push");
-    } else {
-      const interests = Array.from(new Set([...profile.interests, Number(p.value)]));
-      setProfile(await api.updateProfile({ ...profile, interests }));
-      go("roles");
-    }
+    const r = { ...route, scenario: p.value as Scenario, screen: "roles" as Screen };
+    setRoute(r); writeRoute(r, "push");
     flash(`Applied: ${p.label}`);
   }
 

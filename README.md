@@ -22,8 +22,8 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
 | **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
-| **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. Goals you pick give a small ranking boost. |
-| **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario, a goal), but nothing changes until you press **Apply**. |
+| **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. The SDG links explain each role; they are not a ranking preference. |
+| **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario), but nothing changes until you press **Apply**. |
 | **Future Card** | A read-only summary with a QR code to show a counsellor, employer or family. It never shows the full skill list. |
 | **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |

@@ -62,7 +62,7 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     moves: dict[tuple[str, str], dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fit": 0.0})
     sdg_people: Counter = Counter()
     for (role_id, person_skills), count in groups.items():
-        profile = {"skills": list(person_skills), "current_role_id": role_id, "interests": []}
+        profile = {"skills": list(person_skills), "current_role_id": role_id}
         result = matching.match(ref, profile, scenario_id)
         current = next(r for r in result["roles"] if r["role_id"] == role_id)
         entry = by_role.setdefault(role_id, {

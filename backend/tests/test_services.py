@@ -81,20 +81,20 @@ def test_declining_roles_rank_last_and_are_never_robust():
     assert result["roles"][0]["role_id"] != "data_entry_clerk"
 
 
-def test_sdg_interest_changes_the_ranking_and_is_explained():
+def test_users_no_longer_choose_sdgs():
+    """SDG links explain roles; they are the system's, not a ranking preference (spec section 5)."""
     ref = get_reference()
-    plain = matching.match(ref, {**CLERK, "interests": []}, "baseline")["roles"]
-    climate = matching.match(ref, {**CLERK, "interests": [13]}, "baseline")["roles"]
-    rank = lambda roles, rid: next(r["rank"] for r in roles if r["role_id"] == rid)  # noqa: E731
-    assert rank(climate, "renewable_energy_technician") < rank(plain, "renewable_energy_technician")
-    boosted = next(r for r in climate if r["role_id"] == "renewable_energy_technician")
-    assert boosted["why"]["matched_sdgs"] == [13] and boosted["why"]["sdg_points"] > 0
+    plain = matching.match(ref, CLERK, "baseline")["roles"]
+    with_interests = matching.match(ref, {**CLERK, "interests": [13]}, "baseline")["roles"]
+    assert [r["score"] for r in plain] == [r["score"] for r in with_interests]
+    assert all("sdg_points" not in r["why"] and r["why"]["preference_points"] == 0.0 for r in plain)
+    assert any(r["sdgs"] for r in plain)  # the SDG explanation itself stays
 
 
 def test_score_breakdown_adds_up_and_range_covers_every_scenario():
     for role in matching.match(get_reference(), CLERK, "accelerated")["roles"]:
         why = role["why"]
-        assert abs(why["fit_points"] + why["outlook_points"] + why["sdg_points"] - role["score"]) < 1e-3
+        assert abs(why["fit_points"] + why["outlook_points"] + why["preference_points"] - role["score"]) < 1e-3
         indexes = [o["index"] for o in role["outlook"].values()]
         assert role["estimate_range"]["low"] == min(indexes)
         assert role["estimate_range"]["high"] == max(indexes)

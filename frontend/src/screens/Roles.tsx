@@ -30,7 +30,7 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
       .catch(() => live && setError("Couldn't update the list. Showing your last results."))
       .finally(() => live && setLoading(false));
     return () => { live = false; };
-  }, [profile.id, profile.interests.join(","), profile.completed_courses.length, scenario, year]);
+  }, [profile.id, profile.completed_courses.length, scenario, year]);
 
   async function afterRefresh() {
     const before = data;

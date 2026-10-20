@@ -10,7 +10,7 @@ def test_primary_journey(client):
     assert {"data_entry", "excel", "customer_service"} <= set(extracted["skills"])
 
     created = client.post("/api/profiles", json={
-        "current_role_id": "data_entry_clerk", "skills": extracted["skills"], "interests": [8]})
+        "current_role_id": "data_entry_clerk", "skills": extracted["skills"]})
     assert created.status_code == 201
     pid = created.json()["id"]
 
@@ -203,3 +203,8 @@ def test_built_app_is_served_beside_the_api(tmp_path, monkeypatch):
     get_settings.cache_clear()
     monkeypatch.delenv("FRONTEND_DIST")
     importlib.reload(main)
+
+
+def test_profile_rejects_interests_field(client):
+    body = {"skills": ["excel"], "interests": [13]}
+    assert client.post("/api/profiles", json=body).status_code == 422

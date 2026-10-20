@@ -22,7 +22,6 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
         <span className={`badge ${OUTLOOK_TONE[o.label]}`}>{OUTLOOK_TEXT[o.label]}</span>
       </div>
       <p className="muted">Estimate to {role.estimate_range.year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
-      {role.why.sdg_points > 0 && <span className="badge good">Serves your goals: SDG {role.why.matched_sdgs.join(", ")}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">Source: {role.citation.snapshot_id} (imported {role.citation.imported})</span>
     </button>
