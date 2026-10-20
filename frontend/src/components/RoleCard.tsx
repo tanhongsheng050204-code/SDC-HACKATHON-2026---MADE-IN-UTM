@@ -1,6 +1,7 @@
 import type { RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
+import { t } from "../lib/i18n";
 import { Sdgs } from "./Sdgs";
 
 export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario: Scenario; onOpen: () => void }) {
@@ -22,6 +23,7 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
         <span className={`badge ${OUTLOOK_TONE[o.label]}`}>{OUTLOOK_TEXT[o.label]}</span>
       </div>
       <p className="muted">Estimate to {role.estimate_range.year}: {signed(role.estimate_range.low)}% to {signed(role.estimate_range.high)}% jobs across scenarios</p>
+      {role.why.matched_preferences.length > 0 && <span className="badge good">{t("survey.fits")} {role.why.matched_preferences.map((m) => m.label).join(", ")}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">Source: {role.citation.snapshot_id} (imported {role.citation.imported})</span>
     </button>

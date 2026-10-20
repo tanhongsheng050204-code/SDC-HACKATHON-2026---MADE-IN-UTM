@@ -16,6 +16,7 @@ export function Sidebar({ current, profile, hasRole, model, prefs, userId, onGo,
     { label: null, items: [
       { id: "home", label: t("nav.home"), icon: "home", enabled: !!profile },
       { id: "intake", label: t("nav.profile"), icon: "user", enabled: true },
+      { id: "survey", label: t("nav.survey"), icon: "list", enabled: !!profile },
     ] },
     { label: t("nav.signals"), items: [
       { id: "radar", label: t("nav.radar"), icon: "radar", enabled: !!profile },

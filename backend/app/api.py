@@ -435,6 +435,13 @@ def survey_cards(profile_id: str, user: str | None = User):
             "dimensions": ref.work_dimensions}
 
 
+@router.get("/survey/bank")
+def survey_bank():
+    """Every survey card and dimension label, for the review kit's translation check."""
+    ref = get_reference()
+    return {"cards": list(ref.survey_cards.values()), "dimensions": ref.work_dimensions}
+
+
 @router.post("/survey/interpret")
 def survey_interpret(body: InterpretRequest):
     """How we read a free-text answer. Nothing is saved; the person confirms before it counts."""

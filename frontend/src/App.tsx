@@ -23,12 +23,13 @@ import { Review } from "./screens/Review";
 import { ReviewKit } from "./screens/ReviewKit";
 import { RoleDetail } from "./screens/RoleDetail";
 import { SkillTree } from "./screens/SkillTree";
+import { Survey } from "./screens/Survey";
 import { Roles } from "./screens/Roles";
 import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree"];
+const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree", "survey"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -251,7 +252,7 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.tree"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.tree"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
@@ -277,19 +278,22 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (
               <Review initial={draftSkills} onBack={() => go("intake")}
-                onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("radar"); }} />
+                onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("survey"); }} />
             )}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
             {screen === "roles" && profile && (
               <Roles profile={profile} scenario={scenario} year={route.year}
-                onScenario={setScenario} onYear={setYear} onOpen={openRole} />
+                onScenario={setScenario} onYear={setYear} onOpen={openRole} onSurvey={() => go("survey")} />
             )}
             {screen === "role" && profile && role && (
               <RoleDetail profile={profile} role={role} scenario={scenario} onProfile={setProfile}
                 onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
+            {screen === "survey" && profile && (
+              <Survey profile={profile} userId={userId} onDone={(p) => { setProfile(p); go("roles"); }} onSkip={() => go("home")} />
+            )}
             {screen === "tree" && profile && role && (
               <SkillTree profile={profile} roleId={role.role_id} userId={userId} onProfile={setProfile} onBack={() => go("role")} />
             )}

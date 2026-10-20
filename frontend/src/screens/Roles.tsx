@@ -11,9 +11,9 @@ import { KEYS, load, save } from "../lib/storage";
 // Below this fit no role is a realistic short move, so we say so instead of implying one is.
 const CLOSE_FIT = 0.35;
 
-export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
+export function Roles({ profile, scenario, year, onScenario, onYear, onOpen, onSurvey }: {
   profile: Profile; scenario: Scenario; year?: number;
-  onScenario: (s: Scenario) => void; onYear: (y: number) => void; onOpen: (r: RoleMatch) => void;
+  onScenario: (s: Scenario) => void; onYear: (y: number) => void; onOpen: (r: RoleMatch) => void; onSurvey: () => void;
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,6 +78,21 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
       {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>
+      )}
+      {data && data.also_like.length > 0 && (
+        <div className="card also-like">
+          <h2>{t("survey.alsoLike")}</h2>
+          <p className="muted">{t("survey.alsoLikeSub")}</p>
+          <div className="actions">
+            {data.also_like.map((a) => {
+              const match = data.roles.find((r) => r.role_id === a.role_id);
+              return match && <button key={a.role_id} className="btn quiet sm" onClick={() => onOpen(match)}>{a.title} · #{a.rank}</button>;
+            })}
+          </div>
+        </div>
+      )}
+      {data && Object.keys(profile.preferences ?? {}).length === 0 && (
+        <p className="muted"><button className="link" onClick={onSurvey}>{t("survey.prompt")}</button></p>
       )}
       <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
         {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}

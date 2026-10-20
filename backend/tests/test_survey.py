@@ -106,3 +106,9 @@ def test_interpret_scrubs_before_llm(client, monkeypatch):
 def test_interpret_offline_uses_keywords(client):
     result = client.post("/api/survey/interpret", json={"text": "I prefer to work alone", "language": "en"}).json()
     assert result["dims"] == {"team": -1}
+
+
+def test_survey_bank_lists_every_card_for_the_review_kit(client):
+    bank = client.get("/api/survey/bank").json()
+    assert len(bank["cards"]) == len(get_reference().survey_cards)
+    assert {d["id"] for d in bank["dimensions"]} == {"people", "structured", "field", "shifts", "team"}

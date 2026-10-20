@@ -37,7 +37,7 @@ export interface RoleInfo {
 }
 export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
-  year: number; year_range: [number, number];
+  year: number; year_range: [number, number]; also_like: AlsoLike[];
 }
 export interface SkillTrend {
   skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
@@ -107,6 +107,15 @@ export interface CheckResult {
   passed: boolean; correct: number; level: number; level_name: string; answers: number[];
   explanations: string[]; course: { id: string; title: string; url: string } | null;
 }
+
+export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }
+export interface WorkDimension { id: string; plus: Record<string, string>; minus: Record<string, string> }
+export interface SurveyAnswer { card_id: string; answer: "like" | "dislike" | "other"; note?: string; dims?: Record<string, number> }
+export interface AlsoLike {
+  role_id: string; title: string; rank: number; fit: number; preference_match: number;
+  matched_preferences: { dim: string; label: string }[];
+}
+export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
 
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
@@ -270,5 +279,12 @@ export const api = {
   submitCheck: (checkId: string, profileId: string, answers: number[]) =>
     requestDetail<CheckResult>(`/checks/${encodeURIComponent(checkId)}`, {
       method: "POST", body: JSON.stringify({ profile_id: profileId, answers }) }),
+  survey: (id: string) => request<{ cards: SurveyCard[]; dimensions: WorkDimension[] }>(`/profiles/${id}/survey`),
+  surveyBank: () => request<{ cards: SurveyCard[]; dimensions: WorkDimension[] }>("/survey/bank"),
+  interpret: (text: string, language: string) =>
+    request<{ dims: Record<string, number>; reading: string | null }>("/survey/interpret", {
+      method: "POST", body: JSON.stringify({ text, language }) }),
+  submitSurvey: (id: string, answers: SurveyAnswer[], language: string) =>
+    request<SurveyResult>(`/profiles/${id}/survey`, { method: "POST", body: JSON.stringify({ answers, language }) }),
   pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
 };

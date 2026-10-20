@@ -66,7 +66,17 @@ function Output({ text, filename }: { text: string; filename: string }) {
 type Verdict = { ms?: "ok" | "fix"; zh?: "ok" | "fix"; msFix?: string; zhFix?: string };
 
 function Translations({ reviewer }: { reviewer: string }) {
-  const rows = useMemo(allStrings, []);
+  const interfaceRows = useMemo(allStrings, []);
+  // Survey cards and preference labels live in the reference data, so fetch them to check too.
+  const [dataRows, setDataRows] = useState<{ key: string; en: string; ms: string; zh: string }[]>([]);
+  useEffect(() => {
+    api.surveyBank().then((b) => setDataRows([
+      ...b.cards.map((c) => ({ key: c.id, en: c.text.en, ms: c.text.ms, zh: c.text.zh })),
+      ...b.dimensions.flatMap((d) => (["plus", "minus"] as const).map((pole) =>
+        ({ key: `dim.${d.id}.${pole}`, en: d[pole].en, ms: d[pole].ms, zh: d[pole].zh }))),
+    ])).catch(() => undefined);
+  }, []);
+  const rows = useMemo(() => [...interfaceRows, ...dataRows], [interfaceRows, dataRows]);
   const [lang, setLang] = useState<"ms" | "zh">("ms");
   const [verdicts, setVerdicts] = useStored<Record<string, Verdict>>("laluan.kit.translations", {});
   const set = (key: string, patch: Verdict) => setVerdicts({ ...verdicts, [key]: { ...verdicts[key], ...patch } });

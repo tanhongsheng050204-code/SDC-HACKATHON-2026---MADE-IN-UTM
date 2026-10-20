@@ -442,3 +442,10 @@ main:focus { outline: none; }
 .proof-result ol { padding-left: 1.2rem; display: grid; gap: 6px; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 420px) { .tree-node { width: calc(50% - 6px); } }
+
+/* Survey */
+.survey-card { max-width: 640px; gap: 14px; }
+.survey-text { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+.survey-other { display: grid; gap: 10px; }
+.survey-other textarea { width: 100%; }
+.also-like { margin: 14px 0; }
