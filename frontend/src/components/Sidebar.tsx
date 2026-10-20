@@ -2,13 +2,14 @@ import { ReactNode } from "react";
 import type { Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
+import { AccountButton } from "./AccountButton";
 import { LogoMark } from "./Brand";
 import { Icon, IconName } from "./Icon";
 
 interface Item { id: Screen; label: string; icon: IconName; enabled: boolean }
 
-export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome, onDelete }: {
-  current: Screen; profile: Profile | null; hasRole: boolean; model: string | null; prefs: ReactNode;
+export function Sidebar({ current, profile, hasRole, model, prefs, userId, onGo, onHome, onDelete }: {
+  current: Screen; profile: Profile | null; hasRole: boolean; model: string | null; prefs: ReactNode; userId: string | null;
   onGo: (s: Screen) => void; onHome: () => void; onDelete: () => void;
 }) {
   const groups: { label: string | null; items: Item[] }[] = [
@@ -58,6 +59,7 @@ export function Sidebar({ current, profile, hasRole, model, prefs, onGo, onHome,
         {model && <p className="side-note">{t("shell.model")}: {model}</p>}
         <p className="side-note">{t("shell.estimates")}</p>
         <div className="side-prefs">{prefs}</div>
+        <AccountButton userId={userId} className="side-link" />
         {profile && <button className="side-link danger" onClick={onDelete}><Icon name="trash" />{t("shell.delete")}</button>}
       </div>
     </aside>

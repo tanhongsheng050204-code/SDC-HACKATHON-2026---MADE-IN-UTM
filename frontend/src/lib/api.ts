@@ -1,3 +1,5 @@
+import { getToken, signOut } from "./auth";
+
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export type Scenario = "slow" | "baseline" | "accelerated";
@@ -9,6 +11,7 @@ export interface RoleOption { id: string; title: string }
 export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
   skills: string[]; interests: number[]; experience_years: number | null; completed_courses: string[]; story?: string;
+  user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
 }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
@@ -110,11 +113,34 @@ export function onServerWaking(listener: WakeListener) {
 }
 const setWaking = (waking: boolean) => wakeListeners.forEach((l) => l(waking));
 
+// A login that expired (or was revoked) gets a 401: sign out and tell the shell, but keep the
+// profile ID in this browser so nothing is lost.
+type ExpiredListener = () => void;
+const expiredListeners = new Set<ExpiredListener>();
+export function onAuthExpired(listener: ExpiredListener) {
+  expiredListeners.add(listener);
+  return () => { expiredListeners.delete(listener); };
+}
+
+function withAuth(init?: RequestInit): RequestInit | undefined {
+  const token = getToken();
+  if (!token) return init;
+  const headers = new Headers(init?.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+  return { ...init, headers };
+}
+
 async function fetchAwake(url: string, init?: RequestInit): Promise<Response> {
   const started = Date.now();
+  const sentToken = Boolean(getToken());
+  init = withAuth(init);
   for (let attempt = 0; ; attempt++) {
     try {
       const response = await fetch(url, init);
+      if (response.status === 401 && sentToken) {
+        await signOut();
+        expiredListeners.forEach((l) => l());
+      }
       if (!WAKE_STATUSES.has(response.status) || Date.now() - started > WAKE_LIMIT_MS) {
         if (attempt > 0) setWaking(false);
         return response;
@@ -137,6 +163,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  me: () => request<{ user_id: string; profile_id: string | null }>("/me"),
+  claim: async (profileId: string, replace = false) => {
+    const response = await fetchAwake(`${BASE}/api/me/claim`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ profile_id: profileId, replace }),
+    });
+    const body = await response.json();
+    if (response.status === 409) return { conflict: body.detail.existing_profile_id as string };
+    if (!response.ok) throw new Error(`${response.status}`);
+    return { profile_id: body.profile_id as string };
+  },
   health: () => request<{ status: string; llm_model: string; snapshot_imported: string }>("/health"),
   skills: () => request<Skill[]>("/skills"),
   sdgs: () => request<Sdg[]>("/sdgs"),

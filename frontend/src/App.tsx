@@ -1,13 +1,15 @@
 // Screens follow docs/03-APP_FLOW.md. Entry points: /?card=ID opens a read-only Future Card;
 // /?demo=clerk|student|hr opens a demo; ?view=... restores a screen (see lib/route.ts).
 import { useEffect, useRef, useState } from "react";
+import { AccountButton } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
 import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onServerWaking, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onServerWaking, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { authEnabled, getUserId, onAuth } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -48,6 +50,10 @@ function MainApp({ demo }: { demo: string | null }) {
   const [offline, setOffline] = useState(false);
   const [waking, setWaking] = useState(false);
   useEffect(() => onServerWaking(setWaking), []);
+  const [userId, setUserId] = useState<string | null>(getUserId());
+  useEffect(() => onAuth(setUserId), []);
+  useEffect(() => onAuthExpired(() => setError(t("auth.expired"))), []);
+  const [conflict, setConflict] = useState<{ local: string; saved: string } | null>(null);
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
@@ -116,6 +122,54 @@ function MainApp({ demo }: { demo: string | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // After login: save this browser's anonymous profile to the account, or open the account's own.
+  // If both exist and differ, ask (never merge, never drop silently). Demo profiles are never saved.
+  useEffect(() => {
+    if (!userId) {
+      if (profileRef.current?.user_id) { setProfile(null); setRole(null); go("landing", { role: undefined }); }
+      return;
+    }
+    (async () => {
+      try {
+        const me = await api.me();
+        const localId = load(KEYS.profile);
+        const local = localId ? await api.getProfile(localId).catch(() => null) : null;
+        const claimable = local && !local.is_demo && !local.user_id;
+        if (claimable && local && me.profile_id && me.profile_id !== local.id) {
+          setConflict({ local: local.id, saved: me.profile_id });
+          return;
+        }
+        if (claimable && local && !me.profile_id) {
+          await api.claim(local.id);
+          setProfile(await api.getProfile(local.id));
+          return;
+        }
+        if (me.profile_id && (!local || local.is_demo || local.id !== me.profile_id)) {
+          await openSaved(me.profile_id);
+        } else if (local) {
+          setProfile(local);
+        }
+      } catch { setError(t("auth.expired")); }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  async function openSaved(id: string) {
+    const p = await api.getProfile(id);
+    save(KEYS.profile, p.id); setProfile(p); setRole(null);
+    if (route.screen === "landing") go("home", { role: undefined });
+  }
+
+  async function resolveConflict(replace: boolean) {
+    if (!conflict) return;
+    const { local, saved } = conflict;
+    setConflict(null);
+    try {
+      if (replace) { await api.claim(local, true); await openSaved(local); }
+      else await openSaved(saved);
+    } catch { setError(t("auth.expired")); }
+  }
+
   async function openDemo(key: string) {
     setError(null);
     try {
@@ -138,6 +192,8 @@ function MainApp({ demo }: { demo: string | null }) {
       const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" ? wanted : { ...route, screen: "home" };
       setRoute(r); writeRoute(r, "replace");
     } catch {
+      // A profile saved to an account only opens when logged in: keep its ID and ask to log in.
+      if (authEnabled && !getUserId()) { setError(t("auth.needLogin")); go("landing"); return; }
       save(KEYS.profile, null);
       setError("That saved profile has expired. Start again.");
       go("landing");
@@ -186,6 +242,7 @@ function MainApp({ demo }: { demo: string | null }) {
         </div>
         <div className="site-nav-actions">
           {themeButton}
+          <AccountButton userId={userId} />
           {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
           <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
         </div>
@@ -204,7 +261,7 @@ function MainApp({ demo }: { demo: string | null }) {
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} profile={profile} hasRole={!!role} model={model} prefs={prefs}
+      <Sidebar current={screen} profile={profile} hasRole={!!role} model={model} prefs={prefs} userId={userId}
         onGo={(s) => go(s)} onHome={() => go("landing")} onDelete={deleteProfile} />
       <div className="workspace">
         <header className="workbar">
@@ -249,6 +306,22 @@ function MainApp({ demo }: { demo: string | null }) {
           onApply={applyProposal} onClose={() => setCoachOpen(false)} />
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
+      {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}
+    </div>
+  );
+}
+
+function ConflictDialog({ onKeep, onReplace }: { onKeep: () => void; onReplace: () => void }) {
+  return (
+    <div className="dialog-backdrop">
+      <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="conflict-title">
+        <h2 id="conflict-title">{t("auth.conflictTitle")}</h2>
+        <p>{t("auth.conflictBody")}</p>
+        <div className="dialog-actions">
+          <button className="btn ink" autoFocus onClick={onKeep}>{t("auth.keepSaved")}</button>
+          <button className="btn quiet" onClick={onReplace}>{t("auth.replace")}</button>
+        </div>
+      </div>
     </div>
   );
 }
