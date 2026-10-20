@@ -96,6 +96,7 @@ const STRINGS = {
   "path.tabTree": { en: "Tree", ms: "Pokok", zh: "技能树" },
   "path.tabList": { en: "List", ms: "Senarai", zh: "列表" },
   "path.step": { en: "Step", ms: "Langkah", zh: "步骤" },
+  "path.steps": { en: "steps", ms: "langkah", zh: "个步骤" },
   "path.readiness": { en: "Readiness", ms: "Kesediaan", zh: "准备度" },
   "path.hoursLeft": { en: "hours of courses left", ms: "jam kursus lagi", zh: "小时课程待完成" },
   "path.courseDone": { en: "I finished this course", ms: "Saya telah menamatkan kursus ini", zh: "我已完成这门课程" },
@@ -103,6 +104,11 @@ const STRINGS = {
   "path.noCourse": { en: "No course in our catalogue teaches this yet.", ms: "Belum ada kursus dalam katalog kami yang mengajar ini.", zh: "目前我们的课程目录中还没有教授此技能的课程。" },
   "path.topLevel": { en: "Proven at Advanced: nothing left to prove.", ms: "Dibuktikan pada tahap Lanjutan: tiada lagi yang perlu dibuktikan.", zh: "已证明达到高级，无需再证明。" },
   "path.lockedNote": { en: "Unlock the skills below this one first.", ms: "Buka kunci kemahiran di bawahnya dahulu.", zh: "请先解锁下方的技能。" },
+  "lvl.1": { en: "Basic", ms: "Asas", zh: "基础" },
+  "lvl.2": { en: "Working", ms: "Berfungsi", zh: "熟练" },
+  "lvl.3": { en: "Advanced", ms: "Lanjutan", zh: "高级" },
+  "survey.retry": { en: "Try saving again", ms: "Cuba simpan semula", zh: "重新保存" },
+  "card.proven": { en: "Proven skills", ms: "Kemahiran yang dibuktikan", zh: "已证明的技能" },
   "nav.survey": { en: "What I enjoy", ms: "Apa yang saya suka", zh: "我喜欢的工作" },
   "survey.title": { en: "What kind of work do you enjoy?", ms: "Kerja jenis apa yang anda suka?", zh: "您喜欢什么样的工作？" },
   "survey.sub": { en: "A few real moments from jobs that match your skills. Tell us how each one sounds to you; we'll find roles that fit you, not just your skills.", ms: "Beberapa situasi sebenar daripada pekerjaan yang sepadan dengan kemahiran anda. Beritahu kami pendapat anda; kami akan mencari peranan yang sesuai dengan diri anda, bukan sekadar kemahiran anda.", zh: "以下是与您技能匹配的工作中的一些真实场景。告诉我们您的感受，我们会找到适合您本人、而不仅仅是您技能的职位。" },
@@ -178,7 +184,7 @@ const STRINGS = {
   "auth.expired": { en: "Your login expired. Log in again to see your saved profile.", ms: "Log masuk anda telah tamat. Log masuk semula untuk melihat profil yang disimpan.", zh: "您的登录已过期。请重新登录以查看已保存的资料。" },
   "auth.needLogin": { en: "Log in to open your saved profile.", ms: "Log masuk untuk membuka profil anda yang disimpan.", zh: "请登录以打开您已保存的资料。" },
   "auth.conflictTitle": { en: "You already have a saved profile", ms: "Anda sudah mempunyai profil yang disimpan", zh: "您已有一个已保存的资料" },
-  "auth.conflictBody": { en: "This browser has a different profile. Which one should your account keep?", ms: "Pelayar ini mempunyai profil lain. Profil mana yang patut disimpan oleh akaun anda?", zh: "此浏览器中有另一个资料。您的账户应保留哪一个？" },
+  "auth.conflictBody": { en: "This browser has a different profile. Which one should your account keep? Keeping your saved profile leaves this browser's one unsaved; replacing deletes the saved one for good.", ms: "Pelayar ini mempunyai profil lain. Profil mana yang patut disimpan oleh akaun anda? Jika anda kekalkan profil yang disimpan, profil pelayar ini tidak disimpan; jika anda gantikan, profil yang disimpan akan dipadam terus.", zh: "此浏览器中有另一个资料。您的账户应保留哪一个？保留已保存的资料，则此浏览器中的资料不会被保存；替换则会永久删除已保存的资料。" },
   "auth.keepSaved": { en: "Keep my saved profile", ms: "Kekalkan profil yang disimpan", zh: "保留已保存的资料" },
   "auth.replace": { en: "Replace it with this one", ms: "Gantikan dengan profil ini", zh: "用此资料替换" },
   "shell.retry": { en: "Try again", ms: "Cuba lagi", zh: "重试" },
@@ -292,3 +298,13 @@ export function t(key: StringKey): string {
 }
 
 setLang(current);
+
+/** A label the server sends in all three languages, in the current one (English fallback). */
+export function pick(labels: Record<string, string> | undefined, fallback: string): string {
+  return labels?.[current] || fallback;
+}
+
+/** "Basic" / "Working" / "Advanced" in the current language. */
+export function levelName(level: number): string {
+  return level >= 1 && level <= 3 ? t(`lvl.${level}` as StringKey) : "";
+}

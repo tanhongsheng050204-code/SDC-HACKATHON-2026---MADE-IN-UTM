@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, CheckResult, CheckStart, TreeNode } from "../lib/api";
-import { getLang, t } from "../lib/i18n";
+import { getLang, levelName, t } from "../lib/i18n";
 
 // One proof check: three questions, one at a time, graded on the server. Two right proves the level.
 export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
@@ -13,7 +13,10 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
 
+  const started = useRef(false);  // one start per open: each start is a paid model call and counts as an attempt
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     api.startCheck(profileId, node.skill_id, getLang())
       .then(setCheck)
       .catch((e: Error) => setError(e.message))
@@ -40,7 +43,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
   return (
     <div className="dialog-backdrop">
       <div className="dialog proof" role="dialog" aria-modal="true" aria-labelledby="proof-title">
-        <h2 id="proof-title">{node.name}{check && ` · ${t("tree.prove")} ${check.level_name}`}</h2>
+        <h2 id="proof-title">{node.name}{check && ` · ${t("tree.prove")} ${levelName(check.level)}`}</h2>
         {busy && !check && <p className="muted">{t("tree.writing")}</p>}
         {error && <p className="error" role="alert">{error}</p>}
         {question && check && (
@@ -57,7 +60,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
         {result && check && (
           <div className="proof-result" role="status">
             <p className={result.passed ? "badge good" : "badge risk"}>
-              {result.passed ? `${t("tree.passed")} ${result.level_name}` : t("tree.notYet")} · {result.correct} / {check.questions.length}
+              {result.passed ? `${t("tree.passed")} ${levelName(result.level)}` : t("tree.notYet")} · {result.correct} / {check.questions.length}
             </p>
             <ol>
               {check.questions.map((q, i) => (

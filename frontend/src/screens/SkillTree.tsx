@@ -5,9 +5,8 @@ import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
 import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
 import { percent } from "../lib/format";
-import { t } from "../lib/i18n";
+import { levelName, t } from "../lib/i18n";
 
-const LEVELS = ["", "Basic", "Working", "Advanced"];
 
 // My pathway: the skill tree is the map (skills you have at the bottom, the role on top), each
 // node carries the course that teaches it, and the ring fills as levels are proven. The List tab
@@ -60,7 +59,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
       <div className="card path-head">
         <div className="card-row"><strong>{t("path.readiness")}</strong><strong className="readiness-num">{percent(tree.readiness)}%</strong></div>
         <div className="fit" role="img" aria-label={`${t("path.readiness")} ${percent(tree.readiness)}%`}><div style={{ width: `${tree.readiness * 100}%` }} /></div>
-        <span className="muted">{tree.total_steps} {t("path.step").toLowerCase()}s · {tree.hours_left} {t("path.hoursLeft")}</span>
+        <span className="muted">{tree.total_steps} {t("path.steps")} · {tree.hours_left} {t("path.hoursLeft")}</span>
       </div>
 
       <div className="tabs" role="tablist">
@@ -74,7 +73,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
           {depths.map((d) => (
             <div key={d} className="tree-row">
               {tree.nodes.filter((n) => n.depth === d).map((n) => {
-                const state = !n.unlocked ? t("tree.locked") : n.level ? LEVELS[n.level] : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
+                const state = !n.unlocked ? t("tree.locked") : n.level ? levelName(n.level) : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
                 const cls = ["tree-node", n.unlocked ? "" : "locked", n.step ? "has-step" : "", n.course_done ? "course-done" : ""].join(" ").trim();
                 return (
                   <button key={n.skill_id} className={cls} onClick={() => setOpen(n)}
@@ -107,7 +106,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
         <div className="dialog-backdrop" onClick={() => setOpen(null)}>
           <div className="dialog node-panel" role="dialog" aria-modal="true" aria-labelledby="node-title" onClick={(e) => e.stopPropagation()}>
             <h2 id="node-title">{open.step ? `${t("path.step")} ${open.step}: ` : ""}{open.name}</h2>
-            <div className="card-row"><SkillRing level={open.level} /><span className="muted">{open.level ? LEVELS[open.level] : t("tree.notStarted")}</span></div>
+            <div className="card-row"><SkillRing level={open.level} /><span className="muted">{open.level ? levelName(open.level) : t("tree.notStarted")}</span></div>
             {open.course
               ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{open.course.title} ↗</a> · {open.course.hours} h</p>
               : <p className="muted">{t("path.noCourse")}</p>}
