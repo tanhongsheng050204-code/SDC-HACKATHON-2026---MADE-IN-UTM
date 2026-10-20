@@ -13,7 +13,7 @@ from app.reference import get_reference, reload_reference
 from app.schemas import (CardRequest, ClaimRequest, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services import cards, coach, documents, intake, matching, pathway, skills, tasks, workforce
+from app.services import cards, coach, documents, intake, matching, pathway, skills, skilltree, tasks, workforce
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -365,6 +365,15 @@ def workforce_analyse(body: WorkforceRequest):
         return workforce.analyse(get_reference(), body.csv, body.scenario)
     except workforce.WorkforceError as error:
         raise HTTPException(422, str(error)) from error
+
+
+@router.get("/profiles/{profile_id}/tree")
+def profile_tree(profile_id: str, role: str = Query(...), user: str | None = User):
+    """The skill tree toward one role: prerequisites below, proven levels on each node."""
+    ref = get_reference()
+    if role not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return skilltree.build(ref, _profile_for(profile_id, user), role)
 
 
 @router.get("/profiles/{profile_id}/pathway")

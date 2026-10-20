@@ -26,10 +26,12 @@ ROBUST_TOP_N = 5
 
 
 def effective_skills(ref: Reference, profile: dict) -> set[str]:
-    """Skills the person reported, plus skills taught by courses they marked as finished."""
+    """Skills the person reported, skills taught by courses they marked as finished, and skills
+    proven at Basic level or above in the skill tree."""
     done = set(profile.get("completed_courses") or [])
     earned = {s for c in ref.courses if c["id"] in done for s in c["skills"]}
-    return set(profile["skills"]) | earned
+    proven = {s for s, level in (profile.get("skill_levels") or {}).items() if level >= 1}
+    return set(profile["skills"]) | earned | proven
 
 
 def fit_and_gap(role: dict, skills: set[str]) -> tuple[float, list[dict], list[dict]]:

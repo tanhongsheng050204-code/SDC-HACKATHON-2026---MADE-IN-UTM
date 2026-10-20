@@ -26,6 +26,8 @@ class Reference:
     capabilities: list[dict]
     job_terms: dict[str, str]
     tasks: dict  # {"source", "source_url", "labels_note", "roles": {role_id: {...}}}
+    skill_prereqs: dict[str, list[str]]
+    skill_levels: list[dict]
 
     @property
     def latest_snapshot(self) -> dict:
@@ -73,6 +75,8 @@ def get_reference() -> Reference:
         capabilities=_read(data_dir / "capabilities.json")["capabilities"],
         job_terms=_read(data_dir / "job_terms.json")["terms"],
         tasks=_tasks(data_dir / "tasks.json"),
+        skill_prereqs=_read(data_dir / "skill_prereqs.json")["prereqs"],
+        skill_levels=_read(data_dir / "skill_levels.json"),
     )
 
 

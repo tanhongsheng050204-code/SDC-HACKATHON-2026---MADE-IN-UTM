@@ -72,3 +72,24 @@ def test_tasks_cover_every_role_with_valid_labels():
         assert bool(entry["onet_code"]) == bool(entry["tasks"]), role_id
         for t in entry["tasks"]:
             assert t["label"] in {"automate", "assist", "human"} and t["reason"] and t["text"], t["id"]
+
+
+def test_skill_prereqs_reference_known_skills_and_have_no_cycles():
+    ref = get_reference()
+    for skill_id, prereqs in ref.skill_prereqs.items():
+        assert skill_id in ref.skills, skill_id
+        for p in prereqs:
+            assert p in ref.skills and p != skill_id, (skill_id, p)
+
+    def visit(node: str, path: tuple[str, ...]) -> None:
+        assert node not in path, f"cycle: {' -> '.join(path + (node,))}"
+        for p in ref.skill_prereqs.get(node, []):
+            visit(p, path + (node,))
+
+    for skill_id in ref.skill_prereqs:
+        visit(skill_id, ())
+
+
+def test_skill_levels_are_basic_working_advanced():
+    assert [(lvl["level"], lvl["name"]) for lvl in get_reference().skill_levels] == [
+        (1, "Basic"), (2, "Working"), (3, "Advanced")]
