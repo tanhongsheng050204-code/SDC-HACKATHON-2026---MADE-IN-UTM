@@ -55,3 +55,23 @@ def test_custom_adoption_is_explained():
 
 def test_xray_unknown_role_is_404(client):
     assert client.get("/api/roles/astronaut/xray").status_code == 404
+
+
+def test_xray_shows_malaysian_employment_when_the_snapshot_has_it(client):
+    ref = get_reference()
+    live = copy.deepcopy(ref.latest_snapshot)
+    live.update(snapshot_id="2099-01-02-trend-test", imported="2099-01-02", baseline_snapshot_id=ref.latest_snapshot["snapshot_id"])
+    for s in live["signals"]:
+        base = s["net_growth_pct"]
+        s.update(baseline_growth_pct=base, demand_points=1.0, local_points=-4.0, ai_points=0.5,
+                 net_growth_pct=round(base - 2.5, 1))
+    store.save_snapshot(live, "approved")
+    ref = reload_reference()
+    steps = xray.explain(ref, "data_entry_clerk", "baseline", None)["steps"]
+    labels = [s["label"] for s in steps]
+    assert labels[1:4] == ["Job-posting demand", "Malaysian employment", "AI research momentum"]
+    local = steps[2]
+    assert local["value"] == -4.0 and local["cap"] == "±10 points" and "OpenDOSM" in local["source"]
+    assert steps[3]["running_total"] == round(steps[0]["value"] - 2.5, 1)
+    ranked = next(r for r in matching.match(ref, CLERK, "baseline")["roles"] if r["role_id"] == "data_entry_clerk")
+    assert steps[-1]["running_total"] == ranked["outlook"]["baseline"]["index"]
