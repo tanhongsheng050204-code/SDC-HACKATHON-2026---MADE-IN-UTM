@@ -49,7 +49,7 @@ const STEPS: Step[] = [
     panel: (
       <div className="jp-card">
         <div className="seg-mini"><span>Slow</span><span className="on">Baseline</span><span>Accelerated</span></div>
-        <p className="jp-why"><b>Why this rank?</b> Skill fit 50% × 0.6 = 0.30 · Outlook × 0.4 = 0.29 · Serves SDG 4, 8 +0.05</p>
+        <p className="jp-why"><b>Why this rank?</b> Skill fit 50% × 0.6 = 0.30 · Outlook × 0.4 = 0.23 · Serves SDG 4, 8 +0.05</p>
         <span className="badge gold">Robust pick: top five in every scenario</span>
       </div>
     ),

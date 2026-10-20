@@ -28,17 +28,17 @@ const CHAIN = [
 ];
 
 const FAQ = [
-  { q: "Is this a real product, or a demo?", a: "It is a working prototype built for the XMUM hackathon. The matching, scenarios, pathways, coach and workforce view all run on real code. The two demo people are synthetic, and the bundled forecast is marked as illustrative until the team replaces it with cited figures." },
-  { q: "Where do the forecasts come from?", a: "A baseline forecast per role, adjusted by dated signals: AI research activity from arXiv (or OpenAlex) and skill mentions in job postings. The Sources page lists every snapshot with its date." },
+  { q: "Is this a real product, or a demo?", a: "It is a working prototype built for the XMUM hackathon. The matching, scenarios, pathways, coach and workforce view all run on real code. The two demo people are synthetic. Job growth figures come from the WEF Future of Jobs Report 2025; the AI-exposure settings are our own estimates, and the app says so." },
+  { q: "Where do the forecasts come from?", a: "Each role starts from the net job growth to 2030 in the WEF Future of Jobs Report 2025 (Figure 2.3, a global employer survey). Dated signals then adjust it: AI research activity from arXiv (or OpenAlex) and skill mentions in job postings, each update approved by a person. The Sources page lists every snapshot with its date." },
   { q: "Will it tell me to quit my job?", a: "No. Laluan shows estimates under different futures and the skills between you and each role. The decision stays with you, and every screen says so." },
   { q: "Do you keep my CV?", a: "No. The file is read in memory and discarded. We save the skills you confirm, your goals and your course progress, and you can delete all of it from the sidebar at any time." },
   { q: "Can my employer see my results?", a: "Only if you share a Future Card link. The workforce view for HR teams works on anonymous role-and-skills lists and refuses files with names, emails or staff IDs." },
   { q: "Which languages does it support?", a: "English, Bahasa Malaysia and Chinese for the interface. Role, course and task names stay in English, as their sources publish them." },
 ];
 
-export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onSources }: {
+export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onSources, onReviewKit }: {
   nav: ReactNode; banners: ReactNode; model: string | null; prefs: ReactNode;
-  onStart: () => void; onDemo: (k: string) => void; onHr: () => void; onSources: () => void;
+  onStart: () => void; onDemo: (k: string) => void; onHr: () => void; onSources: () => void; onReviewKit: () => void;
 }) {
   const openPerson = (key: string) => (key === "hr" ? onHr() : onDemo(key));
   return (
@@ -156,6 +156,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             <h3>Resources</h3>
             <ul>
               <li><button className="link" onClick={onSources}>{t("nav.sources")}</button></li>
+              <li><button className="link" onClick={onReviewKit}>Review kit</button></li>
               <li><a href={`${REPO}/blob/main/docs/PROPOSAL.md`} target="_blank" rel="noreferrer">Proposal</a></li>
               <li><a href={`${REPO}/blob/main/docs/CODE_TO_EXPLAIN.md`} target="_blank" rel="noreferrer">How it works</a></li>
             </ul>
