@@ -582,3 +582,17 @@ main:focus { outline: none; }
 .emerging-start .kpi-label { display: block; }
 .emerging-start .link { font-weight: 600; padding: 0; }
 .emerging-live { display: grid; gap: 6px; }
+
+/* Scenario switch on Today: the buttons stay put whatever the length of the scenario's description
+   (Baseline's is one short line, Slow and Accelerated are long sentences), and the description
+   keeps two lines' height so the list below does not jump either. */
+.home-roles-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title seg" "note seg";
+  gap: 4px 16px; align-items: start; }
+.home-roles-head h2 { grid-area: title; margin: 0; }
+.home-roles-head .segmented { grid-area: seg; }
+.home-roles-head .scenario-note { grid-area: note; min-height: 3em; margin: 0; }  /* two lines at line-height 1.5 */
+@media (max-width: 760px) {
+  /* Buttons above the description, so their place never depends on its length. */
+  .home-roles-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "seg" "note"; gap: 8px; }
+  .scenario-note, .home-roles-head .scenario-note { min-height: 4.5em; }  /* the longest description is three lines on a 375 px phone */
+}
