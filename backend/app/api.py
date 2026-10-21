@@ -11,12 +11,12 @@ from app import runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills,
-                          skilltree, survey, tasks, tipping, workforce, xray)
+from app.services import (cards, classview, coach, documents, intake, interview, matching, openings, pathway, proofcheck,
+                          rolecase, skills, skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
 
@@ -86,6 +86,14 @@ def role_xray(role_id: str, scenario: Scenario = "baseline", year: int | None = 
     if role_id not in ref.roles:
         raise HTTPException(404, "Role not found")
     return xray.explain(ref, role_id, scenario, year, adoption)
+
+
+@router.get("/roles/{role_id}/openings")
+def role_openings(role_id: str):
+    """Open jobs in Malaysia for this role (freehire.me), newest first, each linking to the original."""
+    if role_id not in get_reference().roles or role_id not in openings.lookups():
+        raise HTTPException(404, "Role not found")
+    return openings.for_role(role_id)
 
 
 @router.get("/roles/{role_id}/tasks")
@@ -525,6 +533,16 @@ def get_card(card_id: str):
     if card is None or profile is None or card["role_id"] not in get_reference().roles:
         raise HTTPException(404, "Card not found")
     return cards.view(get_reference(), profile, card)
+
+
+@router.post("/interview")
+def practise_interview(body: InterviewRequest, user: str | None = User):
+    """Interview practice for one role: feedback on the last answer and the next question."""
+    ref = get_reference()
+    if body.role_id not in ref.roles:
+        raise HTTPException(422, "Unknown role")
+    turns = [t.model_dump() for t in body.turns]
+    return interview.next_turn(ref, _profile_for(body.profile_id, user), body.role_id, turns, body.language)
 
 
 @router.post("/coach")

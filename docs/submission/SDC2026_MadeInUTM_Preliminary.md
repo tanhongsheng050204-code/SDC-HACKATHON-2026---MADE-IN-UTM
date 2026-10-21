@@ -54,7 +54,7 @@ From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and emb
 | Backend API | Python 3.12, FastAPI, Pydantic |
 | AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
 | Data | Supabase Postgres (profiles, progress, Future Cards, review decisions); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
-| Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API |
+| Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API; Malaysian job postings via the freehire.me API |
 | Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
 
 ```mermaid
@@ -129,6 +129,7 @@ flowchart LR
 | Dataset | UN Sustainable Development Goals names, targets and colours | UN SDG guidelines |
 | Dataset | arXiv API metadata counts; OpenAlex | arXiv API terms; CC0 |
 | Dataset | Hacker News “Who is hiring?” posts, counted via the Algolia HN API | HN API terms (counts only, no posts stored) |
+| Dataset | Malaysian job postings via the freehire.me API (counts stored; openings shown live with links) | freehire terms; project MIT |
 | Images | Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Unsplash License |
 | Model | Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
 

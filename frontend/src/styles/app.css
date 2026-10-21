@@ -598,3 +598,14 @@ main:focus { outline: none; }
   .home-roles-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "seg" "note"; gap: 8px; }
   .scenario-note, .home-roles-head .scenario-note { min-height: 4.5em; }  /* the longest description is three lines on a 375 px phone */
 }
+
+/* ---------- Open jobs in Malaysia, interview practice ---------- */
+.openings-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.openings-list li { display: grid; gap: 2px; }
+.openings-list a { font-weight: 600; }
+.openings .job-links { margin-top: 12px; }
+.interview form { display: grid; gap: 10px; }
+.iv-question { font-weight: 600; margin: 0; }
+.iv-feedback { padding: 10px 14px; border-radius: 10px; background: var(--accent-soft); margin-bottom: 12px; }
+.iv-feedback p { margin: 6px 0 0; }
+.iv-feedback.blocked { background: var(--risk-bg); }

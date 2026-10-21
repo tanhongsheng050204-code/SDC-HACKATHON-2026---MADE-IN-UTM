@@ -1,0 +1,261 @@
+{
+  "source": "freehire.me Malaysian job postings",
+  "source_url": "https://freehire.me/jobs?countries=MY",
+  "retrieved": "2026-10-21",
+  "country": "MY",
+  "terms": {
+    "excel": {
+      "phrase": "excel"
+    },
+    "data_entry": {
+      "phrase": "data entry"
+    },
+    "office_admin": {
+      "phrase": "microsoft office"
+    },
+    "scheduling": {
+      "phrase": "scheduling"
+    },
+    "sql": {
+      "tags": [
+        "sql",
+        "postgresql",
+        "mysql",
+        "sql-server",
+        "plsql"
+      ]
+    },
+    "python": {
+      "tags": [
+        "python"
+      ]
+    },
+    "statistics": {
+      "tags": [
+        "statistics"
+      ]
+    },
+    "data_visualization": {
+      "tags": [
+        "data-visualization",
+        "tableau",
+        "looker"
+      ]
+    },
+    "power_bi": {
+      "tags": [
+        "powerbi"
+      ]
+    },
+    "machine_learning": {
+      "tags": [
+        "machine-learning",
+        "scikit-learn"
+      ]
+    },
+    "deep_learning": {
+      "tags": [
+        "deep-learning",
+        "pytorch",
+        "tensorflow"
+      ]
+    },
+    "genai_tools": {
+      "tags": [
+        "generative-ai",
+        "llm",
+        "chatgpt",
+        "microsoft-copilot",
+        "github-copilot"
+      ]
+    },
+    "prompt_engineering": {
+      "tags": [
+        "prompt-engineering"
+      ]
+    },
+    "mlops": {
+      "tags": [
+        "mlops",
+        "model-deployment"
+      ]
+    },
+    "cloud_computing": {
+      "tags": [
+        "cloud",
+        "aws",
+        "azure",
+        "gcp"
+      ]
+    },
+    "javascript": {
+      "tags": [
+        "javascript",
+        "typescript"
+      ]
+    },
+    "git": {
+      "tags": [
+        "git",
+        "github",
+        "gitlab",
+        "version-control"
+      ]
+    },
+    "software_testing": {
+      "tags": [
+        "test-automation",
+        "unit-testing",
+        "selenium",
+        "playwright",
+        "cypress"
+      ]
+    },
+    "api_design": {
+      "tags": [
+        "api",
+        "rest",
+        "api-design"
+      ]
+    },
+    "cybersecurity_fundamentals": {
+      "tags": [
+        "cybersecurity"
+      ]
+    },
+    "network_security": {
+      "tags": [
+        "network-security",
+        "firewall"
+      ]
+    },
+    "incident_response": {
+      "phrase": "incident response"
+    },
+    "risk_assessment": {
+      "tags": [
+        "risk-assessment"
+      ]
+    },
+    "seo": {
+      "tags": [
+        "seo"
+      ]
+    },
+    "social_media_marketing": {
+      "phrase": "social media"
+    },
+    "content_writing": {
+      "tags": [
+        "copywriting",
+        "content-marketing",
+        "technical-writing"
+      ]
+    },
+    "marketing_analytics": {
+      "tags": [
+        "google-analytics",
+        "marketing-automation",
+        "ab-testing"
+      ]
+    },
+    "ux_research": {
+      "tags": [
+        "user-research",
+        "usability-testing"
+      ]
+    },
+    "ui_design": {
+      "tags": [
+        "figma",
+        "wireframing",
+        "prototyping",
+        "interaction-design"
+      ]
+    },
+    "electrical_systems": {
+      "phrase": "electrical"
+    },
+    "solar_pv": {
+      "phrase": "solar"
+    },
+    "safety_compliance": {
+      "phrase": "safety"
+    },
+    "esg_reporting": {
+      "phrase": "sustainability"
+    },
+    "carbon_accounting": {
+      "phrase": "carbon"
+    },
+    "customer_service": {
+      "phrase": "customer service"
+    },
+    "communication": {
+      "phrase": "communication"
+    },
+    "problem_solving": {
+      "phrase": "problem solving"
+    },
+    "critical_thinking": {
+      "phrase": "critical thinking"
+    },
+    "project_management": {
+      "phrase": "project management"
+    },
+    "patient_care": {
+      "phrase": "patient care"
+    },
+    "empathy": {
+      "phrase": "empathy"
+    },
+    "adaptability": {
+      "phrase": "adaptability"
+    }
+  },
+  "postings": 20729,
+  "mentions": {
+    "excel": 234,
+    "data_entry": 108,
+    "office_admin": 85,
+    "scheduling": 318,
+    "sql": 2348,
+    "python": 1890,
+    "statistics": 326,
+    "data_visualization": 460,
+    "power_bi": 678,
+    "machine_learning": 733,
+    "deep_learning": 111,
+    "genai_tools": 864,
+    "prompt_engineering": 134,
+    "mlops": 121,
+    "cloud_computing": 3389,
+    "javascript": 872,
+    "git": 1331,
+    "software_testing": 686,
+    "api_design": 2087,
+    "cybersecurity_fundamentals": 749,
+    "network_security": 547,
+    "incident_response": 151,
+    "risk_assessment": 711,
+    "seo": 107,
+    "social_media_marketing": 246,
+    "content_writing": 167,
+    "marketing_analytics": 230,
+    "ux_research": 50,
+    "ui_design": 311,
+    "electrical_systems": 543,
+    "solar_pv": 111,
+    "safety_compliance": 1470,
+    "esg_reporting": 281,
+    "carbon_accounting": 52,
+    "customer_service": 2211,
+    "communication": 1910,
+    "problem_solving": 413,
+    "critical_thinking": 32,
+    "project_management": 883,
+    "patient_care": 54,
+    "empathy": 38,
+    "adaptability": 13
+  }
+}

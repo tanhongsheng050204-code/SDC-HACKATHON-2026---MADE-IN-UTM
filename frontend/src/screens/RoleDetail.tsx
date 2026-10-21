@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
+import { InterviewPractice } from "../components/InterviewPractice";
+import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { api, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
-import { jobLinks, onetUrl, percent } from "../lib/format";
+import { onetUrl, percent } from "../lib/format";
 import { pick, t } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 
@@ -47,9 +49,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       <PayLine pay={role.pay} change={role.pay_change_rm} />
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year}
         adoption={xray === scenario ? adoption : undefined} onClose={() => setXray(null)} />}
-      <div className="job-links"><span className="muted">See open jobs:</span>
-        {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
-      </div>
+      <Openings roleId={role.role_id} title={role.title} />
 
       {roleCase && <RoleCase data={roleCase} />}
 
@@ -84,6 +84,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
           <button onClick={onImpact}>{t("a.impact")}</button>
         </div>
       )}
+      <InterviewPractice profileId={profile.id} roleId={role.role_id} />
       {error && <p className="error" role="alert">{error}</p>}
       <ShareCard profile={profile} roleId={role.role_id} />
     </section>

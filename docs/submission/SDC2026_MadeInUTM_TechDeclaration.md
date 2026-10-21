@@ -24,7 +24,7 @@ When a CV arrives, the backend reads it in memory, removes names, emails, phone 
 
 Matching, scenarios and pathways are deterministic Python over versioned **JSON reference data**: WEF growth figures, O\*NET tasks, the course catalogue and the SDG map. Profiles, course progress and shared Future Cards are kept in **SQLite**. AI-written text (coach answers, pathway summaries) passes a grounding check against these sources before it is shown.
 
-A trend pipeline counts research papers (**arXiv**, falling back to **OpenAlex**) and job-posting mentions (**Algolia Hacker News API**), builds a new dated snapshot and holds it until an admin approves it.
+A trend pipeline counts research papers (**arXiv**, falling back to **OpenAlex**) and job-posting mentions (**Algolia Hacker News API**, and Malaysian postings on **freehire.me**), builds a new dated snapshot and holds it until an admin approves it.
 
 **GitHub Actions** runs the backend tests and the frontend build on every push. A diagram is in the appendix.
 
@@ -62,6 +62,7 @@ Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
 | arXiv API (Cornell University) | Free | Counting AI research papers per capability for trend signals |
 | OpenAlex API (OurResearch) | Free | Fallback paper counts when arXiv is busy |
 | Hacker News Search API (Algolia) | Free | Counting skill mentions in “Who is hiring?” threads |
+| freehire.me public API (open source, MIT) | Free, no key | Counting skill mentions in Malaysian job postings, and showing the newest openings for each role with links to the original postings |
 
 Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open in the browser; the app does not call those services.
 
@@ -97,6 +98,7 @@ No model is trained or fine-tuned by the team. The model in use is shown in the 
 | arXiv paper counts per AI capability | <https://export.arxiv.org/api/> | Public (counts only) | N | arXiv API terms |
 | OpenAlex paper counts (fallback) | <https://openalex.org/> | Public (counts only) | N | CC0 |
 | Hacker News “Who is hiring?” skill-mention counts | <https://hn.algolia.com/api> | Public (counts only; no posts stored) | N | HN / Algolia API terms |
+| Malaysian job postings (skill-mention counts, newest openings per role) | <https://freehire.me/docs/api> | Public (counts stored; postings shown live with links, not stored) | N | freehire terms; project MIT |
 | Course catalogue (29 courses, prices and HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | N | Facts with links to the providers |
 | Roles, skills and SDG map | `backend/data/` | Self-created | N | Apache-2.0 (this repository) |
 | Demo personas (Aisyah, Wei Jie) and 5 evaluation CVs | `backend/data/demo_profiles.json`, `backend/data/eval/` | Synthetic | N (all invented) | Apache-2.0 (this repository) |
@@ -115,7 +117,7 @@ Did the team use any generative-AI tool to help create code, design, text or oth
 
 **How the team reviewed, tested and took responsibility for AI-generated output** *(100 words max)*
 
-The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 208 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
+The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 269 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
 
 *Word count: 93*
 

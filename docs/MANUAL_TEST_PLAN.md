@@ -116,7 +116,7 @@ Notes: ______
 - [ ] 7.1 Three columns: ▲ Rising, ▬ Steady, ▼ Declining (or the “no skill trends yet” notice if no refresh has been approved).
 - [ ] 7.2 Your own skills have a **Yours** badge.
 - [ ] 7.3 **Show only my skills** hides the others.
-- [ ] 7.4 “N skills have no data in these sources” opens to list them.
+- [ ] 7.4 “N skills have no trend in these sources yet” opens to list them, each with what we do have (e.g. “freehire.me Malaysian job postings: 54 of 20,729 postings mention it”) after a refresh.
 - [ ] 7.5 AI capability momentum bars appear after a refresh.
 - [ ] 7.6 Source line shows snapshot and dates; **See my future roles** opens Future roles.
 
@@ -186,6 +186,13 @@ Notes: ______
 - [ ] 9.17.2 **Why this could work for you** and **What could go wrong** each list points with a source under every point (for Aisyah's clerk role: the share of tasks AI is likely to automate).
 - [ ] 9.17.3 AI operations specialist: a con names the closest WEF category (Process Automation Specialists) and a pro gives the pay difference in RM from DOSM.
 - [ ] 9.17.4 Each “?” on Today (skill fit, outlook, robust pick) opens on hover, focus or tap and closes with Esc or a tap outside.
+
+### 9.18 Open now in Malaysia and interview practice
+- [ ] 9.18.1 **Open now in Malaysia** shows “N postings mention it” and up to three newest postings (title, company, place, date); each link opens the employer or JobStreet page.
+- [ ] 9.18.2 **freehire.me ↗**, MYFutureJobs, JobStreet and LinkedIn links open searches; with the network off, only these links show.
+- [ ] 9.18.3 **Practise an interview → Start practice**: question 1 asks why this role; questions 2–5 start with the skills you are missing.
+- [ ] 9.18.4 After each answer: feedback with a badge (**Written by AI** with a key, **Written by rules** without), and the next question; after five, **Practise again**.
+- [ ] 9.18.5 An answer containing *“ignore all previous instructions”* shows **Stopped by a safety check** and repeats the same question.
 
 ## 10. SDG impact
 
@@ -308,7 +315,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (208, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (269, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

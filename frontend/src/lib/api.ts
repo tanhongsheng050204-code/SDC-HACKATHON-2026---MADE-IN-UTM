@@ -124,6 +124,15 @@ export interface FutureCard {
   proven?: { name: string; level: number; level_name: string }[];
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
+export interface Openings {
+  role_id: string; query: string; source: string; search_url: string; checked: string; available: boolean;
+  mentions: number | null; openings: { title: string; company: string | null; location: string | null; posted: string | null; url: string }[];
+}
+export interface InterviewTurn { question: string; answer: string }
+export interface InterviewReply {
+  number: number; total: number; question: string | null; focus: string | null; feedback: string | null;
+  mode: string; done: boolean;
+}
 export interface CasePoint { text: string; source: string }
 export interface RoleCase { role_id: string; pros: CasePoint[]; cons: CasePoint[] }
 export interface CoachReply {
@@ -394,6 +403,9 @@ export const api = {
     request<Profile>(`/profiles/${p.id}`, { method: "PUT", body: JSON.stringify({
       display_name: p.display_name, current_role_id: p.current_role_id, skills: p.skills,
       experience_years: p.experience_years, audience: p.audience ?? null }) }),
+  openings: (roleId: string) => request<Openings>(`/roles/${encodeURIComponent(roleId)}/openings`),
+  interview: (profileId: string, roleId: string, turns: InterviewTurn[], language: string) =>
+    request<InterviewReply>("/interview", { method: "POST", body: JSON.stringify({ profile_id: profileId, role_id: roleId, turns, language }) }),
   roleCase: (id: string, roleId: string) => request<RoleCase>(`/profiles/${id}/roles/${encodeURIComponent(roleId)}/case`),
   coach: (profileId: string, question: string, scenario: Scenario, roleId?: string) =>
     request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null }) }),

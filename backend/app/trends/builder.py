@@ -9,7 +9,8 @@ figures) is never edited; each refresh writes a new snapshot that adjusts it wit
                             overall speed is what the slow / baseline / accelerated scenarios model.
                             Only acceleration (m > 0) moves roles and skills: a capability growing
                             slower than average does not undo automation that already happened.
-  skill trend             = job-posting trend (change in share of postings mentioning the skill)
+  skill trend             = job-posting trend (change in share of postings mentioning the skill;
+                            the mean of Hacker News and Malaysian postings when both have one)
                             + 0.5 x (momentum of capabilities that boost it - momentum of those that automate it)
                             clipped to [-1, 1]; "rising" above +0.15, "declining" below -0.15
   role demand adjustment  = 15 x weighted mean skill trend of the role's skills, capped at +/-15 points
@@ -59,22 +60,41 @@ def _mean(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
-def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict) -> dict[str, dict]:
+def _posting_trend(jobs: dict, skill_id: str, earlier: str) -> tuple[float | None, str | None]:
+    """Change in the share of postings that mention the skill, and the line that explains it."""
+    totals, mention = jobs["postings"], jobs["mentions"].get(skill_id)
+    if not mention:
+        return None, None
+    if mention["prior"] is None:  # first run of this source: a share today, no trend yet
+        return None, (f"{jobs['source']}: {mention['recent']:,} of {totals['recent']:,} postings mention it "
+                      f"({jobs['retrieved']}); a trend needs a second count at least a month later")
+    seen = mention["recent"] + mention["prior"]
+    if seen == 0:
+        return None, None
+    if seen < MIN_MENTIONS:
+        return None, f"{jobs['source']}: only {seen} postings mention it, too few for a trend"
+    share_recent = mention["recent"] / totals["recent"] if totals["recent"] else 0.0
+    share_prior = mention["prior"] / totals["prior"] if totals["prior"] else 0.0
+    trend = _clip(_change(share_recent, share_prior) or 0.0, -1.0, 1.0)
+    return trend, (f"{jobs['source']}: {mention['recent']:,} of {totals['recent']:,} postings "
+                   f"vs {mention['prior']:,} of {totals['prior']:,} {earlier}")
+
+
+def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict,
+                  my_postings: dict | None = None) -> dict[str, dict]:
     m = _pressure(momentum(research))
-    totals = jobs["postings"]
     out: dict[str, dict] = {}
     for skill_id in skills:
-        sources, trend = [], None
-        mention = jobs["mentions"].get(skill_id)
-        seen = (mention["recent"] + mention["prior"]) if mention else 0
-        if 0 < seen < MIN_MENTIONS:
-            sources.append(f"{jobs['source']}: only {seen} postings mention it, too few for a trend")
-        if seen >= MIN_MENTIONS:
-            share_recent = mention["recent"] / totals["recent"] if totals["recent"] else 0.0
-            share_prior = mention["prior"] / totals["prior"] if totals["prior"] else 0.0
-            trend = _clip(_change(share_recent, share_prior) or 0.0, -1.0, 1.0)
-            sources.append(f"{jobs['source']}: {mention['recent']} of {totals['recent']} postings "
-                           f"vs {mention['prior']} of {totals['prior']} a year earlier")
+        sources, trends = [], []
+        readings = [_posting_trend(jobs, skill_id, "a year earlier")]
+        if my_postings:
+            readings.append(_posting_trend(my_postings, skill_id, f"on {my_postings.get('prior_retrieved')}"))
+        for value, line in readings:
+            if line:
+                sources.append(line)
+            if value is not None:
+                trends.append(value)
+        trend = _mean(trends) if trends else None
         boost = [m[c["id"]] for c in capabilities if skill_id in c["boosts_skills"]]
         automate = [m[c["id"]] for c in capabilities if skill_id in c["automates_skills"]]
         if boost or automate:
@@ -142,15 +162,16 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
 
 
 def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
-          dosm: dict | None = None) -> dict:
+          dosm: dict | None = None, my_postings: dict | None = None) -> dict:
     caps = ref.capabilities
-    skills_out = skill_signals(ref.skills, caps, research, jobs)
+    skills_out = skill_signals(ref.skills, caps, research, jobs, my_postings)
     stamp = now.strftime("%Y-%m-%d")
     return {
         "snapshot_id": f"{stamp}-trend-{now:%H%M%S}",
         "kind": "trend-adjusted",
         "source": (f"{baseline['source']} adjusted by {research['source']} research momentum "
-                   f"and {jobs['source']}" + (f" and {dosm['source']}" if dosm else "")),
+                   f"and {jobs['source']}" + (f" and {dosm['source']}" if dosm else "")
+                   + (f" and {my_postings['source']}" if my_postings else "")),
         "source_url": baseline["source_url"],
         "published": baseline["published"],
         "imported": now.isoformat(timespec="seconds"),
@@ -164,6 +185,9 @@ def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
              "threads": {w: [t["title"] for t in ts] for w, ts in jobs["threads"].items()}},
             *([{"source": dosm["source"], "url": dosm["source_url"], "retrieved": dosm["retrieved"],
                 "years": dosm["years"]}] if dosm else []),
+            *([{"source": my_postings["source"], "url": my_postings["source_url"],
+                "retrieved": my_postings["retrieved"], "compared_with": my_postings.get("prior_retrieved")}]
+              if my_postings else []),
         ],
         "capability_momentum": momentum(research),
         "signals": role_signals(ref.roles, caps, baseline, research, skills_out, dosm),

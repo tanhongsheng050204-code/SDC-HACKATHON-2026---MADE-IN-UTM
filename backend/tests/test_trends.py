@@ -9,7 +9,7 @@ import pytest
 from app import store
 from app.reference import get_reference
 from app.services import matching
-from app.trends import builder, dosm, jobs, research
+from app.trends import builder, dosm, jobs, mypostings, research
 
 TODAY = dt.date(2026, 10, 19)
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
@@ -39,6 +39,23 @@ def fake_dosm(clerical: float = 1000.0, craft: float = 1000.0) -> dict:
     groups["7"] = {"recent": craft, "prior": 1000.0}
     return {"source": "test DOSM", "source_url": "z", "retrieved": str(TODAY), "dataset": "wages_occupation",
             "years": [2022, 2025], "overall": {"recent": 1100.0, "prior": 1000.0}, "groups": groups}
+
+
+def fake_my_postings(counts: dict | None = None) -> dict:
+    """A first freehire run: every skill in 50 of 1,000 Malaysian postings, unless given."""
+    mentions = {skill: 50 for skill in get_reference().my_posting_terms}
+    mentions.update(counts or {})
+    return {"source": "test MY postings", "source_url": "w", "retrieved": str(TODAY), "country": "MY",
+            "terms": {}, "postings": 1000, "mentions": mentions}
+
+
+collect_my_postings = mypostings.collect  # the real one, for the tests of freehire itself
+
+
+@pytest.fixture(autouse=True)
+def offline_freehire(monkeypatch):
+    """Refresh tests never call freehire.me; tests that need it patch collect themselves."""
+    monkeypatch.setattr(mypostings, "collect", lambda *a, **k: fake_my_postings())
 
 
 def test_momentum_is_relative_to_the_median_and_clipped():
@@ -298,3 +315,66 @@ def test_refresh_still_runs_when_opendosm_is_down(data_copy, client, monkeypatch
     assert any("OpenDOSM unavailable" in step and "data.gov.my" not in step for step in state["steps"])
     pending = store.get_snapshot(state["snapshot_id"])["body"]
     assert all("local_points" not in s for s in pending["signals"])
+
+
+def _freehire(request: httpx.Request) -> httpx.Response:
+    params = request.url.params
+    if params.get("skills") == "nope":
+        return httpx.Response(200, json={"data": [], "meta": {"total": 9, "ignored_params": [{"param": "skills"}]}})
+    total = 1000 if "skills" not in params and "q" not in params else (
+        40 if params.get("skills") == "sql,postgresql" else 7 if params.get("q") == '"customer service"' else 0)
+    assert params["countries"] == "MY"
+    return httpx.Response(200, json={"data": [], "meta": {"total": total}})
+
+
+def test_my_postings_counts_tags_and_quoted_phrases():
+    client = httpx.Client(transport=httpx.MockTransport(_freehire))
+    terms = {"sql": {"tags": ["sql", "postgresql"]}, "customer_service": {"phrase": "customer service"}}
+    raw = collect_my_postings(terms, TODAY, client=client)
+    assert raw["postings"] == 1000 and raw["mentions"] == {"sql": 40, "customer_service": 7}
+
+
+def test_my_postings_refuses_a_filter_freehire_ignored():
+    client = httpx.Client(transport=httpx.MockTransport(_freehire))
+    with pytest.raises(ValueError):
+        collect_my_postings({"x": {"tags": ["nope"]}}, TODAY, client=client)
+
+
+def test_my_postings_compares_with_a_run_at_least_four_weeks_old(tmp_path):
+    for day, total in (("2026-09-01", 800), ("2026-09-15", 900), ("2026-10-10", 950)):
+        (tmp_path / f"{day}.json").write_text(json.dumps({"retrieved": day, "postings": total, "mentions": {}}))
+    assert mypostings.previous(tmp_path, TODAY)["retrieved"] == "2026-09-15"
+    assert mypostings.previous(tmp_path, dt.date(2026, 9, 20)) is None
+
+
+def test_first_malaysian_run_shows_a_share_but_no_trend():
+    ref = get_reference()
+    first = mypostings.with_prior(fake_my_postings({"patient_care": 30}), None)
+    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), first)
+    care = skills["patient_care"]
+    assert care["label"] == "no_data"
+    assert any("30 of 1,000 postings mention it" in line and "second count" in line for line in care["sources"])
+
+
+def test_malaysian_trend_averages_with_hacker_news():
+    ref = get_reference()
+    prior = {"retrieved": "2026-09-01", "postings": 1000,
+             "mentions": {**fake_my_postings()["mentions"], "patient_care": 30}}
+    now = mypostings.with_prior(fake_my_postings({"patient_care": 60}), prior)
+    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), now)
+    assert skills["patient_care"]["trend"] == 1.0 and skills["patient_care"]["label"] == "rising"
+    sql = skills["sql"]  # Hacker News flat (0) and Malaysia flat (0): steady, with both sources named
+    assert sql["label"] == "steady" and len([s for s in sql["sources"] if "postings" in s]) == 2
+
+
+def test_refresh_still_runs_when_freehire_is_down(data_copy, client, monkeypatch):
+    def down(*a, **k):
+        raise httpx.ConnectError("no route to https://freehire.me/api/v1/jobs/search?countries=MY")
+    monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research())
+    monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs())
+    monkeypatch.setattr(dosm, "collect", lambda *a, **k: fake_dosm())
+    monkeypatch.setattr(mypostings, "collect", down)
+    state = _refresh(client)
+    assert any("freehire.me unavailable" in step and "countries=MY" not in step for step in state["steps"])
+    pending = store.get_snapshot(state["snapshot_id"])["body"]
+    assert not any(i["source"] == mypostings.SOURCE for i in pending["inputs"])

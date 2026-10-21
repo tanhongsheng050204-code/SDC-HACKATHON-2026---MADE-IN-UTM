@@ -51,6 +51,18 @@ class CoachRequest(BaseModel):
     role_id: str | None = Field(default=None, max_length=80)
 
 
+class InterviewTurn(BaseModel):
+    question: str = Field(min_length=1, max_length=400)
+    answer: str = Field(min_length=1, max_length=2000)
+
+
+class InterviewRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    role_id: str = Field(min_length=1, max_length=80)
+    turns: list[InterviewTurn] = Field(default_factory=list, max_length=5)
+    language: Literal["en", "ms", "zh"] = "en"
+
+
 class ClaimRequest(BaseModel):
     profile_id: str = Field(min_length=1, max_length=64)
     replace: bool = False

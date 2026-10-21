@@ -1,0 +1,18 @@
+{
+  "_note": "How each role is looked up in Malaysian job postings on freehire.me. 'query' is a full-text search (it also matches descriptions, so its total is postings that mention the role); 'titles' are the words (whole words, any case) a posting's title must contain to be listed as an opening for the role. Team: review these when a role's list looks off (REVIEW_LOG.md).",
+  "roles": {
+    "data_entry_clerk": {"query": "\"data entry\"", "titles": ["data entry", "clerk"]},
+    "admin_assistant": {"query": "\"admin assistant\" OR \"administrative assistant\" OR \"admin executive\"", "titles": ["admin", "administrative"]},
+    "customer_service_rep": {"query": "\"customer service\"", "titles": ["customer service", "customer support", "customer care", "customer experience"]},
+    "data_analyst": {"query": "\"data analyst\"", "titles": ["data analyst", "business intelligence", "bi analyst"]},
+    "ai_ml_engineer": {"query": "\"machine learning engineer\" OR \"AI engineer\"", "titles": ["machine learning", "ml engineer", "ai engineer", "ai agent engineer"]},
+    "ai_operations_specialist": {"query": "\"AI operations\" OR \"automation specialist\" OR \"RPA\"", "titles": ["automation", "rpa", "ai operations", "ai ops"]},
+    "software_developer": {"query": "\"software engineer\" OR \"software developer\"", "titles": ["software engineer", "software developer", "developer"]},
+    "cybersecurity_analyst": {"query": "\"security analyst\" OR \"SOC analyst\"", "titles": ["security", "soc"]},
+    "digital_marketing_specialist": {"query": "\"digital marketing\"", "titles": ["digital marketing", "performance marketing", "growth marketing", "seo"]},
+    "ux_designer": {"query": "\"UX designer\" OR \"UI/UX\" OR \"product designer\"", "titles": ["ux", "ui/ux", "product designer", "ui designer"]},
+    "renewable_energy_technician": {"query": "\"solar\" OR \"renewable energy\"", "titles": ["solar", "renewable", "pv", "energy technician"]},
+    "sustainability_analyst": {"query": "\"ESG\" OR \"sustainability analyst\" OR \"sustainability executive\"", "titles": ["esg", "sustainability"]},
+    "care_worker": {"query": "\"caregiver\" OR \"care assistant\" OR \"nursing aide\"", "titles": ["caregiver", "care assistant", "nursing aide", "nurse aide"]}
+  }
+}

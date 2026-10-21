@@ -52,8 +52,11 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         </>
       )}
       {noData.length > 0 && (
-        <details><summary className="muted">{noData.length} skills have no data in these sources</summary>
-          <p className="muted">{noData.map((s) => s.name).join(", ")}. The job-posting source is tech-heavy, so we show "no data" instead of guessing.</p>
+        <details><summary className="muted">{noData.length} skills have no trend in these sources yet</summary>
+          <p className="muted">A trend needs two counts of the same source. Until then we show what we have instead of guessing.</p>
+          <ul className="plain-list">
+            {noData.map((s) => <li key={s.skill_id}><strong>{s.name}</strong>{s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
+          </ul>
         </details>
       )}
       {momentum && (
