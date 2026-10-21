@@ -125,7 +125,7 @@ One **Replit Deployment** runs everything: FastAPI serves the API under `/api` a
    | `VITE_SUPABASE_ANON_KEY` | Required | Supabase → Project Settings → API Keys → Legacy API keys → `anon` (public by design) |
    | `ADMIN_TOKEN` | Required | Any long random string: `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
    | `GEMINI_API_KEY` | Recommended | [Google AI Studio](https://aistudio.google.com/apikey). Without it: dictionary and templates, and proof checks are unavailable |
-   | `GEMINI_MODEL` | Optional | Default `gemini-2.5-flash`; the team uses `gemini-3.8-flash` |
+   | `GEMINI_MODEL` | Optional | Default `gemini-3.8-flash` (Google no longer offers `gemini-3.8-flash` to new keys) |
    | `RUNPOD_API_KEY` | Optional | RunPod → Settings → API Keys. One key calls both endpoints |
    | `RUNPOD_LLM_ENDPOINT` | Optional | Endpoint ID of the vLLM (Qwen) endpoint, for CV reading |
    | `RUNPOD_WHISPER_ENDPOINT` | Optional | Endpoint ID of the faster-whisper endpoint, for voice input |
@@ -148,7 +148,7 @@ The backend reads environment variables and `backend/.env` (real environment var
 | Variable | Purpose / default |
 | --- | --- |
 | `GEMINI_API_KEY` | Optional. Empty means offline rules and templates; set it to use Gemini for CV reading, coach answers and pathway summaries. The model in use is shown in the app. |
-| `GEMINI_MODEL` | Generation model, default `gemini-2.5-flash`. |
+| `GEMINI_MODEL` | Generation model, default `gemini-3.8-flash`. |
 | `GEMINI_EMBEDDING_MODEL` | Embedding model, default `gemini-embedding-001`. |
 | `GEMINI_TIMEOUT_SECONDS` | Provider timeout, default `15`. |
 | `RUNPOD_API_KEY` | Optional. Turns on the RunPod Serverless endpoints below. |

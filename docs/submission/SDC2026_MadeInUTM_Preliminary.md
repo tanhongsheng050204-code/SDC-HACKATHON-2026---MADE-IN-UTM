@@ -52,7 +52,7 @@ From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and emb
 | --- | --- |
 | Frontend | React 18 + TypeScript + Vite; responsive; EN / BM / 中文; lite mode for slow connections |
 | Backend API | Python 3.12, FastAPI, Pydantic |
-| AI | Google Gemini API (`gemini-2.5-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
+| AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
 | Data | SQLite (profiles, progress, Future Cards); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
 | Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API |
 | Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
@@ -130,7 +130,7 @@ flowchart LR
 | Dataset | arXiv API metadata counts; OpenAlex | arXiv API terms; CC0 |
 | Dataset | Hacker News “Who is hiring?” posts, counted via the Algolia HN API | HN API terms (counts only, no posts stored) |
 | Images | Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Unsplash License |
-| Model | Google Gemini `gemini-2.5-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
+| Model | Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
 
 ### 6.3 Employment-related IP conflicts
 
