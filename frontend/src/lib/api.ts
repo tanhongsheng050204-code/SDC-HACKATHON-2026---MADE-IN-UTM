@@ -144,7 +144,8 @@ export interface CheckResult {
 
 export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }
 export interface WorkDimension { id: string; plus: Record<string, string>; minus: Record<string, string> }
-export interface SurveyAnswer { card_id: string; answer: "like" | "dislike" | "other"; note?: string; dims?: Record<string, number> }
+export type ScaleAnswer = "strongly_disagree" | "disagree" | "neutral" | "agree" | "strongly_agree";
+export interface SurveyAnswer { card_id: string; answer: ScaleAnswer | "other"; note?: string; dims?: Record<string, number> }
 export interface AlsoLike {
   role_id: string; title: string; rank: number; fit: number; preference_match: number;
   matched_preferences: PrefMatch[];

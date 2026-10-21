@@ -134,3 +134,32 @@ def test_matched_preferences_carry_every_language():
     care = next(r for r in roles if r["role_id"] == "care_worker")
     labels = care["why"]["matched_preferences"][0]["labels"]
     assert set(labels) == {"en", "ms", "zh"} and all(labels.values())
+
+
+def test_five_point_scale_weights_each_answer():
+    ref = get_reference()
+    prefs = survey.preferences(ref, [
+        {"card_id": "card-customer_service_rep-1", "answer": "agree"},              # people +0.5
+        {"card_id": "card-data_analyst-3", "answer": "strongly_disagree"},          # people +1, team +1
+    ])
+    assert prefs == {"people": 0.75, "team": 1.0}
+
+
+def test_neutral_counts_but_moves_nothing():
+    ref = get_reference()
+    prefs = survey.preferences(ref, [
+        {"card_id": "card-customer_service_rep-1", "answer": "strongly_agree"},     # people +1
+        {"card_id": "card-data_analyst-3", "answer": "neutral"},                    # people 0, team 0
+    ])
+    assert prefs == {"people": 0.5}  # neutral halves the people reading; team has no lean at all
+    assert survey.preferences(ref, [{"card_id": "card-data_analyst-3", "answer": "neutral"}]) == {}
+
+
+def test_scale_answers_round_trip_through_the_api(client):
+    pid = client.post("/api/profiles", json={"skills": CLERK["skills"]}).json()["id"]
+    answers = [{"card_id": "card-customer_service_rep-1", "answer": "strongly_agree"},
+               {"card_id": "card-care_worker-1", "answer": "disagree"},
+               {"card_id": "card-data_analyst-3", "answer": "neutral"}]
+    assert client.post(f"/api/profiles/{pid}/survey", json={"answers": answers}).status_code == 200
+    bad = [{"card_id": "card-customer_service_rep-1", "answer": "somewhat"}]
+    assert client.post(f"/api/profiles/{pid}/survey", json={"answers": bad}).status_code == 422

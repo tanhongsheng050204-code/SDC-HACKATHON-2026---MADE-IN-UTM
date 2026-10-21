@@ -447,6 +447,13 @@ main:focus { outline: none; }
 .survey-card { max-width: 640px; gap: 14px; }
 .survey-text { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
 .survey-other { display: grid; gap: 10px; }
+.likert { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.likert .btn { min-height: 52px; padding: 8px 6px; white-space: normal; line-height: 1.2; text-align: center; justify-content: center; }
+.likert .likert-strongly_disagree, .likert .likert-disagree { border-color: var(--risk-bg); }
+.likert .likert-strongly_disagree { background: var(--risk-bg); color: var(--risk); }
+.likert .likert-strongly_agree, .likert .likert-agree { border-color: var(--good-bg); }
+.likert .likert-strongly_agree { background: var(--good-bg); color: var(--good); }
+@media (max-width: 560px) { .likert { grid-template-columns: 1fr; } }
 .survey-other textarea { width: 100%; }
 .also-like { margin: 14px 0; }
 

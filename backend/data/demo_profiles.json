@@ -15,27 +15,27 @@
     "survey_answers": [
       {
         "card_id": "card-data_entry_clerk-2",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-data_entry_clerk-3",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-data_analyst-3",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-ai_operations_specialist-2",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-customer_service_rep-2",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       },
       {
         "card_id": "card-care_worker-1",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       }
     ],
     "audience": "worker"
@@ -57,27 +57,27 @@
     "survey_answers": [
       {
         "card_id": "card-digital_marketing_specialist-1",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-digital_marketing_specialist-3",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-ux_designer-3",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-customer_service_rep-1",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-data_analyst-3",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       },
       {
         "card_id": "card-data_entry_clerk-2",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       }
     ],
     "audience": "graduate"
@@ -99,23 +99,23 @@
     "survey_answers": [
       {
         "card_id": "card-ux_designer-1",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-ux_designer-2",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-ux_designer-3",
-        "answer": "like"
+        "answer": "strongly_agree"
       },
       {
         "card_id": "card-customer_service_rep-2",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       },
       {
         "card_id": "card-data_entry_clerk-2",
-        "answer": "dislike"
+        "answer": "strongly_disagree"
       }
     ]
   }
