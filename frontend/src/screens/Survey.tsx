@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
-import { api, Profile, SurveyAnswer, SurveyCard, SurveyResult } from "../lib/api";
+import { api, Profile, ScaleAnswer, SurveyAnswer, SurveyCard, SurveyResult } from "../lib/api";
 import { getLang, t } from "../lib/i18n";
 import { MicButton } from "../components/MicButton";
 
 const textFor = (text: Record<string, string>) => text[getLang()] || text.en;
+const SCALE: ScaleAnswer[] = ["strongly_disagree", "disagree", "neutral", "agree", "strongly_agree"];
 
-// One card at a time: Like, Dislike or Other (your own words). At the end, the preferences your
+// One card at a time, answered on a five-point scale, or in your own words ("Something else"). At the end, the preferences your
 // answers reveal and roles you might not have considered.
 export function Survey({ profile, userId, onDone, onSkip }: {
   profile: Profile; userId: string | null; onDone: (p: Profile) => void; onSkip: () => void;
@@ -66,11 +67,20 @@ export function Survey({ profile, userId, onDone, onSkip }: {
           <p className="muted">{answers.length + 1} / {cards.length}</p>
           <p className="survey-text">{textFor(card.text)}</p>
           {other === null ? (
-            <div className="actions">
-              <button className="btn ink" onClick={() => answer({ card_id: card.id, answer: "like" })}>👍 {t("survey.like")}</button>
-              <button className="btn quiet" onClick={() => answer({ card_id: card.id, answer: "dislike" })}>👎 {t("survey.dislike")}</button>
-              <button className="btn quiet" onClick={() => setOther("")}>✎ {t("survey.other")}</button>
-            </div>
+            <>
+              <p className="muted likert-prompt" id="likert-prompt">{t("survey.scale")}</p>
+              <div className="likert">
+                <span className="likert-end disagree" aria-hidden="true">{t("survey.strongly_disagree")}</span>
+                <div className="likert-dots" role="group" aria-labelledby="likert-prompt">
+                  {SCALE.map((value) => (
+                    <button key={value} className={`likert-dot ${value}`} aria-label={t(`survey.${value}`)} title={t(`survey.${value}`)}
+                      onClick={() => answer({ card_id: card.id, answer: value })} />
+                  ))}
+                </div>
+                <span className="likert-end agree" aria-hidden="true">{t("survey.strongly_agree")}</span>
+              </div>
+              <button className="link" onClick={() => setOther("")}>✎ {t("survey.other")}</button>
+            </>
           ) : (
             <div className="survey-other">
               <label>{t("survey.otherLabel")}
