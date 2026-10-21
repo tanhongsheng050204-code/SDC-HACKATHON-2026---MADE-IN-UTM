@@ -101,10 +101,29 @@ On Windows, Docker can't read files managed by OneDrive (“Files On-Demand”).
 
 One **Replit Deployment** runs everything: FastAPI serves the API under `/api` and the built React app at `/` (see [`.replit`](.replit)). Data lives in **Supabase**: Postgres for profiles, progress and trend snapshots, and Supabase Auth for Google login, so nothing is lost when the deployment restarts.
 
-1. Import the repository into Replit and add the secrets listed in `.replit` (Secrets tab). `VITE_SUPABASE_*` must be set before the build, because Vite bakes them into the app.
-2. In Supabase: enable the **Google** provider (Authentication → Providers) with a Google Cloud OAuth client (scopes `openid`, `email`, `profile`; authorised redirect = the Supabase callback URL), and add the Replit address and `http://localhost:5173` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in.
+1. Import the repository into Replit and add these in the **Secrets** tab. `VITE_SUPABASE_*` must be set before the build, because Vite bakes them into the app.
+
+   | Secret | Needed? | Where to get it |
+   | --- | --- | --- |
+   | `DATABASE_URL` | Required | Supabase → Connect → **Session pooler** URI, with the database password filled in (letters and digits, or URL-encoded). Not the direct `db.*` address, which is IPv6-only |
+   | `SUPABASE_URL` | Required | `https://<project-ref>.supabase.co` |
+   | `VITE_SUPABASE_URL` | Required | Same value as `SUPABASE_URL` |
+   | `VITE_SUPABASE_ANON_KEY` | Required | Supabase → Project Settings → API Keys → Legacy API keys → `anon` (public by design) |
+   | `ADMIN_TOKEN` | Required | Any long random string: `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
+   | `GEMINI_API_KEY` | Recommended | [Google AI Studio](https://aistudio.google.com/apikey). Without it: dictionary and templates, and proof checks are unavailable |
+   | `GEMINI_MODEL` | Optional | Default `gemini-2.5-flash`; the team uses `gemini-3.8-flash` |
+   | `RUNPOD_API_KEY` | Optional | RunPod → Settings → API Keys. One key calls both endpoints |
+   | `RUNPOD_LLM_ENDPOINT` | Optional | Endpoint ID of the vLLM (Qwen) endpoint, for CV reading |
+   | `RUNPOD_WHISPER_ENDPOINT` | Optional | Endpoint ID of the faster-whisper endpoint, for voice input |
+   | `RUNPOD_LLM_MODEL` | Only if changed | Default `Qwen/Qwen2.5-7B-Instruct`; must match the model the worker loaded |
+   | `CONTACT_EMAIL` | Optional | Sent to OpenAlex with research-trend requests |
+
+   Not needed on Replit: `SUPABASE_JWT_SECRET` (legacy projects only), `CORS_ORIGINS` and `VITE_API_URL` (the app and API share one address), `DATABASE_PATH`, `DATA_DIR`, `FRONTEND_DIST`.
+2. In Supabase: enable the **Google** provider (Authentication → Providers) with a Google Cloud OAuth client (scopes `openid`, `email`, `profile`; authorised redirect = the Supabase callback URL). Under Authentication → URL Configuration, set the Replit address as the **Site URL** and add it and `http://localhost:5173` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in.
 3. `DATABASE_URL` is the Supabase *Session pooler* connection string. Tables are created on first start.
-4. Deploy (Autoscale, or Reserved VM to avoid a cold start during a demo).
+4. Deploy as a **Reserved VM** (already set in `.replit`): the trend refresh and live forecast live in one process, so Autoscale's several instances would disagree (DECISIONS #31).
+5. After the first deploy: open the Roles screen, run **Refresh trend data** with the admin token and approve it, so the live forecast includes the job-posting, OpenDOSM and research signals. Then try a proof check and a CV upload to confirm the Gemini and RunPod keys.
+6. Before a live demo, wake the RunPod workers (send one CV and one voice clip a minute before), or set the endpoints' active workers to 1 for the session and back to 0 afterwards.
 
 The older Vercel + Render setup above stays live until the Replit address replaces it.
 

@@ -21,7 +21,7 @@ The team chose: **skill tree, survey and login first.**
 | Phase | Target | Contents |
 |---|---|---|
 | 1 | Working by 25 Oct | Login + Supabase database, hosting on Replit, skill tree with proof checks, personalised survey, SDG choice removed, privacy step "send less", serving the four groups (section 11) |
-| 2 | After Phase 1 (**built**; RunPod endpoints still to be created) | RunPod: Whisper voice input and open-model CV reading; wider scrubber; "what gets sent" preview |
+| 2 | After Phase 1 (**built**; RunPod endpoints live since 21 Oct 2026) | RunPod: Whisper voice input and open-model CV reading; wider scrubber; "what gets sent" preview |
 | 3 | After Phase 2 | Cited skill evidence via web search, emerging roles, "a day in this job", SDG reasons for every role/skill/emerging role |
 
 If Phase 1 runs late, the order inside it is: login + database, then skill tree, then survey, then the four-group work (section 11).
@@ -150,6 +150,7 @@ Gemini stays the model. Protection in layers:
 - **CV reading:** a RunPod Serverless endpoint running an open 7–8B instruct model (Qwen or Llama, **builder's call**, e.g. via vLLM) does the CV → skills extraction. Gemini then only ever sees confirmed skills. Fallback order: RunPod → Gemini with scrubber → offline dictionary.
 - Both behind the existing "one client, timeout-bounded, offline fallback" pattern in `llm.py`. Short timeouts so a cold start (10–60 s) triggers the fallback instead of a stall; optionally warm the endpoints before a demo.
 - Budget: keep min workers at 0; watch usage in the RunPod dashboard.
+- **As built (21 Oct 2026):** Qwen2.5-7B-Instruct on RunPod's vLLM worker (24 GB GPU, about US$0.69/hr while running) and the faster-whisper Hub worker with model `small` (16 GB GPU). One account API key calls both endpoints. Measured: Qwen cold start about 2 min on first boot, then about 1.5 s per call; Whisper cold 21 s, warm about 2 s. The 20 s limit covers the whole call (RunPod holds the connection open during a cold start, so a per-read timeout never fired); a cold worker falls back to Gemini and the abandoned request warms it for the next person.
 
 ## 8. Cited skill evidence via web search (Phase 3)
 
