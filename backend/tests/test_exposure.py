@@ -88,11 +88,11 @@ def test_tasks_carry_observed_ai_use_where_published(client):
 
 
 def test_programme_links(client):
-    dev = client.get("/api/roles/software_developer/programmes").json()
+    dev = client.get("/api/roles/software_developer/malaysia-programmes").json()
     assert dev["mycol"]["entry"]["match"] == "listed" and dev["mycol"]["entry"]["page"]
-    clerk = client.get("/api/roles/data_entry_clerk/programmes").json()
+    clerk = client.get("/api/roles/data_entry_clerk/malaysia-programmes").json()
     assert clerk["mycol"]["entry"] is None and clerk["jelajah_ai"]["url"].startswith("https://")
-    assert client.get("/api/roles/astronaut/programmes").status_code == 404
+    assert client.get("/api/roles/astronaut/malaysia-programmes").status_code == 404
 
 
 def test_identity_statement_uses_only_profile_facts(client):

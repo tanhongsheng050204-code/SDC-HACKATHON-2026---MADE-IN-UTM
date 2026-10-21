@@ -12,7 +12,8 @@ anyone sees it (app/evidence/review.py), at most MAX_SHOWN are shown, and none i
 no published growth figure for a job title this new, and the brief forbids inventing one.
 
 The live "Search the web" button on a card runs the job-ad search for its title, labelled "not yet
-reviewed", cached per title per day and limited per profile, and never feeds any score.
+reviewed", cached per title per day and limited per profile, and never feeds any score. The role
+page's "Find current openings" (openings()) uses the same search, cache and limit for catalogue roles.
 """
 
 import datetime as dt
@@ -130,7 +131,19 @@ class RateLimited(Exception):
 
 def live_search(card: dict, profile_id: str, ref) -> dict:
     """Current job ads for an emerging title. Cached per title per day; LIVE_PER_HOUR per profile."""
-    key = (card["capability_id"], str(dt.date.today()))
+    role = {"id": card["capability_id"], "title": card["title"]["en"], "summary": card["summary"]["en"], "skills": []}
+    return _live((card["capability_id"], str(dt.date.today())), role, profile_id, ref)
+
+
+def openings(role_id: str, profile_id: str, ref) -> dict:
+    """Current Malaysian job ads for a catalogue role, for "Find current openings" on the role page.
+    The same unreviewed search, daily cache and per-profile limit as live_search; job ads first."""
+    role = ref.roles[role_id]
+    found = _live((f"role:{role_id}", str(dt.date.today())), {**role, "skills": []}, profile_id, ref)
+    return {**found, "sources": sorted(found["sources"], key=lambda s: s["kind"] != "job_ad")}
+
+
+def _live(key: tuple[str, str], role: dict, profile_id: str, ref) -> dict:
     with _live_lock:
         if key in _live_cache:
             return _live_cache[key]
@@ -138,7 +151,6 @@ def live_search(card: dict, profile_id: str, ref) -> dict:
         if len(recent) >= LIVE_PER_HOUR:
             raise RateLimited()
         _live_calls[profile_id] = [*recent, time.time()]
-    role = {"id": card["capability_id"], "title": card["title"]["en"], "summary": card["summary"]["en"], "skills": []}
     found = search.search_role(role, ref.skills)
     result = {"reviewed": False, "searched": str(dt.date.today()),
               "sources": [{k: p[k] for k in ("url", "title", "employer", "kind", "grounded")}

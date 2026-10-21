@@ -35,11 +35,13 @@ class Reference:
     work_dimensions: list[dict]
     survey_cards: dict[str, dict]
     salaries: dict
+    programmes: list[dict]  # common Malaysian programmes and the skills they usually teach (data/programmes.json)
+    ai_upgrade: dict[str, dict]  # role_id -> {"ai_skills": [{skill_id, why}], "reviewed_by"} (Your job, with AI)
     translations: dict[str, dict]  # English text -> {"ms", "zh"}, AI-drafted (scripts/build_translations.py)
     day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
     role_occupations: dict[str, dict]  # role_id -> {"soc", "onet", "isco08", "note"}
     ai_exposure: dict  # published exposure estimates and AI usage (scripts/build_ai_exposure.py)
-    programmes: dict  # Malaysian public programmes linked from role pages
+    malaysia_programmes: dict  # MyCOL, MyMahir and Jelajah AI links on role pages (data/malaysia_programmes.json)
 
     @property
     def latest_snapshot(self) -> dict:
@@ -104,11 +106,13 @@ def get_reference() -> Reference:
         work_dimensions=_read(data_dir / "work_dimensions.json"),
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
         salaries=_read(data_dir / "salaries.json"),
+        programmes=_read(data_dir / "programmes.json")["programmes"],
+        ai_upgrade=_read(data_dir / "ai_upgrade.json")["roles"],
         translations=_read(data_dir / "translations.json")["strings"],
         day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
         role_occupations=_read(data_dir / "role_occupations.json")["roles"],
         ai_exposure=_read(data_dir / "ai_exposure.json"),
-        programmes=_read(data_dir / "malaysia_programmes.json"),
+        malaysia_programmes=_read(data_dir / "malaysia_programmes.json"),
     )
 
 

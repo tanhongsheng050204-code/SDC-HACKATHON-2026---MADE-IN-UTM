@@ -17,8 +17,8 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
-                          openings, pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, workforce,
-                          xray)
+                          openings, pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
+                          workforce, xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
 
@@ -56,6 +56,13 @@ def health():
 @router.get("/skills")
 def list_skills():
     return sorted(get_reference().skills.values(), key=lambda s: (s["category"], s["name"]))
+
+
+@router.get("/programmes")
+def programmes():
+    """Common Malaysian programmes and the skills they usually teach: a graduate's starting point,
+    which they confirm (team-reviewed data)."""
+    return [{k: p[k] for k in ("id", "name", "skills")} for p in get_reference().programmes]
 
 
 @router.get("/translations")
@@ -148,20 +155,20 @@ def malaysia_ai_use():
     return exposure.malaysia_overview(get_reference())
 
 
-@router.get("/roles/{role_id}/programmes")
-def role_programmes(role_id: str):
+@router.get("/roles/{role_id}/malaysia-programmes")
+def role_malaysia_programmes(role_id: str):
     """Malaysian public programmes for this role: MyCOL, MyMahir and Jelajah AI MyMahir (links only)."""
     ref = get_reference()
     if role_id not in ref.roles:
         raise HTTPException(404, "Role not found")
-    p = ref.programmes
+    p = ref.malaysia_programmes
     mycol = {k: p["mycol"][k] for k in ("name", "publisher", "about", "url", "report_url", "checked")}
     return {"role_id": role_id, "mycol": {**mycol, "entry": p["mycol"]["roles"].get(role_id)},
             "mymahir": p["mymahir"], "jelajah_ai": p["jelajah_ai"]}
 
 
-@router.get("/roles/{role_id}/openings")
-def role_openings(role_id: str):
+@router.get("/roles/{role_id}/postings")
+def role_postings(role_id: str):
     """Open jobs in Malaysia for this role (freehire.me), newest first, each linking to the original."""
     if role_id not in get_reference().roles or role_id not in openings.lookups():
         raise HTTPException(404, "Role not found")
@@ -295,6 +302,20 @@ def emerging_live_search(capability_id: str, body: LiveSearchRequest, user: str 
         raise HTTPException(404, "No emerging role with that ID")
     try:
         return emerging.live_search(card, body.profile_id, get_reference())
+    except emerging.RateLimited:
+        raise HTTPException(429, "You have searched a lot this hour. Try again later.") from None
+    except Exception:
+        raise HTTPException(503, "The web search is unavailable right now.") from None
+
+@router.post("/roles/{role_id}/openings")
+def role_openings(role_id: str, body: LiveSearchRequest, user: str | None = User):
+    """Current Malaysian job ads for this role: found by a live web search, not reviewed, never
+    scored; cached per role per day and limited per profile (shared with the emerging-role search)."""
+    _profile_for(body.profile_id, user)
+    if role_id not in get_reference().roles:
+        raise HTTPException(404, "Role not found")
+    try:
+        return emerging.openings(role_id, body.profile_id, get_reference())
     except emerging.RateLimited:
         raise HTTPException(429, "You have searched a lot this hour. Try again later.") from None
     except Exception:
@@ -590,6 +611,17 @@ def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int 
 def profile_tipping(profile_id: str, year: int | None = None, user: str | None = User):
     """Where, on the AI-adoption slider, this person's picture changes."""
     return tipping.find(get_reference(), _profile_for(profile_id, user), year)
+
+
+@router.get("/profiles/{profile_id}/ai-assisted")
+def ai_assisted(profile_id: str, user: str | None = User):
+    """Your job, with AI: the person's current role with AI skills added, before any move. 404 when
+    they have no current role, or it is an AI job already."""
+    ref = get_reference()
+    result = upgrade.for_profile(ref, _profile_for(profile_id, user))
+    if result is None:
+        raise HTTPException(404, "No AI-assisted version for this profile")
+    return result
 
 
 @router.get("/profiles/{profile_id}/roles/{role_id}/case")

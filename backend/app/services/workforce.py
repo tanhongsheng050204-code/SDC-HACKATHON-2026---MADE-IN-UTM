@@ -6,6 +6,12 @@ yet (named, never guessed). Most catalogue courses are free or free to audit, so
 is usually staff time: learning hours at the DOSM median hourly pay of each person's current
 occupation group (monthly median / WORK_HOURS_PER_MONTH), a group figure, not anyone's salary.
 
+For each group in a declining role there are two options: upskill in place (the same role,
+AI-assisted: app/services/upgrade.py) and the nearest move (the role that is not declining with the
+best skill fit today, never a long shot chosen for its growth). Groups in stable roles where AI is
+likely to automate GET_AHEAD_SHARE of the tasks get the upskill-in-place option in a separate,
+lower-priority "get ahead" list, so HR can plan before the role declines.
+
 Aggregate only, never a ranking of individual employees: the tool supports reskilling decisions and
 must not be used for hiring or firing (brief, section 6). Files with columns that identify people
 (name, email, IC, phone) are rejected outright. Skills are matched with the dictionary only, so a
@@ -18,10 +24,11 @@ import re
 from collections import Counter, defaultdict
 
 from app.reference import Reference
-from app.services import matching, pathway, skills
+from app.services import matching, pathway, skills, tasks, upgrade
 
 MAX_ROWS = 5000
 WORK_HOURS_PER_MONTH = 173.33  # 40 hours a week x 52 weeks / 12 months
+GET_AHEAD_SHARE = 0.4          # stable roles where AI is likely to automate this share of the tasks
 FORBIDDEN = re.compile(r"name|e-?mail|\bic\b|nric|passport|phone|mobile|address|staff.?id|employee.?id", re.I)
 
 
@@ -93,6 +100,9 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     by_role: dict[str, dict] = {}
     moves: dict[tuple[str, str], dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fit": 0.0, "fees": 0.0})
     budget = {"total": 0.0, "claimable": 0.0, "ask": 0.0, "unpriced": set(), "people_paid": 0, "time": 0.0}
+    # Upskill in place, per role: for groups at risk (an option beside the move) and stable but exposed ("get ahead").
+    in_place: dict[str, dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fees": 0.0, "time": 0.0})
+    exposed = {r: tasks.for_role(ref, r)["shares"]["automate"] >= GET_AHEAD_SHARE for r in ref.roles}
     sdg_people: Counter = Counter()
     for (role_id, person_skills), count in groups.items():
         profile = {"skills": list(person_skills), "current_role_id": role_id}
@@ -104,9 +114,20 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         })
         entry["headcount"] += count
         entry["fit_sum"] += current["fit"] * count
+        hourly = matching.pay(ref, role_id)["median_rm"] / WORK_HOURS_PER_MONTH
+        upgraded = upgrade.upgraded_role(ref, role_id)
+        if upgraded and (current["at_risk"] or exposed[role_id]):
+            stay = pathway.build(ref, profile, role_id, summarize=False, role_override=upgraded)
+            slot = in_place[role_id]
+            slot["people"] += count
+            slot["hours"] += stay["total_hours"] * count
+            slot["fees"] += _plan_fees(stay)["total"] * count
+            slot["time"] += stay["total_hours"] * hourly * count
         if not current["at_risk"]:
             continue
-        target = next(r for r in result["roles"] if not r["at_risk"] and r["role_id"] != role_id)
+        # The nearest move: best skill fit among roles that are not declining (fewest hours on a tie).
+        candidates = [r for r in result["roles"] if not r["at_risk"] and r["role_id"] != role_id]
+        target = max(candidates, key=lambda r: (r["fit"], -r.get("plan_hours", 0)))
         plan = pathway.build(ref, profile, target["role_id"], summarize=False)
         move = moves[(role_id, target["role_id"])]
         move["people"] += count
@@ -118,7 +139,6 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
             budget[key] += fees[key] * count
         budget["unpriced"] |= fees["unpriced"]
         budget["people_paid"] += count if fees["total"] or fees["unpriced"] else 0
-        hourly = matching.pay(ref, role_id)["median_rm"] / WORK_HOURS_PER_MONTH
         budget["time"] += plan["total_hours"] * hourly * count
         for sdg in target["sdgs"]:
             sdg_people[sdg["number"]] += count
@@ -134,6 +154,13 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "sdgs": ref.sdg_view(ref.role_sdgs(b)),
     } for (a, b), m in moves.items()), key=lambda m: (-m["people"], m["avg_hours"]))
     at_risk = sum(r["headcount"] for r in rows if r["at_risk"])
+    risk_roles = {r["role_id"] for r in rows if r["at_risk"]}
+
+    def stay_row(role_id: str, m: dict) -> dict:
+        return {"role_id": role_id, "title": ref.roles[role_id]["title"], "people": m["people"],
+                "avg_hours": round(m["hours"] / m["people"]), "fees_each_rm": round(m["fees"] / m["people"], 2),
+                "staff_time_rm": round(m["time"], -2),
+                "ai_skills": [ref.skills[s["skill_id"]]["name"] for s in ref.ai_upgrade[role_id]["ai_skills"]]}
     return {
         "scenario": ref.scenarios[scenario_id],
         "employees": len(people),
@@ -146,6 +173,10 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
                    "staff_time_rm": round(budget["time"], -2), "pay_year": ref.salaries["year"]},
         "roles": rows,
         "moves": move_list,
+        # Option 1 for each group at risk: the same role, AI-assisted. "get_ahead": stable roles AI is
+        # likely to change a lot, a lower priority.
+        "in_place": sorted((stay_row(r, m) for r, m in in_place.items() if r in risk_roles), key=lambda x: -x["people"]),
+        "get_ahead": sorted((stay_row(r, m) for r, m in in_place.items() if r not in risk_roles), key=lambda x: -x["people"]),
         "sdg_contribution": [{**ref.sdgs[n], "people": c} for n, c in sdg_people.most_common()],
         "problems": problems[:20],
         "signal_source": {k: ref.latest_snapshot[k] for k in ("snapshot_id", "imported", "illustrative")},

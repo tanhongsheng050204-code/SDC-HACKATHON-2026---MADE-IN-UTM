@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, Identity, MalaysiaAiUse, Programmes as ProgrammesData } from "../lib/api";
+import { api, Identity, MalaysiaAiUse, MalaysiaProgrammes as ProgrammesData } from "../lib/api";
 import { getLang, t } from "../lib/i18n";
 import { AiBadge } from "./AiBadge";
 
@@ -30,7 +30,7 @@ export function MalaysiaAiUseCard() {
 // Malaysian public programmes for a role: links only, with no claim of endorsement.
 export function Programmes({ roleId }: { roleId: string }) {
   const [data, setData] = useState<ProgrammesData | null>(null);
-  useEffect(() => { api.programmes(roleId).then(setData).catch(() => setData(null)); }, [roleId]);
+  useEffect(() => { api.malaysiaProgrammes(roleId).then(setData).catch(() => setData(null)); }, [roleId]);
   if (!data) return null;
   const entry = data.mycol.entry;
   return (

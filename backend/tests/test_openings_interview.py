@@ -55,7 +55,7 @@ def test_openings_are_cached_and_an_outage_is_not(monkeypatch):
 
 
 def test_openings_route_rejects_unknown_roles(client):
-    assert client.get("/api/roles/astronaut/openings").status_code == 404
+    assert client.get("/api/roles/astronaut/postings").status_code == 404
 
 
 def test_interview_plan_starts_with_the_role_then_missing_core_skills():

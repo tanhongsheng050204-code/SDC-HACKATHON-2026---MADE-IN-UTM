@@ -182,3 +182,12 @@ def test_reference_text_has_bm_and_chinese():
 def test_translations_are_served(client):
     body = client.get("/api/translations").json()
     assert body["Data entry clerk"]["ms"] and body["Data entry clerk"]["zh"]
+
+
+def test_programmes_use_catalogue_skills_with_courses():
+    ref = get_reference()
+    taught = {s for c in ref.courses for s in c["skills"]}
+    assert len(ref.programmes) >= 15
+    for prog in ref.programmes:
+        assert set(prog["name"]) == {"en", "ms", "zh"} and prog["aliases"] and 3 <= len(prog["skills"]) <= 6
+        assert all(s in ref.skills and s in taught for s in prog["skills"]), prog["id"]

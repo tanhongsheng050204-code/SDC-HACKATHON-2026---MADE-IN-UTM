@@ -6,8 +6,10 @@ import { EmergingRoles } from "../components/EmergingRoles";
 import { ExposureMap } from "../components/ExposureMap";
 import { RoleCard } from "../components/RoleCard";
 import { RoleGraph } from "../components/RoleGraph";
+import { percent } from "../lib/format";
+import { AiAssisted } from "../components/AiAssisted";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
-import { t, tr } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
 
@@ -44,6 +46,12 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
   function dismissTip() { setTipSeen(true); save(KEYS.sliderTip, "1"); }
 
   const noCloseRole = data && data.roles.length > 0 && data.roles.every((r) => r.fit < CLOSE_FIT);
+  // Someone with a job sees A "Your job, with AI" before B, the moves; the shortest move is picked out.
+  const hasJob = Boolean(profile.current_role_id) && profile.audience !== "graduate";
+  // Only worth pointing out when it saves real time: at least 30% fewer hours than the top role.
+  const top = data?.roles[0];
+  const candidate = data?.shortest_route ? data.roles.find((r) => r.role_id === data.shortest_route) : undefined;
+  const shortest = candidate && top && (candidate.plan_hours ?? 0) <= 0.7 * (top.plan_hours ?? 0) ? candidate : undefined;
   return (
     <section>
       <div className="page-head">
@@ -105,6 +113,15 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         <p className="muted"><button className="link" onClick={onSurvey}>{t("survey.prompt")}</button></p>
       )}
       {data && <WhatIf data={data} extra={extra} onChange={setExtra} />}
+      {data && hasJob && <AiAssisted profile={profile} outlook={data.current_role?.outlook[scenario]} />}
+      {data && hasJob && <h2 className="option-head">{t("aa.optionB")}</h2>}
+      {data && shortest && shortest.role_id !== data.roles[0]?.role_id && (
+        <button className="card shortest-route" onClick={() => onOpen(shortest)}>
+          <span className="badge good">{t("route.badge")}</span>
+          <strong>{tr(shortest.title)}</strong>
+          <span className="muted">{tf("route.text", { h: shortest.plan_hours ?? 0, n: percent(shortest.fit), top: tr(data.roles[0].title), topH: data.roles[0].plan_hours ?? 0 })}</span>
+        </button>
+      )}
       {data && (
         <div className="segmented view-switch" role="radiogroup" aria-label={t("graph.title")}>
           <button role="radio" aria-checked={view === "list"} onClick={() => changeView("list")}>{t("graph.list")}</button>

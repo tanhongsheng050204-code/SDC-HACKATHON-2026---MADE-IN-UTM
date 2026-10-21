@@ -5,6 +5,7 @@ import { ExposureBand, ExposureLine } from "../components/Exposure";
 import { ForecastHistory } from "../components/ForecastHistory";
 import { InterviewPractice } from "../components/InterviewPractice";
 import { IdentityStatement, Programmes } from "../components/MalaysiaPanels";
+import { JobPostings } from "../components/JobPostings";
 import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
 import { SdgReasons } from "../components/Sdgs";
@@ -127,7 +128,8 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
 
         {tab === "market" && (
           <>
-            <Openings roleId={role.role_id} title={tr(role.title)} />
+            <JobPostings roleId={role.role_id} title={tr(role.title)} />
+            <Openings roleId={role.role_id} roleTitle={tr(role.title)} profileId={profile.id} />
             <Programmes roleId={role.role_id} />
             <div className="card"><ExposureBand roleId={role.role_id} /></div>
           </>
