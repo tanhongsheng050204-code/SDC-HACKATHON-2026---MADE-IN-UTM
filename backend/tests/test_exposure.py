@@ -118,8 +118,14 @@ def test_model_statement_off_the_facts_falls_back(monkeypatch):
     identity._model_statement.cache_clear()
 
 
-def test_future_card_shows_the_rules_statement(client):
+def test_future_card_statement_reveals_no_current_job_or_unproven_skills(client):
     pid = _clerk(client)
     card = client.post(f"/api/profiles/{pid}/cards", json={"role_id": "data_analyst"}).json()
     view = client.get(f"/api/cards/{card['id'] if 'id' in card else card['card_id']}").json()
-    assert view["identity"].startswith("I'm a data entry clerk")
+    assert "clerk" not in view["identity"].lower() and "brings" not in view["identity"]
+    assert view["identity"].startswith("I'm starting out")
+
+
+def test_identity_rejects_unknown_languages(client):
+    pid = _clerk(client)
+    assert client.get(f"/api/profiles/{pid}/roles/data_analyst/identity", params={"language": "xx"}).status_code == 422

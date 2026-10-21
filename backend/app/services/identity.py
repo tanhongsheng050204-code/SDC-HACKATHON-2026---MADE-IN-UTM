@@ -6,6 +6,9 @@ first core skill you are building. With Gemini, the same facts are rewritten mor
 answer is kept only if it names at least one of those skills and stays short, otherwise the rules
 version is used. Only skill and role names reach the model, never CV text. Answers are cached per
 set of facts, so opening a page again does not call the model again.
+
+A public Future Card uses the rules version without the current job and with only the skills the
+card already shows as proven, so a shared link reveals nothing new.
 """
 
 from functools import lru_cache
@@ -68,7 +71,15 @@ def _model_statement(target: str, current: str | None, have: tuple[str, ...], bu
     return text
 
 
+def public_statement(ref: Reference, profile: dict, role_id: str) -> str:
+    """For a shared Future Card: no current job, and only skills the card shows as proven."""
+    proven = {ref.skills[s]["name"] for s, lvl in (profile.get("skill_levels") or {}).items() if lvl >= 1 and s in ref.skills}
+    f = facts(ref, profile, role_id)
+    return rules_statement({**f, "current": None, "have": [s for s in f["have"] if s in proven]})
+
+
 def statement(ref: Reference, profile: dict, role_id: str, language: str = "en", use_model: bool = True) -> dict:
+    language = language if language in LANGUAGES else "en"  # unknown values must not create new cache entries
     f = facts(ref, profile, role_id)
     text, mode = None, "rules"
     if use_model and get_settings().llm_mode == "gemini":

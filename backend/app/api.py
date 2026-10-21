@@ -2,6 +2,7 @@
 
 import datetime as dt
 import hmac
+from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
@@ -581,7 +582,7 @@ def get_card(card_id: str):
 
 
 @router.get("/profiles/{profile_id}/roles/{role_id}/identity")
-def role_identity(profile_id: str, role_id: str, language: str = "en", user: str | None = User):
+def role_identity(profile_id: str, role_id: str, language: Literal["en", "ms", "zh"] = "en", user: str | None = User):
     """A one- or two-sentence career identity statement for this role, from your transferable skills."""
     ref = get_reference()
     if role_id not in ref.roles:
