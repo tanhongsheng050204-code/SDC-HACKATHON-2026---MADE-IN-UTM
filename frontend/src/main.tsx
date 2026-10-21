@@ -4,6 +4,7 @@ import "@fontsource-variable/inter";
 import App from "./App";
 import "./styles/app.css";
 import "./styles/site.css";
+import "./styles/bright.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

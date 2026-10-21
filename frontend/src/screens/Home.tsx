@@ -1,10 +1,10 @@
 import { FormEvent, KeyboardEvent, useEffect, useId, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { Icon } from "../components/Icon";
-import { api, Journey, JourneyStep, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
+import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
-import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
+import { OUTLOOK_TEXT, OUTLOOK_TONE, priceText } from "../lib/labels";
 
 export type TargetScreen = "role" | "tree";
 
@@ -26,19 +26,11 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [error, setError] = useState(false);
-  const [question, setQuestion] = useState("");
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     api.matches(profile.id, scenario).then((d) => { setData(d); setError(false); }).catch(() => setError(true));
   }, [profile.id, profile.completed_courses.length, scenario, attempt]);
-
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    if (!question.trim()) return;
-    onAsk(question.trim());
-    setQuestion("");
-  }
 
   const name = profile.display_name?.replace(/\s*\(demo\)$/, "");
   const top = data?.roles[0];
@@ -61,13 +53,7 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
 
-      <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
-
-      {target !== null && data !== null && (
-        <StoryBanner profile={profile} target={target} />
-      )}
-
-      {journey && data && <NextStep journey={journey} top={top ?? null} target={target} onOpenRole={onOpenRole} onStep={openStep} />}
+      {journey && data && <NextStep profile={profile} journey={journey} top={top ?? null} target={target} onOpenRole={onOpenRole} onStep={openStep} />}
       {journey && (
         <ol className="journey" aria-label={t("step.title")}>
           {journey.steps.map((s, i) => {
@@ -84,22 +70,20 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         </ol>
       )}
 
-      <form className="home-ask" onSubmit={submit}>
-        <label className="sr-only" htmlFor="home-q">{t("shell.coach")}</label>
-        <input id="home-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t("home.askPlaceholder")} />
-        <button className="primary" type="submit" disabled={!question.trim()}>{t("a.ask")}</button>
-      </form>
+      <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
+
 
       {error && (
         <p className="error" role="alert">{t("home.loadFailed")} <button className="link" onClick={() => setAttempt((n) => n + 1)}>{t("shell.retry")}</button></p>
       )}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
 
+      <div className="home-pair">
       {data && top && audience === "worker" && current && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.workerTitle")}</span>
           <strong>{tr(current.title)}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
-          <p className="muted">{t("lead.workerBody")}</p>
+          <p className="muted">{t("v3.notWithout")} {t("lead.workerBody")}</p>
           <button className="btn quiet sm" onClick={() => onGo("tasks")}>{t("nav.tasks")} →</button>
         </div>
       )}
@@ -123,25 +107,31 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         </div>
       )}
 
+      {target !== null && data !== null && <StoryBanner profile={profile} target={target} />}
+      </div>
+
       {data && (
-        <div className="card home-roles">
-          <h2>{t("home.bestRoles")}</h2>
-          <ol className="home-list">
+        <div className="home-roles">
+          <div className="home-roles-top">
+            <h2>{t("home.bestRoles")}</h2>
+            <button className="link" onClick={() => onGo("roles")}>{tf("home.seeAll", { n: data.roles.length })} →</button>
+          </div>
+          <ol className="home-cards">
             {data.roles.slice(0, 3).map((r) => (
               <li key={r.role_id}>
-                <button className="home-role" onClick={() => onOpenRole(r)}>
-                  <span className="rank">#{r.rank}</span>
-                  <span className="home-role-title">{tr(r.title)}
+                <button className="home-card" onClick={() => onOpenRole(r)}>
+                  <span className="home-card-tags">
+                    <span className="badge">#{r.rank}</span>
                     {r.role_id === profile.target_role_id && <span className="badge good"><Icon name="target" />{t("target.yours")}</span>}
                     {r.robust_pick && <span className="badge gold">{t("k.robustPick")}</span>}
                   </span>
-                  <span className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(r.fit) })}><span style={{ width: `${r.fit * 100}%` }} /></span>
-                  <span className={`badge ${OUTLOOK_TONE[r.outlook[scenario].label]}`}>{OUTLOOK_TEXT[r.outlook[scenario].label]}</span>
+                  <span className="home-card-title">{tr(r.title)}</span>
+                  <span className="home-card-big">{percent(r.fit)}%</span>
+                  <span className="home-card-meta">{t("v3.fitNow")} · <span className={`outlook ${r.outlook[scenario].label}`}>{OUTLOOK_TEXT[r.outlook[scenario].label]} {signed(r.outlook[scenario].index)}</span></span>
                 </button>
               </li>
             ))}
           </ol>
-          <button className="link" onClick={() => onGo("roles")}>{tf("home.seeAll", { n: data.roles.length })} →</button>
         </div>
       )}
       {!data && !error && <div className="grid" aria-hidden="true">{[0, 1].map((i) => <div key={i} className="card skeleton" />)}</div>}
@@ -234,17 +224,28 @@ function StoryBanner({ profile, target }: { profile: Profile; target: RoleMatch 
   );
 }
 
-// The one thing to do next: the first journey step not done, in plain words.
-function NextStep({ journey, top, target, onOpenRole, onStep }: {
-  journey: Journey; top: RoleMatch | null; target: RoleMatch | null;
+// The one thing to do next: the first journey step not done, in plain words. With a destination
+// it names the next unfinished course from the pathway and shows readiness, hours and cost to go.
+function NextStep({ profile, journey, top, target, onOpenRole, onStep }: {
+  profile: Profile; journey: Journey; top: RoleMatch | null; target: RoleMatch | null;
   onOpenRole: (r: RoleMatch) => void; onStep: (s: JourneyStep) => void;
 }) {
+  const [plan, setPlan] = useState<Pathway | null>(null);
+  useEffect(() => {
+    if (!target) { setPlan(null); return; }
+    api.pathway(profile.id, target.role_id).then(setPlan).catch(() => setPlan(null));
+  }, [profile.id, target?.role_id, profile.completed_courses.length]);
+
   const step = journey.next;
+  const next = plan?.steps.find((s) => !s.done) ?? null;
   let title: string, body: string, action: string, go: () => void;
   if (step === "stand") {
     [title, body, action, go] = [t("next.standTitle"), t("next.standBody"), t("next.standAction"), () => onStep("stand")];
   } else if (step === "explore" && top) {
     [title, body, action, go] = [`${t("next.exploreTitle")} ${tr(top.title)}`, t("next.exploreBody"), t("next.exploreAction"), () => onOpenRole(top)];
+  } else if ((step === "build" || step === "explore") && target && next) {
+    [title, body, action, go] = [tf("v3.nextCourse", { course: tr(next.skills[0]?.name ?? next.course.title), h: next.course.hours, cost: priceText(next.course.price_rm, next.course.cost).toLowerCase() }),
+      `${tr(next.course.title)} · ${next.course.provider}`, t("v3.startCourse"), () => window.open(next.course.url, "_blank", "noopener")];
   } else if (step === "build" && target) {
     [title, body, action, go] = [`${t("next.buildTitle")} ${tr(target.title)}`,
       `${target.missing.length} ${t("next.buildBody")}`, t("next.buildAction"), () => onStep("build")];
@@ -253,12 +254,23 @@ function NextStep({ journey, top, target, onOpenRole, onStep }: {
   } else {
     [title, body, action, go] = [t("next.doneTitle"), t("next.doneBody"), t("next.doneAction"), () => onStep(target ? "build" : "explore")];
   }
+  const rm = plan ? plan.steps.filter((s) => !s.done).reduce((n, s) => n + (s.course.price_rm ?? 0), 0) : 0;
+  const ready = plan ? percent(plan.readiness) : null;
   return (
     <div className="card next-step">
-      <span className="eyebrow">{t("home.next")}</span>
+      <span className="pill">{target ? tf("v3.destTag", { role: tr(target.title) }) : t("home.next")}</span>
       <h2>{title}</h2>
       <p className="muted">{body}</p>
-      <button className="btn ink" onClick={go}>{action} →</button>
+      {plan && ready !== null && (
+        <div className="next-progress">
+          <div className="next-progress-row"><span>{tf("v3.ready", { n: ready })}</span><span className="muted">{tf("v3.toGo", { h: plan.hours_left, rm: `RM ${rm.toLocaleString("en-MY")}` })}</span></div>
+          <div className="next-progress-bar" role="img" aria-label={tf("v3.ready", { n: ready })}><span style={{ width: `${ready}%` }} /></div>
+        </div>
+      )}
+      <div className="actions">
+        <button className="btn ink" onClick={go}>{action} →</button>
+        {target && <button className="btn quiet" onClick={() => onStep("build")}>{t("v3.seeRoute")}</button>}
+      </div>
     </div>
   );
 }
