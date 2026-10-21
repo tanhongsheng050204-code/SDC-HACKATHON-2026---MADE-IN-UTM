@@ -418,6 +418,9 @@ export const api = {
   emergingSearch: (capabilityId: string, profileId: string) =>
     requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/emerging/${encodeURIComponent(capabilityId)}/search`, {
       method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
+  openings: (roleId: string, profileId: string) =>
+    requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/roles/${encodeURIComponent(roleId)}/openings`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
   evidenceDetail: (token: string, id: string) =>
     request<EvidenceDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceDecide: (token: string, id: string, decision: "approve" | "reject", body: { reviewer: string; reason?: string; drop_sources?: string[]; drop_added?: string[] }) =>

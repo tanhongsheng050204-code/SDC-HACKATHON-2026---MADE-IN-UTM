@@ -264,6 +264,20 @@ def emerging_live_search(capability_id: str, body: LiveSearchRequest, user: str 
     except Exception:
         raise HTTPException(503, "The web search is unavailable right now.") from None
 
+@router.post("/roles/{role_id}/openings")
+def role_openings(role_id: str, body: LiveSearchRequest, user: str | None = User):
+    """Current Malaysian job ads for this role: found by a live web search, not reviewed, never
+    scored; cached per role per day and limited per profile (shared with the emerging-role search)."""
+    _profile_for(body.profile_id, user)
+    if role_id not in get_reference().roles:
+        raise HTTPException(404, "Role not found")
+    try:
+        return emerging.openings(role_id, body.profile_id, get_reference())
+    except emerging.RateLimited:
+        raise HTTPException(429, "You have searched a lot this hour. Try again later.") from None
+    except Exception:
+        raise HTTPException(503, "The web search is unavailable right now.") from None
+
 # --- cited skill evidence (admin) ---------------------------------------------------------------
 
 @router.post("/evidence/refresh", status_code=202)

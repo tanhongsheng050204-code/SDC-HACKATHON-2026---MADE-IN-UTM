@@ -699,3 +699,6 @@ main:focus { outline: none; }
 .shortest-route { display: grid; gap: 4px; text-align: left; margin-bottom: 10px; border-left: 4px solid var(--good); }
 .degree-start { display: grid; gap: 8px; margin-bottom: 12px; }
 .degree-start h2, .degree-start p { margin: 0; }
+.openings { margin: 8px 0 14px; }
+.openings-list { display: grid; gap: 8px; }
+.openings-list p { margin: 0; }

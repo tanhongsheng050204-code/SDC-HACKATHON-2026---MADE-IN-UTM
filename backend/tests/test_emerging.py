@@ -158,3 +158,26 @@ def test_live_search_is_unreviewed_cached_and_rate_limited(client, found, monkey
     statuses = [client.post(f"/api/emerging/{cap}/search", json={"profile_id": pid}).status_code for cap in other]
     assert statuses.count(429) >= 1 and statuses[0] == 200
     assert client.post("/api/emerging/not_a_capability/search", json={"profile_id": pid}).status_code == 404
+
+
+def test_role_openings_are_live_unreviewed_job_ads_first_and_share_the_limit(client, monkeypatch):
+    calls = []
+
+    def live(role, skills, **_):
+        calls.append(role["id"])
+        return {"sources": [
+            {"url": "https://example.org/blog", "title": "Blog", "employer": "", "kind": "web", "grounded": True, "quotes": []},
+            {"url": "https://www.jobstreet.com.my/job/1", "title": "Data Analyst", "employer": "Acme Sdn Bhd",
+             "kind": "job_ad", "grounded": True, "quotes": [{"skill_id": "sql", "skill_name": "SQL", "quote": "Strong SQL"}]}]}
+
+    monkeypatch.setattr(search, "search_role", live)
+    emerging.clear_live_cache()
+    pid = client.post("/api/profiles", json={"skills": ["excel"]}).json()["id"]
+    body = client.post("/api/roles/data_analyst/openings", json={"profile_id": pid}).json()
+    assert body["reviewed"] is False and body["sources"][0]["kind"] == "job_ad" and body["sources"][0]["quote"] == "Strong SQL"
+    client.post("/api/roles/data_analyst/openings", json={"profile_id": pid})
+    assert calls == ["data_analyst"]  # cached for the day
+    roles = ["admin_assistant", "ux_designer", "care_worker", "software_developer", "sustainability_analyst"]
+    statuses = [client.post(f"/api/roles/{r}/openings", json={"profile_id": pid}).status_code for r in roles]
+    assert statuses[:4] == [200] * 4 and statuses[4] == 429  # five searches an hour per profile
+    assert client.post("/api/roles/nope/openings", json={"profile_id": pid}).status_code == 404
