@@ -10,7 +10,8 @@ export const KEYS = {
   tasksDone: "laluan.tasksDone",
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",
-  nameSkipped: "laluan.nameSkipped.",  // + user id, session only: "Skip" holds until the next login
+  nameSkipped: "laluan.nameSkipped.",
+  storyCard: "laluan.storyCard.",  // + profile, role and progress: the card made for the Today banner  // + user id, session only: "Skip" holds until the next login
 } as const;
 
 type Area = "local" | "session";

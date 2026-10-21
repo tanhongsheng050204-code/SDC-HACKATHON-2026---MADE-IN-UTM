@@ -193,8 +193,11 @@ Notes: ______
 - [ ] 9.16.1 **Create my Future Card** shows a QR code, **Open the card ↗** and **Copy link**.
 - [ ] 9.16.2 **Copy link** says “Link copied”; the link opens the read-only card in a new tab.
 - [ ] 9.16.3 Scanning the QR with a phone opens the same card.
-- [ ] 9.16.4 The card shows the role, readiness, outlook range, steps and hours, next skills, first step, SDG tiles and source; it does **not** show the full skill list.
-- [ ] 9.16.5 **Make your own plan** goes to the landing page.
+- [ ] 9.16.4 The card opens as a story of six parts with progress dashes: role, summary and identity line → outlook to 2030 with range, robust pick and pay → readiness (and proven skills) → steps, hours, next skills and first step → SDG tiles → the share card. It does **not** show the current job or the full skill list; the source line stays under every slide.
+- [ ] 9.16.4.1 Moving: tap the right two-thirds (or swipe left, → or Space) goes forward; tap the left third (or swipe right, ←) goes back; Home / End jump; each dash jumps to its slide; **Skip to the share card** works. Slides cross-fade (not with reduce-motion).
+- [ ] 9.16.4.2 Share card: role, readiness, outlook and hours left, a QR code, **Copy link**, and **Save image**, which downloads a 1080×1350 PNG with the same numbers, the QR and “Estimates, not predictions. You decide.” (Chinese role names wrap correctly).
+- [ ] 9.16.5 **Make your own plan** (last slide) goes to the landing page.
+- [ ] 9.16.8 With a destination set, Today shows **Your 2030 route is ready**; **See my route** makes a card for the destination (once, until progress changes) and opens the story.
 - [ ] 9.16.6 After **Delete my profile**, the card link shows **“This Future Card no longer exists…”**.
 - [ ] 9.16.7 A made-up link (`/?card=abc`) shows the same “no longer exists” message.
 

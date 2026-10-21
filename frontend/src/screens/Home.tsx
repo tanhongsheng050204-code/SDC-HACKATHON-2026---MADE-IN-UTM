@@ -6,6 +6,7 @@ import { RouteMap } from "../components/RouteMap";
 import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
+import { KEYS, load, save } from "../lib/storage";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
 
 export type TargetScreen = "role" | "tree";
@@ -56,6 +57,8 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
       </div>
 
       <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
+
+      {data && target && <StoryBanner profile={profile} target={target} year={data.signal_source.horizon_year} />}
 
       {journey && data && <NextStep journey={journey} top={top ?? null} target={target} profile={profile}
         from={current ? tr(current.title) : t("route.yourSkills")} onOpenRole={onOpenRole} onStep={openStep} />}
@@ -183,6 +186,32 @@ function NextStep({ journey, top, target, profile, from, onOpenRole, onStep }: {
       <h2>{title}</h2>
       <p className="muted">{body}</p>
       <button className="btn ink" onClick={go}>{action} →</button>
+    </div>
+  );
+}
+
+// "Your 2030 route is ready": makes a Future Card for the destination (once per progress state)
+// and opens it as a story.
+function StoryBanner({ profile, target, year }: { profile: Profile; target: RoleMatch; year: number }) {
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const key = `${KEYS.storyCard}${profile.id}.${target.role_id}.${profile.completed_courses.length}.${profile.skills.length}`;
+  async function open() {
+    setBusy(true); setFailed(false);
+    try {
+      let id = load(key);
+      if (!id) { id = (await api.createCard(profile.id, target.role_id)).card_id; save(key, id); }
+      window.location.href = `${window.location.pathname}?card=${encodeURIComponent(id)}`;
+    } catch { setFailed(true); setBusy(false); }
+  }
+  return (
+    <div className="story-banner">
+      <div>
+        <strong>{tf("story.banner", { year })}</strong>
+        <span>{tf("story.bannerSub", { role: tr(target.title) })}</span>
+      </div>
+      <button className="btn" onClick={open} disabled={busy}>{busy ? t("story.making") : t("story.open")} →</button>
+      {failed && <p className="error" role="alert">{t("share.failed")}</p>}
     </div>
   );
 }
