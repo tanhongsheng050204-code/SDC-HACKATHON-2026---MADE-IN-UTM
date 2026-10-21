@@ -14,14 +14,12 @@ SCRIPTED_QUESTIONS = {
         "What tools or software do you use most days? For example Excel, a CRM, social media or a programming language.",
         "Tell me about something at work or school you're proud of. What did you do?",
         "Any courses, certificates or side projects?",
-        "Which causes matter to you? For example climate, health, education or fair work.",
     ],
     "ms": [
         "Apakah pekerjaan anda sekarang, atau apa yang anda sedang belajar?",
         "Alat atau perisian apa yang anda guna hampir setiap hari? Contohnya Excel, media sosial atau bahasa pengaturcaraan.",
         "Ceritakan sesuatu di tempat kerja atau sekolah yang anda banggakan. Apa yang anda lakukan?",
         "Ada kursus, sijil atau projek sampingan?",
-        "Isu apa yang penting bagi anda? Contohnya iklim, kesihatan, pendidikan atau pekerjaan yang adil.",
     ],
     # Drafted with AI assistance; needs a native speaker's check. Skills are matched against the
     # English dictionary, so tool names (Excel, Python ...) are found in Chinese answers too.
@@ -30,7 +28,6 @@ SCRIPTED_QUESTIONS = {
         "您平时最常用哪些工具或软件？例如 Excel、CRM、社交媒体或编程语言。",
         "说说一件您在工作或学校里感到自豪的事。您做了什么？",
         "有没有上过课程、考过证书或做过副业项目？",
-        "您关心哪些议题？例如气候、健康、教育或公平就业。",
     ],
 }
 DONE = {
@@ -38,16 +35,6 @@ DONE = {
     "ms": "Terima kasih! Semak kemahiran yang kami jumpa, kemudian lihat peranan masa depan anda.",
     "zh": "谢谢！请核对我们找到的技能，然后查看您的未来职位。",
 }
-
-# Words in the last answer that point to an SDG interest.
-INTEREST_WORDS = {
-    3: ("health", "kesihatan", "care", "健康"), 4: ("education", "pendidikan", "teaching", "教育"),
-    5: ("gender", "women", "wanita", "性别", "女性"), 7: ("energy", "tenaga", "solar", "能源"),
-    8: ("fair work", "jobs", "pekerjaan", "就业"), 10: ("inequality", "poverty", "b40", "贫困", "不平等"),
-    12: ("waste", "recycling", "consumption", "回收", "废物"),
-    13: ("climate", "iklim", "environment", "alam sekitar", "气候", "环境"),
-}
-
 
 def _lang(language: str) -> str:
     lang = language.strip().lower()
@@ -66,15 +53,10 @@ def turn(messages: list[dict], language: str = "en") -> dict:
         for skill_id in skills.dictionary_extract(scrub(answer)):
             if skill_id not in found:
                 found.append(skill_id)
-    interests = []
-    if len(answers) >= len(SCRIPTED_QUESTIONS[lang]):
-        last = answers[-1].casefold()
-        interests = [sdg for sdg, words in INTEREST_WORDS.items() if any(w in last for w in words)]
     complete = len(answers) >= len(questions)
     return {
         "next_question": DONE[lang] if complete else questions[len(answers)],
         "is_complete": complete,
         "skills_found": found,
-        "interests": interests,
         "mode": "scripted",
     }

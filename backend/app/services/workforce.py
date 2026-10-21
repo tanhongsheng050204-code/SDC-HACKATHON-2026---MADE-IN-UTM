@@ -30,15 +30,26 @@ def _role_index(ref: Reference) -> dict[str, str]:
     return index
 
 
+def check_columns(columns: list[str]) -> None:
+    """Refuse files with columns that identify people (shared with the class view)."""
+    personal = [c for c in columns if FORBIDDEN.search(c)]
+    if personal:
+        raise WorkforceError(f"Remove columns that identify people before uploading: {', '.join(personal)}")
+
+
+def read_skills(cell: str) -> list[str]:
+    """Skill IDs in one CSV cell ("Excel; SQL | Python"), dictionary matching only."""
+    aliases = skills._alias_index()
+    return sorted({aliases[t] for t in (skills.normalize(s) for s in re.split(r"[;|]", cell)) if t in aliases})
+
+
 def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
     reader = csv.DictReader(io.StringIO(text.strip()))
     columns = [c.strip().lower() for c in (reader.fieldnames or [])]
     if "role" not in columns or "skills" not in columns:
         raise WorkforceError("The CSV needs a 'role' column and a 'skills' column")
-    personal = [c for c in columns if FORBIDDEN.search(c)]
-    if personal:
-        raise WorkforceError(f"Remove columns that identify people before uploading: {', '.join(personal)}")
-    roles, aliases = _role_index(ref), skills._alias_index()
+    check_columns(columns)
+    roles = _role_index(ref)
     people, problems = [], []
     for n, raw in enumerate(reader, start=2):
         if n - 1 > MAX_ROWS:
@@ -48,8 +59,7 @@ def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
         if not role_id:
             problems.append(f"Row {n}: unknown role '{row.get('role', '')}'")
             continue
-        found = {aliases[t] for t in (skills.normalize(s) for s in re.split(r"[;|]", row.get("skills", ""))) if t in aliases}
-        people.append({"role_id": role_id, "skills": sorted(found)})
+        people.append({"role_id": role_id, "skills": read_skills(row.get("skills", ""))})
     if not people:
         raise WorkforceError("No rows could be read")
     return people, problems
@@ -62,7 +72,7 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     moves: dict[tuple[str, str], dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fit": 0.0})
     sdg_people: Counter = Counter()
     for (role_id, person_skills), count in groups.items():
-        profile = {"skills": list(person_skills), "current_role_id": role_id, "interests": []}
+        profile = {"skills": list(person_skills), "current_role_id": role_id}
         result = matching.match(ref, profile, scenario_id)
         current = next(r for r in result["roles"] if r["role_id"] == role_id)
         entry = by_role.setdefault(role_id, {

@@ -29,4 +29,8 @@ def view(ref: Reference, profile: dict, card: dict) -> dict:
         "first_step": plan["steps"][0]["course"]["title"] if plan["steps"] else None,
         "sdgs": role_match["sdgs"],
         "source": role_match["citation"],
+        "pay": role_match["pay"],
+        "proven": [{"name": ref.skills[s]["name"], "level": lvl, "level_name": ref.skill_levels[lvl - 1]["name"]}
+                   for s, lvl in sorted((profile.get("skill_levels") or {}).items()) if lvl >= 1],
+        "pay_change_rm": role_match["pay_change_rm"],
     }

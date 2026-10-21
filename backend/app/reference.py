@@ -1,7 +1,8 @@
 """Reference data: skills, roles, courses, SDGs, scenarios and dated signal snapshots.
 
 All of it is versioned JSON under backend/data/, read once and kept in memory. Snapshots are
-immutable: a refresh adds a new file, and the latest by `imported` date is the one used.
+immutable: committed ones are files; ones imported or approved at runtime are rows in the database.
+The latest by `imported` date is the one used.
 """
 
 import json
@@ -25,7 +26,11 @@ class Reference:
     capabilities: list[dict]
     job_terms: dict[str, str]
     tasks: dict  # {"source", "source_url", "labels_note", "roles": {role_id: {...}}}
-    malaysia_pay: dict  # DOSM pay and employees by MASCO group (app/trends/malaysia.py)
+    skill_prereqs: dict[str, list[str]]
+    skill_levels: list[dict]
+    work_dimensions: list[dict]
+    survey_cards: dict[str, dict]
+    salaries: dict
 
     @property
     def latest_snapshot(self) -> dict:
@@ -43,7 +48,11 @@ def _read(path: Path):
 
 
 def load_snapshots(data_dir: Path) -> list[dict]:
+    """The committed snapshot files plus every snapshot approved at runtime (kept in the database)."""
+    from app import store
+
     snapshots = [_read(p) for p in sorted((data_dir / "signals").glob("*.json"))]
+    snapshots += store.list_snapshots("approved")
     if not snapshots:
         raise RuntimeError(f"No signal snapshots in {data_dir / 'signals'}")
     return sorted(snapshots, key=lambda s: (s["imported"], s["snapshot_id"]))
@@ -69,7 +78,11 @@ def get_reference() -> Reference:
         capabilities=_read(data_dir / "capabilities.json")["capabilities"],
         job_terms=_read(data_dir / "job_terms.json")["terms"],
         tasks=_tasks(data_dir / "tasks.json"),
-        malaysia_pay=_read(data_dir / "malaysia_pay.json"),
+        skill_prereqs=_read(data_dir / "skill_prereqs.json")["prereqs"],
+        skill_levels=_read(data_dir / "skill_levels.json"),
+        work_dimensions=_read(data_dir / "work_dimensions.json"),
+        survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
+        salaries=_read(data_dir / "salaries.json"),
     )
 
 

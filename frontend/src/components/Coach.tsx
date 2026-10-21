@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, CoachProposal, CoachReply, Profile, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
 import { AiBadge } from "./AiBadge";
+import { MicButton } from "./MicButton";
 
 interface Turn { question: string; reply: CoachReply | null; error?: string; dismissed?: boolean; applied?: boolean }
 
@@ -99,6 +100,7 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
       <form className="chat-form" onSubmit={(e) => { e.preventDefault(); ask(question); }}>
         <label className="sr-only" htmlFor="coach-q">Ask about your results</label>
         <input id="coach-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ask about your results" autoFocus />
+        <MicButton onText={(text) => setQuestion((q) => `${q.trimEnd()} ${text}`.trim().slice(0, 500))} />
         <button className="primary" type="submit" disabled={busy || !question.trim()}>{t("a.ask")}</button>
       </form>
     </div>

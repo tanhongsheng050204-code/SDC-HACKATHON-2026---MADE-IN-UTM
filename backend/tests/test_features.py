@@ -5,7 +5,7 @@ from app.reference import get_reference
 from app.services import documents, matching, pathway, scenario, workforce
 
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-         "current_role_id": "data_entry_clerk", "interests": []}
+         "current_role_id": "data_entry_clerk"}
 CV_TEXT = ("Data entry clerk at a logistics company for nine years. I use Microsoft Excel every day with "
            "pivot tables, write simple SQL queries and help with customer service on the phone.")
 
@@ -145,6 +145,7 @@ def test_every_recommendation_carries_a_source(client):
     assert analyst["skills_source"]["onet_code"] == "15-2051.01"
     plan = client.get(f"/api/profiles/{profile['id']}/pathway", params={"role": "data_analyst"}).json()
     assert all("checked" in s["course"] and s["course"]["provider"] for s in plan["steps"])
+    assert all(r["pay"]["source"] and r["pay"]["table"] for r in roles)
 
 
 # ---------- Future Card ----------
@@ -196,8 +197,7 @@ def test_coach_proposes_changes_but_never_applies_them(client):
     assert reply["proposal"] == {"kind": "scenario", "value": "accelerated",
                                  "label": "Switch to the Accelerated AI adoption scenario"}
     climate = _ask(client, profile["id"], "I care about climate change").json()
-    assert climate["proposal"]["kind"] == "interest" and climate["proposal"]["value"] == 13
-    assert client.get(f"/api/profiles/{profile['id']}").json()["interests"] == profile["interests"]
+    assert "Renewable energy technician" in climate["answer"] and climate["proposal"] is None
 
 
 def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatch):
@@ -217,3 +217,19 @@ def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatc
     monkeypatch.setattr(coach, "generate_json", fake_llm)
     reply = _ask(client, profile["id"], "Call me on 012-345 6789 about my top role").json()
     assert reply["mode"] == "gemini" and "012-345" not in seen["prompt"] and "[PHONE]" in seen["prompt"]
+
+
+def test_future_card_shows_proven_levels(client):
+    from app import store
+
+    pid = client.post("/api/profiles/demo/clerk").json()["id"]
+    store.set_skill_level(pid, "sql", 2)
+    card = client.post(f"/api/profiles/{pid}/cards", json={"role_id": "data_analyst"}).json()["card_id"]
+    assert {"name": "SQL", "level": 2, "level_name": "Working"} in client.get(f"/api/cards/{card}").json()["proven"]
+
+
+def test_no_leftover_sdg_choice_in_coach_or_questionnaire():
+    from app.services import coach, intake
+
+    assert "SDG goal" not in coach.PROMPT and "SDG goal" not in (coach.__doc__ or "")
+    assert not any("cause" in q.lower() for q in intake.SCRIPTED_QUESTIONS["en"])

@@ -1,13 +1,15 @@
 // Screens follow docs/03-APP_FLOW.md. Entry points: /?card=ID opens a read-only Future Card;
 // /?demo=clerk|student|hr opens a demo; ?view=... restores a screen (see lib/route.ts).
 import { useEffect, useRef, useState } from "react";
+import { AccountButton } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
 import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onServerWaking, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { authEnabled, getUserId, onAuth, ready as authReady } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -20,13 +22,14 @@ import { Radar } from "./screens/Radar";
 import { Review } from "./screens/Review";
 import { ReviewKit } from "./screens/ReviewKit";
 import { RoleDetail } from "./screens/RoleDetail";
+import { SkillTree } from "./screens/SkillTree";
+import { Survey } from "./screens/Survey";
 import { Roles } from "./screens/Roles";
 import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
-import { WhatIf } from "./screens/WhatIf";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["home", "whatif", "radar", "tasks", "roles", "role", "impact"];
+const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree", "survey"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -44,12 +47,17 @@ function MainApp({ demo }: { demo: string | null }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
   const [draftSkills, setDraftSkills] = useState<string[]>([]);
-  const [draftMode, setDraftMode] = useState("picked");
+  const [audience, setAudience] = useState<Audience | null>(null);
+  const [workforceTab, setWorkforceTab] = useState<"company" | "class">("company");
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [waking, setWaking] = useState(false);
   useEffect(() => onServerWaking(setWaking), []);
+  const [userId, setUserId] = useState<string | null>(getUserId());
+  useEffect(() => onAuth(setUserId), []);
+  useEffect(() => onAuthExpired(() => setError(t("auth.expired"))), []);
+  const [conflict, setConflict] = useState<{ local: string; saved: string } | null>(null);
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
@@ -76,6 +84,10 @@ function MainApp({ demo }: { demo: string | null }) {
     const r = { ...route, scenario: s };
     setRoute(r); writeRoute(r, "replace");
   }
+  function setAdoption(a: number | undefined) {
+    const r = { ...route, adoption: a };
+    setRoute(r); writeRoute(r, "replace");
+  }
   function setYear(y: number) {
     const r = { ...route, year: y };
     setRoute(r); writeRoute(r, "replace");
@@ -95,7 +107,7 @@ function MainApp({ demo }: { demo: string | null }) {
       const r = readRoute();
       if (NEEDS_PROFILE.includes(r.screen) && !profileRef.current) r.screen = "landing";
       if (r.screen === "review") r.screen = "intake";
-      if ((r.screen === "role" || r.screen === "impact") && roleRef.current?.role_id !== r.role) r.screen = "roles";
+      if ((r.screen === "role" || r.screen === "impact" || r.screen === "tree") && roleRef.current?.role_id !== r.role) r.screen = "roles";
       setRoute(r);
     };
     window.addEventListener("popstate", onPop);
@@ -110,13 +122,74 @@ function MainApp({ demo }: { demo: string | null }) {
   useEffect(() => {
     if (entryHandled) return;
     entryHandled = true;
-    if (demo === "clerk" || demo === "student") { openDemo(demo); return; }
+    if (demo === "clerk" || demo === "student" || demo === "switcher") { openDemo(demo); return; }
     if (demo === "hr") { go("workforce"); return; }
+    if (demo === "class") { setWorkforceTab("class"); go("workforce"); return; }
     // A reload on ?view=roles (or deeper) resumes the saved profile and the role in the URL.
     const wanted = readRoute();
-    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) resume(wanted);
+    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) authReady.then(() => resume(wanted));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // After login: save this browser's anonymous profile to the account, or open the account's own.
+  // If both exist and differ, ask (never merge, never drop silently). Demo profiles are never saved.
+  useEffect(() => {
+    if (!userId) {
+      if (profileRef.current?.user_id) { setProfile(null); setRole(null); go("landing", { role: undefined }); }
+      return;
+    }
+    (async () => {
+      try {
+        const me = await api.me();
+        const localId = load(KEYS.profile);
+        const local = localId ? await api.getProfile(localId).catch(() => null) : null;
+        const claimable = local && !local.is_demo && !local.user_id;
+        if (claimable && local && me.profile_id && me.profile_id !== local.id) {
+          setConflict({ local: local.id, saved: me.profile_id });
+          return;
+        }
+        if (claimable && local && !me.profile_id) {
+          await api.claim(local.id);
+          setProfile(await api.getProfile(local.id));
+          return;
+        }
+        if (me.profile_id && (!local || local.is_demo || local.id !== me.profile_id)) {
+          await openSaved(me.profile_id);
+        } else if (local) {
+          setProfile(local);
+        }
+        setError(null);  // any "log in to open your profile" notice is answered now
+      } catch { setError(t("auth.expired")); }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  async function openSaved(id: string) {
+    const p = await api.getProfile(id);
+    save(KEYS.profile, p.id); setProfile(p); setRole(null);
+    if (route.screen === "landing") go("home", { role: undefined });
+  }
+
+  // A profile made while logged in belongs to the account straight away.
+  async function profileSaved(p: Profile) {
+    save(KEYS.profile, p.id); setProfile(p); go("survey");
+    if (!userId) return;
+    try {
+      const claimed = await api.claim(p.id);
+      if (claimed.conflict) setConflict({ local: p.id, saved: claimed.conflict });
+      else setProfile(await api.getProfile(p.id));
+    } catch { setError(t("auth.expired")); }
+  }
+
+  async function resolveConflict(replace: boolean) {
+    if (!conflict) return;
+    const { local, saved } = conflict;
+    setConflict(null);
+    try {
+      if (replace) { await api.claim(local, true); await openSaved(local); }
+      else await openSaved(saved);
+    } catch { setError(t("auth.expired")); }
+  }
 
   async function openDemo(key: string) {
     setError(null);
@@ -132,14 +205,16 @@ function MainApp({ demo }: { demo: string | null }) {
     try {
       const p = await api.getProfile(storedId);
       setProfile(p);
-      if (wanted?.role && (wanted.screen === "role" || wanted.screen === "impact")) {
-        const m = await api.matches(p.id, wanted.scenario, wanted.year);
+      if (wanted?.role && (wanted.screen === "role" || wanted.screen === "impact" || wanted.screen === "tree")) {
+        const m = await api.matches(p.id, wanted.scenario, wanted.year, wanted.adoption);
         const found = m.roles.find((r) => r.role_id === wanted.role);
         if (found) { setRole(found); setRoute(wanted); return; }
       }
-      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" ? wanted : { ...route, screen: "home" };
+      const r: Route = wanted && wanted.screen !== "role" && wanted.screen !== "impact" && wanted.screen !== "tree" ? wanted : { ...route, screen: "home" };
       setRoute(r); writeRoute(r, "replace");
     } catch {
+      // A profile saved to an account only opens when logged in: keep its ID and ask to log in.
+      if (authEnabled && !getUserId()) { setError(t("auth.needLogin")); go("landing"); return; }
       save(KEYS.profile, null);
       setError("That saved profile has expired. Start again.");
       go("landing");
@@ -155,14 +230,8 @@ function MainApp({ demo }: { demo: string | null }) {
 
   async function applyProposal(p: CoachProposal) {
     if (!profile) return;
-    if (p.kind === "scenario") {
-      const r = { ...route, scenario: p.value as Scenario, screen: "roles" as Screen };
-      setRoute(r); writeRoute(r, "push");
-    } else {
-      const interests = Array.from(new Set([...profile.interests, Number(p.value)]));
-      setProfile(await api.updateProfile({ ...profile, interests }));
-      go("roles");
-    }
+    const r = { ...route, scenario: p.value as Scenario, screen: "roles" as Screen };
+    setRoute(r); writeRoute(r, "push");
     flash(`Applied: ${p.label}`);
   }
 
@@ -188,6 +257,7 @@ function MainApp({ demo }: { demo: string | null }) {
         </div>
         <div className="site-nav-actions">
           {themeButton}
+          <AccountButton userId={userId} />
           {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
           <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
         </div>
@@ -195,18 +265,18 @@ function MainApp({ demo }: { demo: string | null }) {
     );
     return (
       <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
-        onStart={() => go("intake")} onDemo={openDemo} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
+        onStart={() => go("intake")} onDemo={(k) => (k === "class" ? (setWorkforceTab("class"), go("workforce")) : openDemo(k))} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
     );
   }
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit", whatif: t("nav.whatif"),
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} profile={profile} hasRole={!!role} model={model} prefs={prefs}
+      <Sidebar current={screen} profile={profile} hasRole={!!role} model={model} prefs={prefs} userId={userId}
         onGo={(s) => go(s)} onHome={() => go("landing")} onDelete={deleteProfile} />
       <div className="workspace">
         <header className="workbar">
@@ -224,26 +294,33 @@ function MainApp({ demo }: { demo: string | null }) {
               <Home profile={profile} scenario={scenario} onScenario={setScenario} onOpenRole={openRole} onGo={(s) => go(s)}
                 onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
-            {screen === "intake" && <Intake onDone={(skills, mode) => { setDraftSkills(skills); setDraftMode(mode); go("review"); }} />}
+            {screen === "intake" && <Intake audience={audience} onAudience={setAudience} onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (
-              <Review initial={draftSkills} foundBy={draftMode} onBack={() => go("intake")}
-                onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("radar"); }} />
+              <Review initial={draftSkills} audience={audience} onBack={() => go("intake")}
+                onSaved={profileSaved} />
             )}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
             {screen === "roles" && profile && (
-              <Roles profile={profile} scenario={scenario} year={route.year}
-                onScenario={setScenario} onYear={setYear} onOpen={openRole} />
+              <Roles profile={profile} scenario={scenario} year={route.year} adoption={route.adoption}
+                onScenario={(s) => { setRoute({ ...route, scenario: s, adoption: undefined }); writeRoute({ ...route, scenario: s, adoption: undefined }, "replace"); }}
+                onAdoption={setAdoption} onYear={setYear} onOpen={openRole} onSurvey={() => go("survey")} />
             )}
             {screen === "role" && profile && role && (
-              <RoleDetail profile={profile} role={role} scenario={scenario} year={route.year} onProfile={setProfile}
-                onImpact={() => go("impact")} onBack={() => go("roles")} />
+              <RoleDetail profile={profile} role={role} scenario={scenario} adoption={route.adoption} onProfile={setProfile}
+                onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
-            {screen === "whatif" && profile && <WhatIf profile={profile} onRoles={() => go("roles")} />}
+            {screen === "survey" && profile && (
+              <Survey profile={profile} userId={userId} onDone={(p) => { setProfile(p); go("roles"); }} onSkip={() => go("home")} />
+            )}
+            {screen === "tree" && profile && role && (
+              <SkillTree profile={profile} role={role} userId={userId} onProfile={setProfile}
+                onImpact={() => go("impact")} onBack={() => go("role")} />
+            )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
             {screen === "review-kit" && <ReviewKit />}
-            {screen === "workforce" && <Workforce />}
+            {screen === "workforce" && <Workforce initialTab={workforceTab} />}
           </ScreenBoundary>
         </main>
       </div>
@@ -252,6 +329,22 @@ function MainApp({ demo }: { demo: string | null }) {
           onApply={applyProposal} onClose={() => setCoachOpen(false)} />
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
+      {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}
+    </div>
+  );
+}
+
+function ConflictDialog({ onKeep, onReplace }: { onKeep: () => void; onReplace: () => void }) {
+  return (
+    <div className="dialog-backdrop">
+      <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="conflict-title">
+        <h2 id="conflict-title">{t("auth.conflictTitle")}</h2>
+        <p>{t("auth.conflictBody")}</p>
+        <div className="dialog-actions">
+          <button className="btn ink" autoFocus onClick={onKeep}>{t("auth.keepSaved")}</button>
+          <button className="btn quiet" onClick={onReplace}>{t("auth.replace")}</button>
+        </div>
+      </div>
     </div>
   );
 }

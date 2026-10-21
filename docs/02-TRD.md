@@ -23,6 +23,7 @@ anyone can re-run:
 |---|---|---|
 | **arXiv API** (public); **OpenAlex** (open research index that includes arXiv) as automatic fallback | Papers per AI capability in the last 6 months (ending 60 days ago, as recent papers are still being indexed) vs the same months a year earlier | **AI advancement**: a capability accelerating faster than AI research overall raises the exposure of roles it can automate and the outlook of roles it complements |
 | **Public job postings**: Hacker News "Ask HN: Who is hiring?" threads through the public Algolia API | Share of postings mentioning each skill (whole word or exact phrase) in the latest 3 monthly threads vs the same months a year earlier | **Job-market demand** for skills, which feeds the Future Skills Radar. Tech-heavy source: skills with fewer than 20 mentions show "too few postings" |
+| **OpenDOSM API** (`api.data.gov.my`, dataset `wages_occupation`, Salaries & Wages Survey) | Salaried employees per MASCO major group, latest year vs 3 years earlier, compared with all employees | **Malaysian employment**: a local check on the global baseline. Nine groups only, so roles in the same group move together. Optional: if the API is down the refresh runs without it |
 | **WEF Future of Jobs Report 2025** | Expected growth and decline by role to 2030 | **Baseline** outlook |
 | **O\*NET** (open database) | Skills and tasks per occupation | Role skill lists, task lists, codes for citation |
 
@@ -35,7 +36,9 @@ skill trend          = change in share of postings mentioning it (needs ≥ 20 m
                        + 0.5 × (momentum of capabilities that boost it − of those that automate it), clipped to ±1
 role demand points   = 15 × weighted mean skill trend of the role's skills, capped ±15
 role AI points       = 15 × (mean momentum of complementing − of exposing capabilities), capped ±15
-net growth           = WEF baseline + demand points + AI points
+Malaysian points     = employee growth of the role's MASCO group − growth of all employees
+                       (percentage points over 3 years), capped ±10
+net growth           = WEF baseline + demand points + Malaysian points + AI points
 scenario outlook     = net growth + (adoption − 1) × 40 × (ai_complementarity − automation_exposure)
 ```
 

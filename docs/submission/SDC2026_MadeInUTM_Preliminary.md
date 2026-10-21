@@ -53,7 +53,7 @@ From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and emb
 | Frontend | React 18 + TypeScript + Vite; responsive; EN / BM / 中文; lite mode for slow connections |
 | Backend API | Python 3.12, FastAPI, Pydantic |
 | AI | Google Gemini API (`gemini-2.5-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
-| Data | SQLite (profiles, progress, Future Cards); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots); Malaysian pay and employment from OpenDOSM (CC BY 4.0) |
+| Data | SQLite (profiles, progress, Future Cards); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
 | Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API |
 | Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
 
@@ -124,7 +124,6 @@ flowchart LR
 | Code | Uvicorn, HTTPX, pypdf | BSD-3 |
 | Code | python-multipart, google-genai SDK | Apache-2.0 |
 | Code | PyMuPDF (only for the one-off WEF figure extraction script, not in the app) | AGPL-3.0 |
-| Dataset | DOSM Annual Salaries & Wages by Occupation (OpenDOSM) | CC BY 4.0 |
 | Dataset | O\*NET 30.0 task statements (U.S. Department of Labor) | CC BY 4.0 |
 | Dataset | WEF Future of Jobs Report 2025, Figure 2.3 (figures cited, not redistributed as a dataset) | WEF terms of use, with citation |
 | Dataset | UN Sustainable Development Goals names, targets and colours | UN SDG guidelines |

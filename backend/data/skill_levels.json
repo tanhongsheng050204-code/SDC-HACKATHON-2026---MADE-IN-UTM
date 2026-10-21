@@ -1,0 +1,5 @@
+[
+  {"level": 1, "name": "Basic", "description": "Knows the main ideas and terms and can do simple, guided tasks with this skill."},
+  {"level": 2, "name": "Working", "description": "Uses the skill on everyday work tasks without help and can spot and fix common mistakes."},
+  {"level": 3, "name": "Advanced", "description": "Handles unusual or complex cases, chooses between approaches and can explain the trade-offs to others."}
+]

@@ -1,12 +1,35 @@
 import { useEffect, useState } from "react";
 import { Icon } from "../components/Icon";
-import { api, ChatTurn, Skill } from "../lib/api";
-import { getLang, t } from "../lib/i18n";
+import { MicButton } from "../components/MicButton";
+import { api, Audience, ChatTurn, SendPreview, Skill } from "../lib/api";
+import { getLang, StringKey, t } from "../lib/i18n";
 
 type Tab = "upload" | "cv" | "chat" | "pick";
 
-export function Intake({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
+const AUDIENCES: { id: Audience; label: string; hint: string }[] = [
+  { id: "worker", label: "aud.worker", hint: "aud.workerHint" },
+  { id: "graduate", label: "aud.graduate", hint: "aud.graduateHint" },
+  { id: "switcher", label: "aud.switcher", hint: "aud.switcherHint" },
+];
+
+export function Intake({ audience, onAudience, onDone }: {
+  audience: Audience | null; onAudience: (a: Audience) => void; onDone: (skills: string[]) => void;
+}) {
   const [tab, setTab] = useState<Tab>("upload");
+  if (!audience) {
+    return (
+      <section>
+        <div className="page-head"><h1>{t("aud.title")}</h1><p className="muted">{t("aud.sub")}</p></div>
+        <div className="audience-choices" role="radiogroup" aria-label={t("aud.title")}>
+          {AUDIENCES.map((a) => (
+            <button key={a.id} role="radio" aria-checked={false} className="card audience" onClick={() => onAudience(a.id)}>
+              <strong>{t(a.label as never)}</strong><span className="muted">{t(a.hint as never)}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
   const tabs: { id: Tab; label: string }[] = [
     { id: "upload", label: t("in.upload") },
     { id: "cv", label: t("in.paste") },
@@ -33,16 +56,51 @@ export function Intake({ onDone }: { onDone: (skills: string[], mode: string) =>
   );
 }
 
-function UploadCv({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
+/** What gets sent: the scrubbed text, editable, before any language model reads it. */
+function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: () => void; onDone: (skills: string[]) => void }) {
+  const [text, setText] = useState(preview.text);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const removed = Object.entries(preview.removed);
+  async function send() {
+    setBusy(true); setError(null);
+    try { onDone((await api.extract(text)).skills); }
+    catch { setError("We couldn't read that. Try picking skills from the list instead."); }
+    finally { setBusy(false); }
+  }
+  return (
+    <div className="send-check">
+      <h2>{t("send.title")}</h2>
+      <p className="muted">{t("send.sub")}</p>
+      {removed.length ? (
+        <p className="chips" aria-label={t("send.removed")}>
+          <span>{t("send.removed")}:</span>
+          {removed.map(([kind, n]) => <span key={kind} className="chip">{t(`pii.${kind}` as StringKey)} ({n})</span>)}
+        </p>
+      ) : <p className="muted">{t("send.none")}</p>}
+      <label className="sr-only" htmlFor="send-text">{t("send.title")}</label>
+      <textarea id="send-text" rows={12} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} />
+      <div className="actions">
+        <button className="primary" disabled={busy || text.trim().length < 50} onClick={send}>{busy ? t("in.reading") : t("send.ok")}</button>
+        <button className="btn quiet" disabled={busy} onClick={onBack}>{t("send.back")}</button>
+      </div>
+      {error && <p className="error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<SendPreview | null>(null);
   async function upload(file: File | undefined) {
     if (!file) return;
     setBusy(true); setError(null);
-    try { const r = await api.upload(file); onDone(r.skills, r.mode); }
+    try { setPreview(await api.previewUpload(file)); }
     catch (e) { setError(e instanceof Error ? e.message : "Upload failed"); }
     finally { setBusy(false); }
   }
+  if (preview) return <SendCheck preview={preview} onBack={() => setPreview(null)} onDone={onDone} />;
   return (
     <div className="dropzone">
       <Icon name="upload" />
@@ -57,31 +115,36 @@ function UploadCv({ onDone }: { onDone: (skills: string[], mode: string) => void
   );
 }
 
-function PasteCv({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
+function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<SendPreview | null>(null);
   const length = text.trim().length;
-  async function read() {
+  async function check() {
     setBusy(true); setError(null);
-    try { const r = await api.extract(text); onDone(r.skills, r.mode); }
+    try { setPreview(await api.preview(text)); }
     catch { setError("We couldn't read that. Try picking skills from the list instead."); }
     finally { setBusy(false); }
   }
+  if (preview) return <SendCheck preview={preview} onBack={() => setPreview(null)} onDone={onDone} />;
   return (
     <>
       <label htmlFor="cv">Paste your CV or describe your work (at least 50 characters)</label>
       <textarea id="cv" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} />
-      <p className="muted counter" aria-live="polite">{length < 50 ? `${50 - length} more characters` : `${length.toLocaleString()} / 20,000`}</p>
-      <button className="primary" disabled={busy || length < 50} onClick={read}>
-        {busy ? t("in.reading") : t("in.read")}
+      <div className="row-between">
+        <p className="muted counter" aria-live="polite">{length < 50 ? `${50 - length} more characters` : `${length.toLocaleString()} / 20,000`}</p>
+        <MicButton onText={(spoken) => setText((x) => `${x.trimEnd()}\n${spoken}`.trim().slice(0, 20000))} />
+      </div>
+      <button className="primary" disabled={busy || length < 50} onClick={check}>
+        {busy ? t("in.reading") : t("send.check")}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
     </>
   );
 }
 
-function PickSkills({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
+function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   const [all, setAll] = useState<Skill[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
   const [filter, setFilter] = useState("");
@@ -101,7 +164,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[], mode: string) => vo
         ))}
         {all.length > 0 && shown.length === 0 && <p className="muted">No skill matches “{filter}”.</p>}
       </div>
-      <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked, "picked")}>
+      <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked)}>
         {picked.length < 3 ? "Pick at least 3 skills" : `Continue with ${picked.length} skills`}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
@@ -109,7 +172,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[], mode: string) => vo
   );
 }
 
-function Questionnaire({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
+function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [turn, setTurn] = useState<ChatTurn | null>(null);
   const [answer, setAnswer] = useState("");
@@ -138,13 +201,14 @@ function Questionnaire({ onDone }: { onDone: (skills: string[], mode: string) =>
       </ol>
       {turn && turn.skills_found.length > 0 && <p className="muted">Skills found so far: {turn.skills_found.length}</p>}
       {turn?.is_complete ? (
-        <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found, "scripted")}>
+        <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found)}>
           {turn.skills_found.length ? `Continue with ${turn.skills_found.length} skills` : "No skills found. Try another tab"}
         </button>
       ) : (
         <form className="chat-form" onSubmit={(e) => { e.preventDefault(); send(); }}>
           <label className="sr-only" htmlFor="answer">Your answer</label>
           <input id="answer" type="text" maxLength={1000} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer" />
+          <MicButton onText={(spoken) => setAnswer((a) => `${a.trimEnd()} ${spoken}`.trim().slice(0, 1000))} />
           <button className="primary" type="submit" disabled={busy || !answer.trim()}>{busy ? "…" : "Send"}</button>
         </form>
       )}

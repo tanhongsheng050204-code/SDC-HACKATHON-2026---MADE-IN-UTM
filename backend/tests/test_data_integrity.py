@@ -74,22 +74,80 @@ def test_tasks_cover_every_role_with_valid_labels():
             assert t["label"] in {"automate", "assist", "human"} and t["reason"] and t["text"], t["id"]
 
 
-def test_every_role_has_malaysian_pay_from_dosm():
+def test_skill_prereqs_reference_known_skills_and_have_no_cycles():
     ref = get_reference()
-    pay = ref.malaysia_pay
-    assert pay["licence"] == "CC BY 4.0" and pay["year"] >= 2024 and pay["trend_from"] == 2019
+    for skill_id, prereqs in ref.skill_prereqs.items():
+        assert skill_id in ref.skills, skill_id
+        for p in prereqs:
+            assert p in ref.skills and p != skill_id, (skill_id, p)
+
+    def visit(node: str, path: tuple[str, ...]) -> None:
+        assert node not in path, f"cycle: {' -> '.join(path + (node,))}"
+        for p in ref.skill_prereqs.get(node, []):
+            visit(p, path + (node,))
+
+    for skill_id in ref.skill_prereqs:
+        visit(skill_id, ())
+
+
+def test_skill_levels_are_basic_working_advanced():
+    assert [(lvl["level"], lvl["name"]) for lvl in get_reference().skill_levels] == [
+        (1, "Basic"), (2, "Working"), (3, "Advanced")]
+
+
+def test_every_role_has_a_full_work_context():
+    ref = get_reference()
+    dims = {d["id"] for d in ref.work_dimensions}
+    assert dims == {"people", "structured", "field", "shifts", "team"}
     for role in ref.roles.values():
-        group = pay["groups"][role["masco_group"]]
-        assert 1000 < group["median_rm"] < 20000 and group["employees_change_pct"] is not None, role["id"]
+        context = role["work_context"]
+        assert set(context) == dims, role["id"]
+        assert all(-1 <= v <= 1 for v in context.values()), role["id"]
 
 
-def test_dosm_summary_compares_with_2019():
-    import datetime as dt
+def test_survey_cards_are_valid():
+    ref = get_reference()
+    dims = {d["id"] for d in ref.work_dimensions}
+    assert len(ref.survey_cards) >= 30
+    for card_id, card in ref.survey_cards.items():
+        assert card_id == card["id"] and card_id.startswith("card-")
+        assert card["role_ids"] and all(r in ref.roles for r in card["role_ids"]), card_id
+        assert card["dims"] and all(d in dims and v in (1, -1) for d, v in card["dims"].items()), card_id
+        assert all(card["text"][lang].strip() for lang in ("en", "ms", "zh")), card_id
+    for d in ref.work_dimensions:
+        assert all(d[pole][lang].strip() for pole in ("plus", "minus") for lang in ("en", "ms", "zh"))
 
-    from app.trends import malaysia
-    csv_text = ("date,sex,occupation,recipients,wages_median,wages_mean\n"
-                "2019-01-01,both,clerical,100,2000,2200\n2020-01-01,both,clerical,80,2000,2200\n"
-                "2025-01-01,both,clerical,110,2700,3000\n2025-01-01,male,clerical,50,2800,3100\n")
-    summary = malaysia.summarise(csv_text, dt.date(2026, 10, 20))
-    clerical = summary["groups"]["clerical"]
-    assert summary["year"] == 2025 and clerical["median_rm"] == 2700 and clerical["employees_change_pct"] == 10.0
+
+def test_every_dimension_has_cards_both_ways():
+    ref = get_reference()
+    for d in ref.work_dimensions:
+        directions = {card["dims"].get(d["id"]) for card in ref.survey_cards.values()}
+        assert {1, -1} <= directions, d["id"]
+
+
+def test_every_role_has_survey_cards():
+    ref = get_reference()
+    covered = {r for card in ref.survey_cards.values() for r in card["role_ids"]}
+    assert covered == set(ref.roles)
+
+
+def test_every_role_has_entry_level():
+    ref = get_reference()
+    assert all(isinstance(role.get("entry_level"), bool) for role in ref.roles.values())
+    assert any(role["entry_level"] for role in ref.roles.values())
+
+
+DOSM_2025_MEDIANS = {"1": 6186, "2": 6124, "3": 3852, "4": 2693, "5": 2035, "6": 1992, "7": 2173, "8": 2083,
+                     "9": 1758, "all": 2940}  # DOSM Salaries & Wages Survey Report 2025, Appendix table A10
+
+
+def test_salaries_match_dosm_table_a10():
+    salaries = get_reference().salaries
+    assert {g["id"]: g["median_rm"] for g in salaries["groups"]} == DOSM_2025_MEDIANS
+    assert salaries["year"] == 2025 and "A10" in salaries["table"] and salaries["source_url"].startswith("https://storage.dosm.gov.my")
+
+
+def test_every_role_maps_to_a_dosm_group():
+    ref = get_reference()
+    groups = {g["id"] for g in ref.salaries["groups"]}
+    assert all(role["masco_major"] in groups - {"all"} for role in ref.roles.values())

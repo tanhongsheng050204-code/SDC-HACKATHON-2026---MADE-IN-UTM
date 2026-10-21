@@ -4,15 +4,119 @@
     "story": "34, data-entry clerk at a logistics company in Shah Alam. Her team just started using an AI tool that reads invoices.",
     "current_role_id": "data_entry_clerk",
     "experience_years": 9,
-    "skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
-    "interests": [8, 4]
+    "skills": [
+      "data_entry",
+      "excel",
+      "office_admin",
+      "scheduling",
+      "communication",
+      "genai_tools"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_entry_clerk-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_analyst-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ai_operations_specialist-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-2",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-care_worker-1",
+        "answer": "dislike"
+      }
+    ],
+    "audience": "worker"
   },
   "student": {
     "display_name": "Wei Jie (demo)",
-    "story": "22, final-year business student in Penang who did a marketing internship and cares about climate change.",
+    "story": "22, final-year business student in Penang who did a marketing internship. He enjoys working with people and in a team, and likes varied, creative work more than routine.",
     "current_role_id": null,
     "experience_years": 0,
-    "skills": ["excel", "social_media_marketing", "content_writing", "communication", "statistics", "genai_tools", "project_management"],
-    "interests": [13, 12]
+    "skills": [
+      "excel",
+      "social_media_marketing",
+      "content_writing",
+      "communication",
+      "statistics",
+      "genai_tools",
+      "project_management"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-digital_marketing_specialist-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-digital_marketing_specialist-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-data_analyst-3",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "dislike"
+      }
+    ],
+    "audience": "graduate"
+  },
+  "switcher": {
+    "display_name": "Farid (demo)",
+    "story": "29, customer service representative at a telco call centre in Cyberjaya. He wants to move into designing apps, building on what he knows about frustrated customers.",
+    "audience": "switcher",
+    "current_role_id": "customer_service_rep",
+    "experience_years": 6,
+    "skills": [
+      "customer_service",
+      "communication",
+      "empathy",
+      "problem_solving",
+      "genai_tools",
+      "content_writing"
+    ],
+    "survey_answers": [
+      {
+        "card_id": "card-ux_designer-1",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-2",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-ux_designer-3",
+        "answer": "like"
+      },
+      {
+        "card_id": "card-customer_service_rep-2",
+        "answer": "dislike"
+      },
+      {
+        "card_id": "card-data_entry_clerk-2",
+        "answer": "dislike"
+      }
+    ]
   }
 }

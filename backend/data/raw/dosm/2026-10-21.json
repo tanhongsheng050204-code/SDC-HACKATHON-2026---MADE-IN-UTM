@@ -1,0 +1,52 @@
+{
+  "source": "OpenDOSM Salaries & Wages Survey (employees by occupation)",
+  "source_url": "https://open.dosm.gov.my/data-catalogue/wages_occupation",
+  "retrieved": "2026-10-21",
+  "dataset": "wages_occupation",
+  "years": [
+    2022,
+    2025
+  ],
+  "overall": {
+    "recent": 10381.6,
+    "prior": 9996.4
+  },
+  "groups": {
+    "1": {
+      "recent": 330.5,
+      "prior": 327.4
+    },
+    "2": {
+      "recent": 1945.4,
+      "prior": 1833.7
+    },
+    "3": {
+      "recent": 1527.9,
+      "prior": 1470.0
+    },
+    "4": {
+      "recent": 1360.1,
+      "prior": 1292.2
+    },
+    "5": {
+      "recent": 2305.7,
+      "prior": 2176.9
+    },
+    "6": {
+      "recent": 87.7,
+      "prior": 85.2
+    },
+    "7": {
+      "recent": 723.9,
+      "prior": 735.4
+    },
+    "8": {
+      "recent": 1290.8,
+      "prior": 1278.8
+    },
+    "9": {
+      "recent": 809.7,
+      "prior": 796.8
+    }
+  }
+}

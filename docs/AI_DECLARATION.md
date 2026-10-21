@@ -6,8 +6,9 @@
 
 | Tool | Used for |
 |---|---|
-| Claude (Anthropic), coding assistant | First drafts of the planning documents, the project scaffold (backend services, tests, first frontend screens) and the illustrative seed data; later, under the team's direction: splitting the frontend into screens and components, the landing page and Today screen layout (modelled on a reference site the team chose), the Docker and deployment files, the admin review step for trend data, the what-if tools (tipping points, forecast x-ray, pros and cons), the prompt-injection guardrails, and fixes recorded in REVIEW_LOG.md |
+| Claude (Anthropic), coding assistant | First drafts of the planning documents, the project scaffold (backend services, tests, first frontend screens) and the illustrative seed data; later, under the team's direction: splitting the frontend into screens and components, the landing page and Today screen layout (modelled on a reference site the team chose), the Docker and deployment files, the admin review step for trend data, the pros and cons per role, the prompt-injection guardrails, and fixes recorded in REVIEW_LOG.md |
 | Google Gemini (inside the product; model set by `GEMINI_MODEL`, default `gemini-2.5-flash`, and shown in the app footer) | Reading skills from CVs, drafting task labels for later human review, coach answers, pathway summaries. Without a key the app runs offline with rules and templates |
+| Open models on RunPod Serverless (optional; CV reading with `RUNPOD_LLM_MODEL`, default Qwen2.5-7B-Instruct; voice with faster-whisper `RUNPOD_WHISPER_MODEL`, default `small`) | Reading skills from scrubbed CV text instead of Gemini, and turning speech into text. Off unless `RUNPOD_API_KEY` and the endpoint IDs are set |
 | ______ | ______ |
 
 ## What the team decided and did

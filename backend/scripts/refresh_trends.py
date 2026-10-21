@@ -31,7 +31,7 @@ if __name__ == "__main__":
     print("Role changes vs baseline:")
     for s in sorted(snapshot["signals"], key=lambda s: s["net_growth_pct"] - s["baseline_growth_pct"]):
         print(f"  {s['role_id']:30} {s['baseline_growth_pct']:+6.1f} -> {s['net_growth_pct']:+6.1f}"
-              f"   (demand {s['demand_points']:+.1f}, AI {s['ai_points']:+.1f})")
+              f"   (demand {s['demand_points']:+.1f}, Malaysia {s.get('local_points', 0):+.1f}, AI {s['ai_points']:+.1f})")
     if args.approve_as:
         review.approve(snapshot["snapshot_id"], args.approve_as)
         print(f"

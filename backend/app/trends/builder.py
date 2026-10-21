@@ -17,7 +17,9 @@ figures) is never edited; each refresh writes a new snapshot that adjusts it wit
                                   - mean momentum of capabilities that expose it), capped at +/-15
   automation_exposure     += 0.3 x mean momentum of exposing capabilities   (clipped 0..1)
   ai_complementarity      += 0.3 x mean momentum of complementing capabilities (clipped 0..1)
-  net_growth_pct          = baseline + demand adjustment + AI adjustment
+  Malaysian employment    = employee growth in the role's MASCO group - growth of all employees
+                            (OpenDOSM, percentage points over 3 years), capped at +/-10 points
+  net_growth_pct          = baseline + demand adjustment + Malaysian employment + AI adjustment
 """
 
 import datetime as dt
@@ -29,6 +31,7 @@ MIN_MENTIONS = 20  # postings mentioning a skill, both periods together, before 
 TREND_THRESHOLD = 0.15
 CAP_POINTS = 15.0
 EXPOSURE_STEP = 0.3
+LOCAL_CAP = 10.0  # Malaysian employment points; nine coarse groups, so a smaller cap
 
 
 def _clip(value: float, low: float, high: float) -> float:
@@ -91,8 +94,20 @@ def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: 
     return out
 
 
+def _growth(pair: dict) -> float:
+    return (pair["recent"] - pair["prior"]) / pair["prior"] * 100 if pair["prior"] else 0.0
+
+
+def local_points(dosm: dict, masco: str | None) -> float:
+    """Points from Malaysian employment: the group's growth above or below all employees."""
+    group = dosm["groups"].get(masco or "")
+    if not group:
+        return 0.0
+    return round(_clip(_growth(group) - _growth(dosm["overall"]), -LOCAL_CAP, LOCAL_CAP), 1)
+
+
 def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research: dict,
-                 skills_out: dict[str, dict]) -> list[dict]:
+                 skills_out: dict[str, dict], dosm: dict | None = None) -> list[dict]:
     m = _pressure(momentum(research))
     by_role = {s["role_id"]: s for s in baseline["signals"]}
     out = []
@@ -106,7 +121,9 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
         demand_points = round(_clip(CAP_POINTS * demand, -CAP_POINTS, CAP_POINTS), 1)
         ai_points = round(_clip(CAP_POINTS * (_mean(complementing) - _mean(exposing)),
                                 -CAP_POINTS, CAP_POINTS), 1)
-        growth = round(base["net_growth_pct"] + demand_points + ai_points, 1)
+        local = local_points(dosm, role.get("masco_major")) if dosm else 0.0
+        growth = round(base["net_growth_pct"] + demand_points + local + ai_points, 1)
+        extra = {"local_points": local} if dosm else {}
         out.append({
             "role_id": role_id,
             "net_growth_pct": growth,
@@ -115,13 +132,17 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
             "baseline_growth_pct": base["net_growth_pct"],
             "demand_points": demand_points,
             "ai_points": ai_points,
+            **extra,
             "note": (f"Baseline {base['net_growth_pct']:+g}% ({baseline['snapshot_id']}); "
-                     f"job-posting demand {demand_points:+g}; AI research momentum {ai_points:+g}"),
+                     f"job-posting demand {demand_points:+g}; "
+                     + (f"Malaysian employment {local:+g}; " if dosm else "")
+                     + f"AI research momentum {ai_points:+g}"),
         })
     return out
 
 
-def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime) -> dict:
+def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
+          dosm: dict | None = None) -> dict:
     caps = ref.capabilities
     skills_out = skill_signals(ref.skills, caps, research, jobs)
     stamp = now.strftime("%Y-%m-%d")
@@ -129,7 +150,7 @@ def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime) -> 
         "snapshot_id": f"{stamp}-trend-{now:%H%M%S}",
         "kind": "trend-adjusted",
         "source": (f"{baseline['source']} adjusted by {research['source']} research momentum "
-                   f"and {jobs['source']}"),
+                   f"and {jobs['source']}" + (f" and {dosm['source']}" if dosm else "")),
         "source_url": baseline["source_url"],
         "published": baseline["published"],
         "imported": now.isoformat(timespec="seconds"),
@@ -141,8 +162,10 @@ def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime) -> 
              "retrieved": research["retrieved"], "windows": research["windows"]},
             {"source": jobs["source"], "url": jobs["source_url"], "retrieved": jobs["retrieved"],
              "threads": {w: [t["title"] for t in ts] for w, ts in jobs["threads"].items()}},
+            *([{"source": dosm["source"], "url": dosm["source_url"], "retrieved": dosm["retrieved"],
+                "years": dosm["years"]}] if dosm else []),
         ],
         "capability_momentum": momentum(research),
-        "signals": role_signals(ref.roles, caps, baseline, research, skills_out),
+        "signals": role_signals(ref.roles, caps, baseline, research, skills_out, dosm),
         "skill_signals": list(skills_out.values()),
     }

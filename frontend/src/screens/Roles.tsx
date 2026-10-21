@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
+import { AdoptionSlider, TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
-import { InfoTip } from "../components/InfoTip";
 import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
 import { RoleCard } from "../components/RoleCard";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
-import { SCENARIOS } from "../lib/labels";
+import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
 
 // Below this fit no role is a realistic short move, so we say so instead of implying one is.
 const CLOSE_FIT = 0.35;
 
-export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
-  profile: Profile; scenario: Scenario; year?: number;
-  onScenario: (s: Scenario) => void; onYear: (y: number) => void; onOpen: (r: RoleMatch) => void;
+export function Roles({ profile, scenario, year, adoption, onScenario, onAdoption, onYear, onOpen, onSurvey }: {
+  profile: Profile; scenario: Scenario; year?: number; adoption?: number;
+  onScenario: (s: Scenario) => void; onAdoption: (a: number | undefined) => void;
+  onYear: (y: number) => void; onOpen: (r: RoleMatch) => void; onSurvey: () => void;
 }) {
   const [data, setData] = useState<Matches | null>(null);
+  const [extra, setExtra] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<Change[] | null>(null);
@@ -25,17 +27,17 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
   useEffect(() => {
     let live = true;
     setLoading(true);
-    api.matches(profile.id, scenario, year)
+    api.matches(profile.id, scenario, year, adoption, extra)
       .then((d) => { if (live) { setData(d); setError(null); } })
       // Keep the last list on screen; it is still correct for the previous choice.
       .catch(() => live && setError("Couldn't update the list. Showing your last results."))
       .finally(() => live && setLoading(false));
     return () => { live = false; };
-  }, [profile.id, profile.interests.join(","), profile.completed_courses.length, scenario, year]);
+  }, [profile.id, profile.completed_courses.length, scenario, year, adoption, extra.join(",")]);
 
   async function afterRefresh() {
     const before = data;
-    const after = await api.matches(profile.id, scenario, year);
+    const after = await api.matches(profile.id, scenario, year, adoption, extra);
     setData(after);
     if (before) setChanges(compareMatches(before, after, scenario));
   }
@@ -50,11 +52,13 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
       </div>
       {!data && loading && <SkeletonCards />}
       {data && <Kpis data={data} scenario={scenario} />}
-      <div className="scenario-row"><div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+      <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
-          <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
+          <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
-      </div> <InfoTip term="gl.scenario" label="AI futures" /></div>
+      </div>
+      <AdoptionSlider value={adoption} onChange={onAdoption} />
+      {data && <TippingPoints profileId={profile.id} year={year} />}
       {data && (
         <div className="year-slider">
           <label htmlFor="year">{t("k.lookAhead")} <strong>{data.year}</strong> <span className="badge">{t("k.estimate")}</span></label>
@@ -80,6 +84,29 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>
       )}
+      {data && profile.audience === "switcher" && data.current_role && (
+        <div className="card lead">
+          <span className="kpi-label">{t("lead.switchTitle")}</span>
+          <strong>{data.current_role.title}: {OUTLOOK_TEXT[data.current_role.outlook[scenario].label]}</strong>
+          <p className="muted">{t("lead.switchList")}</p>
+        </div>
+      )}
+      {data && data.also_like.length > 0 && (
+        <div className="card also-like">
+          <h2>{t("survey.alsoLike")}</h2>
+          <p className="muted">{t("survey.alsoLikeSub")}</p>
+          <div className="actions">
+            {data.also_like.map((a) => {
+              const match = data.roles.find((r) => r.role_id === a.role_id);
+              return match && <button key={a.role_id} className="btn quiet sm" onClick={() => onOpen(match)}>{a.title} · #{a.rank}</button>;
+            })}
+          </div>
+        </div>
+      )}
+      {data && Object.keys(profile.preferences ?? {}).length === 0 && (
+        <p className="muted"><button className="link" onClick={onSurvey}>{t("survey.prompt")}</button></p>
+      )}
+      {data && <WhatIf data={data} extra={extra} onChange={setExtra} />}
       <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
         {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
       </div>
@@ -96,5 +123,28 @@ function SkeletonCards() {
     <div className="grid" aria-hidden="true">
       {[0, 1, 2].map((i) => <div key={i} className="card skeleton" />)}
     </div>
+  );
+}
+
+// "What if I learn...?": tick skills you don't have yet and watch the ranking move. Nothing is
+// saved; a skill only counts for real once it is proven in the skill tree.
+function WhatIf({ data, extra, onChange }: { data: Matches; extra: string[]; onChange: (s: string[]) => void }) {
+  const options = new Map<string, string>();
+  for (const r of data.roles.slice(0, 6)) for (const s of r.missing) if (!options.has(s.skill_id)) options.set(s.skill_id, s.name);
+  for (const id of extra) if (!options.has(id)) options.set(id, id);
+  const toggle = (id: string) => onChange(extra.includes(id) ? extra.filter((x) => x !== id) : [...extra, id].slice(0, 10));
+  return (
+    <details className="card what-if" open={extra.length > 0}>
+      <summary>{t("whatif.title")}{extra.length > 0 && ` (${extra.length})`}</summary>
+      <p className="muted">{t("whatif.sub")}</p>
+      <div className="chips">
+        {[...options].slice(0, 14).map(([id, name]) => (
+          <button key={id} className={extra.includes(id) ? "chip covered" : "chip missing"} aria-pressed={extra.includes(id)} onClick={() => toggle(id)}>
+            {extra.includes(id) ? "✓ " : "+ "}{name}
+          </button>
+        ))}
+      </div>
+      {extra.length > 0 && <button className="link" onClick={() => onChange([])}>{t("whatif.clear")}</button>}
+    </details>
   );
 }

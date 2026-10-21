@@ -9,7 +9,7 @@ const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
 
 const PEOPLE = [
   { key: "clerk", photo: "worker", alt: "A woman in a hijab working at her laptop", who: "A clerk whose job is changing", text: "Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices. She sees which of her skills carry over and a plan for the role she can reach first.", cta: "Open Aisyah's demo", chips: ["Data entry ▼", "Excel ▲", "AI operations"] },
-  { key: "student", photo: "student", alt: "Two students working together at a laptop", who: "A student choosing a direction", text: "Wei Jie is a final-year business student who cares about climate change. He compares roles under three futures, keeps the ones that hold up in all of them, and picks free courses first.", cta: "Open the student demo", chips: ["Robust pick", "Free courses", "SDG 12, 13"] },
+  { key: "student", photo: "student", alt: "Two students working together at a laptop", who: "A student choosing a direction", text: "Wei Jie is a final-year business student who enjoys working with people and varied, creative work. He compares roles under three futures, keeps the ones that hold up in all of them, and sees which ones he can start in as a graduate.", cta: "Open the student demo", chips: ["Robust pick", "Open to graduates", "Fits what he enjoys"] },
   { key: "hr", photo: "hr-team", alt: "Colleagues reviewing work on a laptop in an office", who: "An HR team planning ahead", text: "Upload an anonymous list of roles and skills. See which roles AI puts at risk and the cheapest moves for each group, never a ranking of people.", cta: "Open the workforce view", chips: ["160 people", "Heatmap", "Learning hours"] },
 ];
 
@@ -28,8 +28,8 @@ const CHAIN = [
 ];
 
 const FAQ = [
-  { q: "Is this a real product, or a demo?", a: "It is a working prototype built for the XMUM hackathon. The matching, scenarios, pathways, coach and workforce view all run on real code. The two demo people are synthetic. Job growth figures come from the WEF Future of Jobs Report 2025; the AI-exposure settings are our own estimates, and the app says so." },
-  { q: "Where do the forecasts come from?", a: "Each role starts from the net job growth to 2030 in the WEF Future of Jobs Report 2025 (Figure 2.3, a global employer survey). Dated signals then adjust it: AI research activity from arXiv (or OpenAlex) and skill mentions in job postings, each update approved by a person. The Sources page lists every snapshot with its date." },
+  { q: "Is this a real product, or a demo?", a: "It is a working prototype built for the XMUM hackathon. The matching, scenarios, pathways, coach and workforce view all run on real code. The three demo people are synthetic. Job growth figures come from the WEF Future of Jobs Report 2025; the AI-exposure settings are our own estimates, and the app says so." },
+  { q: "Where do the forecasts come from?", a: "Each role starts from the net job growth to 2030 in the WEF Future of Jobs Report 2025 (Figure 2.3, a global employer survey). Dated signals then adjust it: AI research activity from arXiv (or OpenAlex), skill mentions in job postings and Malaysian employment by occupation from OpenDOSM, each update approved by a person. The Sources page lists every snapshot with its date." },
   { q: "Will it tell me to quit my job?", a: "No. Laluan shows estimates under different futures and the skills between you and each role. The decision stays with you, and every screen says so." },
   { q: "Do you keep my CV?", a: "No. The file is read in memory and discarded. We save the skills you confirm, your goals and your course progress, and you can delete all of it from the sidebar at any time." },
   { q: "Can my employer see my results?", a: "Only if you share a Future Card link. The workforce view for HR teams works on anonymous role-and-skills lists and refuses files with names, emails or staff IDs." },
@@ -74,6 +74,8 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
               </article>
             ))}
           </div>
+          <p className="lp-switch">{t("landing.switcher")} <button className="link" onClick={() => onDemo("switcher")}>{t("landing.switcherCta")}</button></p>
+          <p className="lp-switch">{t("landing.centre")} <button className="link" onClick={() => onDemo("class")}>{t("landing.centreCta")}</button></p>
           <p className="lp-credit">Illustrative photos from Unsplash by Gema Saputera, Mimi Thian and Vitaly Gariev. The people shown are not the demo personas.</p>
         </section>
 
@@ -149,6 +151,8 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             <ul>
               <li><button className="link" onClick={() => onDemo("clerk")}>Worker demo</button></li>
               <li><button className="link" onClick={() => onDemo("student")}>Student demo</button></li>
+              <li><button className="link" onClick={() => onDemo("switcher")}>Career-switcher demo</button></li>
+              <li><button className="link" onClick={() => onDemo("class")}>Career-centre class view</button></li>
               <li><button className="link" onClick={onHr}>Workforce view</button></li>
             </ul>
           </div>

@@ -13,9 +13,11 @@ import re
 import threading
 from pathlib import Path
 
+import httpx
+
 from app.config import get_settings
 from app.reference import get_reference
-from app.trends import builder, jobs, research, review
+from app.trends import builder, dosm, jobs, research, review
 
 _lock = threading.Lock()
 _status: dict = {"state": "idle", "steps": [], "snapshot_id": None, "error": None}
@@ -63,10 +65,15 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
         ref.capabilities, now.date(), mailto=contact, progress=_log), force)
     jobs_raw = _raw("jobs", now.date(), lambda: jobs.collect(
         ref.job_terms, now.date(), progress=_log), force)
+    try:
+        dosm_raw = _raw("dosm", now.date(), lambda: dosm.collect(now.date(), progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError) as error:  # optional source: build without it
+        _log(f"OpenDOSM unavailable, building without Malaysian employment ({_safe_error(error)})")
+        dosm_raw = None
     _log("Building new snapshot")
-    snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now)
-    out: Path = review.save_pending(snapshot)
-    _log(f"Saved {out.name} for review. Users keep the current forecast until an admin approves it.")
+    snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now, dosm_raw)
+    review.save_pending(snapshot)
+    _log(f"Saved {snapshot['snapshot_id']} for review. Users keep the current forecast until an admin approves it.")
     return snapshot
 
 

@@ -1,0 +1,23 @@
+{
+  "note": "Which skills sit below which in the skill tree. AI-drafted from typical course sequences, to be reviewed by the team (REVIEW_LOG). Skills not listed have no prerequisite and sit at the bottom of the tree.",
+  "prereqs": {
+    "sql": ["excel"],
+    "statistics": ["excel"],
+    "data_visualization": ["excel"],
+    "power_bi": ["excel", "data_visualization"],
+    "machine_learning": ["python", "statistics"],
+    "deep_learning": ["machine_learning"],
+    "mlops": ["machine_learning", "cloud_computing", "git"],
+    "software_testing": ["git"],
+    "network_security": ["cybersecurity_fundamentals"],
+    "incident_response": ["cybersecurity_fundamentals", "network_security"],
+    "prompt_engineering": ["genai_tools"],
+    "marketing_analytics": ["excel", "social_media_marketing"],
+    "seo": ["content_writing"],
+    "ux_research": ["empathy"],
+    "solar_pv": ["electrical_systems", "safety_compliance"],
+    "esg_reporting": ["excel"],
+    "carbon_accounting": ["esg_reporting"],
+    "patient_care": ["empathy"]
+  }
+}

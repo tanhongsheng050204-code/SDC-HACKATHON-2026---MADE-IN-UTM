@@ -44,13 +44,13 @@ export function Sources({ onReviewKit }: { onReviewKit: () => void }) {
       <div className="card">
         <h2>Other data in Laluan</h2>
         <ul className="plain-list">
-          <li><strong>Malaysian pay and jobs:</strong> Department of Statistics Malaysia, <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">Annual Salaries &amp; Wages by Occupation</a> (CC BY 4.0), by MASCO occupation group; refreshed with <code>scripts/refresh_malaysia.py</code>.</li>
           <li><strong>Tasks:</strong> O*NET 30.0 task statements (US Department of Labor), labelled automate / assist / human by our team with AI help.</li>
           <li><strong>Skills per role:</strong> the Laluan team's list, checked against O*NET occupations where one exists.</li>
           <li><strong>Courses:</strong> the Laluan catalogue; each link shows the date we last opened it.</li>
           <li><strong>SDGs:</strong> UN Sustainable Development Goals and targets, with a written reason for every link.</li>
           <li><strong>Courses' prices and HRD Corp status:</strong> from each provider's own page, with the date we checked; ask the provider before enrolling.</li>
-          <li><strong>Trend refresh:</strong> arXiv (or OpenAlex) paper counts and Hacker News “Who is hiring?” posts. Raw counts are kept in <code>backend/data/raw/</code>.</li>
+          <li><strong>Trend refresh:</strong> arXiv (or OpenAlex) paper counts, Hacker News “Who is hiring?” posts, and Malaysian employment by occupation group from the <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">OpenDOSM public API</a> (Salaries &amp; Wages Survey, latest year vs three years earlier). Raw counts are kept in <code>backend/data/raw/</code>.</li>
+          <li><strong>Pay:</strong> median monthly salaries by MASCO occupation group from the <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> (table A10). These are group medians, not job offers.</li>
         </ul>
       </div>
       <div className="card">

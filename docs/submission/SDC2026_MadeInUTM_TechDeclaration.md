@@ -61,7 +61,6 @@ Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
 | Gemini API (Google): `gemini-2.5-flash`, `gemini-embedding-001` | Free tier, optional *(team to confirm whether a sponsor key is used)* | Reading skills from scrubbed CV text, coach answers, pathway summaries, embeddings for unfamiliar skill phrases. The app runs fully without it (offline rules and templates). |
 | arXiv API (Cornell University) | Free | Counting AI research papers per capability for trend signals |
 | OpenAlex API (OurResearch) | Free | Fallback paper counts when arXiv is busy |
-| OpenDOSM open data (Department of Statistics Malaysia) | Free | Downloading Malaysian pay and employee numbers by occupation group (CSV, refreshed yearly) |
 | Hacker News Search API (Algolia) | Free | Counting skill mentions in “Who is hiring?” threads |
 
 Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open in the browser; the app does not call those services.
@@ -91,7 +90,6 @@ No model is trained or fine-tuned by the team. The model in use is shown in the 
 
 | Dataset name | Source / URL | Type | Personal data? | Licence |
 | --- | --- | --- | --- | --- |
-| DOSM Annual Salaries & Wages by Occupation & Sex (2010–2025) | <https://open.dosm.gov.my/data-catalogue/wages_occupation> | Public (official statistics) | N (aggregates only) | CC BY 4.0 |
 | WEF Future of Jobs Report 2025, Figure 2.3 (net job growth 2025–2030, 126 occupations) | <https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf> | Public | N | WEF terms of use; cited on every role |
 | O\*NET 30.0 task statements | <https://www.onetcenter.org/> | Public | N | CC BY 4.0 |
 | UN SDG goals, targets and colours | <https://sdgs.un.org/goals> | Public | N | UN SDG guidelines |
@@ -116,7 +114,7 @@ Did the team use any generative-AI tool to help create code, design, text or oth
 
 **How the team reviewed, tested and took responsibility for AI-generated output** *(100 words max)*
 
-The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 92 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
+The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 208 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
 
 *Word count: 93*
 

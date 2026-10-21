@@ -3,7 +3,7 @@
 import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.reference import get_reference
 
@@ -51,6 +51,59 @@ class CoachRequest(BaseModel):
     role_id: str | None = Field(default=None, max_length=80)
 
 
+class ClaimRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    replace: bool = False
+
+
+class CheckStart(BaseModel):
+    language: Literal["en", "ms", "zh"] = "en"
+
+
+class CheckAnswers(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)
+    answers: list[int] = Field(min_length=3, max_length=3)
+
+
+class SurveyAnswer(BaseModel):
+    card_id: str = Field(min_length=1, max_length=80)
+    answer: Literal["like", "dislike", "other"]
+    note: str | None = Field(default=None, max_length=300)
+    dims: dict[str, int] | None = None  # an "other" answer's reading, sent only once confirmed
+
+    @field_validator("card_id")
+    @classmethod
+    def card_exists(cls, value: str) -> str:
+        if value not in get_reference().survey_cards:
+            raise ValueError(f"Unknown card: {value}")
+        return value
+
+    @field_validator("dims")
+    @classmethod
+    def dims_known(cls, value: dict[str, int] | None) -> dict[str, int] | None:
+        known = {d["id"] for d in get_reference().work_dimensions}
+        if value and any(d not in known or v not in (1, -1) for d, v in value.items()):
+            raise ValueError("Unknown preference dimension")
+        return value
+
+
+class SurveyIn(BaseModel):
+    answers: list[SurveyAnswer] = Field(min_length=1, max_length=12)
+    language: Literal["en", "ms", "zh"] = "en"
+
+    @field_validator("answers")
+    @classmethod
+    def one_answer_per_card(cls, value: list[SurveyAnswer]) -> list[SurveyAnswer]:
+        if len({a.card_id for a in value}) != len(value):
+            raise ValueError("Each card can be answered once")
+        return value
+
+
+class InterpretRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=300)
+    language: Literal["en", "ms", "zh"] = "en"
+
+
 class CardRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
 
@@ -84,8 +137,15 @@ class ProfileIn(BaseModel):
     display_name: str | None = Field(default=None, max_length=60)
     current_role_id: str | None = None
     skills: list[str] = Field(min_length=1, max_length=60)
-    interests: list[int] = Field(default_factory=list, max_length=17)
     experience_years: int | None = Field(default=None, ge=0, le=60)
+    # The person's situation, not a demographic: it changes what Laluan shows first.
+    audience: Literal["worker", "graduate", "switcher"] | None = None
+
+    @model_validator(mode="after")
+    def working_needs_a_role(self):
+        if self.audience in ("worker", "switcher") and not self.current_role_id:
+            raise ValueError("Choose your current role, so we can show what carries over")
+        return self
 
     @field_validator("display_name")
     @classmethod
@@ -110,9 +170,3 @@ class ProfileIn(BaseModel):
             raise ValueError(f"Unknown skills: {', '.join(unknown)}")
         return list(dict.fromkeys(value))
 
-    @field_validator("interests")
-    @classmethod
-    def sdgs_exist(cls, value: list[int]) -> list[int]:
-        if any(n < 1 or n > 17 for n in value):
-            raise ValueError("Interests must be SDG numbers 1-17")
-        return list(dict.fromkeys(value))
