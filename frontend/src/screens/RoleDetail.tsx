@@ -5,6 +5,7 @@ import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { SdgReasons } from "../components/Sdgs";
+import { ForecastHistory } from "../components/ForecastHistory";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { getLang, pick, t, tf, tr } from "../lib/i18n";
@@ -57,6 +58,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       </table>
 
       <p className="source">{t("xray.hint")}</p>
+      <ForecastHistory roleId={role.role_id} scenario={scenario} />
       <PayLine pay={role.pay} change={role.pay_change_rm} />
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year}
         adoption={xray === scenario ? adoption : undefined} onClose={() => setXray(null)} />}

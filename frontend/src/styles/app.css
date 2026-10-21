@@ -675,3 +675,12 @@ main:focus { outline: none; }
 .budget { display: grid; gap: 10px; }
 .budget h2, .budget p { margin: 0; }
 .budget .badge { white-space: normal; }
+.forecast-history summary { cursor: pointer; font-weight: 650; }
+.forecast-history p { margin: 6px 0; }
+.history-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.history-list li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+.history-list li.current .history-date { font-weight: 700; }
+.history-list .source { grid-column: 2; }
+.history-move { margin-left: 8px; font-weight: 650; font-size: .85rem; }
+.history-move.up { color: var(--good); }
+.history-move.down { color: var(--risk); }

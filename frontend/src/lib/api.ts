@@ -189,6 +189,12 @@ export interface Xray {
   steps: { label: string; value: number; running_total: number; source: string; cap: string | null; key?: string; vars?: Record<string, unknown> }[];
 }
 
+export interface RoleHistory {
+  role_id: string; scenario: Scenario;
+  points: { snapshot_id: string; imported: string; source: string; illustrative: boolean; reviewed_by: string | null;
+    horizon_year: number; index: number; label: string }[];
+}
+
 export interface Tipping {
   current_role: { role_id: string; title: string; declining_at: number | null; declining_below: boolean; label_now: string } | null;
   overtakes: { role_id: string; title: string; overtakes_role_id: string; overtakes_title: string; at: number; direction: "above" | "below" }[];
@@ -402,6 +408,8 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
+  history: (roleId: string, scenario: Scenario) =>
+    request<RoleHistory>(`/roles/${encodeURIComponent(roleId)}/history?scenario=${scenario}`),
   translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),

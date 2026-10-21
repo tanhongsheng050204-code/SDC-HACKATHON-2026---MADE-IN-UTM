@@ -95,6 +95,26 @@ def role_day(role_id: str):
     return {k: entry.get(k) for k in ("role_id", "text", "basis", "drafted", "reviewed_by")}
 
 
+@router.get("/roles/{role_id}/history")
+def role_history(role_id: str, scenario: Scenario = "baseline"):
+    """This role's outlook in every forecast Laluan has used, oldest first: how the number moved as
+    trend refreshes were approved. Each point names its snapshot, so it can be traced."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    adoption = float(ref.scenarios[scenario]["adoption"])
+    points = []
+    for snap in ref.snapshots:
+        signal = signals_from_snapshot(snap).get(role_id)
+        if signal is None:  # a snapshot from before this role was added
+            continue
+        o = outlook(signal, scenario, adoption)
+        points.append({"snapshot_id": snap["snapshot_id"], "imported": snap["imported"], "source": snap["source"],
+                       "illustrative": bool(snap.get("illustrative")), "reviewed_by": snap.get("reviewed_by"),
+                       "horizon_year": snap["horizon_year"], "index": o.index, "label": o.label})
+    return {"role_id": role_id, "scenario": scenario, "points": points}
+
+
 @router.get("/roles/{role_id}/xray")
 def role_xray(role_id: str, scenario: Scenario = "baseline", year: int | None = None,
               adoption: float | None = Query(default=None, ge=0.5, le=2.0)):
