@@ -66,7 +66,7 @@ def get_settings() -> Settings:
     _load_dotenv(BACKEND_DIR / ".env")
     return Settings(
         gemini_api_key=os.environ.get("GEMINI_API_KEY", ""),
-        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-3.8-flash"),
         gemini_embedding_model=os.environ.get("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"),
         gemini_timeout_seconds=int(os.environ.get("GEMINI_TIMEOUT_SECONDS", "15")),
         admin_token=os.environ.get("ADMIN_TOKEN", ""),
