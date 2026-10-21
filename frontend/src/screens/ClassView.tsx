@@ -80,6 +80,23 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
             </tbody></table>
           </div>
 
+          {result.by_programme.length > 0 && (
+            <div className="card">
+              <h2>{t("class.byProgramme")}</h2>
+              <p className="muted">{t("class.byProgrammeSub")}</p>
+              <div className="table-wrap"><table className="heatmap">
+                <thead><tr><th>{t("class.programme")}</th><th>{t("class.students")}</th><th>{t("class.bestFit")}</th><th>{t("class.gaps")}</th></tr></thead>
+                <tbody>{result.by_programme.map((p) => (
+                  <tr key={p.name}>
+                    <th scope="row">{tr(p.name)}</th><td>{p.students}</td>
+                    <td>{p.best_fit.map((b) => `${tr(b.title)} (${b.students})`).join(", ")}</td>
+                    <td>{p.top_gaps.map((g, i) => <span key={g.skill_id}>{i > 0 && ", "}{g.course ? <a href={g.course.url} target="_blank" rel="noreferrer">{tr(g.name)}</a> : tr(g.name)} ({g.students})</span>)}</td>
+                  </tr>
+                ))}</tbody>
+              </table></div>
+            </div>
+          )}
+
           <div className="card">
             <h2>{t("class.courses")}</h2>
             <ol>{result.courses.map((c) => (

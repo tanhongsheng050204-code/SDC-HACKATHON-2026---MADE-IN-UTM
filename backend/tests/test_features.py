@@ -99,7 +99,7 @@ def test_workforce_aggregates_and_suggests_moves():
     assert result["sdg_contribution"] and "Row 9" in result["problems"][0]
     # Aggregates only: groups by role and by move, never a row per employee.
     assert set(result) == {"scenario", "employees", "at_risk", "total_hours", "budget", "roles", "moves",
-                           "sdg_contribution", "problems", "signal_source"}
+                           "in_place", "get_ahead", "sdg_contribution", "problems", "signal_source"}
     assert all("headcount" in r for r in result["roles"]) and all("people" in m for m in result["moves"])
 
 
@@ -257,3 +257,34 @@ def test_workforce_reports_course_fees_and_staff_time():
     budget = workforce.analyse(ref, csv_text, "baseline")["budget"]
     assert set(budget) >= {"total_rm", "claimable_rm", "ask_provider_rm", "unpriced_courses", "staff_time_rm"}
     assert budget["staff_time_rm"] > 0 and budget["total_rm"] >= budget["claimable_rm"]
+
+
+def test_hr_moves_go_to_the_nearest_role_and_offer_upskilling_in_place():
+    from app.services import workforce
+
+    ref = get_reference()
+    result = workforce.analyse(ref, open("data/sample_workforce.csv", encoding="utf-8").read(), "baseline")
+    # The nearest move, never a long shot picked for its growth (the old pick: clerks -> AI/ML specialist at 0% fit).
+    assert all(m["to_role_id"] != "ai_ml_engineer" for m in result["moves"])
+    in_place = {r["role_id"]: r for r in result["in_place"]}
+    assert "data_entry_clerk" in in_place and 0 < in_place["data_entry_clerk"]["avg_hours"] < 100
+    assert in_place["data_entry_clerk"]["ai_skills"]
+    risky = {r["role_id"] for r in result["roles"] if r["at_risk"]}
+    assert all(r["role_id"] not in risky for r in result["get_ahead"])  # stable roles only
+
+
+def test_class_view_splits_results_by_programme_without_small_groups():
+    from app.services import classview
+
+    ref = get_reference()
+    result = classview.analyse(ref, open("data/sample_class.csv", encoding="utf-8").read(), "baseline")
+    names = {p["name"] for p in result["by_programme"]}
+    assert {"Business administration", "Computer science", "Electrical and electronic engineering"} <= names
+    assert all(p["students"] >= classview.SMALL and p["best_fit"] and p["top_gaps"] for p in result["by_programme"])
+    small = "programme,skills\n" + "Psychology,communication; empathy\n" * 2 + "Accounting,excel; statistics\n" * 4
+    assert [p["name"] for p in classview.analyse(ref, small, "baseline")["by_programme"]] == ["Accounting"]
+
+
+def test_programmes_are_served(client):
+    body = client.get("/api/programmes").json()
+    assert any(p["id"] == "accounting" and "excel" in p["skills"] for p in body)

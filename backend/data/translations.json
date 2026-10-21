@@ -457,6 +457,70 @@
    "ms": "Mengendalikan kes luar biasa atau kompleks, memilih pendekatan terbaik dan mampu menerangkan kelebihan serta kekurangannya kepada orang lain.",
    "zh": "能处理复杂或罕见的特殊情况，权衡并选择最佳方案，并向他人解释利弊。"
   },
+  "Accounting": {
+   "ms": "Perakaunan",
+   "zh": "会计"
+  },
+  "Business administration": {
+   "ms": "Pentadbiran Perniagaan",
+   "zh": "工商管理"
+  },
+  "Computer science": {
+   "ms": "Sains Komputer",
+   "zh": "计算机科学"
+  },
+  "Information technology": {
+   "ms": "Teknologi Maklumat",
+   "zh": "资讯科技"
+  },
+  "Software engineering": {
+   "ms": "Kejuruteraan Perisian",
+   "zh": "软件工程"
+  },
+  "Data science": {
+   "ms": "Sains Data",
+   "zh": "数据科学"
+  },
+  "Cybersecurity": {
+   "ms": "Keselamatan Siber",
+   "zh": "网络安全"
+  },
+  "Electrical and electronic engineering": {
+   "ms": "Kejuruteraan Elektrik dan Elektronik",
+   "zh": "电气与电子工程"
+  },
+  "Mechanical engineering": {
+   "ms": "Kejuruteraan Mekanikal",
+   "zh": "机械工程"
+  },
+  "Electrical technology (TVET)": {
+   "ms": "Teknologi Elektrik (TVET)",
+   "zh": "电气技术（TVET）"
+  },
+  "Environmental science": {
+   "ms": "Sains Alam Sekitar",
+   "zh": "环境科学"
+  },
+  "Nursing and health care": {
+   "ms": "Kejururawatan dan Penjagaan Kesihatan",
+   "zh": "护理与医疗保健"
+  },
+  "Psychology": {
+   "ms": "Psikologi",
+   "zh": "心理学"
+  },
+  "Graphic and multimedia design": {
+   "ms": "Reka Bentuk Grafik dan Multimedia",
+   "zh": "平面与多媒体设计"
+  },
+  "Mass communication": {
+   "ms": "Komunikasi Massa",
+   "zh": "大众传播"
+  },
+  "Hospitality and tourism": {
+   "ms": "Hospitaliti dan Pelancongan",
+   "zh": "酒店与旅游"
+  },
   "Compile, sort, and verify the accuracy of data before it is entered.": {
    "ms": "Mengumpul, menyusun dan mengesahkan ketepatan data sebelum dimasukkan.",
    "zh": "在录入前整理、分类并核实数据的准确性。"

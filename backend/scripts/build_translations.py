@@ -2,7 +2,7 @@
 
 Covers what the app shows from the data files: role titles, families and summaries, skill names,
 scenario names and descriptions, SDG goal names, AI capability names, skill-level names and
-descriptions, and each role's O*NET tasks with their labels' reasons. The app looks each English
+descriptions, programme names, and each role's O*NET tasks with their labels' reasons. The app looks each English
 text up here (GET /api/translations) and shows English where a translation is missing.
 
 Gemini drafts them; the output is committed and listed in REVIEW_LOG.md for a native speaker to
@@ -49,6 +49,7 @@ def texts() -> list[str]:
     out += [c["name"] for c in _read("capabilities.json")["capabilities"]]
     for lv in _read("skill_levels.json"):
         out += [lv["name"], lv["description"]]
+    out += [p["name"]["en"] for p in _read("programmes.json")["programmes"]]
     for role in _read("tasks.json")["roles"]:
         for task in role["tasks"]:
             out += [task["text"], task["reason"]]

@@ -8,11 +8,11 @@ Each student is matched as a graduate (entry-level roles get their visible boost
 
 import csv
 import io
-from collections import Counter
+from collections import Counter, defaultdict
 
 from app.config import get_settings
 from app.reference import Reference
-from app.services import matching, skilltree, workforce
+from app.services import matching, skills, skilltree, workforce
 from app.services.workforce import WorkforceError
 
 SMALL = 3
@@ -26,6 +26,18 @@ def sample_path():
 
 def _count(n: int) -> int | str:
     return n if n >= SMALL else HIDDEN
+
+
+def programme_name(ref: Reference, raw: str) -> str:
+    """The catalogue programme a free-text programme cell names (data/programmes.json aliases), so
+    "BBA" and "Business Administration" count together; otherwise the text as written."""
+    key = skills.normalize(raw)
+    if not key:
+        return "Not given"
+    for prog in ref.programmes:
+        if key in {skills.normalize(a) for a in prog["aliases"]} or key == skills.normalize(prog["name"]["en"]):
+            return prog["name"]["en"]
+    return raw.strip()[:60]
 
 
 def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
@@ -43,7 +55,7 @@ def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
         if not found:
             problems.append(f"Row {n}: no skills we recognise")
             continue
-        students.append({"programme": row.get("programme") or "Not given", "skills": found})
+        students.append({"programme": programme_name(ref, row.get("programme") or ""), "skills": found})
     if not students:
         raise WorkforceError("No rows could be read")
     return students, problems
@@ -51,20 +63,25 @@ def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
 
 def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     students, problems = parse(ref, text)
-    groups = Counter(tuple(s["skills"]) for s in students)
+    groups = Counter((s["programme"], tuple(s["skills"])) for s in students)
+    per_programme: dict[str, dict] = defaultdict(lambda: {"students": 0, "best": Counter(), "gaps": Counter()})
     best: Counter = Counter()
     gaps: Counter = Counter()
     helped: Counter = Counter()
     sdg_students: Counter = Counter()
     outlooks: dict[str, dict] = {}
-    for skills, count in groups.items():
-        result = matching.match(ref, {"skills": list(skills), "current_role_id": None, "audience": "graduate"}, scenario_id)
+    for (programme, skill_ids), count in groups.items():
+        result = matching.match(ref, {"skills": list(skill_ids), "current_role_id": None, "audience": "graduate"}, scenario_id)
         top = result["roles"][0]
         best[top["role_id"]] += count
+        prog = per_programme[programme]
+        prog["students"] += count
+        prog["best"][top["role_id"]] += count
         outlooks[top["role_id"]] = top["outlook"]
         missing = {s["skill_id"] for s in top["missing"]}
         for skill_id in missing:
             gaps[skill_id] += count
+            prog["gaps"][skill_id] += count
         for course in ref.courses:
             if missing & set(course["skills"]):
                 helped[course["id"]] += count
@@ -84,6 +101,15 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "courses": [{"course": {k: courses[c][k] for k in ("id", "title", "provider", "url", "hours", "cost")},
                      "students_helped": _count(n), "hours": courses[c]["hours"]}
                     for c, n in sorted(helped.items(), key=lambda kv: (-kv[1], courses[kv[0]]["hours"]))[:TOP_COURSES]],
+        # Per programme (groups of at least SMALL students only, so no small group can be singled out):
+        # where its students fit best and the gaps a counsellor could close with one add-on course.
+        "by_programme": [
+            {"name": name, "students": p["students"],
+             "best_fit": [{"role_id": r, "title": ref.roles[r]["title"], "students": _count(n)} for r, n in p["best"].most_common(2)],
+             "top_gaps": [{"skill_id": g, "name": ref.skills[g]["name"], "students": _count(n), "course": skilltree.course_for(ref, g)}
+                          for g, n in p["gaps"].most_common(3)]}
+            for name, p in sorted(per_programme.items(), key=lambda kv: -kv[1]["students"])
+            if p["students"] >= SMALL and name != "Not given"],
         "sdg_contribution": [{**ref.sdgs[n], "students": _count(c)} for n, c in sdg_students.most_common()],
         "problems": problems[:20],
         "signal_source": {k: ref.latest_snapshot[k] for k in ("snapshot_id", "imported", "illustrative")},

@@ -6,6 +6,7 @@ import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { SdgReasons } from "../components/Sdgs";
 import { ForecastHistory } from "../components/ForecastHistory";
+import { Openings } from "../components/Openings";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { getLang, pick, t, tf, tr } from "../lib/i18n";
@@ -65,6 +66,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       <div className="job-links"><span className="muted">{t("rd.jobs")}</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
       </div>
+      <Openings roleId={role.role_id} roleTitle={tr(role.title)} profileId={profile.id} />
 
       {roleCase && <RoleCase data={roleCase} />}
 

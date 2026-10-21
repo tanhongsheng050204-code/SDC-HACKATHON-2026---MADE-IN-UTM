@@ -54,6 +54,7 @@ export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   evidence: RoleEvidence | null;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
+  plan_hours?: number; long_shot?: boolean; stepping_stone?: { role_id: string; title: string } | null;
   carry_over: { skill_id: string; name: string }[];
   rank_without_extra?: number;
   pay: Pay; pay_change_rm: number | null;
@@ -80,6 +81,7 @@ export interface Matches {
   scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
   year: number; year_range: [number, number]; also_like: AlsoLike[];
   current_role: (Pick<RoleMatch, "role_id" | "title" | "summary" | "fit" | "outlook" | "at_risk"> & { is_current_role: true }) | null;
+  shortest_route?: string | null;
 }
 export interface SkillTrend {
   skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
@@ -99,6 +101,7 @@ export interface PendingPreview {
   skills: Record<"rising" | "steady" | "declining" | "no_data", number>;
 }
 export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; snapshot_id: string | null; error: string | null }
+export interface InPlace { role_id: string; title: string; people: number; avg_hours: number; fees_each_rm: number; staff_time_rm: number; ai_skills: string[] }
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
   employees: number; at_risk: number; total_hours: number;
@@ -107,6 +110,7 @@ export interface Workforce {
   roles: { role_id: string; title: string; headcount: number; at_risk: boolean; avg_fit: number;
     outlook: Record<Scenario, { index: number; label: string }> }[];
   moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
+  in_place: InPlace[]; get_ahead: InPlace[];
   sdg_contribution: (Sdg & { people: number })[];
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
@@ -174,9 +178,12 @@ export interface AlsoLike {
 export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
 
 type Count = number | "fewer than 3";
+export interface Programme { id: string; name: Texts; skills: string[] }
 export interface ClassResult {
   scenario: { id: Scenario; label: string; description: string };
   students: Count; programmes: { name: string; students: Count }[];
+  by_programme: { name: string; students: number; best_fit: { role_id: string; title: string; students: Count }[];
+    top_gaps: { skill_id: string; name: string; students: Count; course: { title: string; url: string } | null }[] }[];
   best_fit: { role_id: string; title: string; students: Count; outlook: Record<Scenario, { index: number; label: string }> }[];
   top_gaps: { skill_id: string; name: string; students: Count; course: { id: string; title: string; url: string } | null }[];
   courses: { course: { id: string; title: string; provider: string; url: string; hours: number; cost: string }; students_helped: Count; hours: number }[];
@@ -187,6 +194,16 @@ export interface ClassResult {
 export interface Xray {
   role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
   steps: { label: string; value: number; running_total: number; source: string; cap: string | null; key?: string; vars?: Record<string, unknown> }[];
+}
+
+export interface AiAssisted {
+  role_id: string; title: string; readiness: number;
+  ai_skills: { skill_id: string; name: string; why: string; have: boolean }[];
+  tasks: { id: string; text: string; label: TaskLabel; change: "check" | "faster" | "yours" }[];
+  task_shares: Record<TaskLabel, number>;
+  steps: Pathway["steps"]; total_hours: number; hours_left: number;
+  leads_to: { capability_id: string; title: Texts }[];
+  reviewed_by: string | null;
 }
 
 export interface RoleHistory {
@@ -401,6 +418,9 @@ export const api = {
   emergingSearch: (capabilityId: string, profileId: string) =>
     requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/emerging/${encodeURIComponent(capabilityId)}/search`, {
       method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
+  openings: (roleId: string, profileId: string) =>
+    requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/roles/${encodeURIComponent(roleId)}/openings`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
   evidenceDetail: (token: string, id: string) =>
     request<EvidenceDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceDecide: (token: string, id: string, decision: "approve" | "reject", body: { reviewer: string; reason?: string; drop_sources?: string[]; drop_added?: string[] }) =>
@@ -408,8 +428,10 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
+  aiAssisted: (profileId: string) => request<AiAssisted>(`/profiles/${encodeURIComponent(profileId)}/ai-assisted`),
   history: (roleId: string, scenario: Scenario) =>
     request<RoleHistory>(`/roles/${encodeURIComponent(roleId)}/history?scenario=${scenario}`),
+  programmes: () => request<Programme[]>("/programmes"),
   translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
