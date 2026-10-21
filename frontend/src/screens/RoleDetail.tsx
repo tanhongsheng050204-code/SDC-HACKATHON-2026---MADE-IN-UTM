@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
+import { ExposureLine } from "../components/Exposure";
 import { InterviewPractice } from "../components/InterviewPractice";
+import { IdentityStatement, Programmes } from "../components/MalaysiaPanels";
 import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
@@ -58,12 +60,15 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       </table>
 
       <p className="source">{t("xray.hint")}</p>
+      <ExposureLine roleId={role.role_id} onOpen={() => setXray(scenario)} />
       <PayLine pay={role.pay} change={role.pay_change_rm} />
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year}
         adoption={xray === scenario ? adoption : undefined} onClose={() => setXray(null)} />}
       <Openings roleId={role.role_id} title={role.title} />
+      <Programmes roleId={role.role_id} />
 
       {roleCase && <RoleCase data={roleCase} />}
+      <IdentityStatement profileId={profile.id} roleId={role.role_id} />
 
       <div className="two-col">
         {role.carry_over.length > 0 && (

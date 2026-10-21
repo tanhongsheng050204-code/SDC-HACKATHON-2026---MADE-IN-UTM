@@ -36,6 +36,9 @@ class Reference:
     survey_cards: dict[str, dict]
     salaries: dict
     day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
+    role_occupations: dict[str, dict]  # role_id -> {"soc", "onet", "isco08", "note"}
+    ai_exposure: dict  # published exposure estimates and AI usage (scripts/build_ai_exposure.py)
+    programmes: dict  # Malaysian public programmes linked from role pages
 
     @property
     def latest_snapshot(self) -> dict:
@@ -94,6 +97,9 @@ def get_reference() -> Reference:
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
         salaries=_read(data_dir / "salaries.json"),
         day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
+        role_occupations=_read(data_dir / "role_occupations.json")["roles"],
+        ai_exposure=_read(data_dir / "ai_exposure.json"),
+        programmes=_read(data_dir / "malaysia_programmes.json"),
     )
 
 

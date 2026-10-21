@@ -30,6 +30,7 @@ export function CardPage({ cardId }: { cardId: string }) {
             <p className="eyebrow">Future Card{card.display_name ? ` · ${card.display_name}` : ""}</p>
             <h1>Moving toward {card.role.title}</h1>
             <p className="muted">{card.role.summary}</p>
+            {card.identity && <blockquote className="card-identity">{card.identity}</blockquote>}
             <div className="kpis">
               <div className="kpi"><span className="kpi-label">Readiness</span><strong>{percent(card.readiness)}%</strong>
                 <span className="badge">skills already covered</span></div>

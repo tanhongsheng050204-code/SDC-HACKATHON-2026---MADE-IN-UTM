@@ -7,7 +7,7 @@ skill list.
 """
 
 from app.reference import Reference
-from app.services import matching, pathway
+from app.services import identity, matching, pathway
 
 
 def view(ref: Reference, profile: dict, card: dict) -> dict:
@@ -33,4 +33,6 @@ def view(ref: Reference, profile: dict, card: dict) -> dict:
         "proven": [{"name": ref.skills[s]["name"], "level": lvl, "level_name": ref.skill_levels[lvl - 1]["name"]}
                    for s, lvl in sorted((profile.get("skill_levels") or {}).items()) if lvl >= 1],
         "pay_change_rm": role_match["pay_change_rm"],
+        # Rules version only: a public link must not trigger model calls.
+        "identity": identity.statement(ref, profile, role_id, use_model=False)["statement"],
     }

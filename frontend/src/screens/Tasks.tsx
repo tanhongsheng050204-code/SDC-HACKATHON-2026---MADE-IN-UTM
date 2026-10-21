@@ -65,10 +65,16 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
                 <div className="card-row">
                   <span className={`badge ${TASK_LABEL[task.label].tone}`} title={TASK_LABEL[task.label].help}>{TASK_LABEL[task.label].text}</span>
                   <span className="muted">{task.reason}</span>
+                  {task.observed && (
+                    <small className="task-observed">{t("task.observed")} {Math.round(task.observed.automation_pct)}% {t("task.auto")} · {Math.round(task.observed.augmentation_pct)}% {t("task.aug")}</small>
+                  )}
                 </div>
               </li>
             ))}
           </ul>
+          {data.tasks.some((x) => x.observed) && (
+            <p className="source">{t("task.observedFoot")} <a href={data.observed_source.url} target="_blank" rel="noreferrer">{data.observed_source.name}</a>, {data.observed_source.month} ({data.observed_source.licence}).</p>
+          )}
           <p className="source">Tasks: {data.source}{data.onet_code && <>, occupation <a href={onetUrl(data.onet_code)} target="_blank" rel="noreferrer">{data.onet_code}</a></>}
             {data.onet_note && ` · ${data.onet_note}`} · Labels are judgements drafted with AI assistance, not predictions; checked by our team so far: {data.reviewed} of {data.tasks.length}.</p>
           <button className="primary" onClick={onNext}>{t("a.moveInto")}</button>

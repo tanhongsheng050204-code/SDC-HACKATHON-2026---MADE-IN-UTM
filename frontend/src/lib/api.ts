@@ -113,8 +113,10 @@ export type TaskLabel = "automate" | "assist" | "human";
 export interface RoleTasks {
   role_id: string; onet_code: string | null; onet_note: string | null;
   source: string; source_url: string; labels_note: string;
-  tasks: { id: string; text: string; label: TaskLabel; reason: string; reviewed_by: string | null }[];
+  tasks: { id: string; text: string; label: TaskLabel; reason: string; reviewed_by: string | null;
+    observed: { automation_pct: number; augmentation_pct: number } | null }[];
   counted: number; shares: Record<TaskLabel, number>; reviewed: number;
+  observed_source: { name: string; url: string; month: string; licence: string };
 }
 export interface FutureCard {
   card_id: string; created_at: string; display_name: string | null;
@@ -125,6 +127,39 @@ export interface FutureCard {
   sdgs: Sdg[]; source: { snapshot_id: string; imported: string; note: string | null };
   pay: Pay; pay_change_rm: number | null;
   proven?: { name: string; level: number; level_name: string }[];
+  identity?: string;
+}
+export interface ExposureSource {
+  id: string; name: string; measure: string; url: string; licence: string; rank: number;
+  code: string; occupation: string; score: number; percentile: number; gradient?: string;
+}
+export interface MalaysiaGroup {
+  name: string; mys_pct: number; global_pct: number | null; automation_pct: number | null; augmentation_pct: number | null; month: string;
+}
+export interface RoleExposure {
+  role_id: string; title: string; note: string | null; compared: number; sources: ExposureSource[];
+  laluan: { automation_exposure: number; rank: number | null; source: string };
+  band: { low: number; high: number; mean: number } | null; published_ranks?: { low: number; high: number };
+  flag: boolean; malaysia: MalaysiaGroup | null;
+}
+export interface ExposureMap {
+  scenario: Scenario; horizon_year: number; sources: string[]; missing: { role_id: string; title: string }[];
+  points: { role_id: string; title: string; exposure: { low: number; high: number; mean: number }; outlook: number; label: string; flag: boolean }[];
+}
+export interface MalaysiaAiUse {
+  month: string; usage_index: number | null; source: string; url: string; licence: string;
+  requests: { name: string; mys_pct: number; global_pct: number | null }[];
+}
+export interface Programmes {
+  role_id: string;
+  mycol: { name: string; publisher: string; about: string; url: string; report_url: string; checked: string;
+    entry: { match: "listed" | "related"; titles: string[]; page: number } | null };
+  mymahir: { name: string; about: string; url: string };
+  jelajah_ai: { name: string; about: string; url: string };
+}
+export interface Identity {
+  role_id: string; statement: string; mode: string;
+  facts: { target: string; current: string | null; have: string[]; building: string | null };
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
 export interface Openings {
@@ -411,6 +446,12 @@ export const api = {
     request<Profile>(`/profiles/${p.id}`, { method: "PUT", body: JSON.stringify({
       display_name: p.display_name, current_role_id: p.current_role_id, skills: p.skills,
       experience_years: p.experience_years, audience: p.audience ?? null }) }),
+  exposure: (roleId: string) => request<RoleExposure>(`/roles/${encodeURIComponent(roleId)}/exposure`),
+  exposureMap: (scenario: Scenario) => request<ExposureMap>(`/exposure/map?scenario=${scenario}`),
+  malaysiaAiUse: () => request<MalaysiaAiUse>("/malaysia/ai-use"),
+  programmes: (roleId: string) => request<Programmes>(`/roles/${encodeURIComponent(roleId)}/programmes`),
+  identity: (profileId: string, roleId: string, language: string) =>
+    request<Identity>(`/profiles/${profileId}/roles/${encodeURIComponent(roleId)}/identity?language=${language}`),
   openings: (roleId: string) => request<Openings>(`/roles/${encodeURIComponent(roleId)}/openings`),
   interview: (profileId: string, roleId: string, turns: InterviewTurn[], language: string) =>
     request<InterviewReply>("/interview", { method: "POST", body: JSON.stringify({ profile_id: profileId, role_id: roleId, turns, language }) }),

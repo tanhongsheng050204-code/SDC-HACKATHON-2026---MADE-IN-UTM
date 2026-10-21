@@ -5,6 +5,7 @@ import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
 import { EvidencePanel } from "../components/EvidencePanel";
 import { EmergingRoles } from "../components/EmergingRoles";
+import { ExposureMap } from "../components/ExposureMap";
 import { RoleCard } from "../components/RoleCard";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
@@ -26,6 +27,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<Change[] | null>(null);
   const [tipSeen, setTipSeen] = useState(() => load(KEYS.sliderTip) === "1");
+  const [view, setView] = useState<"list" | "map">("list");
 
   useEffect(() => {
     let live = true;
@@ -111,9 +113,17 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         <p className="muted"><button className="link" onClick={onSurvey}>{t("survey.prompt")}</button></p>
       )}
       {data && <WhatIf data={data} extra={extra} onChange={setExtra} />}
-      <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
-        {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
-      </div>
+      {data && (
+        <div className="segmented view-switch" role="radiogroup" aria-label={`${t("map.list")} / ${t("map.map")}`}>
+          <button role="radio" aria-checked={view === "list"} onClick={() => setView("list")}>{t("map.list")}</button>
+          <button role="radio" aria-checked={view === "map"} onClick={() => setView("map")}>{t("map.map")}</button>
+        </div>
+      )}
+      {data && view === "map" ? <ExposureMap data={data} scenario={scenario} onOpen={onOpen} /> : (
+        <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
+          {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
+        </div>
+      )}
       {data && (
         <EmergingRoles profile={profile} refreshKey={emergingKey} onStart={(roleId) => {
           const match = data.roles.find((r) => r.role_id === roleId);

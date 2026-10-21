@@ -15,8 +15,8 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, intake, interview, matching, openings, pathway, proofcheck,
-                          rolecase, skills, skilltree, survey, tasks, tipping, workforce, xray)
+from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, matching, openings,
+                          pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
 
@@ -98,6 +98,39 @@ def role_xray(role_id: str, scenario: Scenario = "baseline", year: int | None = 
     if role_id not in ref.roles:
         raise HTTPException(404, "Role not found")
     return xray.explain(ref, role_id, scenario, year, adoption)
+
+
+@router.get("/roles/{role_id}/exposure")
+def role_exposure(role_id: str):
+    """Published AI-exposure estimates for this role next to Laluan's own, and Malaysian AI use."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return exposure.for_role(ref, role_id)
+
+
+@router.get("/exposure/map")
+def exposure_map(scenario: Scenario = "baseline"):
+    """Every role's published AI exposure against its 2030 outlook."""
+    return exposure.map_points(get_reference(), scenario)
+
+
+@router.get("/malaysia/ai-use")
+def malaysia_ai_use():
+    """What people in Malaysia use AI for (Anthropic Economic Index, latest month)."""
+    return exposure.malaysia_overview(get_reference())
+
+
+@router.get("/roles/{role_id}/programmes")
+def role_programmes(role_id: str):
+    """Malaysian public programmes for this role: MyCOL, MyMahir and Jelajah AI MyMahir (links only)."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    p = ref.programmes
+    mycol = {k: p["mycol"][k] for k in ("name", "publisher", "about", "url", "report_url", "checked")}
+    return {"role_id": role_id, "mycol": {**mycol, "entry": p["mycol"]["roles"].get(role_id)},
+            "mymahir": p["mymahir"], "jelajah_ai": p["jelajah_ai"]}
 
 
 @router.get("/roles/{role_id}/openings")
@@ -545,6 +578,15 @@ def get_card(card_id: str):
     if card is None or profile is None or card["role_id"] not in get_reference().roles:
         raise HTTPException(404, "Card not found")
     return cards.view(get_reference(), profile, card)
+
+
+@router.get("/profiles/{profile_id}/roles/{role_id}/identity")
+def role_identity(profile_id: str, role_id: str, language: str = "en", user: str | None = User):
+    """A one- or two-sentence career identity statement for this role, from your transferable skills."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return identity.statement(ref, _profile_for(profile_id, user), role_id, language)
 
 
 @router.post("/interview")

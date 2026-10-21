@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { MalaysiaAiUseCard } from "../components/MalaysiaPanels";
 import { api, Profile, Radar as RadarData } from "../lib/api";
 import { signed } from "../lib/format";
 import { t } from "../lib/i18n";
@@ -59,6 +60,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
           </ul>
         </details>
       )}
+      <MalaysiaAiUseCard />
       {momentum && (
         <div className="card">
           <h3>AI capabilities: research momentum</h3>
