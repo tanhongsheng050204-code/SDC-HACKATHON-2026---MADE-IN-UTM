@@ -83,16 +83,32 @@ export interface Matches {
   current_role: (Pick<RoleMatch, "role_id" | "title" | "summary" | "fit" | "outlook" | "at_risk"> & { is_current_role: true }) | null;
   shortest_route?: string | null;
 }
+export type TrendLabel = "rising" | "steady" | "declining" | "no_data";
+export interface ForecastBand { change_pct: number; low_pct: number; high_pct: number; label: TrendLabel; sure: boolean }
+export interface SkillForecast {
+  horizon_year: number; history: { period: string; share_pct: number }[];
+  growth_per_year: number | null; ai_per_year: number; emerging: boolean;
+  scenarios: Record<Scenario, ForecastBand>;
+}
 export interface SkillTrend {
-  skill_id: string; name: string; trend: number | null; label: "rising" | "steady" | "declining" | "no_data";
-  sources: string[]; mine: boolean;
+  skill_id: string; name: string; trend: number | null; label: TrendLabel;
+  sources: string[]; mine: boolean; forecast?: SkillForecast;
+}
+export interface ForecastMeta {
+  method: string; horizon_year: number;
+  history: Partial<Record<"jobs" | "research" | "dosm", { source: string; retrieved: string; periods: [string, string] }>>;
+  backtest: { held_out_quarters: number; skills_checked: number; clear_trends: number; direction_right: number;
+    always_rising_right: number; model_error: number; no_change_error: number } | null;
 }
 export interface Radar {
   snapshot_id: string; imported: string; source: string; illustrative: boolean;
   inputs: { source: string; url: string; retrieved: string }[];
   capability_momentum: { id: string; name: string; momentum: number | null }[];
   skills: SkillTrend[];
-  roles: { role_id: string; title: string; index: number; label: string }[];
+  roles: { role_id: string; title: string; index: number; label: string;
+    scenarios: Record<Scenario, { index: number; label: string }>;
+    malaysia: (ForecastBand & { horizon_year: number; history: { period: string; share_pct: number }[] }) | null }[];
+  forecast: ForecastMeta | null;
 }
 export interface PendingPreview {
   snapshot_id: string; imported: string; live_snapshot_id: string;
