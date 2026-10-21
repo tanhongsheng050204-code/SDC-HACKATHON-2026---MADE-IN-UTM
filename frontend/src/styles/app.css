@@ -466,6 +466,13 @@ main:focus { outline: none; }
 .likert-dot.strongly_disagree:hover, .likert-dot.disagree:hover { background: var(--risk-bg); border-color: var(--risk); }
 .likert-dot.strongly_agree:hover, .likert-dot.agree:hover { background: var(--good-bg); border-color: var(--good); }
 .likert-dot.neutral:hover { background: var(--surface-2); border-color: var(--ink-soft); }
+/* The chosen answer is filled in, so the person sees it before pressing Next. */
+.likert-dot.selected { box-shadow: 0 0 0 4px var(--surface-2); }
+.likert-dot.selected.strongly_disagree, .likert-dot.selected.disagree { background: var(--risk); border-color: var(--risk); }
+.likert-dot.selected.strongly_agree, .likert-dot.selected.agree { background: var(--good); border-color: var(--good); }
+.likert-dot.selected.neutral { background: var(--ink-soft); border-color: var(--ink-soft); }
+.survey-nav { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
+.survey-nav .btn { min-width: 120px; }
 @media (max-width: 560px) {
   .likert { grid-template-columns: 1fr 1fr; grid-template-areas: "dots dots" "left right"; row-gap: 8px; }
   .likert-dots { grid-area: dots; justify-content: center; }
