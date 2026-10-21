@@ -58,6 +58,12 @@ def list_skills():
     return sorted(get_reference().skills.values(), key=lambda s: (s["category"], s["name"]))
 
 
+@router.get("/translations")
+def translations():
+    """BM / 中文 for the text in our reference data, keyed by its English wording (AI-drafted)."""
+    return get_reference().translations
+
+
 @router.get("/roles")
 def list_roles():
     return list(get_reference().roles.values())
@@ -71,10 +77,9 @@ def role_detail(role_id: str):
     role = ref.roles[role_id]
     return {
         **role,
-        "sdgs": [{**ref.sdgs[t["sdg"]], "reason": t["reason"]} for t in ref.role_sdgs(role_id)],
+        "sdgs": ref.sdg_view(ref.role_sdgs(role_id)),
         "skill_sdgs": {
-            rs["skill_id"]: [{**ref.sdgs[t["sdg"]], "reason": t["reason"]}
-                             for t in ref.skill_sdgs(rs["skill_id"])]
+            rs["skill_id"]: ref.sdg_view(ref.skill_sdgs(rs["skill_id"]))
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
     }
@@ -90,6 +95,26 @@ def role_day(role_id: str):
     if entry is None:
         raise HTTPException(404, "No description for this role yet")
     return {k: entry.get(k) for k in ("role_id", "text", "basis", "drafted", "reviewed_by")}
+
+
+@router.get("/roles/{role_id}/history")
+def role_history(role_id: str, scenario: Scenario = "baseline"):
+    """This role's outlook in every forecast Laluan has used, oldest first: how the number moved as
+    trend refreshes were approved. Each point names its snapshot, so it can be traced."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    adoption = float(ref.scenarios[scenario]["adoption"])
+    points = []
+    for snap in ref.snapshots:
+        signal = signals_from_snapshot(snap).get(role_id)
+        if signal is None:  # a snapshot from before this role was added
+            continue
+        o = outlook(signal, scenario, adoption)
+        points.append({"snapshot_id": snap["snapshot_id"], "imported": snap["imported"], "source": snap["source"],
+                       "illustrative": bool(snap.get("illustrative")), "reviewed_by": snap.get("reviewed_by"),
+                       "horizon_year": snap["horizon_year"], "index": o.index, "label": o.label})
+    return {"role_id": role_id, "scenario": scenario, "points": points}
 
 
 @router.get("/roles/{role_id}/xray")
@@ -284,6 +309,15 @@ def start_evidence_refresh(mode: str = Query("roles", pattern="^(roles|emerging)
     _require_admin(x_admin_token)
     if not evidence_refresh.start(mode):
         raise HTTPException(409, "An evidence search is already running")
+    return evidence_refresh.status()
+
+
+@router.post("/evidence/refresh/stop")
+def stop_evidence_refresh(x_admin_token: str = Header(default="")):
+    """Cancel the searches not started yet; the ones running finish and are kept for review."""
+    _require_admin(x_admin_token)
+    if not evidence_refresh.stop():
+        raise HTTPException(409, "No evidence search is running")
     return evidence_refresh.status()
 
 
@@ -694,7 +728,9 @@ def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
             "level_name": ref.skill_levels[check["level"] - 1]["name"],
             "answers": [q["answer"] for q in check["questions"]],
             "explanations": [q["explanation"] for q in check["questions"]],
-            "course": None if passed else skilltree.course_for(ref, check["skill_id"])}
+            "course": None if passed else skilltree.course_for(ref, check["skill_id"]),
+            # A pass shows how the proven skill serves the Sustainable Development Goals.
+            "sdgs": ref.sdg_view(ref.skill_sdgs(check["skill_id"])) if passed else []}
 
 
 @router.get("/profiles/{profile_id}/survey")

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { InfoTip } from "../components/InfoTip";
 import { ClassView } from "./ClassView";
 import { SdgTile, Sdgs } from "../components/Sdgs";
 import { api, Scenario, Workforce as WorkforceData } from "../lib/api";
 import { percent, signed } from "../lib/format";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { HEAT, SCENARIOS } from "../lib/labels";
 
 // H1: aggregate view for HR teams. The backend refuses files with personal columns; this screen
@@ -36,7 +37,7 @@ function Company() {
   async function analyse(text = csv, s = scenario) {
     setBusy(true); setError(null);
     try { setResult(await api.workforce(text, s)); }
-    catch (e) { setError(e instanceof Error ? e.message : t("wf.readFailed")); setResult(null); }
+    catch (e) { setError(e instanceof Error ? e.message : "Couldn't read that file"); setResult(null); }
     finally { setBusy(false); }
   }
   async function sample() {
@@ -44,7 +45,7 @@ function Company() {
       const text = await api.workforceSample();
       setCsv(text);
       analyse(text);
-    } catch { setError(t("wf.sampleFailed")); }
+    } catch { setError("Couldn't load the sample company."); }
   }
   async function readFile(file: File | undefined) {
     if (!file) return;
@@ -65,7 +66,7 @@ function Company() {
         <textarea id="wf-csv" rows={6} value={csv} onChange={(e) => setCsv(e.target.value)}
           placeholder={"role,skills\nData entry clerk,Excel; data entry\nCustomer service representative,customer service; communication"} />
         <div className="actions">
-          <button className="primary" disabled={busy || csv.trim().length < 10} onClick={() => analyse()}>{busy ? "Analysing…" : "Analyse"}</button>
+          <button className="primary" disabled={busy || csv.trim().length < 10} onClick={() => analyse()}>{busy ? t("wf.analysing") : t("wf.analyse")}</button>
           <label className="btn quiet file-btn">{t("wf.upload")}<input type="file" accept=".csv,text/csv" onChange={(e) => readFile(e.target.files?.[0])} /></label>
           <button onClick={sample} disabled={busy}>{t("wf.sample")}</button>
         </div>
@@ -80,20 +81,47 @@ function Company() {
   );
 }
 
+const rm = (n: number) => `RM ${n.toLocaleString("en-MY", { maximumFractionDigits: 0 })}`;
+
+// What the reskilling moves cost: course fees from the catalogue's dated prices, split by HRD Corp
+// status, and staff time at DOSM group-median pay. Estimates for planning, not quotes.
+function Budget({ budget, hours }: { budget: WorkforceData["budget"]; hours: number }) {
+  if (hours === 0) return null;
+  return (
+    <div className="card budget">
+      <h2>{t("bud.title")}</h2>
+      <div className="kpis">
+        <div className="kpi"><span className="kpi-label">{t("bud.fees")}</span><strong>{rm(budget.total_rm)}</strong>
+          <span className="badge">{budget.total_rm === 0 && !budget.unpriced_courses.length ? t("bud.allFree") : tf("bud.peopleFees", { n: budget.people_with_fees })}</span></div>
+        {budget.total_rm > 0 && <>  {/* nothing to claim when every course is free */}
+          <div className="kpi"><span className="kpi-label">{t("bud.claimable")}</span><strong>{rm(budget.claimable_rm)}</strong>
+            <span className="badge good">{t("hrd.claimable")}</span></div>
+          <div className="kpi"><span className="kpi-label">{t("bud.ask")}</span><strong>{rm(budget.ask_provider_rm)}</strong>
+            <span className="badge">{t("hrd.check")}</span></div>
+        </>}
+        <div className="kpi"><span className="kpi-label">{t("bud.time")} <InfoTip term="gl.masco" label={t("bud.time")} /></span><strong>{rm(budget.staff_time_rm)}</strong>
+          <span className="badge">{tf("bud.timeNote", { h: hours.toLocaleString() })}</span></div>
+      </div>
+      {budget.unpriced_courses.length > 0 && <p className="banner">{tf("bud.unpriced", { list: budget.unpriced_courses.join(", ") })}</p>}
+      <p className="source">{tf("bud.source", { year: budget.pay_year })}</p>
+    </div>
+  );
+}
+
 function Results({ result, scenario, onScenario }: { result: WorkforceData; scenario: Scenario; onScenario: (s: Scenario) => void }) {
   const src = result.signal_source;
   return (
     <>
-      <div className="segmented" role="radiogroup" aria-label={t("sc.label")}>
+      <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
       </div>
       <DataBanner illustrative={src.illustrative} imported={src.imported} />
       <div className="kpis">
-        <div className="kpi"><span className="kpi-label">{t("wf.people")}</span><strong>{result.employees}</strong><span className="badge">{result.roles.length} {t("wf.roles")}</span></div>
+        <div className="kpi"><span className="kpi-label">{t("wf.people")}</span><strong>{result.employees}</strong><span className="badge">{tf("wf.roles", { n: result.roles.length })}</span></div>
         <div className="kpi"><span className="kpi-label">{t("wf.declining")}</span><strong>{result.at_risk}</strong>
-          <span className={`badge ${result.at_risk ? "risk" : "good"}`}>{result.employees ? percent(result.at_risk / result.employees) : 0}% {t("wf.ofTeam")}</span></div>
+          <span className={`badge ${result.at_risk ? "risk" : "good"}`}>{tf("wf.ofTeam", { n: result.employees ? percent(result.at_risk / result.employees) : 0 })}</span></div>
         <div className="kpi"><span className="kpi-label">{t("wf.hours")}</span><strong>{result.total_hours.toLocaleString()}</strong><span className="badge">{t("wf.fromCatalogue")}</span></div>
         <div className="kpi"><span className="kpi-label">{t("k.data")}</span><strong>{src.imported.slice(0, 10)}</strong>
           <span className={`badge ${src.illustrative ? "risk" : "good"}`}>{src.illustrative ? t("k.illustrative") : t("k.cited")}</span></div>
@@ -107,7 +135,7 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
             <tbody>
               {result.roles.map((r) => (
                 <tr key={r.role_id}>
-                  <th scope="row">{r.title}</th><td>{r.headcount}</td>
+                  <th scope="row">{tr(r.title)}</th><td>{r.headcount}</td>
                   {SCENARIOS.map((s) => <td key={s.id} className={HEAT[r.outlook[s.id].label]}>{signed(r.outlook[s.id].index)}%</td>)}
                   <td>{percent(r.avg_fit)}%</td>
                 </tr>
@@ -115,7 +143,7 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
             </tbody>
           </table>
         </div>
-        <p className="source">{t("wf.heatSource")} {src.snapshot_id}.</p>
+        <p className="source">{tf("wf.heatSource", { id: src.snapshot_id })}</p>
       </div>
 
       <div className="card">
@@ -123,11 +151,11 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         {result.moves.length === 0 ? <p className="muted">{t("wf.noMoves")}</p> : (
           <div className="table-wrap">
             <table className="heatmap">
-              <thead><tr><th>{t("wf.from")}</th><th>{t("wf.to")}</th><th>{t("wf.peopleCol")}</th><th>{t("wf.hoursEach")}</th><th>{t("wf.fitNow")}</th><th>SDGs</th></tr></thead>
+              <thead><tr><th>{t("wf.from")}</th><th>{t("wf.to")}</th><th>{t("wf.peopleCol")}</th><th>{t("wf.hoursEach")}</th><th>{t("bud.feesEach")}</th><th>{t("wf.fitToday")}</th><th>SDGs</th></tr></thead>
               <tbody>
                 {result.moves.map((m) => (
                   <tr key={m.from_role + m.to_role}>
-                    <td>{m.from_role}</td><th scope="row">{m.to_role}</th><td>{m.people}</td><td>{m.avg_hours}</td>
+                    <td>{tr(m.from_role)}</td><th scope="row">{tr(m.to_role)}</th><td>{m.people}</td><td>{m.avg_hours}</td><td>{rm(m.fees_each_rm)}</td>
                     <td>{percent(m.avg_fit_now)}%</td><td><Sdgs sdgs={m.sdgs} /></td>
                   </tr>
                 ))}
@@ -137,18 +165,20 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         )}
       </div>
 
+      <Budget budget={result.budget} hours={result.total_hours} />
+
       {result.sdg_contribution.length > 0 && (
         <div className="card">
           <h2>{t("wf.sdgs")}</h2>
           <div className="sdg-totals">
             {result.sdg_contribution.map((g) => (
               <div key={g.number} className="sdg-total"><SdgTile sdg={g} />
-                <span><strong>{g.people} people</strong><small>{g.name}</small></span></div>
+                <span><strong>{tf("wf.peopleN", { n: g.people })}</strong><small>{tr(g.name)}</small></span></div>
             ))}
           </div>
         </div>
       )}
-      {result.problems.length > 0 && <div className="banner">Rows skipped: {result.problems.join(" · ")}</div>}
+      {result.problems.length > 0 && <div className="banner">{t("wf.skipped")}: {result.problems.join(" · ")}</div>}
     </>
   );
 }

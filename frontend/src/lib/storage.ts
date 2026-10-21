@@ -6,6 +6,7 @@ export const KEYS = {
   lite: "laluan.lite",
   theme: "laluan.theme",
   sliderTip: "laluan.sliderTipSeen",
+  rolesView: "laluan.rolesView",  // "list" or "graph" on Future roles
   tasksDone: "laluan.tasksDone",
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",

@@ -35,6 +35,7 @@ class Reference:
     work_dimensions: list[dict]
     survey_cards: dict[str, dict]
     salaries: dict
+    translations: dict[str, dict]  # English text -> {"ms", "zh"}, AI-drafted (scripts/build_translations.py)
     day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
     role_occupations: dict[str, dict]  # role_id -> {"soc", "onet", "isco08", "note"}
     ai_exposure: dict  # published exposure estimates and AI usage (scripts/build_ai_exposure.py)
@@ -49,6 +50,13 @@ class Reference:
 
     def skill_sdgs(self, skill_id: str) -> list[dict]:
         return self.sdg_map["skills"].get(skill_id, [])
+
+    def sdg_view(self, tags: list[dict]) -> list[dict]:
+        """SDG tags as sent to the app: the goal, its target, and the reason in each language (BM
+        and 中文 are AI-drafted; English is shown where a translation is missing)."""
+        return [{**self.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"],
+                 "reasons": {"en": t["reason"], "ms": t.get("reason_ms") or t["reason"],
+                             "zh": t.get("reason_zh") or t["reason"]}} for t in tags]
 
 
 def _read(path: Path):
@@ -96,6 +104,7 @@ def get_reference() -> Reference:
         work_dimensions=_read(data_dir / "work_dimensions.json"),
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
         salaries=_read(data_dir / "salaries.json"),
+        translations=_read(data_dir / "translations.json")["strings"],
         day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
         role_occupations=_read(data_dir / "role_occupations.json")["roles"],
         ai_exposure=_read(data_dir / "ai_exposure.json"),

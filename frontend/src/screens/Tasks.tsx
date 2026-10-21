@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, Profile, RoleOption, RoleTasks, TaskLabel } from "../lib/api";
 import { onetUrl, percent } from "../lib/format";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { TASK_LABEL } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
 
@@ -16,10 +16,10 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
   const [data, setData] = useState<RoleTasks | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { api.roles().then(setRoles).catch(() => setError(t("tasks.rolesFailed"))); }, []);
+  useEffect(() => { api.roles().then(setRoles).catch(() => setError("Couldn't load the role list.")); }, []);
   useEffect(() => {
     if (!roleId) return;
-    api.tasks(roleId, done).then((d) => { setData(d); setError(null); }).catch(() => setError(t("tasks.failed")));
+    api.tasks(roleId, done).then((d) => { setData(d); setError(null); }).catch(() => setError(t("tasks.loadFailed")));
     save(KEYS.tasksDone, JSON.stringify(done), "session");
   }, [roleId, done]);
 
@@ -31,14 +31,14 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
     <section>
       <div className="page-head"><h1>{t("h.tasks")}</h1>
         <p className="muted">{t("tasks.sub")}</p></div>
-      <label className="narrow">Job
+      <label className="narrow">{t("tasks.job")}
         <select value={roleId} onChange={(e) => { setRoleId(e.target.value); setDone([]); }}>
           <option value="">{t("tasks.choose")}</option>
-          {roles.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
+          {roles.map((r) => <option key={r.id} value={r.id}>{tr(r.title)}</option>)}
         </select>
       </label>
       {error && <p className="error" role="alert">{error}</p>}
-      {!roleId && <div className="empty-state"><p>{t("tasks.empty")}</p></div>}
+      {!roleId && <div className="empty-state"><p>{t("tasks.pick")}</p></div>}
       {data && data.tasks.length === 0 && <div className="banner">{data.onet_note ?? t("tasks.none")}</div>}
       {data && data.tasks.length > 0 && (
         <>
@@ -52,19 +52,19 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
               ))}
             </ul>
             <p className="muted">{ticked.length
-              ? `${t("tasks.basedTicked")} ${data.counted}.`
-              : `${t("tasks.basedAll")} ${data.counted}. ${t("tasks.tickYours")}`}</p>
+              ? tf(data.counted === 1 ? "tasks.basedOne" : "tasks.basedTicked", { n: data.counted })
+              : tf("tasks.basedAll", { n: data.counted })}</p>
           </div>
           <ul className="task-list">
             {data.tasks.map((task) => (
               <li key={task.id} className="card">
                 <label className="check">
                   <input type="checkbox" checked={done.includes(task.id)} onChange={(e) => toggle(task.id, e.target.checked)} />
-                  <span>{task.text}</span>
+                  <span>{tr(task.text)}</span>
                 </label>
                 <div className="card-row">
                   <span className={`badge ${TASK_LABEL[task.label].tone}`} title={TASK_LABEL[task.label].help}>{TASK_LABEL[task.label].text}</span>
-                  <span className="muted">{task.reason}</span>
+                  <span className="muted">{tr(task.reason)}</span>
                   {task.observed && (
                     <small className="task-observed">{t("task.observed")} {Math.round(task.observed.automation_pct)}% {t("task.auto")} · {Math.round(task.observed.augmentation_pct)}% {t("task.aug")}</small>
                   )}
@@ -75,8 +75,8 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
           {data.tasks.some((x) => x.observed) && (
             <p className="source">{t("task.observedFoot")} <a href={data.observed_source.url} target="_blank" rel="noreferrer">{data.observed_source.name}</a>, {data.observed_source.month} ({data.observed_source.licence}).</p>
           )}
-          <p className="source">Tasks: {data.source}{data.onet_code && <>, occupation <a href={onetUrl(data.onet_code)} target="_blank" rel="noreferrer">{data.onet_code}</a></>}
-            {data.onet_note && ` · ${data.onet_note}`} · Labels are judgements drafted with AI assistance, not predictions; checked by our team so far: {data.reviewed} of {data.tasks.length}.</p>
+          <p className="source">{t("tasks.source")}: {data.source}{data.onet_code && <>, {t("tasks.occupation")} <a href={onetUrl(data.onet_code)} target="_blank" rel="noreferrer">{data.onet_code}</a></>}
+            {data.onet_note && ` · ${data.onet_note}`} · {tf("tasks.labelsNote", { n: data.reviewed, total: data.tasks.length })}</p>
           <button className="primary" onClick={onNext}>{t("a.moveInto")}</button>
         </>
       )}

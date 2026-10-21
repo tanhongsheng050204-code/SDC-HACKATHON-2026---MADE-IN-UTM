@@ -61,6 +61,8 @@ def test_two_of_three_passes_and_fills_the_level(client, gemini):
     assert result["passed"] is True and result["correct"] == 2 and len(result["explanations"]) == 3
     assert client.get(f"/api/profiles/{pid}").json()["skill_levels"] == {"excel": 1}
     assert _start(client, pid).json()["level"] == 2  # next level is open the same day
+    goal = result["sdgs"][0]  # a pass shows how the proven skill serves the goals, in every language
+    assert goal["number"] == 4 and set(goal["reasons"]) == {"en", "ms", "zh"} and goal["reasons"]["ms"] != goal["reason"]
 
 
 def test_one_of_three_fails_and_suggests_a_course(client, gemini):
@@ -68,7 +70,7 @@ def test_one_of_three_fails_and_suggests_a_course(client, gemini):
     check = _start(client, pid).json()
     result = _submit(client, check["check_id"], pid, [0, 1, 1]).json()
     assert result["passed"] is False and result["correct"] == 1
-    assert result["course"]["url"].startswith("http")
+    assert result["course"]["url"].startswith("http") and result["sdgs"] == []
     assert client.get(f"/api/profiles/{pid}").json()["skill_levels"] == {}
 
 

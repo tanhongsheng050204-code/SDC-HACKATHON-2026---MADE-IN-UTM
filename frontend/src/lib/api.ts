@@ -10,7 +10,7 @@ export type Audience = "worker" | "graduate" | "switcher";
 export interface Skill { id: string; name: string; category: string }
 /** The scrubbed CV text that would go to a language model, and how many details were removed. */
 export interface SendPreview { text: string; removed: Partial<Record<"NAME" | "EMAIL" | "PHONE" | "IC" | "DOB" | "AGE" | "ADDRESS" | "ORG", number>>; characters: number }
-export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
+export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string; reasons?: Texts }
 export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[]; added_from_ads?: boolean }
 export interface RoleOption { id: string; title: string }
 export interface Profile {
@@ -55,7 +55,7 @@ export interface EmergingDetail {
   title: Texts; summary: Texts; skills: string[]; stepping_stone: string; stepping_stone_title: string; stepping_reason: Texts;
   sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
 }
-export interface EvidenceStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null }
+export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   evidence: RoleEvidence | null;
@@ -108,9 +108,11 @@ export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; 
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
   employees: number; at_risk: number; total_hours: number;
+  budget: { total_rm: number; claimable_rm: number; ask_provider_rm: number; unpriced_courses: string[];
+    people_with_fees: number; staff_time_rm: number; pay_year: number };
   roles: { role_id: string; title: string; headcount: number; at_risk: boolean; avg_fit: number;
     outlook: Record<Scenario, { index: number; label: string }> }[];
-  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; sdgs: Sdg[] }[];
+  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
   sdg_contribution: (Sdg & { people: number })[];
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
@@ -177,7 +179,7 @@ export interface InterviewReply {
   number: number; total: number; question: string | null; focus: string | null; feedback: string | null;
   mode: string; done: boolean;
 }
-export interface CasePoint { text: string; source: string }
+export interface CasePoint { text: string; source: string; key?: string; vars?: Record<string, unknown>; source_key?: string }
 export interface RoleCase { role_id: string; pros: CasePoint[]; cons: CasePoint[] }
 export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
@@ -208,6 +210,7 @@ export interface CheckStart {
 export interface CheckResult {
   passed: boolean; correct: number; level: number; level_name: string; answers: number[];
   explanations: string[]; course: { id: string; title: string; url: string } | null;
+  sdgs?: Sdg[];  // on a pass: how the proven skill serves the goals
 }
 
 export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }
@@ -233,7 +236,13 @@ export interface ClassResult {
 
 export interface Xray {
   role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
-  steps: { label: string; value: number; running_total: number; source: string; cap: string | null }[];
+  steps: { label: string; value: number; running_total: number; source: string; cap: string | null; key?: string; vars?: Record<string, unknown> }[];
+}
+
+export interface RoleHistory {
+  role_id: string; scenario: Scenario;
+  points: { snapshot_id: string; imported: string; source: string; illustrative: boolean; reviewed_by: string | null;
+    horizon_year: number; index: number; label: string }[];
 }
 
 export interface Tipping {
@@ -244,7 +253,8 @@ export interface Tipping {
 
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
-  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
+  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean }[];
+  summary_template?: { key: string; vars: Record<string, unknown> };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   uncovered_skills: string[];
 }
@@ -425,6 +435,8 @@ export const api = {
     }),
   evidenceStart: (token: string, mode: "roles" | "emerging" = "roles") =>
     request<EvidenceStatus>(`/evidence/refresh?mode=${mode}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidenceStop: (token: string) =>
+    request<EvidenceStatus>("/evidence/refresh/stop", { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceStatus: (token: string) =>
     request<EvidenceStatus>("/evidence/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidencePending: (token: string) =>
@@ -449,6 +461,9 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
+  history: (roleId: string, scenario: Scenario) =>
+    request<RoleHistory>(`/roles/${encodeURIComponent(roleId)}/history?scenario=${scenario}`),
+  translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
   updateProfile: (p: Profile) =>

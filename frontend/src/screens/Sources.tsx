@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { api, Snapshot } from "../lib/api";
 import { monthsOld } from "../lib/format";
-import { getLang, t } from "../lib/i18n";
+import { t, tf } from "../lib/i18n";
 
 // S9: every forecast snapshot the app has used, newest first, so anyone can trace a number back.
 export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onAdmin: () => void }) {
   const [snapshots, setSnapshots] = useState<Snapshot[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError(t("src.failed"))); }, []);
+  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError(t("src.loadFailed"))); }, []);
 
   return (
     <section>
       <div className="page-head"><h1>{t("h.sources")}</h1>
         <p className="muted">{t("note.sources")}</p></div>
       {error && <p className="error" role="alert">{error}</p>}
-      {!snapshots && !error && <p className="muted">{t("shell.loading")}</p>}
+      {!snapshots && !error && <p className="muted">{t("a.loading")}</p>}
       {snapshots?.length === 0 && <div className="empty-state"><p>{t("src.none")}</p></div>}
       {snapshots && snapshots.length > 0 && (
         <div className="table-wrap card">
@@ -33,7 +33,7 @@ export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onA
                     {s.illustrative ? <span className="badge risk">{t("src.illustrative")}</span>
                       : monthsOld(s.imported) > 12 ? <span className="badge gold">{t("src.old")}</span>
                       : <span className="badge good">{t("src.cited")}</span>}
-                    {s.reviewed_by && <small className="source"> Reviewed by {s.reviewed_by}</small>}
+                    {s.reviewed_by && <small className="source"> {tf("src.reviewedBy", { name: s.reviewed_by })}</small>}
                   </td>
                 </tr>
               ))}
@@ -43,25 +43,25 @@ export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onA
       )}
       <div className="card">
         <h2>{t("src.other")}</h2>
-        {getLang() !== "en" && <p className="source">{t("src.english")}</p>}
         <ul className="plain-list">
-          <li><strong>Tasks:</strong> O*NET 30.0 task statements (US Department of Labor), labelled automate / assist / human by our team with AI help.</li>
-          <li><strong>Skills per role:</strong> the Laluan team's list, checked against O*NET occupations where one exists.</li>
-          <li><strong>Courses:</strong> the Laluan catalogue; each link shows the date we last opened it.</li>
-          <li><strong>SDGs:</strong> UN Sustainable Development Goals and targets, with a written reason for every link.</li>
-          <li><strong>Courses' prices and HRD Corp status:</strong> from each provider's own page, with the date we checked; ask the provider before enrolling.</li>
-          <li><strong>Published AI exposure:</strong> <a href="https://huggingface.co/datasets/Anthropic/EconomicIndex" target="_blank" rel="noreferrer">Anthropic Economic Index</a> (CC BY; also the Malaysia usage figures), OpenAI <a href="https://github.com/openai/GPTs-are-GPTs" target="_blank" rel="noreferrer">“GPTs are GPTs”</a> (MIT) and <a href="https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure" target="_blank" rel="noreferrer">ILO Working Paper 140</a> (CC BY 4.0), matched to each role by occupation code; built with <code>scripts/build_ai_exposure.py</code>. Shown for comparison, never used in the ranking.</li>
-          <li><strong>Critical occupations:</strong> TalentCorp's <a href="https://www.talentcorp.com.my/mycol/" target="_blank" rel="noreferrer">MyCOL 2024/2025</a>, matched by the job titles employers nominated.</li>
-          <li><strong>Trend refresh:</strong> arXiv (or OpenAlex) paper counts, Hacker News “Who is hiring?” posts, skill mentions in Malaysian job postings on <a href="https://freehire.me" target="_blank" rel="noreferrer">freehire.me</a> (an open-source job search engine), and Malaysian employment by occupation group from the <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">OpenDOSM public API</a> (Salaries &amp; Wages Survey, latest year vs three years earlier). Raw counts are kept in <code>backend/data/raw/</code>.</li>
-          <li><strong>Skill evidence:</strong> current Malaysian job ads found by Gemini with Google Search grounding. Each role's ads and quotes are checked and approved by a named reviewer before they count; the role page shows them.</li>
-          <li><strong>Emerging roles:</strong> new job titles found by Gemini with Google Search grounding, one per AI capability we track, each with its quoted sources and approved by a named reviewer. Shown as a prediction and never ranked.</li>
-          <li><strong>A day in this job:</strong> written by Gemini from our own data only (O*NET tasks, work context, main skills, DOSM pay group and SDG reason), committed for team review. A richer version using approved Malaysian job ads replaces it only after a named reviewer approves it.</li>
-          <li><strong>Pay:</strong> median monthly salaries by MASCO occupation group from the <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> (table A10). These are group medians, not job offers.</li>
+          <li><strong>{t("src.tasksT")}:</strong> {t("src.tasks")}</li>
+          <li><strong>{t("src.skillsT")}:</strong> {t("src.skills")}</li>
+          <li><strong>{t("src.coursesT")}:</strong> {t("src.courses")}</li>
+          <li><strong>SDGs:</strong> {t("src.sdgs")}</li>
+          <li><strong>{t("src.pricesT")}:</strong> {t("src.prices")}</li>
+          <li><strong>{t("src.trendT")}:</strong> {t("src.trend1")} <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">{t("src.opendosm")}</a> {t("src.trend2")} <code>backend/data/raw/</code>.</li>
+          <li><strong>{t("src.evidenceT")}:</strong> {t("src.evidence")}</li>
+          <li><strong>{t("em.title")}:</strong> {t("src.emerging")}</li>
+          <li><strong>{t("day.title")}:</strong> {t("src.day")}</li>
+          <li><strong>{t("src.exposureT")}:</strong> <a href="https://huggingface.co/datasets/Anthropic/EconomicIndex" target="_blank" rel="noreferrer">Anthropic Economic Index</a> (CC BY), OpenAI <a href="https://github.com/openai/GPTs-are-GPTs" target="_blank" rel="noreferrer">“GPTs are GPTs”</a> (MIT), <a href="https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure" target="_blank" rel="noreferrer">ILO Working Paper 140</a> (CC BY 4.0). {t("src.exposure")}</li>
+          <li><strong>{t("src.mycolT")}:</strong> <a href="https://www.talentcorp.com.my/mycol/" target="_blank" rel="noreferrer">MyCOL 2024/2025</a> (TalentCorp). {t("src.mycol")}</li>
+          <li><strong>{t("src.postingsT")}:</strong> <a href="https://freehire.me" target="_blank" rel="noreferrer">freehire.me</a>. {t("src.postings")}</li>
+          <li><strong>{t("src.payT")}:</strong> {t("src.pay1")} <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> {t("src.pay2")}</li>
         </ul>
       </div>
       <div className="card">
         <h2>{t("src.help")}</h2>
-        <p className="muted">{t("src.helpBody")}</p>
+        <p className="muted">{t("src.helpSub")}</p>
         <button onClick={onReviewKit}>{t("src.openKit")}</button>
         <button className="btn quiet" onClick={onAdmin}>Admin: review new data</button>
       </div>

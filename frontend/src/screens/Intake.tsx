@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Icon } from "../components/Icon";
 import { MicButton } from "../components/MicButton";
 import { api, Audience, ChatTurn, SendPreview, Skill } from "../lib/api";
-import { getLang, StringKey, t } from "../lib/i18n";
+import { getLang, StringKey, t, tf, tr } from "../lib/i18n";
 
 type Tab = "upload" | "cv" | "chat" | "pick";
 
@@ -105,8 +105,8 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
     <div className="dropzone">
       <Icon name="upload" />
       <p><strong>{t("in.uploadTitle")}</strong></p>
-      <p className="muted">{t("in.uploadHint")}</p>
-      <label className="btn ink file-btn">{busy ? t("in.reading") : "Choose a file"}
+      <p className="muted">{t("in.uploadSub")}</p>
+      <label className="btn ink file-btn">{busy ? t("in.reading") : t("in.chooseFile")}
         <input type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
           disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
       </label>
@@ -133,7 +133,7 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
       <label htmlFor="cv">{t("in.pasteLabel")}</label>
       <textarea id="cv" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} />
       <div className="row-between">
-        <p className="muted counter" aria-live="polite">{length < 50 ? `${50 - length} more characters` : `${length.toLocaleString()} / 20,000`}</p>
+        <p className="muted counter" aria-live="polite">{length < 50 ? tf("in.moreChars", { n: 50 - length }) : `${length.toLocaleString()} / 20,000`}</p>
         <MicButton onText={(spoken) => setText((x) => `${x.trimEnd()}\n${spoken}`.trim().slice(0, 20000))} />
       </div>
       <button className="primary" disabled={busy || length < 50} onClick={check}>
@@ -154,20 +154,20 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   const [filter, setFilter] = useState("");
   const [field, setField] = useState<string>(FIELDS[0]);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.skills().then(setAll).catch(() => setError(t("in.skillsFailed"))); }, []);
+  useEffect(() => { api.skills().then(setAll).catch(() => setError("Can't load the skill list.")); }, []);
   const query = filter.trim().toLowerCase();
   const fields = [...FIELDS, ...new Set(all.map((s) => s.category).filter((c) => !(FIELDS as readonly string[]).includes(c)))];
   const fieldName = (c: string) => ((FIELDS as readonly string[]).includes(c) ? t(`pick.${c}` as StringKey) : c);
-  const shown = all.filter((s) => (query ? s.name.toLowerCase().includes(query) : s.category === field));
+  const shown = all.filter((s) => (query ? `${s.name} ${tr(s.name)}`.toLowerCase().includes(query) : s.category === field));  // either language matches
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const chip = (s: Skill) => (
     <button key={s.id} className={picked.includes(s.id) ? "chip covered" : "chip"} aria-pressed={picked.includes(s.id)}
-      onClick={() => toggle(s.id)}>{picked.includes(s.id) && "✓ "}{s.name}</button>
+      onClick={() => toggle(s.id)}>{picked.includes(s.id) && "✓ "}{tr(s.name)}</button>
   );
   return (
     <>
       <label className="narrow">{t("pick.filter")}
-        <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="e.g. Excel" />
+        <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={t("in.filterHint")} />
       </label>
       {!query && (
         <div className="tabs pick-fields" role="tablist" aria-label={t("pick.fields")}>
@@ -182,13 +182,13 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
         <div key={c} className="pick-group"><span className="kpi-label">{fieldName(c)}</span>
           <div className="chips">{shown.filter((s) => s.category === c).map(chip)}</div></div>
       )) : <div className="chips" role="tabpanel">{shown.map(chip)}</div>}
-      {all.length > 0 && query && shown.length === 0 && <p className="muted">{t("in.noMatch")} “{filter}”.</p>}
+      {all.length > 0 && query && shown.length === 0 && <p className="muted">{tf("in.noMatch", { q: filter })}</p>}
       {picked.length > 0 && (
         <div className="pick-group"><span className="kpi-label">{t("pick.picked")} ({picked.length})</span>
           <div className="chips">{all.filter((s) => picked.includes(s.id)).map(chip)}</div></div>
       )}
       <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked)}>
-        {picked.length < 3 ? t("in.pickThree") : `${t("in.continueWith")} ${picked.length} ${t("in.skillsWord")}`}
+        {picked.length < 3 ? t("in.pickThree") : tf("in.continueWith", { n: picked.length })}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
     </>
@@ -204,7 +204,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
   useEffect(() => {
     api.turn([], getLang())
       .then((first) => { setTurn(first); setMessages([{ role: "assistant", content: first.next_question }]); })
-      .catch(() => setError(t("in.chatFailed")));
+      .catch(() => setError(t("in.chatUnavailable")));
   }, []);
   async function send() {
     if (!answer.trim() || busy) return;
@@ -222,17 +222,17 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
       <ol className="chat-log" aria-live="polite">
         {messages.map((m, i) => <li key={i} className={m.role}>{m.content}</li>)}
       </ol>
-      {turn && turn.skills_found.length > 0 && <p className="muted">Skills found so far: {turn.skills_found.length}</p>}
+      {turn && turn.skills_found.length > 0 && <p className="muted">{tf("in.foundSoFar", { n: turn.skills_found.length })}</p>}
       {turn?.is_complete ? (
         <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found)}>
-          {turn.skills_found.length ? `${t("in.continueWith")} ${turn.skills_found.length} ${t("in.skillsWord")}` : t("in.noneFound")}
+          {turn.skills_found.length ? tf("in.continueWith", { n: turn.skills_found.length }) : t("in.noneFound")}
         </button>
       ) : (
         <form className="chat-form" onSubmit={(e) => { e.preventDefault(); send(); }}>
-          <label className="sr-only" htmlFor="answer">{t("iv.answer")}</label>
+          <label className="sr-only" htmlFor="answer">{t("in.answer")}</label>
           <input id="answer" type="text" maxLength={1000} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={t("in.typeAnswer")} />
           <MicButton onText={(spoken) => setAnswer((a) => `${a.trimEnd()} ${spoken}`.trim().slice(0, 1000))} />
-          <button className="primary" type="submit" disabled={busy || !answer.trim()}>{busy ? "…" : "Send"}</button>
+          <button className="primary" type="submit" disabled={busy || !answer.trim()}>{busy ? "…" : t("in.send")}</button>
         </form>
       )}
       {error && <p className="error" role="alert">{error}</p>}

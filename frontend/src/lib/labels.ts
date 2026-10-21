@@ -1,60 +1,35 @@
 import type { Scenario, TaskLabel } from "./api";
-import { StringKey, t } from "./i18n";
+import { t, type StringKey } from "./i18n";
 
-// Labels shown on many screens. Each is read through t() when it is used (getters), so it
-// follows the chosen language without changing any call site.
-function translated<K extends string>(keys: Record<K, StringKey>): Record<K, string> {
-  const out = {} as Record<K, string>;
-  for (const k of Object.keys(keys) as K[]) Object.defineProperty(out, k, { get: () => t(keys[k]), enumerable: true });
-  return out;
-}
+// Labels are read through t() each time, so they follow the chosen language.
+const live = <T,>(make: (key: string) => T): Record<string, T> =>
+  new Proxy({} as Record<string, T>, { get: (_, key) => (typeof key === "string" ? make(key) : undefined) });
 
-export const SCENARIOS: { id: Scenario; label: string }[] = (["slow", "baseline", "accelerated"] as Scenario[]).map((id) => {
-  const s = { id } as { id: Scenario; label: string };
-  Object.defineProperty(s, "label", { get: () => t(`sc.${id}` as StringKey), enumerable: true });
-  return s;
-});
+export const SCENARIOS: { id: Scenario; readonly label: string }[] = (["slow", "baseline", "accelerated"] as const)
+  .map((id) => ({ id, get label() { return t(`sc.${id}`); } }));
 
 // Outlook is never colour alone: each label has a word and an arrow (UI brief).
 export const OUTLOOK_TONE: Record<string, string> = { emerging: "good", growing: "good", stable: "", declining: "risk" };
-export const OUTLOOK_TEXT: Record<string, string> = translated({
-  emerging: "lbl.emerging", growing: "lbl.growing", stable: "lbl.stable", declining: "lbl.declining",
-});
+export const OUTLOOK_TEXT = live((label) => t(`out.${label}` as StringKey) ?? label);
 export const HEAT: Record<string, string> = { emerging: "hm-good", growing: "hm-good", stable: "hm-stable", declining: "hm-risk" };
 
-export const TREND_TEXT: Record<string, string> = translated({
-  rising: "lbl.rising", steady: "lbl.steady", declining: "lbl.declining", no_data: "lbl.noData",
-});
+export const TREND_TEXT = live((label) => t(`trend.${label}` as StringKey) ?? label);
 
-const withLabel = (key: StringKey, tone: string) => {
-  const o = { tone } as { label: string; tone: string };
-  Object.defineProperty(o, "label", { get: () => t(key), enumerable: true });
-  return o;
-};
+const COST_TONE: Record<string, string> = { free: "good", free_audit: "good", paid: "gold" };
+export const COST = live((id) => (id in COST_TONE ? { label: t(`cost.${id}` as StringKey), tone: COST_TONE[id] } : undefined)) as
+  Record<string, { label: string; tone: string } | undefined>;
 
-export const COST: Record<string, { label: string; tone: string }> = {
-  free: withLabel("lbl.free", "good"), free_audit: withLabel("lbl.freeAudit", "good"), paid: withLabel("lbl.paid", "gold"),
-};
-
-export const HRD: Record<string, { label: string; tone: string }> = {
-  claimable: withLabel("lbl.hrdClaimable", "good"), check: withLabel("lbl.hrdCheck", ""),
-};
+const HRD_TONE: Record<string, string> = { claimable: "good", check: "" };
+export const HRD = live((id) => (id in HRD_TONE ? { label: t(`hrd.${id}` as StringKey), tone: HRD_TONE[id] } : undefined)) as
+  Record<string, { label: string; tone: string } | undefined>;
 
 export function priceText(price: number | null | undefined, cost: string) {
-  if (price === 0) return cost === "free_audit" ? t("lbl.freeAudit") : t("lbl.free");
-  if (price == null) return t("lbl.paidAsk");
-  return `${t("lbl.paid")} · RM ${price.toLocaleString("en-MY", { minimumFractionDigits: price % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+  if (price === 0) return cost === "free_audit" ? t("cost.free_audit") : t("cost.free");
+  if (price == null) return t("cost.askPrice");
+  return `${t("cost.paid")} · RM ${price.toLocaleString("en-MY", { minimumFractionDigits: price % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
 }
 
-const task = (text: StringKey, tone: string, help: StringKey) => {
-  const o = { tone } as { text: string; tone: string; help: string };
-  Object.defineProperty(o, "text", { get: () => t(text), enumerable: true });
-  Object.defineProperty(o, "help", { get: () => t(help), enumerable: true });
-  return o;
-};
+const TASK_TONE: Record<TaskLabel, string> = { automate: "risk", assist: "gold", human: "good" };
+export const TASK_LABEL = live((id) => ({ text: t(`task.${id}` as StringKey), tone: TASK_TONE[id as TaskLabel], help: t(`task.${id}Help` as StringKey) })) as
+  Record<TaskLabel, { text: string; tone: string; help: string }>;
 
-export const TASK_LABEL: Record<TaskLabel, { text: string; tone: string; help: string }> = {
-  automate: task("lbl.automate", "risk", "lbl.automateHelp"),
-  assist: task("lbl.assist", "gold", "lbl.assistHelp"),
-  human: task("lbl.human", "good", "lbl.humanHelp"),
-};

@@ -605,6 +605,86 @@ main:focus { outline: none; }
   .scenario-note, .home-roles-head .scenario-note { min-height: 4.5em; }  /* the longest description is three lines on a 375 px phone */
 }
 
+/* Future roles as a map (RoleGraph) */
+.role-graph { margin: 0; padding: 8px; }
+.role-graph svg { display: block; width: 100%; height: auto; font-family: var(--font); }
+.graph-scroll { overflow-x: auto; }
+.graph-edge { stroke: var(--line-strong, var(--line)); stroke-width: 1.5; }
+.graph-edge.link { stroke: var(--gold-bright); stroke-dasharray: 5 4; }
+.graph-pill rect { fill: var(--surface); stroke: var(--line-strong, var(--line)); }
+.graph-pill text { font-size: 11px; fill: var(--ink-2, var(--ink)); }
+.graph-pill.link rect { fill: var(--gold-bg); stroke: var(--gold-bright); }
+.graph-pill.link text { fill: var(--gold); font-weight: 600; }
+.graph-arrowhead.link { fill: var(--gold-bright); }
+.graph-arrowhead { fill: var(--ink-faint, var(--ink-soft)); }
+.graph-you circle { fill: var(--accent); }
+.graph-you text { fill: #fff; font-size: 12px; }
+.graph-you .graph-you-name { font-size: 15px; font-weight: 700; }
+.graph-node { cursor: pointer; outline: none; }
+.graph-node rect { fill: var(--surface); stroke: var(--line-strong, var(--line)); stroke-width: 1.5; transition: stroke .15s; }
+.graph-node.tone-good rect { fill: var(--good-bg); stroke: var(--good); }
+.graph-node.tone-risk rect { fill: var(--risk-bg); stroke: var(--risk); }
+.graph-node:hover rect, .graph-node:focus-visible rect, .graph-node.open rect { stroke: var(--accent); stroke-width: 3; }
+.graph-toggle { font-size: 16px; font-weight: 700; fill: var(--accent); }
+.graph-you { cursor: pointer; }
+.graph-hint { margin: 4px 8px 0; font-size: 13px; }
+.graph-detail { border-top: 1px solid var(--line); margin: 4px 8px 0; padding-top: 10px; display: grid; gap: 6px; }
+.graph-detail p, .graph-steps { margin: 0; }
+.graph-steps { padding-left: 20px; display: grid; gap: 2px; }
+.graph-title { font-size: 13px; font-weight: 650; fill: var(--ink); }
+.graph-rank { font-size: 11px; font-weight: 700; fill: var(--ink-soft); }
+.graph-small { font-size: 10.5px; fill: var(--ink-soft); }
+.graph-you .graph-small { fill: rgba(255, 255, 255, .85); }
+.role-graph .dim { opacity: .25; transition: opacity .15s; }
+.graph-key { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 8px 8px 4px; font-size: 12px; color: var(--ink-soft); }
+.graph-key i { display: inline-block; width: 22px; vertical-align: middle; border-top: 2px solid var(--ink-faint, var(--ink-soft)); }
+.graph-key i.key-dash { border-top: 2px dashed var(--gold-bright); }
+.view-switch { margin: 4px 0 8px; }
+
+/* Map layout: the map, with its details panel to the right (below on phones) */
+.graph-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .graph-layout { grid-template-columns: minmax(0, 1fr); } }
+.graph-panel { display: grid; gap: 8px; }
+.graph-panel h3 { margin: 0; }
+.graph-panel p { margin: 0; }
+.graph-details { display: grid; gap: 8px; }
+.graph-howto ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+.graph-howto li { color: var(--ink-soft); }
+.key-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; border: 1.5px solid var(--line-strong, var(--line)); background: var(--surface); }
+.key-swatch.good { background: var(--good-bg); border-color: var(--good); }
+.key-swatch.risk { background: var(--risk-bg); border-color: var(--risk); }
+.graph-moved { white-space: normal; }
+.graph-match { font-size: 12px; font-weight: 700; fill: var(--accent); }
+.graph-node.tone-prediction rect { fill: var(--gold-bg); stroke: var(--gold-bright); stroke-dasharray: 6 4; }
+.role-graph.compact .graph-title { font-size: 18px; }
+.role-graph.compact .graph-match { font-size: 16px; }
+.role-graph.compact .graph-pill text { font-size: 16px; }
+.role-graph.compact .graph-you text { font-size: 15px; }
+.role-graph.compact .graph-you .graph-you-name { font-size: 17px; }
+.actions button.danger { color: var(--risk); border-color: var(--risk); }
+.review-top { scroll-margin-top: 130px; outline: none; }
+.sdg-reasons { display: grid; gap: 8px; margin: 12px 0; }
+.sdg-reasons h2 { margin: 0; font-size: 1.05rem; }
+.sdg-reasons ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.proof-result .sdg-reasons h2 { font-size: .95rem; }
+.study-calendar { display: grid; gap: 10px; margin-top: 12px; }
+.study-calendar h3, .study-calendar p { margin: 0; }
+.cal-days { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.cal-days legend { font-weight: 600; margin-bottom: 4px; }
+@media print { .study-calendar { display: none; } }
+.budget { display: grid; gap: 10px; }
+.budget h2, .budget p { margin: 0; }
+.budget .badge { white-space: normal; }
+.forecast-history summary { cursor: pointer; font-weight: 650; }
+.forecast-history p { margin: 6px 0; }
+.history-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.history-list li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+.history-list li.current .history-date { font-weight: 700; }
+.history-list .source { grid-column: 2; }
+.history-move { margin-left: 8px; font-weight: 650; font-size: .85rem; }
+.history-move.up { color: var(--good); }
+.history-move.down { color: var(--risk); }
+
 /* ---------- Open jobs in Malaysia, interview practice ---------- */
 .openings-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .openings-list li { display: grid; gap: 2px; }

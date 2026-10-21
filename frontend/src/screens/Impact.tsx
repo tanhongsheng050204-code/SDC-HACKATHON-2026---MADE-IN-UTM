@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { SdgTile } from "../components/Sdgs";
+import { sdgReason, SdgTile } from "../components/Sdgs";
 import { api, RoleInfo, RoleMatch } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 
 export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }) {
   const [info, setInfo] = useState<RoleInfo | null>(null);
@@ -15,33 +15,33 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.pathway")}</button>
-      <div className="page-head"><h1>Your impact as {/^[aeiou]/i.test(role.title) ? "an" : "a"} {role.title}</h1>
+      <div className="page-head"><h1>{tf("impact.title", { role: tr(role.title) })}</h1>
         <p className="muted">{t("impact.sub")}</p></div>
       <div className="grid">
         {role.sdgs.map((g) => (
           <div key={g.number} className="card sdg-card" style={{ borderTopColor: g.colour }}>
             <SdgTile sdg={g} />
-            <h2>SDG {g.number}: {g.name}</h2>
-            {g.target && <span className="muted">Target {g.target}</span>}
-            <p>{g.reason}</p>
+            <h2>SDG {g.number}: {tr(g.name)}</h2>
+            {g.target && <span className="muted">{tf("impact.target", { n: g.target })}</span>}
+            <p>{sdgReason(g)}</p>
           </div>
         ))}
       </div>
 
       <h2>{t("impact.skills")}</h2>
-      {error && <p className="error" role="alert">{t("impact.failed")}</p>}
-      {!info && !error && <p className="muted">{t("shell.loading")}</p>}
-      {info && skills.length === 0 && <p className="muted">{t("impact.none")}</p>}
+      {error && <p className="error" role="alert">{t("impact.loadFailed")}</p>}
+      {!info && !error && <p className="muted">{t("a.loading")}</p>}
+      {info && skills.length === 0 && <p className="muted">{t("impact.noSkills")}</p>}
       {skills.length > 0 && (
         <ul className="skill-sdgs">
           {skills.map((s) => (
             <li key={s.skill_id} className="card">
               <div className="card-row">
-                <strong>{s.name}</strong>
-                <span className={`badge ${s.learning ? "gold" : "good"}`}>{s.learning ? t("impact.inPlan") : t("impact.have")}</span>
+                <strong>{tr(s.name)}</strong>
+                <span className={`badge ${s.learning ? "gold" : "good"}`}>{s.learning ? t("impact.inPlan") : t("impact.haveThis")}</span>
               </div>
               {info!.skill_sdgs[s.skill_id].map((g) => (
-                <p key={g.number} className="skill-sdg"><SdgTile sdg={g} small /><span><strong>SDG {g.number}</strong> {g.reason}</span></p>
+                <p key={g.number} className="skill-sdg"><SdgTile sdg={g} small /><span><strong>SDG {g.number}</strong> {sdgReason(g)}</span></p>
               ))}
             </li>
           ))}

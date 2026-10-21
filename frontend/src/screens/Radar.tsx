@@ -3,7 +3,7 @@ import { DataBanner } from "../components/DataBanner";
 import { MalaysiaAiUseCard } from "../components/MalaysiaPanels";
 import { api, Profile, Radar as RadarData } from "../lib/api";
 import { signed } from "../lib/format";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { TREND_TEXT } from "../lib/labels";
 
 const BANDS = ["rising", "steady", "declining"] as const;
@@ -39,7 +39,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
                   <ul>
                     {skills.map((s) => (
                       <li key={s.skill_id} className={s.mine ? "mine" : ""} title={s.sources.join("\n")}>
-                        <span>{s.name}{s.mine && <span className="badge">{t("radar.yours")}</span>}</span>
+                        <span>{tr(s.name)}{s.mine && <span className="badge">{t("radar.yours")}</span>}</span>
                         <span className="muted">{s.trend !== null ? `${signed(Math.round(s.trend * 100))}%` : ""}</span>
                         {s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}
                       </li>
@@ -53,10 +53,10 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         </>
       )}
       {noData.length > 0 && (
-        <details><summary className="muted">{noData.length} {t("radar.noTrend")}</summary>
+        <details><summary className="muted">{tf("radar.noDataCount", { n: noData.length })}</summary>
           <p className="muted">{t("radar.twoCounts")}</p>
           <ul className="plain-list">
-            {noData.map((s) => <li key={s.skill_id}><strong>{s.name}</strong>{s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
+            {noData.map((s) => <li key={s.skill_id}><strong>{tr(s.name)}</strong>{s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
           </ul>
         </details>
       )}
@@ -70,7 +70,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
               const m = c.momentum ?? 0;
               return (
                 <li key={c.id}>
-                  <span>{c.name}</span>
+                  <span>{tr(c.name)}</span>
                   <span className="bar"><span style={{ width: `${Math.abs(m) * 50}%`, marginLeft: m < 0 ? `${50 - Math.abs(m) * 50}%` : "50%" }} className={m < 0 ? "neg" : "pos"} /></span>
                   <span className="muted">{c.momentum !== null ? signed(Math.round(c.momentum * 100) / 100) : "–"}</span>
                 </li>

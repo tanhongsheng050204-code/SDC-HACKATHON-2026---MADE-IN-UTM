@@ -208,3 +208,11 @@ def test_built_app_is_served_beside_the_api(tmp_path, monkeypatch):
 def test_profile_rejects_interests_field(client):
     body = {"skills": ["excel"], "interests": [13]}
     assert client.post("/api/profiles", json=body).status_code == 422
+
+
+def test_role_history_lists_every_forecast_oldest_first(client):
+    body = client.get("/api/roles/data_analyst/history").json()
+    points = body["points"]
+    assert len(points) >= 2 and [p["imported"] for p in points] == sorted(p["imported"] for p in points)
+    assert points[0]["illustrative"] is True and all("index" in p and p["snapshot_id"] for p in points)
+    assert client.get("/api/roles/nope/history").status_code == 404

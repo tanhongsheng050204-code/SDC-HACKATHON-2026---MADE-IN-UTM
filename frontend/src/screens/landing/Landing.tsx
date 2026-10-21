@@ -1,40 +1,24 @@
 import { ReactNode } from "react";
 import { LogoMark, Rosette } from "../../components/Brand";
-import { t } from "../../lib/i18n";
+import { t, type StringKey } from "../../lib/i18n";
 import "../../styles/landing.css";
 import { HeroPreview } from "./HeroPreview";
 import { Journey } from "./Journey";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
 
-const PEOPLE = [
-  { key: "clerk", photo: "worker", alt: "A woman in a hijab working at her laptop", who: "A clerk whose job is changing", text: "Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices. She sees which of her skills carry over and a plan for the role she can reach first.", cta: "Open Aisyah's demo", chips: ["Data entry ▼", "Excel ▲", "AI operations"] },
-  { key: "student", photo: "student", alt: "Two students working together at a laptop", who: "A student choosing a direction", text: "Wei Jie is a final-year business student who enjoys working with people and varied, creative work. He compares roles under three futures, keeps the ones that hold up in all of them, and sees which ones he can start in as a graduate.", cta: "Open the student demo", chips: ["Robust pick", "Open to graduates", "Fits what he enjoys"] },
-  { key: "hr", photo: "hr-team", alt: "Colleagues reviewing work on a laptop in an office", who: "An HR team planning ahead", text: "Upload an anonymous list of roles and skills. See which roles AI puts at risk and the cheapest moves for each group, never a ranking of people.", cta: "Open the workforce view", chips: ["160 people", "Heatmap", "Learning hours"] },
+// Read through t() at render time, so the page follows the chosen language.
+const people = () => [
+  { key: "clerk", photo: "worker", alt: t("lp.clerkAlt"), who: t("lp.clerkWho"), text: t("lp.clerkText"), cta: t("lp.clerkCta"), chips: [t("lp.clerkChip1"), t("lp.clerkChip2"), t("lp.clerkChip3")] },
+  { key: "student", photo: "student", alt: t("lp.studentAlt"), who: t("lp.studentWho"), text: t("lp.studentText"), cta: t("lp.studentCta"), chips: [t("card.robust"), t("lead.openToGrads"), t("lp.studentChip3")] },
+  { key: "hr", photo: "hr-team", alt: t("lp.hrAlt"), who: t("lp.hrWho"), text: t("lp.hrText"), cta: t("lp.hrCta"), chips: [t("lp.hrChip1"), t("lp.hrChip2"), t("lp.hrChip3")] },
 ];
 
-const PRINCIPLES = [
-  { title: "Estimates, never predictions", text: "Every forecast shows a range across three scenarios and the word “estimate”. No single number stands alone." },
-  { title: "Every number has a source", text: "Each role, skill, task and course shows where it came from and when. Old forecasts are kept, so a number can be traced back." },
-  { title: "Your CV is never stored", text: "Files are read in memory. Names, emails, phone and IC numbers are removed before any AI sees the text. Only your skills are saved." },
-  { title: "The coach only suggests", text: "The AI coach answers from your own results with sources. A suggested change does nothing until you press Apply." },
-];
+const principles = () => [1, 2, 3, 4].map((i) => ({ title: t(`lp.p${i}` as StringKey), text: t(`lp.p${i}Text` as StringKey) }));
 
-const CHAIN = [
-  { title: "CV uploaded", by: "You" },
-  { title: "Personal details removed", by: "Before any AI" },
-  { title: "Skills matched", by: "Skill dictionary + AI" },
-  { title: "You confirm the list", by: "You" },
-];
+const chain = () => [1, 2, 3, 4].map((i) => ({ title: t(`lp.c${i}` as StringKey), by: t(`lp.c${i}By` as StringKey) }));
 
-const FAQ = [
-  { q: "Is this a real product, or a demo?", a: "It is a working prototype built for the XMUM hackathon. The matching, scenarios, pathways, coach and workforce view all run on real code. The three demo people are synthetic. Job growth figures come from the WEF Future of Jobs Report 2025; the AI-exposure settings are our own estimates, and the app says so." },
-  { q: "Where do the forecasts come from?", a: "Each role starts from the net job growth to 2030 in the WEF Future of Jobs Report 2025 (Figure 2.3, a global employer survey). Dated signals then adjust it: AI research activity from arXiv (or OpenAlex), skill mentions in job postings and Malaysian employment by occupation from OpenDOSM, each update approved by a person. The Sources page lists every snapshot with its date." },
-  { q: "Will it tell me to quit my job?", a: "No. Laluan shows estimates under different futures and the skills between you and each role. The decision stays with you, and every screen says so." },
-  { q: "Do you keep my CV?", a: "No. The file is read in memory and discarded. We save the skills you confirm, your goals and your course progress, and you can delete all of it from the sidebar at any time." },
-  { q: "Can my employer see my results?", a: "Only if you share a Future Card link. The workforce view for HR teams works on anonymous role-and-skills lists and refuses files with names, emails or staff IDs." },
-  { q: "Which languages does it support?", a: "English, Bahasa Malaysia and Chinese for the interface. Role, course and task names stay in English, as their sources publish them." },
-];
+const faq = () => [1, 2, 3, 4, 5, 6].map((i) => ({ q: t(`lp.q${i}` as StringKey), a: t(`lp.a${i}` as StringKey) }));
 
 export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onSources, onReviewKit }: {
   nav: ReactNode; banners: ReactNode; model: string | null; prefs: ReactNode;
@@ -60,9 +44,9 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
         </header>
 
         <section className="lp-frame" id="people">
-          <h2 className="lp-two-tone"><span>Made for the people AI is changing first.</span> Clerks, service staff, students and the HR teams planning their next move.</h2>
+          <h2 className="lp-two-tone"><span>{t("lp.peopleH")}</span> {t("lp.peopleSub")}</h2>
           <div className="lp-people">
-            {PEOPLE.map((p) => (
+            {people().map((p) => (
               <article key={p.key} className="lp-person">
                 <div className={`lp-person-art ${p.key}`}>
                   <img src={`/images/people/${p.photo}.webp`} alt={p.alt} width={880} height={748} loading="lazy" decoding="async" />
@@ -76,30 +60,30 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           </div>
           <p className="lp-switch">{t("landing.switcher")} <button className="link" onClick={() => onDemo("switcher")}>{t("landing.switcherCta")}</button></p>
           <p className="lp-switch">{t("landing.centre")} <button className="link" onClick={() => onDemo("class")}>{t("landing.centreCta")}</button></p>
-          <p className="lp-credit">Illustrative photos from Unsplash by Gema Saputera, Mimi Thian and Vitaly Gariev. The people shown are not the demo personas.</p>
+          <p className="lp-credit">{t("lp.credit")}</p>
         </section>
 
         <section className="lp-frame lp-split">
-          <h2 className="lp-two-tone"><span>Starts from what you already have.</span> A CV, a few answers, or a list of skills, with your personal details removed first.</h2>
+          <h2 className="lp-two-tone"><span>{t("lp.startH")}</span> {t("lp.startSub")}</h2>
           <div className="lp-redact" aria-hidden="true">
             <div className="lp-doc">
               <p className="jp-label">cv_aisyah.pdf</p>
               <p><mark>████████ ██████</mark> · <mark>████@█████.com</mark> · <mark>01█-███ ████</mark></p>
-              <p>Data entry clerk, logistics company, Shah Alam (2017–now)</p>
-              <p>Keyed delivery orders and invoices into the company system, kept Excel trackers, scheduled pickups with drivers, answered customer calls.</p>
+              <p>{t("lp.cvLine1")}</p>
+              <p>{t("lp.cvLine2")}</p>
             </div>
             <span className="lp-arrow">→</span>
             <div className="lp-doc">
-              <p className="jp-label">Skills you confirm</p>
+              <p className="jp-label">{t("lp.confirm")}</p>
               <div className="chips">
-                {["Data entry", "Microsoft Excel", "Scheduling", "Communication"].map((s) => <span key={s} className="chip covered">✓ {s}</span>)}
+                {[t("lp.sk1"), t("lp.sk2"), t("lp.sk3"), t("lp.sk4")].map((s) => <span key={s} className="chip covered">✓ {s}</span>)}
               </div>
             </div>
           </div>
         </section>
 
         <section className="lp-frame lp-flush" id="journey">
-          <h2 className="lp-two-tone lp-pad"><span>One afternoon with Laluan.</span> From your skills to a plan you can start this week, every step with its source.</h2>
+          <h2 className="lp-two-tone lp-pad"><span>{t("lp.journeyH")}</span> {t("lp.journeySub")}</h2>
           <Journey />
         </section>
 
@@ -109,20 +93,20 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             <div className="lp-band-head">
               <h2>{t("landing.bandTitle")}</h2>
               <p>{t("landing.bandText")}</p>
-              <button className="btn outline-light" onClick={onSources}>See where the numbers come from</button>
+              <button className="btn outline-light" onClick={onSources}>{t("lp.seeSources")}</button>
             </div>
             <div className="lp-principles">
-              {PRINCIPLES.map((p) => <div key={p.title}><h3>{p.title}</h3><p>{p.text}</p></div>)}
+              {principles().map((p) => <div key={p.title}><h3>{p.title}</h3><p>{p.text}</p></div>)}
             </div>
           </div>
-          <ol className="lp-chain" aria-label="What happens to your CV">
-            {CHAIN.map((c) => <li key={c.title}><b>{c.title}</b><span>{c.by}</span></li>)}
+          <ol className="lp-chain" aria-label={t("lp.chainAria")}>
+            {chain().map((c) => <li key={c.title}><b>{c.title}</b><span>{c.by}</span></li>)}
           </ol>
         </section>
 
         <section className="lp-faq" id="faq">
-          <h2>Questions people ask</h2>
-          {FAQ.map((f, i) => (
+          <h2>{t("lp.faq")}</h2>
+          {faq().map((f, i) => (
             <details key={f.q} open={i === 0}>
               <summary>{f.q}<span className="lp-plus" aria-hidden="true" /></summary>
               <p>{f.a}</p>
@@ -144,33 +128,33 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
         <div className="site-footer-inner">
           <div className="footer-about">
             <span className="brand"><LogoMark size={22} /><span>Laluan</span></span>
-            <p className="footer-blurb">{t("landing.tag")}. Built by team Made in UTM for the XMUM hackathon (Domain 1, Future-Ready Workforce), shown with synthetic people.</p>
+            <p className="footer-blurb">{t("landing.tag")}. {t("lp.blurb")}</p>
           </div>
           <div>
-            <h3>Product</h3>
+            <h3>{t("lp.product")}</h3>
             <ul>
-              <li><button className="link" onClick={() => onDemo("clerk")}>Worker demo</button></li>
-              <li><button className="link" onClick={() => onDemo("student")}>Student demo</button></li>
-              <li><button className="link" onClick={() => onDemo("switcher")}>Career-switcher demo</button></li>
-              <li><button className="link" onClick={() => onDemo("class")}>Career-centre class view</button></li>
-              <li><button className="link" onClick={onHr}>Workforce view</button></li>
+              <li><button className="link" onClick={() => onDemo("clerk")}>{t("lp.workerDemo")}</button></li>
+              <li><button className="link" onClick={() => onDemo("student")}>{t("lp.studentDemo")}</button></li>
+              <li><button className="link" onClick={() => onDemo("switcher")}>{t("lp.switcherDemo")}</button></li>
+              <li><button className="link" onClick={() => onDemo("class")}>{t("lp.classView")}</button></li>
+              <li><button className="link" onClick={onHr}>{t("nav.workforce")}</button></li>
             </ul>
           </div>
           <div>
-            <h3>Resources</h3>
+            <h3>{t("lp.resources")}</h3>
             <ul>
               <li><button className="link" onClick={onSources}>{t("nav.sources")}</button></li>
-              <li><button className="link" onClick={onReviewKit}>Review kit</button></li>
-              <li><a href={`${REPO}/blob/main/docs/PROPOSAL.md`} target="_blank" rel="noreferrer">Proposal</a></li>
-              <li><a href={`${REPO}/blob/main/docs/CODE_TO_EXPLAIN.md`} target="_blank" rel="noreferrer">How it works</a></li>
+              <li><button className="link" onClick={onReviewKit}>{t("lp.reviewKit")}</button></li>
+              <li><a href={`${REPO}/blob/main/docs/PROPOSAL.md`} target="_blank" rel="noreferrer">{t("lp.proposal")}</a></li>
+              <li><a href={`${REPO}/blob/main/docs/CODE_TO_EXPLAIN.md`} target="_blank" rel="noreferrer">{t("lp.howItWorks")}</a></li>
             </ul>
           </div>
           <div>
-            <h3>Project</h3>
+            <h3>{t("lp.project")}</h3>
             <ul>
-              <li><a href={REPO} target="_blank" rel="noreferrer">Source code on GitHub</a></li>
-              <li><a href={`${REPO}/blob/main/docs/AI_DECLARATION.md`} target="_blank" rel="noreferrer">AI declaration</a></li>
-              <li><a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer">Apache 2.0 licence</a></li>
+              <li><a href={REPO} target="_blank" rel="noreferrer">{t("lp.github")}</a></li>
+              <li><a href={`${REPO}/blob/main/docs/AI_DECLARATION.md`} target="_blank" rel="noreferrer">{t("lp.aiDecl")}</a></li>
+              <li><a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer">{t("lp.licence")}</a></li>
             </ul>
           </div>
         </div>

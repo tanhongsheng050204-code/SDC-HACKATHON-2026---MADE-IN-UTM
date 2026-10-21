@@ -10,7 +10,7 @@ import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
-import { t } from "./lib/i18n";
+import { setDataText, t } from "./lib/i18n";
 import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
@@ -56,6 +56,9 @@ function MainApp({ demo }: { demo: string | null }) {
   const [offline, setOffline] = useState(false);
   const [waking, setWaking] = useState(false);
   useEffect(() => onServerWaking(setWaking), []);
+  // BM / 中文 for role titles, skill names and other data text; redraw once they arrive.
+  const [, setDataLoaded] = useState(false);
+  useEffect(() => { api.translations().then((m) => { setDataText(m); setDataLoaded(true); }).catch(() => undefined); }, []);
   const [userId, setUserId] = useState<string | null>(getUserId());
   useEffect(() => onAuth(setUserId), []);
   useEffect(() => onAuthExpired(() => setError(t("auth.expired"))), []);
@@ -293,8 +296,8 @@ function MainApp({ demo }: { demo: string | null }) {
 
   if (screen === "landing") {
     const nav = (
-      <nav className="site-nav" aria-label="Main">
-        <button className="brand" onClick={() => go("landing")} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+      <nav className="site-nav" aria-label={t("nav.main")}>
+        <button className="brand" onClick={() => go("landing")} aria-label={t("nav.homeAria")}><LogoMark /><span>Laluan</span></button>
         <div className="site-links">
           <a href="#people">{t("landing.navPeople")}</a>
           <a href="#journey">{t("landing.navJourney")}</a>

@@ -3,7 +3,7 @@ import { DataBanner } from "../components/DataBanner";
 import { Icon } from "../components/Icon";
 import { api, Journey, JourneyStep, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
-import { StringKey, t } from "../lib/i18n";
+import { StringKey, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
 
 export type TargetScreen = "role" | "tree";
@@ -57,7 +57,7 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
   return (
     <section className="home">
       <div className="page-head">
-        <h1>{greeting()}{name ? `, ${name}` : ""}.</h1>
+        <h1>{name ? tf("home.helloName", { g: greeting(), name }) : tf("home.hello", { g: greeting() })}</h1>
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
 
@@ -92,7 +92,7 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
       {data && top && audience === "worker" && current && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.workerTitle")}</span>
-          <strong>{current.title}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
+          <strong>{tr(current.title)}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
           <p className="muted">{t("lead.workerBody")}</p>
           <button className="btn quiet sm" onClick={() => onGo("tasks")}>{t("nav.tasks")} →</button>
         </div>
@@ -102,17 +102,17 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
           <span className="kpi-label">{t("lead.gradTitle")}</span>
           <p className="muted">{t("lead.gradBody")}</p>
           <div className="actions">{entryRoles.map((r) => (
-            <button key={r.role_id} className="btn quiet sm" onClick={() => onOpenRole(r)}>{r.title} · {percent(r.fit)}%</button>
+            <button key={r.role_id} className="btn quiet sm" onClick={() => onOpenRole(r)}>{tr(r.title)} · {percent(r.fit)}%</button>
           ))}</div>
         </div>
       )}
       {data && top && audience === "switcher" && current && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.switchTitle")}</span>
-          <strong>{current.title}: {OUTLOOK_TEXT[current.outlook[scenario].label]} {signed(current.outlook[scenario].index)}%</strong>
-          <p className="muted">{t("lead.switchBody")} <strong>{top.title}</strong>:</p>
+          <strong>{tr(current.title)}: {OUTLOOK_TEXT[current.outlook[scenario].label]} {signed(current.outlook[scenario].index)}%</strong>
+          <p className="muted">{t("lead.switchBody")} <strong>{tr(top.title)}</strong>:</p>
           <div className="chips">{top.carry_over.length
-            ? top.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)
+            ? top.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}</span>)
             : <span className="muted">{t("lead.noCarry")}</span>}</div>
         </div>
       )}
@@ -125,21 +125,21 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
               <li key={r.role_id}>
                 <button className="home-role" onClick={() => onOpenRole(r)}>
                   <span className="rank">#{r.rank}</span>
-                  <span className="home-role-title">{r.title}
+                  <span className="home-role-title">{tr(r.title)}
                     {r.role_id === profile.target_role_id && <span className="badge good"><Icon name="target" />{t("target.yours")}</span>}
                     {r.robust_pick && <span className="badge gold">{t("k.robustPick")}</span>}
                   </span>
-                  <span className="fit" role="img" aria-label={`${t("k.fit")} ${percent(r.fit)}%`}><span style={{ width: `${r.fit * 100}%` }} /></span>
+                  <span className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(r.fit) })}><span style={{ width: `${r.fit * 100}%` }} /></span>
                   <span className={`badge ${OUTLOOK_TONE[r.outlook[scenario].label]}`}>{OUTLOOK_TEXT[r.outlook[scenario].label]}</span>
                 </button>
               </li>
             ))}
           </ol>
-          <button className="link" onClick={() => onGo("roles")}>{t("home.seeAll")} ({data.roles.length}) →</button>
+          <button className="link" onClick={() => onGo("roles")}>{tf("home.seeAll", { n: data.roles.length })} →</button>
         </div>
       )}
       {!data && !error && <div className="grid" aria-hidden="true">{[0, 1].map((i) => <div key={i} className="card skeleton" />)}</div>}
-      {data && <p className="source">{t("home.forecast")} {data.signal_source.snapshot_id}, {data.signal_source.imported}. {t("shell.estimates")}</p>}
+      {data && <p className="source">{tf("home.forecast", { id: data.signal_source.snapshot_id, date: data.signal_source.imported })} {t("shell.estimates")}</p>}
     </section>
   );
 }
@@ -154,12 +154,12 @@ function NextStep({ journey, top, target, onOpenRole, onStep }: {
   if (step === "stand") {
     [title, body, action, go] = [t("next.standTitle"), t("next.standBody"), t("next.standAction"), () => onStep("stand")];
   } else if (step === "explore" && top) {
-    [title, body, action, go] = [`${t("next.exploreTitle")} ${top.title}`, t("next.exploreBody"), t("next.exploreAction"), () => onOpenRole(top)];
+    [title, body, action, go] = [`${t("next.exploreTitle")} ${tr(top.title)}`, t("next.exploreBody"), t("next.exploreAction"), () => onOpenRole(top)];
   } else if (step === "build" && target) {
-    [title, body, action, go] = [`${t("next.buildTitle")} ${target.title}`,
+    [title, body, action, go] = [`${t("next.buildTitle")} ${tr(target.title)}`,
       `${target.missing.length} ${t("next.buildBody")}`, t("next.buildAction"), () => onStep("build")];
   } else if (step === "apply" && target) {
-    [title, body, action, go] = [`${t("next.applyTitle")} ${target.title}`, t("next.applyBody"), t("next.applyAction"), () => onStep("apply")];
+    [title, body, action, go] = [`${t("next.applyTitle")} ${tr(target.title)}`, t("next.applyBody"), t("next.applyAction"), () => onStep("apply")];
   } else {
     [title, body, action, go] = [t("next.doneTitle"), t("next.doneBody"), t("next.doneAction"), () => onStep(target ? "build" : "explore")];
   }

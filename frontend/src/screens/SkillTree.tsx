@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { StudyCalendar } from "../components/StudyCalendar";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
 import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
 import { percent } from "../lib/format";
-import { levelName, t } from "../lib/i18n";
+import { levelName, t, tr } from "../lib/i18n";
 
 
 // My pathway: the skill tree is the map (skills you have at the bottom, the role on top), each
@@ -53,8 +54,8 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
   const depths = Array.from(new Set(tree.nodes.map((n) => n.depth))).sort((a, b) => b - a);
   return (
     <section>
-      <button className="link back-link" onClick={onBack}>← {tree.role.title}</button>
-      <div className="page-head"><h1>{t("path.title")}: {tree.role.title}</h1><p className="muted">{t("path.sub")}</p></div>
+      <button className="link back-link" onClick={onBack}>← {tr(tree.role.title)}</button>
+      <div className="page-head"><h1>{t("path.title")}: {tr(tree.role.title)}</h1><p className="muted">{t("path.sub")}</p></div>
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
 
       <div className="card path-head">
@@ -70,7 +71,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
 
       {tab === "tree" && (
         <div className="tree">
-          <div className="tree-target">🎯 {tree.role.title}</div>
+          <div className="tree-target">🎯 {tr(tree.role.title)}</div>
           {depths.map((d) => (
             <div key={d} className="tree-row">
               {tree.nodes.filter((n) => n.depth === d).map((n) => {
@@ -78,12 +79,12 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
                 const cls = ["tree-node", n.unlocked ? "" : "locked", n.step ? "has-step" : "", n.course_done ? "course-done" : ""].join(" ").trim();
                 return (
                   <button key={n.skill_id} className={cls} onClick={() => setOpen(n)}
-                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${n.name}: ${state}, ${n.level} / 3`}>
+                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${tr(n.name)}: ${state}, ${n.level} / 3`}>
                     {n.step && <span className="tree-step">{t("path.step")} {n.step}</span>}
                     <SkillRing level={n.level} />
-                    <span className="tree-name">{n.name}</span>
+                    <span className="tree-name">{tr(n.name)}</span>
                     <small>{state}</small>
-                    {n.step && n.course && <span className="tree-course">{n.course_done ? "✓ " : ""}{n.course.title} · {n.course.hours} h</span>}
+                    {n.step && n.course && <span className="tree-course">{n.course_done ? "✓ " : ""}{tr(n.course.title)} · {n.course.hours} h</span>}
                   </button>
                 );
               })}
@@ -96,6 +97,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
       {tab === "list" && (plan
         ? <>
             <PathwayList plan={plan} role={role} onToggle={setCourse} />
+            <StudyCalendar plan={plan} roleTitle={role.title} />
             <div className="actions">
               <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
               <button onClick={() => window.print()}>{t("a.print")}</button>
@@ -106,10 +108,10 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
       {open && !proving && (
         <div className="dialog-backdrop" onClick={() => setOpen(null)}>
           <div className="dialog node-panel" role="dialog" aria-modal="true" aria-labelledby="node-title" onClick={(e) => e.stopPropagation()}>
-            <h2 id="node-title">{open.step ? `${t("path.step")} ${open.step}: ` : ""}{open.name}</h2>
+            <h2 id="node-title">{open.step ? `${t("path.step")} ${open.step}: ` : ""}{tr(open.name)}</h2>
             <div className="card-row"><SkillRing level={open.level} /><span className="muted">{open.level ? levelName(open.level) : t("tree.notStarted")}</span></div>
             {open.course
-              ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{open.course.title} ↗</a> · {open.course.hours} h</p>
+              ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{tr(open.course.title)} ↗</a> · {open.course.hours} h</p>
               : <p className="muted">{t("path.noCourse")}</p>}
             {open.step && open.course && (
               <label className="check"><input type="checkbox" checked={open.course_done}

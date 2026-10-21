@@ -98,7 +98,7 @@ def test_workforce_aggregates_and_suggests_moves():
     assert result["moves"][0]["people"] == 5 and result["moves"][0]["avg_hours"] > 0
     assert result["sdg_contribution"] and "Row 9" in result["problems"][0]
     # Aggregates only: groups by role and by move, never a row per employee.
-    assert set(result) == {"scenario", "employees", "at_risk", "total_hours", "roles", "moves",
+    assert set(result) == {"scenario", "employees", "at_risk", "total_hours", "budget", "roles", "moves",
                            "sdg_contribution", "problems", "signal_source"}
     assert all("headcount" in r for r in result["roles"]) and all("people" in m for m in result["moves"])
 
@@ -233,3 +233,27 @@ def test_no_leftover_sdg_choice_in_coach_or_questionnaire():
 
     assert "SDG goal" not in coach.PROMPT and "SDG goal" not in (coach.__doc__ or "")
     assert not any("cause" in q.lower() for q in intake.SCRIPTED_QUESTIONS["en"])
+
+
+def test_training_budget_splits_fees_and_never_guesses_a_missing_price():
+    from app.services import workforce
+
+    plan = {"steps": [
+        {"course": {"title": "Free one", "cost": "free", "price_rm": 0}},
+        {"course": {"title": "Claimable", "cost": "paid", "price_rm": 500.0, "hrd_corp": "claimable"}},
+        {"course": {"title": "Ask first", "cost": "paid", "price_rm": 120.0, "hrd_corp": "check"}},
+        {"course": {"title": "No price yet", "cost": "paid", "price_rm": None, "hrd_corp": "check"}},
+    ]}
+    fees = workforce._plan_fees(plan)
+    assert (fees["total"], fees["claimable"], fees["ask"]) == (620.0, 500.0, 120.0)
+    assert fees["unpriced"] == {"No price yet"}
+
+
+def test_workforce_reports_course_fees_and_staff_time():
+    from app.services import workforce
+
+    ref = get_reference()
+    csv_text = "role,skills\n" + "Data entry clerk,Excel; data entry\n" * 4
+    budget = workforce.analyse(ref, csv_text, "baseline")["budget"]
+    assert set(budget) >= {"total_rm", "claimable_rm", "ask_provider_rm", "unpriced_courses", "staff_time_rm"}
+    assert budget["staff_time_rm"] > 0 and budget["total_rm"] >= budget["claimable_rm"]

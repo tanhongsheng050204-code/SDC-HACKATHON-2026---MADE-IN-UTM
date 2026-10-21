@@ -1,7 +1,7 @@
 import { useState } from "react";
 import QRCode from "qrcode";
 import { api, Profile } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tf } from "../lib/i18n";
 
 export function ShareCard({ profile, roleId }: { profile: Profile; roleId: string }) {
   const [link, setLink] = useState<string | null>(null);
@@ -26,10 +26,10 @@ export function ShareCard({ profile, roleId }: { profile: Profile; roleId: strin
   return (
     <div className="card share-card">
       <h3>{t("share.title")}</h3>
-      <p className="muted">A read-only summary of this plan you can show a counsellor, employer or family. It shows {profile.display_name ? `your name, ${profile.display_name},` : "no name"} the role, your readiness and the plan in brief, never your full skill list. It stops working when you delete your profile.</p>
+      <p className="muted">{profile.display_name ? tf("share.bodyName", { name: profile.display_name }) : t("share.bodyNoName")}</p>
       {!link ? <button className="primary" onClick={create}>{t("a.card")}</button> : (
         <div className="share-row">
-          {qr && <img src={qr} width={160} height={160} alt="QR code that opens your Future Card" />}
+          {qr && <img src={qr} width={160} height={160} alt={t("share.qr")} />}
           <div className="share-actions">
             <a href={link} target="_blank" rel="noreferrer">{t("share.open")} ↗</a>
             <button onClick={copy}>{copied ? t("share.copied") : t("share.copy")}</button>

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { api, CoachProposal, CoachReply, Profile, Scenario } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { AiBadge } from "./AiBadge";
 import { MicButton } from "./MicButton";
 
 interface Turn { question: string; reply: CoachReply | null; error?: string; dismissed?: boolean; applied?: boolean }
 
-const STARTERS = () => [t("coach.q1"), t("coach.q2"), t("coach.q3"), t("coach.q4")];
+const STARTERS = ["coach.s1", "coach.s2", "coach.s3", "coach.s4"] as const;  // translated when shown
 
 // The coach only proposes. A proposal changes nothing until the person presses Apply.
 export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onClose }: {
@@ -48,10 +48,10 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
 
   async function apply(i: number, p: CoachProposal) {
     try { await onApply(p); mark(i, { applied: true }); }
-    catch { mark(i, { error: t("coach.applyFailed") }); }
+    catch { mark(i, { error: "Couldn't apply that change. Nothing was changed." }); }
   }
 
-  const suggestions = turns.at(-1)?.reply?.suggestions ?? STARTERS();
+  const suggestions = turns.at(-1)?.reply?.suggestions ?? STARTERS.map((k) => t(k));
   return (
     <div className="coach" role="dialog" aria-modal="false" aria-labelledby="coach-title">
       <div className="coach-head">
@@ -71,11 +71,11 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
                 <AiBadge mode={turn.reply.mode} />
                 {turn.reply.grounding && (
                   <span className={`badge ${turn.reply.grounding.all_supported ? "good" : "risk"}`}>
-                    {turn.reply.grounding.all_supported ? t("coach.grounded") : `${t("coach.check")} ${turn.reply.grounding.unsupported.join(", ")}: ${t("coach.notIn")}`}
+                    {turn.reply.grounding.all_supported ? t("coach.grounded") : tf("coach.ungrounded", { list: turn.reply.grounding.unsupported.join(", ") })}
                   </span>
                 )}
-                <details><summary className="muted">Sources ({turn.reply.sources.length})</summary>
-                  <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {s.text}</li>)}</ul>
+                <details><summary className="muted">{tf("coach.sources", { n: turn.reply.sources.length })}</summary>
+                  <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {tr(s.text)}</li>)}</ul>
                 </details>
                 {turn.reply.proposal && !turn.dismissed && (
                   <div className="proposal card">

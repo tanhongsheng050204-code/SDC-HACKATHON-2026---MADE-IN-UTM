@@ -151,3 +151,34 @@ def test_every_role_maps_to_a_dosm_group():
     ref = get_reference()
     groups = {g["id"] for g in ref.salaries["groups"]}
     assert all(role["masco_major"] in groups - {"all"} for role in ref.roles.values())
+
+
+def test_every_sdg_reason_has_bm_and_chinese():
+    ref = get_reference()
+    for tags in [*ref.sdg_map["roles"].values(), *ref.sdg_map["skills"].values()]:
+        for tag in tags:
+            assert tag.get("reason_ms", "").strip() and tag.get("reason_zh", "").strip(), tag["reason"]
+
+
+def test_role_page_sends_sdg_reasons_in_three_languages(client):
+    body = client.get("/api/roles/care_worker").json()
+    assert body["sdgs"] and all(set(g["reasons"]) == {"en", "ms", "zh"} for g in body["sdgs"])
+    assert all(set(g["reasons"]) == {"en", "ms", "zh"} for goals in body["skill_sdgs"].values() for g in goals)
+
+
+def test_reference_text_has_bm_and_chinese():
+    """Role titles, summaries, skill names, scenario and task text: every one has BM and 中文
+    (scripts/build_translations.py), so switching language never leaves them in English."""
+    ref = get_reference()
+    texts = [r["title"] for r in ref.roles.values()] + [r["summary"] for r in ref.roles.values()]
+    texts += [s["name"] for s in ref.skills.values()]
+    texts += [x for s in ref.scenarios.values() for x in (s["label"], s["description"])]
+    texts += [g["name"] for g in ref.sdgs.values()]
+    texts += [t[k] for role in ref.tasks["roles"].values() for t in role["tasks"] for k in ("text", "reason")]
+    missing = [x for x in texts if not (ref.translations.get(x, {}).get("ms") and ref.translations.get(x, {}).get("zh"))]
+    assert not missing, missing[:5]
+
+
+def test_translations_are_served(client):
+    body = client.get("/api/translations").json()
+    assert body["Data entry clerk"]["ms"] and body["Data entry clerk"]["zh"]

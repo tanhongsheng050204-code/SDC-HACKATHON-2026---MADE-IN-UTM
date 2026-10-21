@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, DayDetail, DayPending, EmergingDetail, EmergingPending, EvidenceDetail, EvidencePending, EvidenceStatus } from "../lib/api";
 import { KEYS, load, save } from "../lib/storage";
 import { EvidenceBadge } from "./SkillEvidence";
@@ -20,6 +20,9 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   const [reason, setReason] = useState("");
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const listTop = useRef<HTMLDivElement>(null);
 
   async function loadPending(t = token) {
     if (!t) return;
@@ -41,6 +44,13 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       setStatus(s);
       if (s.state !== "running") { await loadPending(); return; }
     }
+  }
+
+  // Cancels the searches not started yet; the ones running finish (already paid for) and are kept.
+  async function stop() {
+    setError(null);
+    try { setStatus(await api.evidenceStop(token)); }
+    catch (e) { if (!String(e).includes("409")) setError("Couldn't stop the search. Try again."); }
   }
 
   async function open(id: string) {
@@ -67,53 +77,45 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
     try { setDayItem(await api.dayDetail(token, id)); } catch { setError("Couldn't open that draft."); }
   }
 
-  async function decideDay(decision: "approve" | "reject") {
-    if (!dayItem) return;
-    setError(null);
-    save(KEYS.reviewer, reviewer.trim());
-    try {
-      await api.evidenceDecide(token, dayItem.id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined });
-      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: a day as ${dayItem.title}, by ${reviewer.trim()}.`);
-      setDayItem(null);
-      await loadPending();
-    } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
+  // Close whichever review is open and bring the person back to the top of the review lists. The
+  // jump is instant: a smooth scroll is cancelled by the role list re-rendering after an approval.
+  function backToList() {
+    setDetail(null); setCard(null); setDayItem(null); setReason("");
+    requestAnimationFrame(() => {
+      listTop.current?.scrollIntoView({ block: "start" });
+      listTop.current?.focus({ preventScroll: true });
+    });
   }
 
-  async function decideCard(decision: "approve" | "reject") {
-    if (!card) return;
-    setError(null);
+  // One decision on the open review. On success: back to the list, with the result shown at its top;
+  // on failure: the review stays open so nothing is lost, with the error under its buttons.
+  async function decideItem(id: string, label: string, decision: "approve" | "reject",
+                            extra: { drop_sources?: string[]; drop_added?: string[] } = {}, refreshes = false) {
+    setError(null); setSaving(true);
     save(KEYS.reviewer, reviewer.trim());
     try {
-      await api.evidenceDecide(token, card.id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined });
-      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: ${card.title.en}, by ${reviewer.trim()}.`);
-      setCard(null);
+      await api.evidenceDecide(token, id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined, ...extra });
+      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: ${label}, by ${reviewer.trim()}.`);
       await loadPending();
-      if (decision === "approve") await onDone();
+      backToList();
+      if (decision === "approve" && refreshes) await onDone();  // the ranking and emerging cards may change
     } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
+    finally { setSaving(false); }
   }
 
-  async function decide(decision: "approve" | "reject") {
-    if (!detail) return;
-    setError(null);
-    save(KEYS.reviewer, reviewer.trim());
-    try {
-      await api.evidenceDecide(token, detail.id, decision, {
-        reviewer: reviewer.trim(), reason: reason.trim() || undefined,
-        drop_sources: [...dropSources], drop_added: [...dropAdded],
-      });
-      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: ${detail.title}, by ${reviewer.trim()}.`);
-      setDetail(null);
-      await loadPending();
-      if (decision === "approve") await onDone();
-    } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
-  }
+  const decideDay = (d: "approve" | "reject") => dayItem && decideItem(dayItem.id, `a day as ${dayItem.title}`, d);
+  const decideCard = (d: "approve" | "reject") => card && decideItem(card.id, card.title.en, d, {}, true);
+  const decide = (d: "approve" | "reject") => detail && decideItem(detail.id, detail.title, d,
+    { drop_sources: [...dropSources], drop_added: [...dropAdded] }, true);
 
   const running = status?.state === "running";
   const name = (id: string) => detail?.skill_names[id] ?? id;
   const waiting = pending.length + emerging.length + days.length;
   const busy = Boolean(detail || card || dayItem);
+  // Opens by itself when something is waiting, but never snaps shut after the last decision.
+  useEffect(() => { if (waiting > 0) setPanelOpen(true); }, [waiting]);
   return (
-    <details className="card admin" open={waiting > 0 || undefined}>
+    <details className="card admin" open={panelOpen} onToggle={(e) => setPanelOpen(e.currentTarget.open)}>
       <summary>Admin: skill evidence and emerging roles{waiting > 0 && <span className="badge gold">{waiting} waiting for review</span>}</summary>
       <p className="muted">Searches the web for current Malaysian job ads for every role and the exact sentences that ask for each skill (about 2 minutes). Skills that 2+ ads ask for are proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Approving a role also drafts a richer "A day in this job" from its ads, which waits here for review too. Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
       <div className="two-col">
@@ -123,9 +125,21 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       <div className="actions">
         <button className="primary" disabled={running || !token} onClick={() => start("roles")}>{running ? "Searching…" : "Refresh skill evidence"}</button>
         <button disabled={running || !token} onClick={() => start("emerging")} title="One web search per AI capability, about 5 minutes">Find emerging roles</button>
+        {running && (
+          <button className="danger" disabled={status?.stopping} onClick={stop}
+            title="Cancels the searches not started yet; the ones already running finish and are kept for review">
+            {status?.stopping ? "Stopping…" : "Stop"}</button>
+        )}
       </div>
+      {status?.stopping && <p className="muted">Finishing the searches already running (up to about 2 minutes); nothing new will start.</p>}
+      {status?.state === "stopped" && <p className="badge gold" role="status">Stopped. {status.saved.length} result{status.saved.length === 1 ? "" : "s"} saved for review.</p>}
       {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
       {status?.state === "failed" && <p className="error" role="alert">Search failed: {status.error}</p>}
+
+      <div ref={listTop} tabIndex={-1} className="review-top">
+        {note && !busy && <p className="badge good" role="status">{note}</p>}
+        {note && !busy && waiting === 0 && <p className="muted">Nothing else is waiting for review.</p>}
+      </div>
 
       {emerging.length > 0 && !busy && (
         <div className="table-wrap">
@@ -162,9 +176,9 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
           <p className="muted">Check that the job title is real (open the sources), that the stepping stone makes sense, and that the BM and 中文 titles read naturally. Approving shows this card to every user, labelled as a prediction; it is never ranked.</p>
           <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. the source is a blog, not a real job" /></label>
           <div className="actions">
-            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decideCard("approve")}>Approve</button>
-            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideCard("reject")}>Reject</button>
-            <button className="link" onClick={() => setCard(null)}>Back to the list</button>
+            <button className="primary" disabled={saving || reviewer.trim().length < 2} onClick={() => decideCard("approve")}>{saving ? "Saving…" : "Approve"}</button>
+            <button disabled={saving || reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideCard("reject")}>Reject</button>
+            <button className="link" onClick={backToList}>Back to the list</button>
           </div>
         </div>
       )}
@@ -229,9 +243,9 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
           )}
           <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. most ads are from Singapore" /></label>
           <div className="actions">
-            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decide("approve")}>Approve</button>
-            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decide("reject")}>Reject</button>
-            <button className="link" onClick={() => setDetail(null)}>Back to the list</button>
+            <button className="primary" disabled={saving || reviewer.trim().length < 2} onClick={() => decide("approve")}>{saving ? "Saving…" : "Approve"}</button>
+            <button disabled={saving || reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decide("reject")}>Reject</button>
+            <button className="link" onClick={backToList}>Back to the list</button>
           </div>
         </div>
       )}
@@ -261,13 +275,12 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
           <p className="muted">Check that every claim comes from our data or the quotes (no invented tools, employers or numbers), and that the BM and 中文 read naturally. Approving replaces the text on this role's page in all three languages.</p>
           <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. it names a tool the ads don't mention" /></label>
           <div className="actions">
-            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decideDay("approve")}>Approve</button>
-            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideDay("reject")}>Reject</button>
-            <button className="link" onClick={() => setDayItem(null)}>Back to the list</button>
+            <button className="primary" disabled={saving || reviewer.trim().length < 2} onClick={() => decideDay("approve")}>{saving ? "Saving…" : "Approve"}</button>
+            <button disabled={saving || reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideDay("reject")}>Reject</button>
+            <button className="link" onClick={backToList}>Back to the list</button>
           </div>
         </div>
       )}
-      {note && <p className="badge good" role="status">{note}</p>}
       {error && <p className="error" role="alert">{error}</p>}
     </details>
   );

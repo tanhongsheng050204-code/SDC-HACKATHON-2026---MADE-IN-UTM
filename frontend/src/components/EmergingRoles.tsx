@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, EmergingCard, EmergingSource, Profile, Texts } from "../lib/api";
-import { getLang, t } from "../lib/i18n";
+import { getLang, t, tr } from "../lib/i18n";
 import { SdgTile } from "./Sdgs";
 
 const pickText = (x: Texts) => x[getLang()] || x.en;
@@ -43,15 +43,15 @@ function Card({ card, profile, onStart }: { card: EmergingCard; profile: Profile
       <p className="source">{why}</p>
       {card.carry_over.length > 0 && (
         <div><span className="kpi-label">{t("em.bring")}</span>
-          <div className="chips">{card.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div></div>
+          <div className="chips">{card.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}</span>)}</div></div>
       )}
       {card.to_learn.length > 0 && (
         <div><span className="kpi-label">{t("em.learn")}</span>
-          <div className="chips">{card.to_learn.map((s) => <span key={s.skill_id} className="chip missing">{s.name}</span>)}</div></div>
+          <div className="chips">{card.to_learn.map((s) => <span key={s.skill_id} className="chip missing">{tr(s.name)}</span>)}</div></div>
       )}
       <div className="emerging-start">
         <span className="kpi-label">{t("em.start")}</span>
-        <button className="link" onClick={() => onStart(card.stepping_stone.role_id)}>{card.stepping_stone.title} →</button>
+        <button className="link" onClick={() => onStart(card.stepping_stone.role_id)}>{tr(card.stepping_stone.title)} →</button>
         <p className="muted">{pickText(card.stepping_stone.reason)}</p>
       </div>
       {card.sdg && <p className="source">SDG {card.sdg.number}: {pickText(card.sdg.reason)}</p>}

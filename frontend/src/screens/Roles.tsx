@@ -5,8 +5,9 @@ import { Kpis } from "../components/Kpis";
 import { EmergingRoles } from "../components/EmergingRoles";
 import { ExposureMap } from "../components/ExposureMap";
 import { RoleCard } from "../components/RoleCard";
+import { RoleGraph } from "../components/RoleGraph";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
 
@@ -23,7 +24,11 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tipSeen, setTipSeen] = useState(() => load(KEYS.sliderTip) === "1");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "graph" | "exposure">(() => {
+    const v = load(KEYS.rolesView);
+    return v === "graph" || v === "exposure" ? v : "list";
+  });
+  function changeView(v: "list" | "graph" | "exposure") { setView(v); save(KEYS.rolesView, v); }
 
   useEffect(() => {
     let live = true;
@@ -31,7 +36,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
     api.matches(profile.id, scenario, year, adoption, extra)
       .then((d) => { if (live) { setData(d); setError(null); } })
       // Keep the last list on screen; it is still correct for the previous choice.
-      .catch(() => live && setError("Couldn't update the list. Showing your last results."))
+      .catch(() => live && setError(t("roles.updateFailed")))
       .finally(() => live && setLoading(false));
     return () => { live = false; };
   }, [profile.id, profile.completed_courses.length, scenario, year, adoption, extra.join(",")]);
@@ -47,7 +52,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       </div>
       {!data && loading && <SkeletonCards />}
       {data && <Kpis data={data} scenario={scenario} />}
-      <div className="segmented" role="radiogroup" aria-label={t("sc.label")}>
+      <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
@@ -71,7 +76,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <button className="link" onClick={dismissTip}>{t("tip.ok")}</button>
         </div>
       )}
-      {data && <p className="muted scenario-note">{data.scenario.description}</p>}
+      {data && <p className="muted scenario-note">{tr(data.scenario.description)}</p>}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
       {noCloseRole && (
@@ -80,7 +85,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       {data && profile.audience === "switcher" && data.current_role && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.switchTitle")}</span>
-          <strong>{data.current_role.title}: {OUTLOOK_TEXT[data.current_role.outlook[scenario].label]}</strong>
+          <strong>{tr(data.current_role.title)}: {OUTLOOK_TEXT[data.current_role.outlook[scenario].label]}</strong>
           <p className="muted">{t("lead.switchList")}</p>
         </div>
       )}
@@ -91,7 +96,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <div className="actions">
             {data.also_like.map((a) => {
               const match = data.roles.find((r) => r.role_id === a.role_id);
-              return match && <button key={a.role_id} className="btn quiet sm" onClick={() => onOpen(match)}>{a.title} · #{a.rank}</button>;
+              return match && <button key={a.role_id} className="btn quiet sm" onClick={() => onOpen(match)}>{tr(a.title)} · #{a.rank}</button>;
             })}
           </div>
         </div>
@@ -101,12 +106,17 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       )}
       {data && <WhatIf data={data} extra={extra} onChange={setExtra} />}
       {data && (
-        <div className="segmented view-switch" role="radiogroup" aria-label={`${t("map.list")} / ${t("map.map")}`}>
-          <button role="radio" aria-checked={view === "list"} onClick={() => setView("list")}>{t("map.list")}</button>
-          <button role="radio" aria-checked={view === "map"} onClick={() => setView("map")}>{t("map.map")}</button>
+        <div className="segmented view-switch" role="radiogroup" aria-label={t("graph.title")}>
+          <button role="radio" aria-checked={view === "list"} onClick={() => changeView("list")}>{t("graph.list")}</button>
+          <button role="radio" aria-checked={view === "graph"} onClick={() => changeView("graph")}>{t("graph.graph")}</button>
+          <button role="radio" aria-checked={view === "exposure"} onClick={() => changeView("exposure")}>{t("map.exposureTab")}</button>
         </div>
       )}
-      {data && view === "map" ? <ExposureMap data={data} scenario={scenario} onOpen={onOpen} /> : (
+      {data && view === "graph" ? (
+        <div className={loading ? "is-updating" : undefined} aria-busy={loading}>
+          <RoleGraph data={data} profile={profile} scenario={scenario} onOpen={onOpen} />
+        </div>
+      ) : data && view === "exposure" ? <ExposureMap data={data} scenario={scenario} onOpen={onOpen} /> : (
         <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
           {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
         </div>
@@ -147,7 +157,7 @@ function WhatIf({ data, extra, onChange }: { data: Matches; extra: string[]; onC
       <div className="chips">
         {[...options].slice(0, 14).map(([id, name]) => (
           <button key={id} className={extra.includes(id) ? "chip covered" : "chip missing"} aria-pressed={extra.includes(id)} onClick={() => toggle(id)}>
-            {extra.includes(id) ? "✓ " : "+ "}{name}
+            {extra.includes(id) ? "✓ " : "+ "}{tr(name)}
           </button>
         ))}
       </div>

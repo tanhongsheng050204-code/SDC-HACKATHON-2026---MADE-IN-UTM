@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lang, LANGS, getLang, setLang, t } from "../lib/i18n";
+import { getLang, Lang, LANGS, setLang, t } from "../lib/i18n";
 import { KEYS, load, save } from "../lib/storage";
 import { Icon } from "./Icon";
 

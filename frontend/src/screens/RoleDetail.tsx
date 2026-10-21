@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
 import { ExposureBand, ExposureLine } from "../components/Exposure";
+import { ForecastHistory } from "../components/ForecastHistory";
 import { InterviewPractice } from "../components/InterviewPractice";
 import { IdentityStatement, Programmes } from "../components/MalaysiaPanels";
 import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
+import { SdgReasons } from "../components/Sdgs";
 import { TargetButton } from "../components/TargetButton";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { Tabs } from "../components/Tabs";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { onetUrl, percent } from "../lib/format";
-import { getLang, pick, t } from "../lib/i18n";
+import { getLang, pick, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import type { RoleTab } from "../lib/route";
 
@@ -36,7 +38,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
       <div className="page-head role-head">
-        <div><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
+        <div><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p></div>
         <div className="role-actions">
           <TargetButton profile={profile} roleId={role.role_id} onProfile={onProfile} />
           {role.missing.length > 0 && <button className="btn" onClick={onTree}>{t("a.build")}</button>}
@@ -47,7 +49,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
         {role.outlook[scenario].index > 0 ? "+" : ""}{role.outlook[scenario].index}% · {role.missing.length} {t("role.toLearn")}
       </p>
 
-      <Tabs id="role" label={role.title} tabs={tabs} value={tab} onChange={onTab}>
+      <Tabs id="role" label={tr(role.title)} tabs={tabs} value={tab} onChange={onTab}>
         {tab === "overview" && (
           <>
             {day && (
@@ -60,27 +62,28 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
               </section>
             )}
             <details className="card why" open>
-              <summary>{t("why.title")} {role.why.score.toFixed(2)}</summary>
+              <summary>{tf("rd.why", { n: role.why.score.toFixed(2) })}</summary>
               <ul>
-                <li>{t("why.fit")} {percent(role.why.fit)}% × 0.6 = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
-                <li>{t("why.outlook")} × 0.4 = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
+                <li>{tf("rd.fitPart", { n: percent(role.why.fit) })} = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
+                <li>{t("rd.outlookPart")} = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
                 {role.why.entry_points > 0 && <li>{t("lead.openToGrads")}: <strong>+{role.why.entry_points.toFixed(2)}</strong></li>}
-                {role.why.preference_points > 0 && <li>{t("why.prefs")}: <strong>+{role.why.preference_points.toFixed(2)}</strong>{role.why.matched_preferences.length > 0 && ` (${role.why.matched_preferences.map((m) => pick(m.labels, m.label)).join(", ")})`}</li>}
+                {role.why.preference_points > 0 && <li>{t("rd.prefPart")}: <strong>+{role.why.preference_points.toFixed(2)}</strong>{role.why.matched_preferences.length > 0 && ` (${role.why.matched_preferences.map((m) => pick(m.labels, m.label)).join(", ")})`}</li>}
               </ul>
-              <p className="source">{t("why.source")} {role.citation.snapshot_id}, {role.citation.imported}{role.citation.note && ` · ${role.citation.note}`}</p>
+              <p className="source">{tf("rd.outlookSource", { id: role.citation.snapshot_id, date: role.citation.imported })}{role.citation.note && ` · ${role.citation.note}`}</p>
             </details>
             <div className="table-wrap">
               <table className="outlooks">
-                <caption>{t("role.outlookCaption")}</caption>
+                <caption>{tf("rd.caption", { s: t(`sc.${scenario}`) })}</caption>
                 <tbody>{SCENARIOS.map((s) => {
                   const o = role.outlook[s.id];
-                  const name = s.id === scenario && adoption !== undefined ? `${t("adopt.label")} ${adoption}×` : t(`sc.${s.id}`);
+                  const name = s.id === scenario && adoption !== undefined ? `${t("adopt.label")} ${adoption}×` : s.label;
                   return <tr key={s.id} aria-current={s.id === scenario ? "true" : undefined}><th scope="row">{name}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td>
                     <td><button className="link xray-link" onClick={() => setXray(s.id)} aria-label={`${t("xray.title")}: ${name}`}>{o.index > 0 ? "+" : ""}{o.index}% <span aria-hidden="true">🔍</span></button></td></tr>;
                 })}</tbody>
               </table>
             </div>
             <p className="source">{t("xray.hint")}</p>
+            <ForecastHistory roleId={role.role_id} scenario={scenario} />
             <ExposureLine roleId={role.role_id} onOpen={() => onTab("market")} />
             <PayLine pay={role.pay} change={role.pay_change_rm} />
             {roleCase && <RoleCase data={roleCase} />}
@@ -91,24 +94,25 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
           <>
             <div className="two-col">
               {role.carry_over.length > 0 && (
-                <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {s.name}</span>)}</div></div>
+                <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {tr(s.name)}</span>)}</div></div>
               )}
-              <div><h2>{t("role.have")}</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}{s.added_from_ads && <span title={t("ev.added")}> ⁺</span>}</span>)}</div></div>
-              <div><h2>{t("role.need")}</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing" title={s.added_from_ads ? t("ev.added") : undefined}>{s.name}{s.weight === 3 ? ` (${t("role.core")})` : ""}{s.added_from_ads && " ⁺"}</span>)}</div></div>
+              <div><h2>{t("rd.have")}</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}{s.added_from_ads && <span title={t("ev.added")}> ⁺</span>}</span>)}</div></div>
+              <div><h2>{t("rd.need")}</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing" title={s.added_from_ads ? t("ev.added") : undefined}>{tr(s.name)}{s.weight === 3 ? ` ${t("rd.core")}` : ""}{s.added_from_ads && " ⁺"}</span>)}</div></div>
             </div>
-            <p className="source">{t("role.skillsSource")}{role.skills_source.onet_code
-              ? <>, {t("role.checkedOnet")} <a href={onetUrl(role.skills_source.onet_code)} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
-              : ` ${t("role.noOnet")}`}.</p>
+            <p className="source">{t("rd.skillsSource")}{role.skills_source.onet_code
+              ? <>{t("rd.onetChecked")} <a href={onetUrl(role.skills_source.onet_code)} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
+              : ` ${t("rd.noOnet")}`}.</p>
             {role.evidence && (
               <EvidenceList evidence={role.evidence}
                 names={Object.fromEntries([...role.covered, ...role.missing].map((s) => [s.skill_id, s.name]))}
                 added={new Set([...role.covered, ...role.missing].filter((s) => s.added_from_ads).map((s) => s.skill_id))} />
             )}
+            <SdgReasons sdgs={role.sdgs} title={t("sdg.roleTitle")} />
             {role.missing.length === 0 ? (
               <div className="empty-state">
-                <p><strong>{t("role.allSkills")}</strong> {t("role.allSkillsBody")}</p>
+                <p><strong>{t("rd.allSkills")}</strong> {t("rd.allSkillsNext")}</p>
                 <div className="actions">
-                  <button onClick={onBack}>{t("role.stretch")}</button>
+                  <button onClick={onBack}>{t("rd.stretch")}</button>
                   <button onClick={onImpact}>{t("a.impact")}</button>
                 </div>
               </div>
@@ -123,7 +127,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
 
         {tab === "market" && (
           <>
-            <Openings roleId={role.role_id} title={role.title} />
+            <Openings roleId={role.role_id} title={tr(role.title)} />
             <Programmes roleId={role.role_id} />
             <div className="card"><ExposureBand roleId={role.role_id} /></div>
           </>
