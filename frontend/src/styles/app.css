@@ -55,7 +55,9 @@
 
 /* ---------- Base ---------- */
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+/* The page still scrolls (wheel, touch, keyboard); only the scroll bar at the side is hidden. */
+html { -webkit-text-size-adjust: 100%; scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 body { margin: 0; background: var(--canvas); color: var(--ink); font: 14px/1.55 var(--font); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { color: var(--ink); margin: 0; text-wrap: balance; font-family: var(--font); }
 h1 { font-size: 1.6rem; font-weight: 650; letter-spacing: -.02em; line-height: 1.2; }
