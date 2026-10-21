@@ -58,7 +58,7 @@ Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
 
 | API and provider | Access tier | Purpose in project |
 | --- | --- | --- |
-| Gemini API (Google): `gemini-2.5-flash`, `gemini-embedding-001` | Free tier, optional *(team to confirm whether a sponsor key is used)* | Reading skills from scrubbed CV text, coach answers, pathway summaries, embeddings for unfamiliar skill phrases. The app runs fully without it (offline rules and templates). |
+| Gemini API (Google): `gemini-3.8-flash`, `gemini-embedding-001` | Free tier, optional *(team to confirm whether a sponsor key is used)* | Reading skills from scrubbed CV text, coach answers, pathway summaries, embeddings for unfamiliar skill phrases. The app runs fully without it (offline rules and templates). |
 | arXiv API (Cornell University) | Free | Counting AI research papers per capability for trend signals |
 | OpenAlex API (OurResearch) | Free | Fallback paper counts when arXiv is busy |
 | Hacker News Search API (Algolia) | Free | Counting skill mentions in “Who is hiring?” threads |
@@ -82,7 +82,7 @@ Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open i
 
 | Model and version | Source / provider | Licence / terms | Usage |
 | --- | --- | --- | --- |
-| Gemini 2.5 Flash (`gemini-2.5-flash`) | Google, via the Gemini API | Gemini API Terms of Service | Pre-trained, called by API (optional) |
+| Gemini 3.8 Flash (`gemini-3.8-flash`) | Google, via the Gemini API | Gemini API Terms of Service | Pre-trained, called by API (optional) |
 | Gemini Embedding (`gemini-embedding-001`) | Google, via the Gemini API | Gemini API Terms of Service | Pre-trained, called by API (optional) |
 
 No model is trained or fine-tuned by the team. The model in use is shown in the app's sidebar and footer. The deployed demo currently runs in offline mode, with no model.
