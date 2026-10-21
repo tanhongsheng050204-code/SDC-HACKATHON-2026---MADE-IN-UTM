@@ -114,6 +114,12 @@ class ReviewDecision(BaseModel):
     reason: str | None = Field(default=None, max_length=500)
 
 
+class EvidenceDecision(ReviewDecision):
+    """An admin's decision on one role's skill evidence, with the citations and added skills unticked."""
+    drop_sources: list[str] = Field(default_factory=list, max_length=50)
+    drop_added: list[str] = Field(default_factory=list, max_length=50)
+
+
 class WorkforceRequest(BaseModel):
     csv: str = Field(min_length=10, max_length=1_000_000)
     scenario: Scenario = "baseline"

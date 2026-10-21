@@ -101,3 +101,18 @@ def test_postgres_round_trip(monkeypatch):
         assert [r["tablename"] for r in open_tables] == []
     finally:
         get_settings.cache_clear()
+
+
+def test_evidence_round_trip_and_latest_approved_per_subject(db):
+    store.save_evidence("ev-1", "role", "data_analyst", {"n": 1})
+    store.save_evidence("ev-2", "role", "data_analyst", {"n": 2})
+    store.save_evidence("ev-3", "role", "ux_designer", {"n": 3})
+    assert [e["id"] for e in store.list_evidence("pending")] == ["ev-3", "ev-2", "ev-1"]  # newest first
+    store.decide_evidence("ev-1", "approved", "Team Reviewer", {"n": 1, "ok": True})
+    store.decide_evidence("ev-2", "approved", "Team Reviewer", {"n": 2, "ok": True})
+    store.decide_evidence("ev-3", "rejected", "Team Reviewer", {"n": 3}, "quotes did not match")
+    latest = store.latest_approved_evidence("role")
+    assert latest == {"data_analyst": {"n": 2, "ok": True}}  # ev-2 decided last; rejected ignored
+    got = store.get_evidence("ev-3")
+    assert got["state"] == "rejected" and got["reason"] == "quotes did not match" and got["subject"] == "ux_designer"
+    assert store.get_evidence("nope") is None
