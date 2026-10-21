@@ -3,19 +3,16 @@ import { percent } from "../lib/format";
 import { COST, HRD, priceText } from "../lib/labels";
 
 // The pathway as an ordered list: courses, hours, cost and HRD Corp status, for budgeting and print.
+// Readiness itself is the bar at the top of the pathway screen; this adds where you started and what is done.
 export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onToggle: (courseId: string, done: boolean) => void }) {
   const done = plan.steps.filter((s) => s.done);
   const uncovered = plan.uncovered_skills.map((id) => role.missing.find((m) => m.skill_id === id)?.name ?? id);
   return (
     <>
-      <div className="readiness card">
-        <div className="card-row"><h3>Readiness for {role.title}</h3><strong className="readiness-num">{percent(plan.readiness)}%</strong></div>
-        <div className="fit" role="img" aria-label={`Readiness ${percent(plan.readiness)} percent`}><div style={{ width: `${plan.readiness * 100}%` }} /></div>
-        <p className="muted">Started at {percent(plan.fit)}% · {done.length} of {plan.steps.length} steps done · about {plan.hours_left} hours left</p>
-        {done.length > 0 && (
-          <div className="chips">{done.flatMap((s) => s.skills).map((k) => <span key={k.skill_id} className="badge gold">★ {k.name}</span>)}</div>
-        )}
-      </div>
+      <p className="muted">Started at {percent(plan.fit)}% · {done.length} of {plan.steps.length} steps done</p>
+      {done.length > 0 && (
+        <div className="chips">{done.flatMap((s) => s.skills).map((k) => <span key={k.skill_id} className="badge gold">★ {k.name}</span>)}</div>
+      )}
       <h3>Your pathway: {plan.steps.length} steps, about {plan.total_hours} hours</h3>
       <p>{plan.summary}</p>
       {plan.grounding && (
