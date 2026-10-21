@@ -43,6 +43,13 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
     }
   }
 
+  // Cancels the searches not started yet; the ones running finish (already paid for) and are kept.
+  async function stop() {
+    setError(null);
+    try { setStatus(await api.evidenceStop(token)); }
+    catch (e) { if (!String(e).includes("409")) setError("Couldn't stop the search. Try again."); }
+  }
+
   async function open(id: string) {
     setError(null); setNote(null);
     try {
@@ -123,7 +130,14 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       <div className="actions">
         <button className="primary" disabled={running || !token} onClick={() => start("roles")}>{running ? "Searching…" : "Refresh skill evidence"}</button>
         <button disabled={running || !token} onClick={() => start("emerging")} title="One web search per AI capability, about 5 minutes">Find emerging roles</button>
+        {running && (
+          <button className="danger" disabled={status?.stopping} onClick={stop}
+            title="Cancels the searches not started yet; the ones already running finish and are kept for review">
+            {status?.stopping ? "Stopping…" : "Stop"}</button>
+        )}
       </div>
+      {status?.stopping && <p className="muted">Finishing the searches already running (up to about 2 minutes); nothing new will start.</p>}
+      {status?.state === "stopped" && <p className="badge gold" role="status">Stopped. {status.saved.length} result{status.saved.length === 1 ? "" : "s"} saved for review.</p>}
       {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
       {status?.state === "failed" && <p className="error" role="alert">Search failed: {status.error}</p>}
 

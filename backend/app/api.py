@@ -244,6 +244,15 @@ def start_evidence_refresh(mode: str = Query("roles", pattern="^(roles|emerging)
     return evidence_refresh.status()
 
 
+@router.post("/evidence/refresh/stop")
+def stop_evidence_refresh(x_admin_token: str = Header(default="")):
+    """Cancel the searches not started yet; the ones running finish and are kept for review."""
+    _require_admin(x_admin_token)
+    if not evidence_refresh.stop():
+        raise HTTPException(409, "No evidence search is running")
+    return evidence_refresh.status()
+
+
 @router.get("/evidence/refresh")
 def evidence_refresh_status(x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)

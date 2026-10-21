@@ -661,3 +661,4 @@ main:focus { outline: none; }
 .role-graph.compact .graph-pill text { font-size: 16px; }
 .role-graph.compact .graph-you text { font-size: 15px; }
 .role-graph.compact .graph-you .graph-you-name { font-size: 17px; }
+.actions button.danger { color: var(--risk); border-color: var(--risk); }
