@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, EvidenceDetail, EvidencePending, EvidenceStatus } from "../lib/api";
+import { api, EmergingDetail, EmergingPending, EvidenceDetail, EvidencePending, EvidenceStatus } from "../lib/api";
 import { KEYS, load, save } from "../lib/storage";
 import { EvidenceBadge } from "./SkillEvidence";
 
@@ -11,6 +11,8 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   const [status, setStatus] = useState<EvidenceStatus | null>(null);
   const [pending, setPending] = useState<EvidencePending[]>([]);
   const [detail, setDetail] = useState<EvidenceDetail | null>(null);
+  const [emerging, setEmerging] = useState<EmergingPending[]>([]);
+  const [card, setCard] = useState<EmergingDetail | null>(null);
   const [dropSources, setDropSources] = useState<Set<string>>(new Set());
   const [dropAdded, setDropAdded] = useState<Set<string>>(new Set());
   const [reason, setReason] = useState("");
@@ -19,14 +21,15 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
 
   async function loadPending(t = token) {
     if (!t) return;
-    try { setPending(await api.evidencePending(t)); } catch { /* wrong token or offline: buttons report it */ }
+    try { setPending(await api.evidencePending(t)); setEmerging(await api.emergingPending(t)); }
+    catch { /* wrong token or offline: buttons report it */ }
   }
   useEffect(() => { loadPending(); }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function start() {
+  async function start(mode: "roles" | "emerging" = "roles") {
     setError(null); setNote(null);
     save(KEYS.adminToken, token, "session");
-    try { setStatus(await api.evidenceStart(token)); }
+    try { setStatus(await api.evidenceStart(token, mode)); }
     catch (e) { setError(String(e).includes("401") ? "Admin token required." : String(e).includes("409") ? "A search is already running." : "Couldn't start the search."); return; }
     for (;;) {
       await new Promise((r) => setTimeout(r, 2000));
@@ -52,6 +55,24 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
     update(next);
   }
 
+  async function openCard(id: string) {
+    setError(null); setNote(null); setReason("");
+    try { setCard(await api.emergingDetail(token, id)); } catch { setError("Couldn't open that card."); }
+  }
+
+  async function decideCard(decision: "approve" | "reject") {
+    if (!card) return;
+    setError(null);
+    save(KEYS.reviewer, reviewer.trim());
+    try {
+      await api.evidenceDecide(token, card.id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined });
+      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: ${card.title.en}, by ${reviewer.trim()}.`);
+      setCard(null);
+      await loadPending();
+      if (decision === "approve") await onDone();
+    } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
+  }
+
   async function decide(decision: "approve" | "reject") {
     if (!detail) return;
     setError(null);
@@ -71,20 +92,63 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   const running = status?.state === "running";
   const name = (id: string) => detail?.skill_names[id] ?? id;
   return (
-    <details className="card admin" open={pending.length > 0 || undefined}>
-      <summary>Admin: skill evidence from job ads{pending.length > 0 && <span className="badge gold">{pending.length} waiting for review</span>}</summary>
+    <details className="card admin" open={pending.length + emerging.length > 0 || undefined}>
+      <summary>Admin: skill evidence and emerging roles{pending.length + emerging.length > 0 && <span className="badge gold">{pending.length + emerging.length} waiting for review</span>}</summary>
       <p className="muted">Searches the web for current Malaysian job ads for every role and the exact sentences that ask for each skill (about 2 minutes). Skills that 2+ ads ask for are proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
       <div className="two-col">
         <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
         <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
       </div>
       <div className="actions">
-        <button className="primary" disabled={running || !token} onClick={start}>{running ? "Searching…" : "Refresh skill evidence"}</button>
+        <button className="primary" disabled={running || !token} onClick={() => start("roles")}>{running ? "Searching…" : "Refresh skill evidence"}</button>
+        <button disabled={running || !token} onClick={() => start("emerging")} title="One web search per AI capability, about 5 minutes">Find emerging roles</button>
       </div>
       {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
       {status?.state === "failed" && <p className="error" role="alert">Search failed: {status.error}</p>}
 
-      {pending.length > 0 && !detail && (
+      {emerging.length > 0 && !detail && !card && (
+        <div className="table-wrap">
+          <table className="heatmap">
+            <thead><tr><th>Emerging role (prediction)</th><th>From AI capability</th><th>Sources</th><th></th></tr></thead>
+            <tbody>{emerging.map((e) => (
+              <tr key={e.id}>
+                <th scope="row">{e.title}</th><td>{e.capability_name}{e.momentum !== null && ` (+${e.momentum.toFixed(2)})`}</td>
+                <td>{e.sources}</td><td><button className="link" onClick={() => openCard(e.id)}>Review</button></td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      )}
+
+      {card && (
+        <div className="review">
+          <p className="eyebrow">Emerging role waiting for review · from {card.capability_name} · searched {card.searched}</p>
+          <h3>{card.title.en}</h3>
+          <p className="muted">BM: {card.title.ms} · 中文: {card.title.zh}</p>
+          <p>{card.summary.en}</p>
+          <p><strong>Stepping stone:</strong> {card.stepping_stone_title}. {card.stepping_reason.en}</p>
+          <p><strong>Skills:</strong> {card.skills.map((s) => card.skill_names[s] ?? s).join(", ")}</p>
+          {card.sdg && <p><strong>SDG {card.sdg.number}:</strong> {card.sdg.reason.en}</p>}
+          <h3>Sources ({card.sources.length})</h3>
+          {card.sources.map((s) => (
+            <div key={s.url} className="evidence-page">
+              <strong>{s.title || s.url}</strong> <span className="badge">{s.kind === "job_ad" ? "Job ad" : "Web page"}</span>
+              {!s.grounded && <span className="badge risk">not among the search's sources: check it</span>}
+              <p><q>{s.quote}</q></p>
+              <a className="source" href={s.url} target="_blank" rel="noreferrer">{s.url} ↗</a>
+            </div>
+          ))}
+          <p className="muted">Check that the job title is real (open the sources), that the stepping stone makes sense, and that the BM and 中文 titles read naturally. Approving shows this card to every user, labelled as a prediction; it is never ranked.</p>
+          <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. the source is a blog, not a real job" /></label>
+          <div className="actions">
+            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decideCard("approve")}>Approve</button>
+            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideCard("reject")}>Reject</button>
+            <button className="link" onClick={() => setCard(null)}>Back to the list</button>
+          </div>
+        </div>
+      )}
+
+      {pending.length > 0 && !detail && !card && (
         <div className="table-wrap">
           <table className="heatmap">
             <thead><tr><th>Role</th><th>Job ads</th><th>Other pages</th><th>Proposed skills</th><th></th></tr></thead>

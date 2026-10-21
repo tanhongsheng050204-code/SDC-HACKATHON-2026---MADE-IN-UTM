@@ -36,7 +36,11 @@ MAX_CITATIONS = 5     # per skill, as shown
 JOB_BOARDS = ("jobstreet.com", "jobstreet.com.my", "hiredly.com", "myfuturejobs.gov.my", "indeed.com",
               "maukerja.my", "ricebowl.my", "glints.com", "jora.com", "jobsdb.com", "wobb.co", "kalibrr.com",
               "prosple.com", "jobleads.com", "workable.com", "greenhouse.io", "lever.co", "myworkdayjobs.com",
-              "smartrecruiters.com", "successfactors.com", "recruitee.com")
+              "smartrecruiters.com", "successfactors.com", "recruitee.com",
+              # recruitment agencies advertising Malaysian jobs
+              "michaelpage.com.my", "hays.com.my", "randstad.com.my", "robertwalters.com.my", "adecco.com",
+              "kellyservices.com.my", "manpower.com.my", "pagepersonnel.com.my")
+JOB_PATHS = ("/job/", "/jobs/", "/job-detail", "/job-details/", "/vacancy/", "/vacancies/")  # an ad on any site
 CAREER_SUBDOMAINS = ("careers", "career", "jobs", "job", "apply", "recruit", "recruitment", "talent")
 # Gemini sometimes copies Google's grounding redirect instead of the page address. Those links
 # expire, so they are resolved to the real address (only the redirect header is read).
@@ -83,6 +87,8 @@ def page_kind(url: str) -> str:
     if _on(host, "linkedin.com"):
         return "job_ad" if urlparse(url).path.startswith("/jobs") else "web"
     if any(_on(host, board) for board in JOB_BOARDS) or host.split(".")[0] in CAREER_SUBDOMAINS:
+        return "job_ad"
+    if any(part in urlparse(url).path.lower() for part in JOB_PATHS):
         return "job_ad"
     return "web"
 

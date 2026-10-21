@@ -43,10 +43,10 @@
 
 ## B. Emerging roles
 
-- [ ] **B1** Collector: for each capability with positive momentum in the live snapshot, a grounded search for new job titles in Malaysia it creates; Gemini returns title, summary, catalogue skill ids, stepping-stone role id (validated), citations and an SDG reason in EN / BM / 中文.
-- [ ] **B2** Stored in the `evidence` table as kind `emerging`, reviewed in the same panel; at most 6 approved, one per capability.
-- [ ] **B3** `GET /api/emerging?profile_id=` → approved cards with the person's carry-over skills; live `POST /api/emerging/{id}/search` (rate-limited, cached, labelled unreviewed).
-- [ ] **B4** Future roles screen panel "Emerging roles (a prediction)", 3–6 cards with trend, sources, carry-over skills and a link to the stepping-stone role's pathway. Not in the ranked list.
+- [x] **B1** Collector: for each capability with positive momentum in the live snapshot, a grounded search for new job titles in Malaysia it creates; Gemini returns title, summary, catalogue skill ids, stepping-stone role id (validated), citations and an SDG reason in EN / BM / 中文.
+- [x] **B2** Stored in the `evidence` table as kind `emerging`, reviewed in the same panel; at most 6 approved, one per capability.
+- [x] **B3** `GET /api/emerging?profile_id=` → approved cards with the person's carry-over skills; live `POST /api/emerging/{id}/search` (rate-limited, cached, labelled unreviewed).
+- [x] **B4** Future roles screen panel "Emerging roles (a prediction)", 3–6 cards with trend, sources, carry-over skills and a link to the stepping-stone role's pathway. Not in the ranked list.
 
 ## C. A day in this job
 

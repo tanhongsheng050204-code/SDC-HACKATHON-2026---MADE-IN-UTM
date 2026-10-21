@@ -4,6 +4,7 @@ import { DataBanner } from "../components/DataBanner";
 import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
 import { EvidencePanel } from "../components/EvidencePanel";
+import { EmergingRoles } from "../components/EmergingRoles";
 import { RoleCard } from "../components/RoleCard";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
@@ -20,6 +21,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [extra, setExtra] = useState<string[]>([]);
+  const [emergingKey, setEmergingKey] = useState(0);  // reload emerging cards after an admin approves one
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<Change[] | null>(null);
@@ -81,7 +83,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
       <RefreshPanel onDone={afterRefresh} />
-      <EvidencePanel onDone={afterRefresh} />
+      <EvidencePanel onDone={async () => { await afterRefresh(); setEmergingKey((k) => k + 1); }} />
       {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>
@@ -112,6 +114,12 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
         {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
       </div>
+      {data && (
+        <EmergingRoles profile={profile} refreshKey={emergingKey} onStart={(roleId) => {
+          const match = data.roles.find((r) => r.role_id === roleId);
+          if (match) onOpen(match);
+        }} />
+      )}
       {data && (
         <p className="source">Source: {data.signal_source.source} · published {data.signal_source.published} ·
           imported {data.signal_source.imported} · horizon {data.signal_source.horizon_year}</p>

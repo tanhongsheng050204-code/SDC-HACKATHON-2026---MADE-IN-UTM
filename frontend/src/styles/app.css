@@ -573,3 +573,12 @@ main:focus { outline: none; }
 .evidence-page { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; overflow-wrap: anywhere; }
 .evidence-page.dropped { opacity: .5; }
 .grid .badge { white-space: normal; }  /* long "fits your preference" badges must not widen the card */
+
+/* Emerging roles: a labelled prediction under the ranked roles */
+.emerging { margin-top: 28px; display: grid; gap: 12px; }
+.emerging h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.emerging-card { align-content: start; gap: 10px; }
+.emerging-card .card-head { display: flex; justify-content: space-between; align-items: center; }
+.emerging-start .kpi-label { display: block; }
+.emerging-start .link { font-weight: 600; padding: 0; }
+.emerging-live { display: grid; gap: 6px; }

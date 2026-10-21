@@ -224,3 +224,15 @@ def test_one_wrongly_tagged_quote_can_be_unticked_without_dropping_its_page():
     summary = search.aggregate(role, result["sources"], skills, drop_sources=drop)
     assert summary["skills"]["cloud_computing"]["status"] == "single" and summary["added"] == []
     assert summary["skills"]["sql"]["status"] == "confirmed"  # the page's other quote still counts
+
+
+
+@pytest.mark.parametrize("url,kind", [
+    ("https://www.michaelpage.com.my/job-detail/ai-automation-engineer/ref/jn-1", "job_ad"),
+    ("https://www.hays.com.my/job-detail/data-analyst-kuala-lumpur_123", "job_ad"),
+    ("https://www.randstad.com.my/jobs/data-analyst_kuala-lumpur_456/", "job_ad"),
+    ("https://example.com/careers/jobs/789", "job_ad"),
+    ("https://kdci.co/blog/top-administrative-roles-to-outsource/", "web"),
+])
+def test_recruitment_agencies_and_job_paths_are_job_ads(url, kind):
+    assert search.page_kind(url) == kind

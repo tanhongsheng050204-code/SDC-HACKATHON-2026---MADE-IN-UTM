@@ -29,7 +29,7 @@ app.add_middleware(
 app.include_router(router)
 
 
-# The built frontend, when present (Replit runs one process for both). The app keeps its state in
+# The built frontend, when present (one process for both, e.g. Docker Compose or a single-host deploy). The app keeps its state in
 # the query string (?view=roles), so any path that isn't a file gets index.html.
 _dist = get_settings().frontend_dist
 if _dist is not None:

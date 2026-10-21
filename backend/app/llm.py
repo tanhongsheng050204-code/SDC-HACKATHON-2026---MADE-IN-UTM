@@ -39,7 +39,7 @@ def generate_json(prompt: str, timeout_seconds: int | None = None) -> dict | lis
     return json.loads(response.text)
 
 
-GROUNDED_TIMEOUT_SECONDS = 120  # one web-searched answer takes about 25 s
+GROUNDED_TIMEOUT_SECONDS = 180  # a job-ad search takes about 25 s; an emerging-role search up to 2 minutes
 
 
 def generate_grounded_json(prompt: str) -> tuple[dict, list[dict]]:
