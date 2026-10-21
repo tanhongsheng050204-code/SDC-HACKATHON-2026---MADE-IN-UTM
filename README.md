@@ -21,6 +21,9 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
+| **What if…** | Two levers: any AI-adoption speed from 0.5× to 2× (not just three scenarios) and skills you might learn. Rankings and fit move live, and Laluan names your **tipping points**: the speed at which your current job turns from Stable to Declining, or a different role becomes your top match. |
+| **Forecast x-ray** | On every role, each step from the published WEF figure to the outlook shown (baseline → job-post demand → AI research momentum → AI-speed adjustment → year), adding up to the number on screen. |
+| **Why it could work / what could go wrong** | Two honest columns per role for *your* profile: skills you have, growth, plan hours, pay jump in RM; and missing core skills, automation share of its tasks, paid courses, and where Malaysian and global data disagree. Every point names its source. |
 | **In Malaysia today** | On every role: median monthly pay and the change in employees since 2019 for its occupation group, from the Department of Statistics Malaysia (OpenDOSM, CC BY 4.0), shown next to the WEF global outlook, with a note when the two disagree. |
 | **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
 | **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. Goals you pick give a small ranking boost. |
@@ -30,7 +33,18 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
 | **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
+| **Plain-language help** | A “?” beside every piece of jargon (skill fit, outlook, robust pick, AI futures, readiness, MASCO, HRD Corp), and a badge on every generated sentence saying whether AI or plain rules wrote it. |
+| **Safety checks** | Coach questions and CV text are checked for prompt injection (“ignore previous instructions…”, “change my score”) before reaching the AI; the coach answers with a calm refusal and the CV is read by the dictionary only. |
 | **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
+
+## How Laluan meets the judging criteria
+
+| Criterion (weight) | Where to look |
+| --- | --- |
+| **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role, and the approved snapshots on **Sources**. *How scenarios are modelled:* **What if…** with any AI speed and the **tipping points** ([explore.py](backend/app/services/explore.py)). *How SDG links change choices:* goals you pick re-rank roles and show “Serves your goals”; each skill's SDG on **SDG impact**. |
+| **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), costed pathway (**Pathway**), SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
+| **Feasibility of Build (25%)** | Live at [laluan-psi.vercel.app](https://laluan-psi.vercel.app); trend layer feeding matching works live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 92 automated tests. Public and synthetic data only. |
+| **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) (problem → approach → outcome, within the word limits), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
 
@@ -38,7 +52,8 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 2. On **Today**, ask the coach *“Is my current job at risk?”*.
 3. Open **My job, task by task** to see which of her tasks AI is likely to automate.
 4. Go to **Future roles**, switch between scenarios, drag the year slider and open **Why this rank?**.
-5. Open the top role, **Build my pathway**, and tick a course as finished: readiness and rankings update.
+5. Open the top role: show the **forecast x-ray** and **what could go wrong**, then **Build my pathway** and tick a course as finished: readiness and rankings update.
+5b. Open **What if…**, drag AI speed to 1.8× and tick *SQL*: point out the tipping point where her clerk job turns Declining.
 6. **See my impact** for the SDG links, then **Create my Future Card** and scan the QR code.
 7. Finish with the **Workforce view** and the synthetic sample company.
 
@@ -149,7 +164,7 @@ Research activity and Hacker News posts are rough proxies for demand. A refresh 
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 71 tests: API, services, trends, review, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 92 tests: API, services, trends, review, what-if, guardrails, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
