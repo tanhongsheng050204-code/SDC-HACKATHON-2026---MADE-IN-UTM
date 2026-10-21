@@ -694,11 +694,12 @@ def practise_interview(body: InterviewRequest, user: str | None = User):
 
 @router.post("/coach")
 def ask_coach(body: CoachRequest, user: str | None = User):
-    """A cited answer about the person's own results, plus at most one change they can apply."""
+    """A cited answer about the person's own results or the app, plus up to three actions they can apply."""
     ref = get_reference()
     if body.role_id is not None and body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
-    return coach.answer(ref, _profile_for(body.profile_id, user), body.question, body.scenario, body.role_id)
+    return coach.answer(ref, _profile_for(body.profile_id, user), body.question, body.scenario, body.role_id,
+                        history=[t.model_dump() for t in body.history], language=body.language, screen=body.screen)
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

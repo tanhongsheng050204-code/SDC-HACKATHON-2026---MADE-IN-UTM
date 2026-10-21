@@ -4,13 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { AccountButton } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
+import { Command, CommandMenu } from "./components/CommandMenu";
 import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onServerWaking, Audience, CoachAction, CoachProposal, Journey, Profile, RoleMatch, RoleOption, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
-import { setDataText, t } from "./lib/i18n";
+import { setDataText, StringKey, t, tf, tr } from "./lib/i18n";
 import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
@@ -73,6 +74,8 @@ function MainApp({ demo }: { demo: string | null }) {
   }, [userId]);
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [roleList, setRoleList] = useState<RoleOption[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const { theme, toggle: toggleTheme } = useTheme();
   const { lite, setLite } = useLite();
@@ -283,8 +286,47 @@ function MainApp({ demo }: { demo: string | null }) {
     if (!profile) return;
     const r = { ...route, scenario: p.value as Scenario, screen: "roles" as Screen };
     setRoute(r); writeRoute(r, "push");
-    flash(`Applied: ${p.label}`);
+    flash(tf("as.applied", { what: t(`sc.${p.value}` as StringKey) }));
   }
+  // Any role's page, pathway or impact screen, fetching its match first.
+  async function openRoleById(roleId: string, next: "role" | "tree" | "impact" = "role") {
+    if (!profile) return;
+    if (role?.role_id === roleId) { go(next, { role: roleId, tab: undefined }); return; }
+    const m = await api.matches(profile.id, scenario, route.year, route.adoption);
+    const found = m.roles.find((r) => r.role_id === roleId);
+    if (found) { setRole(found); go(next, { role: roleId, tab: undefined }); } else go("roles");
+  }
+  // What Ask Laluan's buttons do. Each runs only on the person's press.
+  async function runAction(a: CoachAction) {
+    if (!profile) return;
+    if (a.kind === "scenario") return applyProposal({ kind: "scenario", value: a.value, label: a.label });
+    if (a.kind === "target") {
+      const p = await api.setTarget(profile.id, a.value);
+      setProfile(p);
+      flash(t("as.destinationSet"));
+      return;
+    }
+    const screenId = a.value as Screen;
+    if (screenId === "role" || screenId === "tree" || screenId === "impact") {
+      const id = a.role_id ?? profile.target_role_id ?? role?.role_id;
+      if (id) await openRoleById(id, screenId); else go("roles");
+    } else if (screenId === "profile") goProfile();
+    else go(screenId);
+  }
+  function askLaluan(q?: string) { setCoachQuestion(q); setCoachOpen(true); }
+
+  // Ctrl/Cmd+K opens the command menu; "/" opens Ask Laluan. Both are ignored while typing.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      const typing = !!el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName));
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k" && !typing) { e.preventDefault(); setMenuOpen((o) => !o); }
+      else if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey && profileRef.current) { e.preventDefault(); setCoachQuestion(undefined); setCoachOpen(true); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  useEffect(() => { if (menuOpen && !roleList.length) api.roles().then(setRoleList).catch(() => undefined); }, [menuOpen, roleList.length]);
 
   const prefs = <><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>;
   const themeButton = <ThemeButton theme={theme} onToggle={toggleTheme} />;
@@ -325,6 +367,28 @@ function MainApp({ demo }: { demo: string | null }) {
     roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": t("nav.reviewKit"),
     profile: t("nav.profile"), admin: "Admin",
   };
+  const nav = (id: Screen, label: string, icon: Command["icon"], needs = true): Command[] =>
+    needs ? [{ id: `go-${id}`, label, icon, group: t("cmd.screens"), run: () => (id === "intake" ? goProfile() : id === "tree" || id === "impact" || id === "role" ? openTarget(id) : go(id)) }] : [];
+  const commands: Command[] = [
+    ...nav("home", t("nav.home"), "home", !!profile),
+    ...nav("intake", t("nav.profile"), "user"),
+    ...nav("tasks", t("nav.tasks"), "list", !!profile),
+    ...nav("radar", t("nav.radar"), "radar", !!profile),
+    ...nav("roles", t("nav.roles"), "briefcase", !!profile),
+    ...nav("tree", t("nav.pathway"), "route", !!profile?.target_role_id),
+    ...nav("impact", t("nav.impact"), "globe", !!profile?.target_role_id),
+    ...nav("role", t("nav.target"), "target", !!profile?.target_role_id),
+    ...nav("survey", t("nav.survey"), "list", !!profile),
+    ...nav("sources", t("nav.sources"), "book"),
+    ...nav("workforce", t("nav.workforce"), "users"),
+    ...(profile ? roleList.map((r): Command => ({ id: `role-${r.id}`, label: tr(r.title), hint: r.id === profile.target_role_id ? t("ro.destination") : undefined,
+      icon: "briefcase", group: t("cmd.roles"), run: () => { openRoleById(r.id).catch(() => setError(t("home.loadFailed"))); } })) : []),
+    ...(profile ? [{ id: "ask", label: t("as.title"), icon: "chat" as const, group: t("cmd.actions"), run: () => askLaluan(undefined) }] : []),
+    { id: "theme", label: t("cmd.theme"), icon: theme === "dark" ? "sun" : "moon", group: t("cmd.actions"), run: toggleTheme },
+    { id: "lite", label: lite ? t("cmd.liteOff") : t("cmd.liteOn"), icon: "list", group: t("cmd.actions"), run: () => setLite(!lite) },
+    ...(["en", "ms", "zh"] as const).filter((l) => l !== lang).map((l): Command => ({ id: `lang-${l}`, label: t(`cmd.lang.${l}` as StringKey), icon: "globe", group: t("cmd.actions"), run: () => changeLang(l) })),
+  ];
+
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
@@ -336,7 +400,8 @@ function MainApp({ demo }: { demo: string | null }) {
           <span className="workbar-title">{titles[screen]}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
-            {profile && <button className="btn sm" onClick={() => { setCoachQuestion(undefined); setCoachOpen(true); }} aria-expanded={coachOpen}><Icon name="chat" />{t("shell.coach")}</button>}
+            <button className="btn sm quiet cmdk-trigger" onClick={() => setMenuOpen(true)} aria-label={t("cmd.title")}><Icon name="radar" /><span>{t("cmd.short")}</span><kbd>Ctrl K</kbd></button>
+            {profile && <button className="btn sm ask-btn" onClick={() => askLaluan(undefined)} aria-expanded={coachOpen}><span className="as-orb sm" aria-hidden="true" />{t("as.title")}<kbd>/</kbd></button>}
             {themeButton}
           </div>
         </header>
@@ -391,7 +456,11 @@ function MainApp({ demo }: { demo: string | null }) {
       </div>
       {coachOpen && profile && (
         <Coach profile={profile} scenario={scenario} roleId={role?.role_id} initialQuestion={coachQuestion}
-          onApply={applyProposal} onClose={() => setCoachOpen(false)} />
+          screen={screen} screenTitle={screen === "role" || screen === "tree" || screen === "impact" ? `${titles[screen]} · ${tr(role?.title ?? "")}` : titles[screen]}
+          onAction={runAction} onClose={() => setCoachOpen(false)} />
+      )}
+      {menuOpen && (
+        <CommandMenu commands={commands} onAsk={(q) => (profile ? askLaluan(q) : go("intake"))} onClose={() => setMenuOpen(false)} />
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
       {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}

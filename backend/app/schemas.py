@@ -44,11 +44,19 @@ class CompleteRequest(BaseModel):
     done: bool = True
 
 
+class CoachTurn(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+    answer: str = Field(default="", max_length=2000)
+
+
 class CoachRequest(BaseModel):
     profile_id: str = Field(min_length=1, max_length=64)
     question: str = Field(min_length=1, max_length=500)
     scenario: Scenario = "baseline"
     role_id: str | None = Field(default=None, max_length=80)
+    history: list[CoachTurn] = Field(default_factory=list, max_length=8)  # earlier turns, for follow-ups
+    language: Literal["en", "ms", "zh"] = "en"
+    screen: str | None = Field(default=None, max_length=30)
 
 
 class InterviewTurn(BaseModel):

@@ -56,7 +56,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | --- | --- |
 | **Innovation & Creativity (30%)** | *How trend signals become skill forecasts:* damped, shrunk trends over three years of job ads and research, projected to 2030 per scenario with an 80% range and a published backtest ([forecast.py](backend/app/trends/forecast.py), **Radar**); the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
 | **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
-| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**, then approve: rankings change). **Hardest risk: reliable, updatable trend data.** Public job-ad and research counts are noisy proxies, and free APIs limit or refuse requests. Fallbacks: noisy trends are shrunk towards no change and shown with 80% ranges; the backtest is published even where it is weak; every source is dated and every refresh waits for a person's approval; arXiv → OpenAlex (optional API key) → the two-period comparison → the last approved snapshot. Other risks: AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 337 automated tests. Public and synthetic data only. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**, then approve: rankings change). **Hardest risk: reliable, updatable trend data.** Public job-ad and research counts are noisy proxies, and free APIs limit or refuse requests. Fallbacks: noisy trends are shrunk towards no change and shown with 80% ranges; the backtest is published even where it is weak; every source is dated and every refresh waits for a person's approval; arXiv → OpenAlex (optional API key) → the two-period comparison → the last approved snapshot. Other risks: AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 345 automated tests. Public and synthetic data only. |
 | **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
@@ -246,7 +246,7 @@ Each role page opens with a short **"A day in this job"** in EN / BM / 中文: w
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 337 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 345 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 

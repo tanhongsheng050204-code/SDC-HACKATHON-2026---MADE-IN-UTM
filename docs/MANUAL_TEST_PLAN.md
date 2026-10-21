@@ -268,15 +268,21 @@ Notes: ______
 
 Notes: ______
 
-## 12. AI coach
+## 12. Ask Laluan (the assistant) and the command menu
 
-- [ ] 12.1 **Ask the coach** opens the drawer on the right (full screen on a phone).
-- [ ] 12.2 Suggested questions work: “Why is this my top role?”, “How long will the plan take?”, “Is my current job at risk?”, “What if AI adoption is faster?”.
-- [ ] 12.3 Each answer has a **Sources (N)** list that opens, and a grounding badge.
-- [ ] 12.4 “What if AI adoption is faster?” offers **Suggested change**; **Apply** switches to Accelerated and shows a toast “Applied: …”; **Dismiss** hides the suggestion and changes nothing.
-- [ ] 12.5 Ask *“Which jobs help the climate?”* → it lists roles serving SDG 13 and offers to add SDG 13 to your goals; **Apply** adds it and re-ranks Future roles.
-- [ ] 12.6 **Esc** or **×** closes the coach.
-- [ ] 12.7 The footer note says the coach only suggests and nothing changes until you press Apply.
+- [ ] 12.1 **Ask Laluan** in the top bar (or the **/** key anywhere outside a text box) opens the panel on the right (full screen on a phone). It greets you by name, says which screen you are looking at, and offers four questions that fit that screen.
+- [ ] 12.2 “What should I do next?” on the clerk demo says the next step is Explore roles and offers **Open Future roles**, **Open Role page: …** and **Set … as destination**; nothing changes until you press one.
+- [ ] 12.3 Follow-ups: ask “Tell me about the data analyst role”, then “And how long would it take?” → the second answer is about Data analyst.
+- [ ] 12.4 Roles named in BM or Chinese work: “Berapa lama untuk menjadi Penganalisis data?”, “成为数据分析师要多久？”.
+- [ ] 12.5 “Compare data analyst and UX / UI designer” gives both roles' rank, fit, outlook and hours, and buttons to open each.
+- [ ] 12.6 “How do I use Laluan?” explains the four steps; “Open the skills radar” offers **Open Future Skills Radar**; “Which courses are free?” gives the free-only route; “Will AI automate my tasks?” gives your job's task split; “What is the salary for a data analyst?” gives the DOSM group median with “not a job offer”.
+- [ ] 12.7 “What if AI adoption is faster?” offers **Switch to Accelerated**; pressing it re-ranks Future roles with a toast. **Set … as destination** sets the target (Today shows Resume route).
+- [ ] 12.8 With a Gemini key and the language on BM or 中文, answers come in that language; the grounding badge still checks them (against an English copy).
+- [ ] 12.9 Each answer shows **Written by AI / by rules**, a grounding badge, and **Sources (N)** listing only the sources it used; citation marks are not shown inside the text.
+- [ ] 12.10 The speaker button reads answers aloud (in the chosen language) until switched off; the setting is remembered.
+- [ ] 12.11 Closing and reopening the panel keeps the conversation for this browser tab; **Clear this conversation** empties it.
+- [ ] 12.12 **Ctrl+K** (⌘K on a Mac), or **Search** in the top bar, opens the command menu: screens, every role, and actions (theme, Lite mode, language). Typing filters; ↑/↓ and Enter run; Esc closes and returns focus. With no match, Enter asks Laluan the typed text. It does nothing while you type in a text box.
+- [ ] 12.13 **Esc** or **×** closes the panel. The footer says answers come from your own results and buttons only act when pressed.
 
 Notes: ______
 
@@ -368,7 +374,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (337, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (345, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

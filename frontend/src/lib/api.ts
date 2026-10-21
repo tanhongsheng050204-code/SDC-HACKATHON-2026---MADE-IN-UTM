@@ -190,6 +190,8 @@ export interface Identity {
   facts: { target: string; current: string | null; have: string[]; building: string | null };
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
+/** An action Ask Laluan offers; it runs only when the person presses its button. */
+export interface CoachAction { kind: "scenario" | "open" | "target"; value: string; role_id?: string | null; label: string }
 export interface JobPostings {
   role_id: string; query: string; source: string; search_url: string; checked: string; available: boolean;
   mentions: number | null; openings: { title: string; company: string | null; location: string | null; posted: string | null; url: string }[];
@@ -205,6 +207,7 @@ export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   proposal: CoachProposal | null; suggestions: string[];
+  actions?: CoachAction[]; language?: string; focus_role_id?: string;
 }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[] }
 export interface Course {
@@ -518,8 +521,9 @@ export const api = {
   interview: (profileId: string, roleId: string, turns: InterviewTurn[], language: string) =>
     request<InterviewReply>("/interview", { method: "POST", body: JSON.stringify({ profile_id: profileId, role_id: roleId, turns, language }) }),
   roleCase: (id: string, roleId: string) => request<RoleCase>(`/profiles/${id}/roles/${encodeURIComponent(roleId)}/case`),
-  coach: (profileId: string, question: string, scenario: Scenario, roleId?: string) =>
-    request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null }) }),
+  coach: (profileId: string, question: string, scenario: Scenario, roleId?: string,
+    extra: { history?: { question: string; answer: string }[]; language?: string; screen?: string } = {}) =>
+    request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null, ...extra }) }),
   createCard: (id: string, roleId: string) =>
     request<{ card_id: string }>(`/profiles/${id}/cards`, { method: "POST", body: JSON.stringify({ role_id: roleId }) }),
   card: (cardId: string) => request<FutureCard>(`/cards/${encodeURIComponent(cardId)}`),
