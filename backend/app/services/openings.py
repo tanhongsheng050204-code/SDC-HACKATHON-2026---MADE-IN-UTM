@@ -11,7 +11,7 @@ import re
 import threading
 import time
 from functools import lru_cache
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 import httpx
 
@@ -36,9 +36,14 @@ def _posting(job: dict) -> dict:
             "posted": (job.get("posted_at") or "")[:10] or None, "url": job["url"]}
 
 
+def _safe_link(job: dict) -> bool:
+    """Only plain web links reach the page: a third-party URL is never trusted as a javascript: link."""
+    return urlsplit(str(job.get("url") or "")).scheme in ("http", "https")
+
+
 def summarise(lookup: dict, total: int, jobs: list[dict]) -> dict:
     names = re.compile(r"\b(" + "|".join(re.escape(w) for w in lookup["titles"]) + r")\b", re.I)
-    local = [j for j in jobs if COUNTRY.lower() in (j.get("countries") or [])]
+    local = [j for j in jobs if COUNTRY.lower() in (j.get("countries") or []) and _safe_link(j)]
     titled = [j for j in local if names.search(j["title"])]
     return {"mentions": total, "openings": [_posting(j) for j in titled[:SHOWN]]}
 

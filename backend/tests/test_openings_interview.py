@@ -28,6 +28,12 @@ def test_openings_keep_malaysian_postings_whose_title_names_the_role():
     assert [j["title"] for j in result["openings"]] == ["Senior Data Analyst", "BI Analyst", "Data Analyst II"]
 
 
+def test_openings_drop_links_that_are_not_web_addresses():
+    unsafe = {**_job("Data Analyst"), "url": "javascript:alert(1)"}
+    result = openings.summarise(openings.lookups()["data_analyst"], 2, [unsafe, _job("Junior Data Analyst")])
+    assert [j["title"] for j in result["openings"]] == ["Junior Data Analyst"]
+
+
 def test_openings_are_cached_and_an_outage_is_not(monkeypatch):
     openings._cache.clear()
     calls = []
