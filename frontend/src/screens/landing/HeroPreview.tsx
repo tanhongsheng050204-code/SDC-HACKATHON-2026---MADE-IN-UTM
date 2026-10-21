@@ -1,15 +1,16 @@
-// A still of the app's home screen for the landing hero. Figures are copied from the synthetic
-// demo profile (Aisyah) so the picture matches what "Open the demo profile" shows.
+// A still of the app's Today screen for the landing hero: "Where to?", the resume-route card and
+// the four-step strip. Figures are copied from the synthetic demo profile (Aisyah) so the picture
+// matches what "Open the demo profile" shows: AI operations specialist, two courses, 11 hours.
 import { LogoMark } from "../../components/Brand";
-import { t, tf, tr } from "../../lib/i18n";
+import { StringKey, t, tf, tr } from "../../lib/i18n";
 import { OUTLOOK_TEXT } from "../../lib/labels";
 
 const ROLES = [
   { title: "AI operations specialist", fit: 50, outlook: "growing", tone: "good" },
-  { title: "Data analyst", fit: 24, outlook: "growing", tone: "good" },
   { title: "UX / UI designer", fit: 25, outlook: "growing", tone: "good" },
-  { title: "Data entry clerk", fit: 88, outlook: "declining", tone: "risk" },
+  { title: "Sustainability and ESG analyst", fit: 29, outlook: "growing", tone: "good" },
 ];
+const LEGS = [["step.stand", "done"], ["step.explore", "done"], ["step.build", "now"], ["step.apply", "later"]] as const;
 
 export function HeroPreview() {
   return (
@@ -27,15 +28,19 @@ export function HeroPreview() {
         </div>
         <div className="lp-main">
           <p className="lp-hello">{t("hp.hello")}</p>
-          <div className="lp-ask">{t("hp.ask")}</div>
-          <div className="lp-kpis">
-            <div><small>{t("k.top")}</small><b>{tr("AI operations specialist")}</b><em className="good">{tf("card.fit", { n: 50 })}</em></div>
-            <div><small>{t("k.robust")}</small><b>3</b><em>{t("hp.every")}</em></div>
-            <div><small>{t("k.current")}</small><b>−25.9%</b><em className="risk">{OUTLOOK_TEXT.declining}</em></div>
-            <div><small>{t("fc.plan")}</small><b>{tf("fc.steps", { n: 2 })}</b><em>{t("hp.hours")}</em></div>
+          <div className="lp-ask"><b>{t("home.whereTo")}</b> {t("hp.ask")}</div>
+          <div className="lp-resume">
+            <small>{t("home.resume")}</small>
+            <b>{tf("route.from", { from: tr("Data entry clerk"), to: tr("AI operations specialist") })}</b>
+            <span className="lp-meta">{tf("route.hoursLeft", { h: 11 })} · {tf("route.rm", { n: 0 })} · {tf("route.stops", { n: 2 })} · {tf("route.readiness", { now: 50, after: 100 })}</span>
           </div>
+          <ol className="lp-legs">
+            {LEGS.map(([key, state], i) => (
+              <li key={key} className={state}><i>{state === "done" ? "✓" : i + 1}</i>{t(key as StringKey)}</li>
+            ))}
+          </ol>
           <div className="lp-card">
-            <p><b>{t("hp.cardH")}</b> {t("hp.cardText")}</p>
+            <p><b>{t("home.topDest")}</b></p>
             <ol className="lp-roles">
               {ROLES.map((r) => (
                 <li key={r.title} className={r.tone === "risk" ? "dim" : ""}>

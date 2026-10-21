@@ -3,6 +3,7 @@ import { LogoMark, Rosette } from "../../components/Brand";
 import { t, type StringKey } from "../../lib/i18n";
 import "../../styles/landing.css";
 import { HeroPreview } from "./HeroPreview";
+import { FactLine, HeroRoute } from "./HeroRoute";
 import { Journey } from "./Journey";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
@@ -36,10 +37,12 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           <p className="pill-tag">{t("landing.tag")}</p>
           <h1>{t("landing.title")}</h1>
           <p className="lp-lede">{t("landing.lede")}</p>
+          <HeroRoute />
           <div className="ctas">
             <button className="btn ink lg" onClick={() => onDemo("clerk")}>{t("landing.demo")}</button>
             <button className="btn quiet lg" onClick={onStart}>{t("landing.mine")}</button>
           </div>
+          <FactLine />
           <HeroPreview />
         </header>
 

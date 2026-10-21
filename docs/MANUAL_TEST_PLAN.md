@@ -35,6 +35,12 @@ Tester: ______ · Date: ______ · Browser / device: ______
 
 Notes: ______
 
+### 1b. Landing redesign (route hero)
+- [ ] 1b.1 Under the lede a route draws itself from **You are here: Data entry clerk** through two numbered stops (Critical thinking; Prompt engineering and AI workflow design) to a gold pin at **AI operations specialist**; with reduce-motion or Lite mode it is drawn at once; on a phone it fits the width with no sideways scroll.
+- [ ] 1b.2 Below the buttons a live line reads “Live now: 13 roles tracked · forecast 2026-10-20-wef-foj-2025, imported 2026-10-20”; with the API stopped it shows the fixed sentence within about 3 seconds.
+- [ ] 1b.3 The app still in the hero shows Today as it is now: **Where to?**, **Resume route** (≈ 11 h left · RM 0 · 2 stops · Readiness 50% → 100%), the four-step strip and **Top destinations for you**; it matches what **Open the demo profile** shows.
+- [ ] 1b.4 Switching to BM or 中文 translates every line of the landing page, including the route and the live line.
+
 ## 2. Entry links and navigation
 
 - [ ] 2.1 `/?demo=clerk` opens Aisyah on **Today**; the address bar changes to `?view=home`.
