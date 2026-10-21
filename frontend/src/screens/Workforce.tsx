@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { InfoTip } from "../components/InfoTip";
 import { ClassView } from "./ClassView";
 import { SdgTile, Sdgs } from "../components/Sdgs";
 import { api, Scenario, Workforce as WorkforceData } from "../lib/api";
@@ -80,6 +81,33 @@ function Company() {
   );
 }
 
+const rm = (n: number) => `RM ${n.toLocaleString("en-MY", { maximumFractionDigits: 0 })}`;
+
+// What the reskilling moves cost: course fees from the catalogue's dated prices, split by HRD Corp
+// status, and staff time at DOSM group-median pay. Estimates for planning, not quotes.
+function Budget({ budget, hours }: { budget: WorkforceData["budget"]; hours: number }) {
+  if (hours === 0) return null;
+  return (
+    <div className="card budget">
+      <h2>{t("bud.title")}</h2>
+      <div className="kpis">
+        <div className="kpi"><span className="kpi-label">{t("bud.fees")}</span><strong>{rm(budget.total_rm)}</strong>
+          <span className="badge">{budget.total_rm === 0 && !budget.unpriced_courses.length ? t("bud.allFree") : tf("bud.peopleFees", { n: budget.people_with_fees })}</span></div>
+        {budget.total_rm > 0 && <>  {/* nothing to claim when every course is free */}
+          <div className="kpi"><span className="kpi-label">{t("bud.claimable")}</span><strong>{rm(budget.claimable_rm)}</strong>
+            <span className="badge good">{t("hrd.claimable")}</span></div>
+          <div className="kpi"><span className="kpi-label">{t("bud.ask")}</span><strong>{rm(budget.ask_provider_rm)}</strong>
+            <span className="badge">{t("hrd.check")}</span></div>
+        </>}
+        <div className="kpi"><span className="kpi-label">{t("bud.time")} <InfoTip term="gl.masco" label={t("bud.time")} /></span><strong>{rm(budget.staff_time_rm)}</strong>
+          <span className="badge">{tf("bud.timeNote", { h: hours.toLocaleString() })}</span></div>
+      </div>
+      {budget.unpriced_courses.length > 0 && <p className="banner">{tf("bud.unpriced", { list: budget.unpriced_courses.join(", ") })}</p>}
+      <p className="source">{tf("bud.source", { year: budget.pay_year })}</p>
+    </div>
+  );
+}
+
 function Results({ result, scenario, onScenario }: { result: WorkforceData; scenario: Scenario; onScenario: (s: Scenario) => void }) {
   const src = result.signal_source;
   return (
@@ -123,11 +151,11 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         {result.moves.length === 0 ? <p className="muted">{t("wf.noMoves")}</p> : (
           <div className="table-wrap">
             <table className="heatmap">
-              <thead><tr><th>{t("wf.from")}</th><th>{t("wf.to")}</th><th>{t("wf.peopleCol")}</th><th>{t("wf.hoursEach")}</th><th>{t("wf.fitToday")}</th><th>SDGs</th></tr></thead>
+              <thead><tr><th>{t("wf.from")}</th><th>{t("wf.to")}</th><th>{t("wf.peopleCol")}</th><th>{t("wf.hoursEach")}</th><th>{t("bud.feesEach")}</th><th>{t("wf.fitToday")}</th><th>SDGs</th></tr></thead>
               <tbody>
                 {result.moves.map((m) => (
                   <tr key={m.from_role + m.to_role}>
-                    <td>{tr(m.from_role)}</td><th scope="row">{tr(m.to_role)}</th><td>{m.people}</td><td>{m.avg_hours}</td>
+                    <td>{tr(m.from_role)}</td><th scope="row">{tr(m.to_role)}</th><td>{m.people}</td><td>{m.avg_hours}</td><td>{rm(m.fees_each_rm)}</td>
                     <td>{percent(m.avg_fit_now)}%</td><td><Sdgs sdgs={m.sdgs} /></td>
                   </tr>
                 ))}
@@ -136,6 +164,8 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
           </div>
         )}
       </div>
+
+      <Budget budget={result.budget} hours={result.total_hours} />
 
       {result.sdg_contribution.length > 0 && (
         <div className="card">

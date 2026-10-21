@@ -102,9 +102,11 @@ export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; 
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
   employees: number; at_risk: number; total_hours: number;
+  budget: { total_rm: number; claimable_rm: number; ask_provider_rm: number; unpriced_courses: string[];
+    people_with_fees: number; staff_time_rm: number; pay_year: number };
   roles: { role_id: string; title: string; headcount: number; at_risk: boolean; avg_fit: number;
     outlook: Record<Scenario, { index: number; label: string }> }[];
-  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; sdgs: Sdg[] }[];
+  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
   sdg_contribution: (Sdg & { people: number })[];
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
@@ -185,6 +187,12 @@ export interface ClassResult {
 export interface Xray {
   role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
   steps: { label: string; value: number; running_total: number; source: string; cap: string | null; key?: string; vars?: Record<string, unknown> }[];
+}
+
+export interface RoleHistory {
+  role_id: string; scenario: Scenario;
+  points: { snapshot_id: string; imported: string; source: string; illustrative: boolean; reviewed_by: string | null;
+    horizon_year: number; index: number; label: string }[];
 }
 
 export interface Tipping {
@@ -400,6 +408,8 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
+  history: (roleId: string, scenario: Scenario) =>
+    request<RoleHistory>(`/roles/${encodeURIComponent(roleId)}/history?scenario=${scenario}`),
   translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
