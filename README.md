@@ -203,7 +203,13 @@ Each role's skill list can be checked against **current Malaysian job ads**. **R
 - a skill from our catalogue that **2+ job ads** ask for is **added to the role at weight 1**, so fit, rankings and the pathway change; web pages never add skills;
 - skill names that are not in our catalogue are listed for the team and change nothing.
 
-Results and decisions are stored in the database (`evidence` table), so a redeploy keeps them. Search grounding is billed by Google per search on paid plans; one full run is 13–26 searches.
+Results and decisions are stored in the database (`evidence` table), so a redeploy keeps them.
+
+## Emerging roles (a prediction)
+
+**Find emerging roles** (same admin panel) runs one grounded Gemini search per AI capability we track (about 5 minutes). Each proposes one new job title in Malaysia with EN / BM / 中文 text, the catalogue skills it needs, a **stepping-stone role from our catalogue**, an SDG and quoted sources. Answers without a source, a catalogue skill or a valid stepping stone are refused. Once a trend refresh is approved, only capabilities whose research is accelerating are searched, fastest first; before that, every card says momentum is not measured yet.
+
+A person approves each card. Up to 6 approved cards appear under the ranked roles on the Future roles screen, labelled **"A prediction"** and **never ranked**: there is no published growth figure for jobs this new. Each card shows the person's carry-over skills, what is left to learn and a link to the stepping-stone role. **Search current job ads** on a card runs a live search, labelled "not yet reviewed", cached per title per day, limited to 5 per profile per hour, and never scored. Search grounding is billed by Google per search on paid plans; one full run is 13–26 searches, an emerging-roles run 8.
 
 ## Tests and checks
 

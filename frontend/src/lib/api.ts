@@ -31,6 +31,21 @@ export interface EvidenceDetail {
   summary: { skills: Record<string, SkillEvidence>; added: { skill_id: string; job_ads: number }[]; not_in_catalogue: { name: string; count: number }[] };
   skill_names: Record<string, string>; role_skills: string[];
 }
+export type Texts = { en: string; ms: string; zh: string };
+export interface EmergingSource { url: string; title: string; kind: "job_ad" | "web"; grounded: boolean; quote: string; employer?: string }
+export interface EmergingCard {
+  capability_id: string; capability_name: string; momentum: number | null; snapshot_id: string; searched: string;
+  title: Texts; summary: Texts; sources: EmergingSource[]; reviewed_by: string | null; reviewed_at: string | null;
+  carry_over: { skill_id: string; name: string }[]; to_learn: { skill_id: string; name: string }[];
+  stepping_stone: { role_id: string; title: string; reason: Texts };
+  sdg: (Sdg & { reason: Texts }) | null;
+}
+export interface EmergingPending { id: string; kind: "emerging"; subject: string; title: string; capability_name: string; momentum: number | null; searched: string; sources: number }
+export interface EmergingDetail {
+  id: string; kind: "emerging"; subject: string; capability_name: string; momentum: number | null; searched: string;
+  title: Texts; summary: Texts; skills: string[]; stepping_stone: string; stepping_stone_title: string; stepping_reason: Texts;
+  sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
+}
 export interface EvidenceStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
@@ -352,12 +367,21 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },
       body: JSON.stringify({ reviewer, reason: reason || null }),
     }),
-  evidenceStart: (token: string) =>
-    request<EvidenceStatus>("/evidence/refresh", { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidenceStart: (token: string, mode: "roles" | "emerging" = "roles") =>
+    request<EvidenceStatus>(`/evidence/refresh?mode=${mode}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceStatus: (token: string) =>
     request<EvidenceStatus>("/evidence/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidencePending: (token: string) =>
     request<EvidencePending[]>("/evidence/pending", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emergingPending: (token: string) =>
+    request<EmergingPending[]>("/evidence/pending?kind=emerging", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emergingDetail: (token: string, id: string) =>
+    request<EmergingDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emerging: (profileId?: string) =>
+    request<{ label: string; roles: EmergingCard[] }>(`/emerging${profileId ? `?profile_id=${encodeURIComponent(profileId)}` : ""}`),
+  emergingSearch: (capabilityId: string, profileId: string) =>
+    requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/emerging/${encodeURIComponent(capabilityId)}/search`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
   evidenceDetail: (token: string, id: string) =>
     request<EvidenceDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceDecide: (token: string, id: string, decision: "approve" | "reject", body: { reviewer: string; reason?: string; drop_sources?: string[]; drop_added?: string[] }) =>
