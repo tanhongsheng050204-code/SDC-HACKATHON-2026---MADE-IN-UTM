@@ -7,13 +7,15 @@ import { MicButton } from "../components/MicButton";
 const textFor = (text: Record<string, string>) => text[getLang()] || text.en;
 const SCALE: ScaleAnswer[] = ["strongly_disagree", "disagree", "neutral", "agree", "strongly_agree"];
 
-// One card at a time, answered on a five-point scale, or in your own words ("Something else"). At the end, the preferences your
+// One card at a time, answered on a five-point scale, or in your own words ("Something else").
+// Choosing fills the circle; Next moves on and Back lets the person change an earlier answer. At the end, the preferences your
 // answers reveal and roles you might not have considered.
 export function Survey({ profile, userId, onDone, onSkip }: {
   profile: Profile; userId: string | null; onDone: (p: Profile) => void; onSkip: () => void;
 }) {
   const [cards, setCards] = useState<SurveyCard[] | null>(null);
-  const [answers, setAnswers] = useState<SurveyAnswer[]>([]);
+  const [answers, setAnswers] = useState<(SurveyAnswer | undefined)[]>([]);  // by card position
+  const [index, setIndex] = useState(0);
   const [other, setOther] = useState<string | null>(null);
   const [reading, setReading] = useState<{ dims: Record<string, number>; reading: string | null } | null>(null);
   const [result, setResult] = useState<SurveyResult | null>(null);
@@ -24,7 +26,8 @@ export function Survey({ profile, userId, onDone, onSkip }: {
     api.survey(profile.id).then((s) => setCards(s.cards)).catch(() => setError(t("survey.loadFailed")));
   }, [profile.id]);
 
-  const card = cards && answers.length < cards.length ? cards[answers.length] : null;
+  const card = cards && index < cards.length ? cards[index] : null;
+  const chosen = answers[index];
 
   async function submit(all: SurveyAnswer[]) {
     setBusy(true); setError(null);
@@ -33,10 +36,17 @@ export function Survey({ profile, userId, onDone, onSkip }: {
     finally { setBusy(false); }
   }
 
-  async function answer(a: SurveyAnswer) {
-    const next = [...answers, a];
+  function answer(a: SurveyAnswer) {
+    const next = [...answers];
+    next[index] = a;
     setAnswers(next); setOther(null); setReading(null);
-    if (cards && next.length === cards.length) submit(next);
+  }
+
+  function go(step: 1 | -1) {
+    setOther(null); setReading(null);
+    const to = index + step;
+    setIndex(to);
+    if (cards && to === cards.length) submit(answers as SurveyAnswer[]);
   }
 
   async function checkOther() {
@@ -57,29 +67,36 @@ export function Survey({ profile, userId, onDone, onSkip }: {
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
       {error && (
         <p className="error" role="alert">{error}
-          {cards && answers.length === cards.length && !result && <> <button className="link" disabled={busy} onClick={() => submit(answers)}>{t("survey.retry")}</button></>}
+          {cards && index === cards.length && !result && <> <button className="link" disabled={busy} onClick={() => submit(answers as SurveyAnswer[])}>{t("survey.retry")}</button></>}
         </p>
       )}
       {!cards && !error && <p className="muted">{t("a.loading")}</p>}
 
       {card && cards && (
         <div className="card survey-card">
-          <p className="muted">{answers.length + 1} / {cards.length}</p>
+          <p className="muted">{index + 1} / {cards.length}</p>
           <p className="survey-text">{textFor(card.text)}</p>
           {other === null ? (
             <>
               <p className="muted likert-prompt" id="likert-prompt">{t("survey.scale")}</p>
               <div className="likert">
                 <span className="likert-end disagree" aria-hidden="true">{t("survey.strongly_disagree")}</span>
-                <div className="likert-dots" role="group" aria-labelledby="likert-prompt">
+                <div className="likert-dots" role="radiogroup" aria-labelledby="likert-prompt">
                   {SCALE.map((value) => (
-                    <button key={value} className={`likert-dot ${value}`} aria-label={t(`survey.${value}`)} title={t(`survey.${value}`)}
+                    <button key={value} className={`likert-dot ${value}${chosen?.answer === value ? " selected" : ""}`}
+                      role="radio" aria-checked={chosen?.answer === value} aria-label={t(`survey.${value}`)} title={t(`survey.${value}`)}
                       onClick={() => answer({ card_id: card.id, answer: value })} />
                   ))}
                 </div>
                 <span className="likert-end agree" aria-hidden="true">{t("survey.strongly_agree")}</span>
               </div>
-              <button className="link" onClick={() => setOther("")}>✎ {t("survey.other")}</button>
+              {chosen?.answer === "other" && <p className="muted">{t("survey.yourWords")} “{chosen.note}”</p>}
+              <button className="link" onClick={() => setOther(chosen?.answer === "other" ? chosen.note ?? "" : "")}>✎ {t("survey.other")}</button>
+              <div className="survey-nav">
+                <button className="btn quiet" disabled={index === 0} onClick={() => go(-1)}>← {t("survey.back")}</button>
+                <button className="btn ink" disabled={!chosen} onClick={() => go(1)}>
+                  {index + 1 === cards.length ? t("survey.finish") : `${t("survey.next")} →`}</button>
+              </div>
             </>
           ) : (
             <div className="survey-other">
@@ -88,6 +105,7 @@ export function Survey({ profile, userId, onDone, onSkip }: {
               </label>
               <MicButton onText={(text) => { setOther((o) => `${(o ?? "").trimEnd()} ${text}`.trim().slice(0, 300)); setReading(null); }} />
               {!reading && <button className="btn quiet" disabled={busy || !other.trim()} onClick={checkOther}>{t("survey.check")}</button>}
+              <button className="link" onClick={() => { setOther(null); setReading(null); }}>{t("survey.cancel")}</button>
               {reading && reading.reading && (
                 <div role="status">
                   <p>{t("survey.readAs")} <strong>{reading.reading}</strong>. {t("survey.right")}</p>
@@ -100,7 +118,7 @@ export function Survey({ profile, userId, onDone, onSkip }: {
               {reading && !reading.reading && (
                 <div role="status">
                   <p className="muted">{t("survey.noReading")}</p>
-                  <button className="btn ink" onClick={() => answer({ card_id: card.id, answer: "other", note: other })}>{t("survey.next")}</button>
+                  <button className="btn ink" onClick={() => answer({ card_id: card.id, answer: "other", note: other })}>{t("survey.useWords")}</button>
                 </div>
               )}
             </div>
