@@ -211,7 +211,9 @@ def case(ref: Reference, profile: dict, role_id: str, scenario_id: str = "baseli
                      "source": dosm})
     note = signals[role_id].note or ""
     if "No WEF category" in note:
-        cons.append({"text": "WEF has no category for this exact role, so its forecast uses the closest one.", "source": note})
+        closest = note.split("closest is ", 1)[-1].split(" (", 1)[0] if "closest is " in note else "the closest category"
+        cons.append({"text": f"WEF has no category for this exact role, so its forecast uses the closest one: {closest}.",
+                     "source": "WEF Future of Jobs 2025, Figure 2.3"})
 
     pay_jump = None
     if pay and pay_now:
