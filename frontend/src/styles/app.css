@@ -288,6 +288,9 @@ code { font-size: .88em; background: var(--surface-2); padding: 1px 5px; border-
 
 /* Your job, task by task */
 .narrow { max-width: 420px; }
+.pick-fields { margin: 4px 0 2px; }
+.pick-fields .badge { margin-left: 6px; }
+.pick-group { display: grid; gap: 6px; margin-top: 4px; }
 .task-split { display: grid; gap: 10px; }
 .split-bar { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
 .split.automate, .swatch.automate { background: var(--risk); }
