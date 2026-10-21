@@ -102,6 +102,24 @@ def test_cold_open_model_falls_back_to_gemini(runpod_on, monkeypatch):
     assert skills.extract(CV)["mode"] == "gemini+dictionary"
 
 
+def test_slow_open_model_falls_back_within_the_total_deadline(runpod_on, monkeypatch):
+    # RunPod keeps the connection alive while a worker cold-starts, so httpx's per-read timeout
+    # never fires; the deadline must cover the whole call.
+    import time
+    monkeypatch.setenv("RUNPOD_TIMEOUT_SECONDS", "1")
+    get_settings.cache_clear()
+
+    def slow(url, **_kwargs):
+        time.sleep(3)
+        return _response(url, {"choices": [{"message": {"content": '{"skills": []}'}}]})
+
+    monkeypatch.setattr(runpod.httpx, "post", slow)
+    monkeypatch.setattr(skills, "generate_json", lambda prompt: {"skills": []})
+    started = time.perf_counter()
+    assert skills.extract(CV)["mode"] == "gemini+dictionary"
+    assert time.perf_counter() - started < 2.5
+
+
 def test_open_model_answer_that_is_not_an_object_falls_back_to_gemini(runpod_on, monkeypatch):
     monkeypatch.setattr(runpod.httpx, "post", lambda url, **_: _response(url, {"choices": [{"message": {"content": "[1, 2]"}}]}))
     monkeypatch.setattr(skills, "generate_json", lambda prompt: {"skills": []})
