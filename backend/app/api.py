@@ -15,7 +15,7 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills,
+from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills, upgrade,
                           skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
@@ -532,6 +532,17 @@ def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int 
 def profile_tipping(profile_id: str, year: int | None = None, user: str | None = User):
     """Where, on the AI-adoption slider, this person's picture changes."""
     return tipping.find(get_reference(), _profile_for(profile_id, user), year)
+
+
+@router.get("/profiles/{profile_id}/ai-assisted")
+def ai_assisted(profile_id: str, user: str | None = User):
+    """Your job, with AI: the person's current role with AI skills added, before any move. 404 when
+    they have no current role, or it is an AI job already."""
+    ref = get_reference()
+    result = upgrade.for_profile(ref, _profile_for(profile_id, user))
+    if result is None:
+        raise HTTPException(404, "No AI-assisted version for this profile")
+    return result
 
 
 @router.get("/profiles/{profile_id}/roles/{role_id}/case")

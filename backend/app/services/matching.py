@@ -201,6 +201,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "pay_change_rm": pay_change(ref, role_id, current_id),
             **({"rank_without_extra": without_extra[role_id]} if extra_skills else {}),
         })
+    _add_routes(ref, profile, roles, scenario_id)
     also_like = sorted((r for r in roles if r["rank"] > ROBUST_TOP_N and not r["at_risk"]
                         and r["why"]["preference_match"] >= ALSO_LIKE_MATCH and r["fit"] >= ALSO_LIKE_MIN_FIT),
                        key=lambda r: (-r["why"]["preference_match"], r["rank"]))[:ALSO_LIKE_N]
@@ -227,7 +228,48 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
         },
         "roles": roles,
         "current_role": current_role,
+        # For someone with a current job: the non-declining move with the fewest learning hours, so a
+        # long plan at the top of the list is never the only answer.
+        "shortest_route": _shortest_route(roles, current_id, scenario_id),
         "also_like": [{"role_id": r["role_id"], "title": r["title"], "rank": r["rank"], "fit": r["fit"],
                        "preference_match": r["why"]["preference_match"],
                        "matched_preferences": r["why"]["matched_preferences"]} for r in also_like],
     }
+
+
+LONG_SHOT_FIT = 0.2       # below this skill fit a role is a long-term goal, not a next move
+STEPPING_MIN_SHARED = 2   # a stepping stone already uses at least this many of the goal's core or important missing skills
+
+
+def _add_routes(ref: Reference, profile: dict, roles: list[dict], scenario_id: str) -> None:
+    """Each role gets its plan's hours; long shots also get a stepping stone: a closer role that is
+    not declining and already uses at least two of the core or important skills the long shot needs
+    (generic skills such as communication don't make one job lead to another)."""
+    from app.services import pathway  # here, as pathway itself imports from this module
+
+    for r in roles:
+        r["plan_hours"] = pathway.build(ref, profile, r["role_id"], summarize=False)["total_hours"]
+        r["long_shot"] = r["fit"] < LONG_SHOT_FIT
+    for r in roles:
+        r["stepping_stone"] = None
+        if not r["long_shot"] or r["at_risk"]:  # no route towards a declining job
+            continue
+        need = {m["skill_id"] for m in r["missing"] if m["weight"] >= 2}
+        best = None
+        for s in roles:
+            if s is r or s["is_current_role"] or s["long_shot"] or s["outlook"][scenario_id]["label"] == "declining":
+                continue
+            shared = len(need & {rs["skill_id"] for rs in ref.roles[s["role_id"]]["skills"]})
+            if shared >= STEPPING_MIN_SHARED and (best is None or (shared, s["fit"]) > best[0]):
+                best = ((shared, s["fit"]), s)
+        if best:
+            r["stepping_stone"] = {"role_id": best[1]["role_id"], "title": best[1]["title"]}
+
+
+def _shortest_route(roles: list[dict], current_id: str | None, scenario_id: str) -> str | None:
+    """Among roles that are growing or emerging (a stable job just as exposed to AI is not a step up)."""
+    if not current_id:
+        return None
+    options = [r for r in roles if not r["is_current_role"] and r["plan_hours"] > 0
+               and r["outlook"][scenario_id]["label"] in ("growing", "emerging")]
+    return min(options, key=lambda r: (r["plan_hours"], -r["score"]))["role_id"] if options else None

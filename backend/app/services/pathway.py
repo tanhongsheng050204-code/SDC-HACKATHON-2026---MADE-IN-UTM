@@ -53,10 +53,11 @@ Steps: {steps}
 Total hours: {hours}"""
 
 
-def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True) -> dict:
+def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None) -> dict:
     """The plan is built from the skills the person reported, so finished steps stay visible
-    (marked done) and readiness shows the progress since the plan was made."""
-    role = ref.roles[role_id]
+    (marked done) and readiness shows the progress since the plan was made. `role_override` is the
+    role with extra skills (the AI-assisted version of a job, app/services/upgrade.py)."""
+    role = role_override or ref.roles[role_id]
     fit, _, missing = fit_and_gap(role, set(profile["skills"]))
     readiness, _, _ = fit_and_gap(role, effective_skills(ref, profile))
     done = set(profile.get("completed_courses") or [])

@@ -15,6 +15,7 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
         <span className="rank">#{role.rank}{move > 0 ? ` ▲${move}` : move < 0 ? ` ▼${-move}` : ""}</span>
         {role.robust_pick && <span className="badge gold">{t("card.robust")}</span>}
         {role.is_current_role && <span className="badge">{t("card.current")}</span>}
+        {role.long_shot && <span className="badge risk" title={t("card.longShotHelp")}>{t("card.longShot")}</span>}
       </div>
       <h2>{tr(role.title)}</h2>
       <div className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(role.fit) })}>
@@ -29,6 +30,8 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
       {role.why.matched_preferences.length > 0 && <span className="badge good">{t("survey.fits")} {role.why.matched_preferences.map((m) => pick(m.labels, m.label)).join(", ")}</span>}
       {role.carry_over.length > 0 && <span className="muted carry">{t("lead.bring")}: {role.carry_over.map((s) => tr(s.name)).join(", ")}</span>}
       {role.why.entry_points > 0 && <span className="badge gold">{t("lead.openToGrads")}</span>}
+      {role.long_shot && role.stepping_stone && <span className="muted">{tf("card.startWith", { role: tr(role.stepping_stone.title) })}</span>}
+      {role.plan_hours !== undefined && role.plan_hours > 0 && <span className="muted">{tf("card.planHours", { h: role.plan_hours })}</span>}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">{tf("card.source", { id: role.citation.snapshot_id, date: role.citation.imported })}</span>
     </button>
