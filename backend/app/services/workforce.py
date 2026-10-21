@@ -1,5 +1,11 @@
 """HR workforce view: an anonymous CSV of roles and skills in, aggregate risk and reskilling moves out.
 
+The training budget adds up the course fees of those moves from the catalogue's dated prices:
+what HRD Corp lists as claimable, what to ask the provider about, and paid courses with no price
+yet (named, never guessed). Most catalogue courses are free or free to audit, so the larger cost
+is usually staff time: learning hours at the DOSM median hourly pay of each person's current
+occupation group (monthly median / WORK_HOURS_PER_MONTH), a group figure, not anyone's salary.
+
 Aggregate only, never a ranking of individual employees: the tool supports reskilling decisions and
 must not be used for hiring or firing (brief, section 6). Files with columns that identify people
 (name, email, IC, phone) are rejected outright. Skills are matched with the dictionary only, so a
@@ -15,6 +21,7 @@ from app.reference import Reference
 from app.services import matching, pathway, skills
 
 MAX_ROWS = 5000
+WORK_HOURS_PER_MONTH = 173.33  # 40 hours a week x 52 weeks / 12 months
 FORBIDDEN = re.compile(r"name|e-?mail|\bic\b|nric|passport|phone|mobile|address|staff.?id|employee.?id", re.I)
 
 
@@ -65,11 +72,27 @@ def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
     return people, problems
 
 
+def _plan_fees(plan: dict) -> dict:
+    """Course fees for one person's plan, split by HRD Corp status; paid courses without a price are listed."""
+    fees = {"total": 0.0, "claimable": 0.0, "ask": 0.0, "unpriced": set()}
+    for step in plan["steps"]:
+        course = step["course"]
+        if course["cost"] != "paid":
+            continue
+        if course.get("price_rm") is None:
+            fees["unpriced"].add(course["title"])
+            continue
+        fees["total"] += course["price_rm"]
+        fees["claimable" if course.get("hrd_corp") == "claimable" else "ask"] += course["price_rm"]
+    return fees
+
+
 def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     people, problems = parse(ref, text)
     groups = Counter((p["role_id"], tuple(p["skills"])) for p in people)
     by_role: dict[str, dict] = {}
-    moves: dict[tuple[str, str], dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fit": 0.0})
+    moves: dict[tuple[str, str], dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fit": 0.0, "fees": 0.0})
+    budget = {"total": 0.0, "claimable": 0.0, "ask": 0.0, "unpriced": set(), "people_paid": 0, "time": 0.0}
     sdg_people: Counter = Counter()
     for (role_id, person_skills), count in groups.items():
         profile = {"skills": list(person_skills), "current_role_id": role_id}
@@ -89,6 +112,14 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         move["people"] += count
         move["hours"] += plan["total_hours"] * count
         move["fit"] += target["fit"] * count
+        fees = _plan_fees(plan)
+        move["fees"] += fees["total"] * count
+        for key in ("total", "claimable", "ask"):
+            budget[key] += fees[key] * count
+        budget["unpriced"] |= fees["unpriced"]
+        budget["people_paid"] += count if fees["total"] or fees["unpriced"] else 0
+        hourly = matching.pay(ref, role_id)["median_rm"] / WORK_HOURS_PER_MONTH
+        budget["time"] += plan["total_hours"] * hourly * count
         for sdg in target["sdgs"]:
             sdg_people[sdg["number"]] += count
 
@@ -99,6 +130,7 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "from_role": ref.roles[a]["title"], "to_role": ref.roles[b]["title"], "to_role_id": b,
         "people": m["people"], "avg_hours": round(m["hours"] / m["people"]),
         "avg_fit_now": round(m["fit"] / m["people"], 3),
+        "fees_each_rm": round(m["fees"] / m["people"], 2),
         "sdgs": ref.sdg_view(ref.role_sdgs(b)),
     } for (a, b), m in moves.items()), key=lambda m: (-m["people"], m["avg_hours"]))
     at_risk = sum(r["headcount"] for r in rows if r["at_risk"])
@@ -107,6 +139,11 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "employees": len(people),
         "at_risk": at_risk,
         "total_hours": sum(m["avg_hours"] * m["people"] for m in move_list),
+        # Course fees for all the moves, from the catalogue's dated prices (an estimate, not a quote).
+        "budget": {"total_rm": round(budget["total"], 2), "claimable_rm": round(budget["claimable"], 2),
+                   "ask_provider_rm": round(budget["ask"], 2), "unpriced_courses": sorted(budget["unpriced"]),
+                   "people_with_fees": budget["people_paid"],
+                   "staff_time_rm": round(budget["time"], -2), "pay_year": ref.salaries["year"]},
         "roles": rows,
         "moves": move_list,
         "sdg_contribution": [{**ref.sdgs[n], "people": c} for n, c in sdg_people.most_common()],

@@ -672,3 +672,6 @@ main:focus { outline: none; }
 .cal-days { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .cal-days legend { font-weight: 600; margin-bottom: 4px; }
 @media print { .study-calendar { display: none; } }
+.budget { display: grid; gap: 10px; }
+.budget h2, .budget p { margin: 0; }
+.budget .badge { white-space: normal; }

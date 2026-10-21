@@ -102,9 +102,11 @@ export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; 
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
   employees: number; at_risk: number; total_hours: number;
+  budget: { total_rm: number; claimable_rm: number; ask_provider_rm: number; unpriced_courses: string[];
+    people_with_fees: number; staff_time_rm: number; pay_year: number };
   roles: { role_id: string; title: string; headcount: number; at_risk: boolean; avg_fit: number;
     outlook: Record<Scenario, { index: number; label: string }> }[];
-  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; sdgs: Sdg[] }[];
+  moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
   sdg_contribution: (Sdg & { people: number })[];
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
