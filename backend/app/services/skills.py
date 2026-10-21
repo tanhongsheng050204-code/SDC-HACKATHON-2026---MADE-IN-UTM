@@ -13,7 +13,7 @@ from app import runpod
 from app.llm import generate_json
 from app.reference import get_reference
 from app.services.deid import scrub_cv
-from app.services.embeddings import cosine, embed_text
+from app.services.embeddings import cosine, embed_many
 
 EMBEDDING_MATCH_THRESHOLD = 0.75
 
@@ -40,10 +40,12 @@ def match_phrase(phrase: str) -> str | None:
     index = _alias_index()
     if norm in index:
         return index[norm]
-    vector, _ = embed_text(norm)
+    terms = list(index)
+    vectors, _ = embed_many([norm, *terms])  # one source, batched, cached after the first CV
+    vector = vectors[0]
     best_id, best_score = None, 0.0
-    for term, skill_id in index.items():
-        score = cosine(vector, embed_text(term)[0])
+    for term, term_vector in zip(terms, vectors[1:], strict=True):
+        score, skill_id = cosine(vector, term_vector), index[term]
         if score > best_score:
             best_id, best_score = skill_id, score
     return best_id if best_score >= EMBEDDING_MATCH_THRESHOLD else None
