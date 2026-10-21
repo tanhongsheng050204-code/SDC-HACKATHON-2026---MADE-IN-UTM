@@ -9,7 +9,7 @@ export const KEYS = {
   tasksDone: "laluan.tasksDone",
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",
-  nameAsked: "laluan.nameAsked.",  // + user id: asked once per account on this browser
+  nameSkipped: "laluan.nameSkipped.",  // + user id, session only: "Skip" holds until the next login
 } as const;
 
 type Area = "local" | "session";

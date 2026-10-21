@@ -9,7 +9,7 @@ import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from 
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
-import { authEnabled, getGoogleName, getUserId, onAuth, ready as authReady } from "./lib/auth";
+import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -58,6 +58,12 @@ function MainApp({ demo }: { demo: string | null }) {
   useEffect(() => onAuth(setUserId), []);
   useEffect(() => onAuthExpired(() => setError(t("auth.expired"))), []);
   const [conflict, setConflict] = useState<{ local: string; saved: string } | null>(null);
+  const [accountName, setAccountNameState] = useState<string | null>(getAccountName());
+  const [nameSkipped, setNameSkipped] = useState(false);
+  useEffect(() => {
+    setAccountNameState(getAccountName());
+    setNameSkipped(Boolean(userId) && load(KEYS.nameSkipped + userId, "session") === "1");
+  }, [userId]);
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
@@ -135,6 +141,8 @@ function MainApp({ demo }: { demo: string | null }) {
   // If both exist and differ, ask (never merge, never drop silently). Demo profiles are never saved.
   useEffect(() => {
     if (!userId) {
+      try { for (const k of Object.keys(sessionStorage)) if (k.startsWith(KEYS.nameSkipped)) save(k, null, "session"); }
+      catch { /* storage blocked: nothing was saved either */ }
       if (profileRef.current?.user_id) { setProfile(null); setRole(null); go("landing", { role: undefined }); }
       return;
     }
@@ -220,6 +228,18 @@ function MainApp({ demo }: { demo: string | null }) {
       go("landing");
     }
   }
+
+  // The account's name goes onto the account's profile: after a replace, on another device, or
+  // once a profile is made. A name saved only on an older profile is moved up to the account.
+  useEffect(() => {
+    if (!userId || !profile || profile.user_id !== userId || profile.is_demo) return;
+    if (accountName && profile.display_name !== accountName) {
+      api.updateProfile({ ...profile, display_name: accountName }).then(setProfile).catch(() => undefined);
+    } else if (!accountName && profile.display_name) {
+      const name = profile.display_name;
+      setAccountName(name).then(() => setAccountNameState(name)).catch(() => undefined);
+    }
+  }, [userId, profile, accountName]);
 
   async function deleteProfile() {
     if (!profile || !window.confirm(t("shell.deleteConfirm"))) return;
@@ -330,27 +350,26 @@ function MainApp({ demo }: { demo: string | null }) {
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
       {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}
-      {!conflict && userId && profile && profile.user_id === userId && !profile.is_demo && !profile.display_name
-        && load(KEYS.nameAsked + userId) !== "1" && (
-        <NameDialog suggestion={getGoogleName() ?? ""} onDone={(saved) => {
-          save(KEYS.nameAsked + userId, "1");
-          if (saved) setProfile(saved);
-          else setProfile({ ...profile });  // re-render without the dialog
-        }} profile={profile} />
+      {!conflict && userId && !accountName && !nameSkipped && !(profile?.user_id === userId && profile.display_name) && (
+        <NameDialog suggestion={getGoogleName() ?? ""} onDone={(name) => {
+          if (name) setAccountNameState(name);
+          else { save(KEYS.nameSkipped + userId, "1", "session"); setNameSkipped(true); }
+        }} />
       )}
     </div>
   );
 }
 
-// After the first Google login: ask once for the name to show, pre-filled with the Google account's
-// name. Only the display name is stored (with the profile); the email never is.
-function NameDialog({ profile, suggestion, onDone }: { profile: Profile; suggestion: string; onDone: (p: Profile | null) => void }) {
+// Right after login, while the account has no name: ask for the name to show, pre-filled with the
+// Google account's name. It is kept on the account and copied to its profile; the email never is.
+// "Skip" holds until the next login.
+function NameDialog({ suggestion, onDone }: { suggestion: string; onDone: (name: string | null) => void }) {
   const [name, setName] = useState(suggestion);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   async function saveName() {
     setBusy(true); setFailed(false);
-    try { onDone(await api.updateProfile({ ...profile, display_name: name.trim() })); }
+    try { await setAccountName(name.trim()); onDone(name.trim()); }
     catch { setFailed(true); }
     finally { setBusy(false); }
   }

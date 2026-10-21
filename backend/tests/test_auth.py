@@ -55,6 +55,18 @@ def test_claim_conflict_asks_then_replaces(client):
     assert client.get("/api/me", headers=token("user-a")).json()["profile_id"] == second
 
 
+def test_replacing_keeps_the_name_and_leaves_one_row_per_account(client):
+    from app import store
+
+    first, second = anonymous_profile(client), anonymous_profile(client)
+    client.post("/api/me/claim", json={"profile_id": first}, headers=token("user-a"))
+    store.update_profile(first, "Aina", None, [])
+    client.post("/api/me/claim", json={"profile_id": second, "replace": True}, headers=token("user-a"))
+    assert client.get(f"/api/profiles/{second}", headers=token("user-a")).json()["display_name"] == "Aina"
+    with store._connect() as conn:
+        assert conn.execute("SELECT COUNT(*) AS n FROM profiles WHERE user_id=?", ("user-a",)).fetchone()["n"] == 1
+
+
 def test_owned_profile_cannot_be_claimed_by_someone_else(client):
     pid = anonymous_profile(client)
     client.post("/api/me/claim", json={"profile_id": pid}, headers=token("user-a"))
