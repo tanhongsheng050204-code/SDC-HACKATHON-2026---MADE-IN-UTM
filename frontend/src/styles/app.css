@@ -640,3 +640,24 @@ main:focus { outline: none; }
 .graph-key i { display: inline-block; width: 22px; vertical-align: middle; border-top: 2px solid var(--ink-faint, var(--ink-soft)); }
 .graph-key i.key-dash { border-top: 2px dashed var(--gold-bright); }
 .view-switch { margin: 4px 0 8px; }
+
+/* Map layout: the map, with its details panel to the right (below on phones) */
+.graph-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .graph-layout { grid-template-columns: minmax(0, 1fr); } }
+.graph-panel { display: grid; gap: 8px; }
+.graph-panel h3 { margin: 0; }
+.graph-panel p { margin: 0; }
+.graph-details { display: grid; gap: 8px; }
+.graph-howto ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+.graph-howto li { color: var(--ink-soft); }
+.key-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; border: 1.5px solid var(--line-strong, var(--line)); background: var(--surface); }
+.key-swatch.good { background: var(--good-bg); border-color: var(--good); }
+.key-swatch.risk { background: var(--risk-bg); border-color: var(--risk); }
+.graph-moved { white-space: normal; }
+.graph-match { font-size: 12px; font-weight: 700; fill: var(--accent); }
+.graph-node.tone-prediction rect { fill: var(--gold-bg); stroke: var(--gold-bright); stroke-dasharray: 6 4; }
+.role-graph.compact .graph-title { font-size: 18px; }
+.role-graph.compact .graph-match { font-size: 16px; }
+.role-graph.compact .graph-pill text { font-size: 16px; }
+.role-graph.compact .graph-you text { font-size: 15px; }
+.role-graph.compact .graph-you .graph-you-name { font-size: 17px; }
