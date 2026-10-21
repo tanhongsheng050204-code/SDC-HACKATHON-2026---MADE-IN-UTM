@@ -236,3 +236,30 @@ def test_one_wrongly_tagged_quote_can_be_unticked_without_dropping_its_page():
 ])
 def test_recruitment_agencies_and_job_paths_are_job_ads(url, kind):
     assert search.page_kind(url) == kind
+
+
+def test_stop_cancels_searches_not_started_and_keeps_what_was_found(client, monkeypatch):
+    from app.evidence import refresh
+
+    real = search.search_role
+    calls = []
+
+    def fake_search_role(role, skills, **_):
+        calls.append(role["id"])
+        if len(calls) == 1:
+            assert client.post("/api/evidence/refresh/stop").status_code == 401
+            assert client.post("/api/evidence/refresh/stop", headers=ADMIN).status_code == 200
+        return real(role, skills, grounded=FakeSearch(ADS))
+
+    monkeypatch.setattr(search, "search_role", fake_search_role)
+    monkeypatch.setattr(refresh, "PARALLEL", 1)  # one at a time, so the other 12 are still queued
+    monkeypatch.setitem(refresh._status, "state", "idle")
+    assert client.post("/api/evidence/refresh", headers=ADMIN).status_code == 202
+    for _ in range(500):
+        state = client.get("/api/evidence/refresh", headers=ADMIN).json()
+        if state["state"] not in ("running",):
+            break
+    assert state["state"] == "stopped" and state["stopping"] is False
+    assert len(calls) == 1 and len(state["saved"]) == 1  # the running search finished and was kept
+    assert any("12 not searched" in s for s in state["steps"])
+    assert client.post("/api/evidence/refresh/stop", headers=ADMIN).status_code == 409  # nothing running now

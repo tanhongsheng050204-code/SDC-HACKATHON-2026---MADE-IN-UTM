@@ -49,7 +49,7 @@ export interface EmergingDetail {
   title: Texts; summary: Texts; skills: string[]; stepping_stone: string; stepping_stone_title: string; stepping_reason: Texts;
   sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
 }
-export interface EvidenceStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null }
+export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
   evidence: RoleEvidence | null;
@@ -372,6 +372,8 @@ export const api = {
     }),
   evidenceStart: (token: string, mode: "roles" | "emerging" = "roles") =>
     request<EvidenceStatus>(`/evidence/refresh?mode=${mode}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidenceStop: (token: string) =>
+    request<EvidenceStatus>("/evidence/refresh/stop", { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidenceStatus: (token: string) =>
     request<EvidenceStatus>("/evidence/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   evidencePending: (token: string) =>
