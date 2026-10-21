@@ -5,7 +5,7 @@ import { getLang, t } from "../lib/i18n";
 
 type Tab = "upload" | "cv" | "chat" | "pick";
 
-export function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
+export function Intake({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
   const [tab, setTab] = useState<Tab>("upload");
   const tabs: { id: Tab; label: string }[] = [
     { id: "upload", label: t("in.upload") },
@@ -33,13 +33,13 @@ export function Intake({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+function UploadCv({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   async function upload(file: File | undefined) {
     if (!file) return;
     setBusy(true); setError(null);
-    try { onDone((await api.upload(file)).skills); }
+    try { const r = await api.upload(file); onDone(r.skills, r.mode); }
     catch (e) { setError(e instanceof Error ? e.message : "Upload failed"); }
     finally { setBusy(false); }
   }
@@ -57,14 +57,14 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
+function PasteCv({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const length = text.trim().length;
   async function read() {
     setBusy(true); setError(null);
-    try { onDone((await api.extract(text)).skills); }
+    try { const r = await api.extract(text); onDone(r.skills, r.mode); }
     catch { setError("We couldn't read that. Try picking skills from the list instead."); }
     finally { setBusy(false); }
   }
@@ -81,7 +81,7 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
+function PickSkills({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
   const [all, setAll] = useState<Skill[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
   const [filter, setFilter] = useState("");
@@ -101,7 +101,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
         ))}
         {all.length > 0 && shown.length === 0 && <p className="muted">No skill matches “{filter}”.</p>}
       </div>
-      <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked)}>
+      <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked, "picked")}>
         {picked.length < 3 ? "Pick at least 3 skills" : `Continue with ${picked.length} skills`}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
@@ -109,7 +109,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
+function Questionnaire({ onDone }: { onDone: (skills: string[], mode: string) => void }) {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [turn, setTurn] = useState<ChatTurn | null>(null);
   const [answer, setAnswer] = useState("");
@@ -138,7 +138,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
       </ol>
       {turn && turn.skills_found.length > 0 && <p className="muted">Skills found so far: {turn.skills_found.length}</p>}
       {turn?.is_complete ? (
-        <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found)}>
+        <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found, "scripted")}>
           {turn.skills_found.length ? `Continue with ${turn.skills_found.length} skills` : "No skills found. Try another tab"}
         </button>
       ) : (

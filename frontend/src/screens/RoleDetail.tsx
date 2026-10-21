@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { AiBadge } from "../components/AiBadge";
+import { InfoTip } from "../components/InfoTip";
+import { ForecastXray, RoleCase } from "../components/RoleInsight";
 import { ShareCard } from "../components/ShareCard";
-import { api, MalaysiaPay, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
+import { api, Insight, MalaysiaPay, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent, signed } from "../lib/format";
 import { t } from "../lib/i18n";
 import { COST, HRD, OUTLOOK_TEXT, priceText, SCENARIOS } from "../lib/labels";
 
-export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBack }: {
-  profile: Profile; role: RoleMatch; scenario: Scenario;
+export function RoleDetail({ profile, role, scenario, year, onImpact, onProfile, onBack }: {
+  profile: Profile; role: RoleMatch; scenario: Scenario; year?: number;
   onImpact: () => void; onProfile: (p: Profile) => void; onBack: () => void;
 }) {
   const [plan, setPlan] = useState<Pathway | null>(null);
@@ -14,6 +17,10 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
   const [error, setError] = useState<string | null>(null);
   const [local, setLocal] = useState<MalaysiaPay | null>(null);
   useEffect(() => { api.role(role.role_id).then((r) => setLocal(r.malaysia)).catch(() => setLocal(null)); }, [role.role_id]);
+  const [insight, setInsight] = useState<Insight | null>(null);
+  useEffect(() => {
+    api.insight(profile.id, role.role_id, scenario, year).then(setInsight).catch(() => setInsight(null));
+  }, [profile.id, role.role_id, scenario, year, profile.completed_courses.length]);
 
   async function build() {
     setBusy(true); setError(null);
@@ -34,9 +41,9 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
       <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
 
       <details className="card why" open>
-        <summary>Why this rank? Score {role.why.score.toFixed(2)}</summary>
+        <summary>Why this rank? Score {role.why.score.toFixed(2)} <InfoTip term="gl.score" label="rank score" /></summary>
         <ul>
-          <li>Skill fit {percent(role.why.fit)}% × 0.6 = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
+          <li>Skill fit <InfoTip term="gl.fit" label="skill fit" /> {percent(role.why.fit)}% × 0.6 = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
           <li>Outlook in this scenario, scaled 0–1, × 0.4 = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
           <li>Serves a goal you chose: <strong>+{role.why.sdg_points.toFixed(2)}</strong>{role.why.matched_sdgs.length > 0 && ` (SDG ${role.why.matched_sdgs.join(", ")})`}</li>
         </ul>
@@ -44,14 +51,18 @@ export function RoleDetail({ profile, role, scenario, onImpact, onProfile, onBac
       </details>
 
       <table className="outlooks">
-        <caption>Outlook in each scenario (current: {scenario})</caption>
+        <caption>Outlook in each AI future <InfoTip term="gl.scenario" label="AI futures" /> (current: {scenario})</caption>
         <tbody>{SCENARIOS.map((s) => {
           const o = role.outlook[s.id];
           return <tr key={s.id}><th scope="row">{s.label}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td><td>{o.index > 0 ? "+" : ""}{o.index}%</td></tr>;
         })}</tbody>
       </table>
 
-      {local && <InMalaysia pay={local} wefChange={role.outlook.baseline.index} />}
+      {insight && <ForecastXray xray={insight.xray} />}
+
+      {local && <InMalaysia pay={local} wefChange={role.outlook.baseline.index} jump={insight?.pay_jump ?? null} />}
+
+      {insight && <RoleCase insight={insight} />}
 
       <div className="job-links"><span className="muted">See open jobs:</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
@@ -98,7 +109,7 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
   return (
     <>
       <div className="readiness card">
-        <div className="card-row"><h3>Readiness for {role.title}</h3><strong className="readiness-num">{percent(plan.readiness)}%</strong></div>
+        <div className="card-row"><h3>Readiness for {role.title} <InfoTip term="gl.readiness" label="readiness" /></h3><strong className="readiness-num">{percent(plan.readiness)}%</strong></div>
         <div className="fit" role="img" aria-label={`Readiness ${percent(plan.readiness)} percent`}><div style={{ width: `${plan.readiness * 100}%` }} /></div>
         <p className="muted">Started at {percent(plan.fit)}% · {done.length} of {plan.steps.length} steps done · about {plan.hours_left} hours left</p>
         {done.length > 0 && (
@@ -106,7 +117,7 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
         )}
       </div>
       <h3>Your pathway: {plan.steps.length} steps, about {plan.total_hours} hours</h3>
-      <p>{plan.summary}</p>
+      <p>{plan.summary} <AiBadge mode={plan.summary_mode} /></p>
       {plan.grounding && (
         <p className={plan.grounding.all_supported ? "badge" : "banner warning"}>
           {plan.grounding.all_supported ? "Every sentence is backed by the course catalogue" : `Check sentences ${plan.grounding.unsupported.join(", ")}: not found in the catalogue`}
@@ -124,6 +135,7 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
                 <span className="step-badges">
                   <span className={`badge ${COST[c.cost]?.tone ?? ""}`}>{c.cost === "paid" ? priceText(c.price_rm, c.cost) : COST[c.cost]?.label ?? c.cost}</span>
                   {c.hrd_corp && HRD[c.hrd_corp] && <span className={`badge ${HRD[c.hrd_corp].tone}`} title={c.hrd_note}>{HRD[c.hrd_corp].label}</span>}
+                  {c.hrd_corp && HRD[c.hrd_corp] && <InfoTip term="gl.hrd" label="HRD Corp" />}
                 </span></div>
               <span>{c.url ? <a href={c.url} target="_blank" rel="noreferrer">{c.title}</a> : c.title} · {c.provider}</span>
               <span className="muted">About {c.hours} hours · {c.level} · {s.why}</span>
@@ -141,11 +153,11 @@ function Plan({ plan, role, onToggle }: { plan: Pathway; role: RoleMatch; onTogg
 
 // Local reality next to the global forecast: DOSM pay and employee numbers for the role's MASCO
 // group. The two can disagree (Malaysian clerical jobs still grew after 2019); we show both.
-function InMalaysia({ pay, wefChange }: { pay: MalaysiaPay; wefChange: number }) {
+function InMalaysia({ pay, wefChange, jump }: { pay: MalaysiaPay; wefChange: number; jump: Insight["pay_jump"] }) {
   const change = pay.employees_change_pct;
   return (
     <div className="card in-malaysia">
-      <div className="card-row"><h3>In Malaysia today</h3><span className="badge">{pay.label}</span></div>
+      <div className="card-row"><h3>In Malaysia today</h3><span className="badge">{pay.label} <InfoTip term="gl.masco" label="MASCO group" /></span></div>
       <div className="kpis">
         <div className="kpi"><span className="kpi-label">Median monthly pay, {pay.year}</span><strong>RM {pay.median_rm.toLocaleString("en-MY")}</strong>
           <span className="badge">mean RM {pay.mean_rm.toLocaleString("en-MY")}</span></div>
@@ -155,6 +167,12 @@ function InMalaysia({ pay, wefChange }: { pay: MalaysiaPay; wefChange: number })
         <div className="kpi"><span className="kpi-label">WEF global outlook to 2030</span><strong>{signed(wefChange)}%</strong>
           <span className="badge">baseline scenario</span></div>
       </div>
+      {jump && (
+        <p className={`pay-jump ${jump.difference_rm >= 0 ? "up" : "down"}`}>
+          <strong>{jump.difference_rm >= 0 ? "+" : "−"}RM {Math.abs(jump.difference_rm).toLocaleString("en-MY")} a month</strong>
+          <span> typical pay from your current group ({jump.from_group}, RM {jump.from_rm.toLocaleString("en-MY")}) to this one (RM {jump.to_rm.toLocaleString("en-MY")}). {jump.note}</span>
+        </p>
+      )}
       {change !== null && (change > 0) !== (wefChange > 0) && (
         <p className="muted">These point in different directions: employment in this group has {change > 0 ? "grown" : "fallen"} in Malaysia since {pay.trend_from}, while the global forecast expects the role to {wefChange > 0 ? "grow" : "shrink"}. The group is broad, and forecasts look ahead while these figures look back.</p>
       )}

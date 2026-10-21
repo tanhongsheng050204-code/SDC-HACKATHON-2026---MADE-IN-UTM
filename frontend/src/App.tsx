@@ -23,9 +23,10 @@ import { RoleDetail } from "./screens/RoleDetail";
 import { Roles } from "./screens/Roles";
 import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
+import { WhatIf } from "./screens/WhatIf";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact"];
+const NEEDS_PROFILE: Screen[] = ["home", "whatif", "radar", "tasks", "roles", "role", "impact"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -43,6 +44,7 @@ function MainApp({ demo }: { demo: string | null }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
   const [draftSkills, setDraftSkills] = useState<string[]>([]);
+  const [draftMode, setDraftMode] = useState("picked");
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -199,7 +201,7 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit", whatif: t("nav.whatif"),
   };
   return (
     <div className="shell">
@@ -222,9 +224,9 @@ function MainApp({ demo }: { demo: string | null }) {
               <Home profile={profile} scenario={scenario} onScenario={setScenario} onOpenRole={openRole} onGo={(s) => go(s)}
                 onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
-            {screen === "intake" && <Intake onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
+            {screen === "intake" && <Intake onDone={(skills, mode) => { setDraftSkills(skills); setDraftMode(mode); go("review"); }} />}
             {screen === "review" && (
-              <Review initial={draftSkills} onBack={() => go("intake")}
+              <Review initial={draftSkills} foundBy={draftMode} onBack={() => go("intake")}
                 onSaved={(p) => { save(KEYS.profile, p.id); setProfile(p); go("radar"); }} />
             )}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
@@ -234,10 +236,11 @@ function MainApp({ demo }: { demo: string | null }) {
                 onScenario={setScenario} onYear={setYear} onOpen={openRole} />
             )}
             {screen === "role" && profile && role && (
-              <RoleDetail profile={profile} role={role} scenario={scenario} onProfile={setProfile}
+              <RoleDetail profile={profile} role={role} scenario={scenario} year={route.year} onProfile={setProfile}
                 onImpact={() => go("impact")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
+            {screen === "whatif" && profile && <WhatIf profile={profile} onRoles={() => go("roles")} />}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
             {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce />}

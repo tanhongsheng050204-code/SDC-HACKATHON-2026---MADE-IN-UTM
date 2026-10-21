@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { InfoTip } from "../components/InfoTip";
 import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
 import { RoleCard } from "../components/RoleCard";
@@ -49,11 +50,11 @@ export function Roles({ profile, scenario, year, onScenario, onYear, onOpen }: {
       </div>
       {!data && loading && <SkeletonCards />}
       {data && <Kpis data={data} scenario={scenario} />}
-      <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+      <div className="scenario-row"><div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}
-      </div>
+      </div> <InfoTip term="gl.scenario" label="AI futures" /></div>
       {data && (
         <div className="year-slider">
           <label htmlFor="year">{t("k.lookAhead")} <strong>{data.year}</strong> <span className="badge">{t("k.estimate")}</span></label>

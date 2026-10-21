@@ -51,6 +51,32 @@ export interface Radar {
   skills: SkillTrend[];
   roles: { role_id: string; title: string; index: number; label: string }[];
 }
+export interface ExploreRow { role_id: string; title: string; rank: number; rank_before: number; fit: number; fit_before: number; score: number; index: number; label: string }
+export interface Explore {
+  adoption: number; preset: Scenario | null; year: number;
+  added_skills: { skill_id: string; name: string }[];
+  ranking: ExploreRow[];
+  tipping: {
+    range: [number, number]; current_role: string | null;
+    current_changes: { adoption: number; from: string; to: string }[];
+    top_changes: { adoption: number; from: string; to: string }[];
+    always_top5: string[];
+    series: { adoption: number; current_index: number | null; top: string }[];
+  };
+  assumption: string; source: { snapshot_id: string; imported: string };
+}
+export interface CasePoint { text: string; source: string }
+export interface Insight {
+  xray: {
+    role_id: string; scenario: Scenario; year: number;
+    steps: { label: string; value: number; detail: string }[];
+    result: { index: number; label: string; bands: string };
+    ranking_points: { normalised: number; points: number; detail: string };
+    source: { snapshot_id: string; imported: string; url: string };
+  };
+  pros: CasePoint[]; cons: CasePoint[];
+  pay_jump: { from_group: string; from_rm: number; to_group: string; to_rm: number; difference_rm: number; year: number; note: string } | null;
+}
 export interface PendingPreview {
   snapshot_id: string; imported: string; live_snapshot_id: string;
   inputs: { source: string; url: string; retrieved: string }[];
@@ -85,7 +111,7 @@ export interface FutureCard {
 }
 export interface CoachProposal { kind: "scenario" | "interest"; value: string | number; label: string }
 export interface CoachReply {
-  answer: string; mode: string; sources: { id: string; text: string }[];
+  answer: string; mode: string; sources: { id: string; text: string }[]; guard?: { safe: boolean; category: string | null };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   proposal: CoachProposal | null; suggestions: string[];
 }
@@ -148,6 +174,10 @@ export const api = {
   roles: () => request<RoleOption[]>("/roles"),
   role: (id: string) => request<RoleInfo>(`/roles/${encodeURIComponent(id)}`),
   snapshots: () => request<Snapshot[]>("/signals"),
+  explore: (id: string, adoption: number, add: string[], year?: number) =>
+    request<Explore>(`/profiles/${id}/explore?adoption=${adoption}${add.length ? `&add=${encodeURIComponent(add.join(","))}` : ""}${year ? `&year=${year}` : ""}`),
+  insight: (id: string, roleId: string, scenario: Scenario, year?: number) =>
+    request<Insight>(`/profiles/${id}/roles/${encodeURIComponent(roleId)}/insight?scenario=${scenario}${year ? `&year=${year}` : ""}`),
   evalCvs: () => request<{ name: string; text: string }[]>("/eval/cvs"),
   extract: (text: string) =>
     request<{ skills: string[]; unmatched: string[]; mode: string }>("/intake/extract", {

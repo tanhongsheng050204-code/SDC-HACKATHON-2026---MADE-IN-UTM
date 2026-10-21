@@ -124,10 +124,28 @@ const STRINGS = {
   "tip.ok": { en: "Got it", ms: "Faham", zh: "知道了" },
   "radar.onlyMine": { en: "Show only my skills", ms: "Tunjuk kemahiran saya sahaja", zh: "只显示我的技能" },
   "impact.skills": { en: "Skills that serve a goal", ms: "Kemahiran yang menyumbang kepada matlamat", zh: "有助于实现目标的技能" },
+  // glossary for the "?" tips (BM and Chinese drafted with AI assistance)
+  "gl.what": { en: "What is", ms: "Apakah", zh: "什么是" },
+  "gl.fit": { en: "Skill fit: the share of this role's skills you already have, with core skills counting three times as much as useful ones.", ms: "Padanan kemahiran: bahagian kemahiran peranan ini yang anda sudah ada; kemahiran teras dikira tiga kali ganda.", zh: "技能匹配：您已具备该职位所需技能的比例；核心技能的权重是一般技能的三倍。" },
+  "gl.score": { en: "Rank score: 60% skill fit plus 40% job outlook, plus a small bonus if the role serves a goal you chose. Higher ranks first; shrinking roles always rank last.", ms: "Skor kedudukan: 60% padanan kemahiran tambah 40% prospek pekerjaan, serta bonus kecil jika peranan itu menyokong matlamat pilihan anda.", zh: "排名分数：60% 技能匹配加 40% 就业前景，若职位符合您选择的目标还有少量加分。" },
+  "gl.outlook": { en: "Outlook: the expected change in the number of these jobs by 2030, as a percentage. It is an estimate under one AI future, not a prediction.", ms: "Prospek: anggaran perubahan bilangan pekerjaan ini menjelang 2030, dalam peratus. Ia anggaran, bukan ramalan.", zh: "前景：到 2030 年此类工作数量的预计变化百分比。这是某种 AI 未来下的估计，不是预言。" },
+  "gl.scenario": { en: "AI futures: how fast employers adopt AI. Slow is half the speed of today's trend, Accelerated is 1.6 times. Roles that work with AI gain when it speeds up; roles AI can automate lose.", ms: "Masa depan AI: sepantas mana majikan menggunakan AI. Perlahan ialah separuh kelajuan trend semasa, Pantas ialah 1.6 kali.", zh: "AI 未来：雇主采用 AI 的速度。缓慢为当前趋势的一半，加速为 1.6 倍。" },
+  "gl.robust": { en: "Robust pick: a role that stays in your top five in every AI future and never shrinks, so it doesn't depend on guessing the future right.", ms: "Pilihan kukuh: peranan yang kekal dalam lima teratas anda dalam setiap masa depan AI dan tidak menyusut.", zh: "稳健选择：在每种 AI 未来下都保持在您前五名、且不会萎缩的职位。" },
+  "gl.readiness": { en: "Readiness: your skill fit for this role, counting courses you have finished. It reaches 100% when every skill on the list is covered.", ms: "Kesediaan: padanan kemahiran anda untuk peranan ini, termasuk kursus yang telah anda tamatkan.", zh: "准备度：计入已完成课程后，您对该职位的技能匹配度。" },
+  "gl.masco": { en: "MASCO group: Malaysia's official grouping of occupations. Pay and job counts here are for the whole group, so a single role can differ.", ms: "Kumpulan MASCO: pengelasan pekerjaan rasmi Malaysia. Gaji dan bilangan pekerjaan di sini untuk seluruh kumpulan.", zh: "MASCO 类别：马来西亚官方职业分类。此处薪资和就业人数针对整个类别，单个职位可能不同。" },
+  "gl.hrd": { en: "HRD Corp: Malaysia's human resources fund. Employers who pay the levy can often claim approved training, if they apply before the course starts.", ms: "HRD Corp: dana sumber manusia Malaysia. Majikan yang membayar levi selalunya boleh menuntut latihan yang diluluskan.", zh: "HRD Corp：马来西亚人力资源发展基金。缴纳税款的雇主通常可在课程开始前申请报销获批培训。" },
+  "gl.xray": { en: "Forecast x-ray: each step from the published WEF figure to the outlook shown, so you can check every number yourself.", ms: "Sinar-X unjuran: setiap langkah daripada angka WEF yang diterbitkan hingga prospek yang dipaparkan.", zh: "预测透视：从 WEF 公布数字到所显示前景的每一步，方便您自行核对。" },
+  "gl.adoption": { en: "AI adoption speed: 1.0× is today's trend. Below 1 means employers adopt AI more slowly, above 1 faster. Values other than 0.5, 1.0 and 1.6 are your own assumption.", ms: "Kelajuan penggunaan AI: 1.0× ialah trend semasa. Bawah 1 lebih perlahan, atas 1 lebih pantas.", zh: "AI 普及速度：1.0× 为当前趋势，低于 1 较慢，高于 1 较快。" },
+  "badge.ai": { en: "Written by AI, checked against sources", ms: "Ditulis oleh AI, disemak dengan sumber", zh: "由 AI 撰写，已与来源核对" },
+  "badge.rules": { en: "Written by rules (no AI)", ms: "Ditulis oleh peraturan (tanpa AI)", zh: "由规则生成（无 AI）" },
+  "badge.blocked": { en: "Stopped by a safety check", ms: "Dihentikan oleh semakan keselamatan", zh: "已被安全检查拦截" },
+  "nav.whatif": { en: "What if…", ms: "Bagaimana jika…", zh: "如果……" },
+  "h.whatif": { en: "What if…?", ms: "Bagaimana jika…?", zh: "如果……？" },
   "data.english": { en: "", ms: "Nama peranan, kursus dan tugas dipaparkan dalam bahasa Inggeris seperti yang diterbitkan oleh sumbernya.", zh: "职位、课程和任务名称按来源原文以英文显示。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;
+export type GlossaryKey = Extract<StringKey, `gl.${string}`>;
 
 /** Every string in every language, for the translation check in the review kit. */
 export function allStrings(): { key: string; en: string; ms: string; zh: string }[] {

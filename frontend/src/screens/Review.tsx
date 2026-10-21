@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { AiBadge } from "../components/AiBadge";
 import { SdgTile } from "../components/Sdgs";
 import { api, Profile, RoleOption, Sdg, Skill } from "../lib/api";
 import { t } from "../lib/i18n";
 
-export function Review({ initial, onSaved, onBack }: { initial: string[]; onSaved: (p: Profile) => void; onBack: () => void }) {
+export function Review({ initial, foundBy, onSaved, onBack }: { initial: string[]; foundBy: string; onSaved: (p: Profile) => void; onBack: () => void }) {
   const [skills, setSkills] = useState(initial);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [sdgs, setSdgs] = useState<Sdg[]>([]);
@@ -39,7 +40,8 @@ export function Review({ initial, onSaved, onBack }: { initial: string[]; onSave
   return (
     <section>
       <div className="page-head"><h1>{t("h.check")}</h1>
-        <p className="muted">Remove anything that isn't right and add what we missed. Only these skills are saved, never your CV.</p></div>
+        <p className="muted">Remove anything that isn't right and add what we missed. Only these skills are saved, never your CV.</p>
+        {foundBy !== "picked" && <p>Found by: <AiBadge mode={foundBy} /></p>}</div>
       {skills.length === 0 && (
         <div className="empty-state">
           <p>We didn't find any skills. Add them below or go back and pick from the list.</p>
