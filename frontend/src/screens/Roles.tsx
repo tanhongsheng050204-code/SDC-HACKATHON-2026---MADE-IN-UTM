@@ -3,6 +3,7 @@ import { AdoptionSlider, TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
 import { Kpis } from "../components/Kpis";
 import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
+import { EvidencePanel } from "../components/EvidencePanel";
 import { RoleCard } from "../components/RoleCard";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
@@ -80,6 +81,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
       <RefreshPanel onDone={afterRefresh} />
+      <EvidencePanel onDone={afterRefresh} />
       {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>

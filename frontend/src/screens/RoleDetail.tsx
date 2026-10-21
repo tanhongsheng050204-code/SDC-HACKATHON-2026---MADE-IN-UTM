@@ -3,6 +3,7 @@ import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
 import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
+import { EvidenceList } from "../components/SkillEvidence";
 import { api, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { pick, t } from "../lib/i18n";
@@ -56,12 +57,17 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
         {role.carry_over.length > 0 && (
           <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {s.name}</span>)}</div></div>
         )}
-        <div><h2>You have</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div></div>
-        <div><h2>You need</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing">{s.name}{s.weight === 3 ? " (core)" : ""}</span>)}</div></div>
+        <div><h2>You have</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}{s.added_from_ads && " ⁺"}</span>)}</div></div>
+        <div><h2>You need</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing" title={s.added_from_ads ? t("ev.added") : undefined}>{s.name}{s.weight === 3 ? " (core)" : ""}{s.added_from_ads && " ⁺"}</span>)}</div></div>
       </div>
       <p className="source">Skills for this role: the Laluan team's list{role.skills_source.onet_code
         ? <>, checked against O*NET occupation <a href={onetUrl(role.skills_source.onet_code)} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
         : " (a new role with no O*NET occupation yet)"}.</p>
+      {role.evidence && (
+        <EvidenceList evidence={role.evidence}
+          names={Object.fromEntries([...role.covered, ...role.missing].map((s) => [s.skill_id, s.name]))}
+          added={new Set([...role.covered, ...role.missing].filter((s) => s.added_from_ads).map((s) => s.skill_id))} />
+      )}
 
       {role.missing.length === 0 && (
         <div className="empty-state">

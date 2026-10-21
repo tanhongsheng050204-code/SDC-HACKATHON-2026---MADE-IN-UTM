@@ -193,6 +193,18 @@ On macOS/Linux use `.venv/bin/python`. Starting the app does not schedule refres
 
 Research activity and Hacker News posts are rough proxies for demand. A refresh adjusts the WEF baseline within capped limits; it does not replace it.
 
+## Skill evidence from job ads
+
+Each role's skill list can be checked against **current Malaysian job ads**. **Refresh skill evidence** (Admin, Future roles screen) runs a Gemini search with Google Search grounding for every role (about 2 minutes) and asks for the exact sentence in each ad that asks for each skill. If fewer than 2 ads come back, it widens to any page (career guides, reports), labelled as weaker evidence. Google's redirect links are resolved to the real address; only the redirect header is read.
+
+**A person approves each role.** The reviewer sees every page and quote, flagged when the site was not among Google's own sources, and can untick a whole page or one quote (wrong page, wrong skill) before approving. Then:
+
+- every skill of the role shows **Confirmed** (2+ pages), **One source** or **Not seen in ads**, with the quotes and links, on the role page and in the skill tree;
+- a skill from our catalogue that **2+ job ads** ask for is **added to the role at weight 1**, so fit, rankings and the pathway change; web pages never add skills;
+- skill names that are not in our catalogue are listed for the team and change nothing.
+
+Results and decisions are stored in the database (`evidence` table), so a redeploy keeps them. Search grounding is billed by Google per search on paid plans; one full run is 13–26 searches.
+
 ## Tests and checks
 
 ```powershell

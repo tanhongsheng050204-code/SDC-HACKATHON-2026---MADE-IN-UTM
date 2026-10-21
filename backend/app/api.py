@@ -11,13 +11,14 @@ from app import runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision, EvidenceDecision,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills,
                           skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
+from app.evidence import refresh as evidence_refresh, review as evidence_review
 
 router = APIRouter(prefix="/api")
 
@@ -176,6 +177,56 @@ def reject_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str =
         return review.reject(snapshot_id, body.reviewer, body.reason or "")
     except review.NotFound:
         raise HTTPException(404, "No snapshot waiting with that ID") from None
+
+
+# --- cited skill evidence (admin) ---------------------------------------------------------------
+
+@router.post("/evidence/refresh", status_code=202)
+def start_evidence_refresh(x_admin_token: str = Header(default="")):
+    """Search Malaysian job ads for every role's skills, in the background, for review."""
+    _require_admin(x_admin_token)
+    if not evidence_refresh.start():
+        raise HTTPException(409, "An evidence search is already running")
+    return evidence_refresh.status()
+
+
+@router.get("/evidence/refresh")
+def evidence_refresh_status(x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return evidence_refresh.status()
+
+
+@router.get("/evidence/pending")
+def pending_evidence(x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return evidence_review.list_pending()
+
+
+@router.get("/evidence/pending/{evidence_id}")
+def pending_evidence_detail(evidence_id: str, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.detail(evidence_id)
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
+
+
+@router.post("/evidence/pending/{evidence_id}/approve")
+def approve_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.approve(evidence_id, body.reviewer, body.drop_sources, body.drop_added)
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
+
+
+@router.post("/evidence/pending/{evidence_id}/reject")
+def reject_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.reject(evidence_id, body.reviewer, body.reason or "")
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
 
 
 @router.get("/radar")
