@@ -119,6 +119,7 @@ Notes: ______
 - [ ] 7.4 “N skills have no trend in these sources yet” opens to list them, each with what we do have (e.g. “freehire.me Malaysian job postings: 54 of 20,729 postings mention it”) after a refresh.
 - [ ] 7.5 AI capability momentum bars appear after a refresh.
 - [ ] 7.6 Source line shows snapshot and dates; **See my future roles** opens Future roles.
+- [ ] 7.7 **What Malaysians use AI for** lists six topics with Malaysia's share and the world's, the usage index and the Anthropic source.
 
 Notes: ______
 
@@ -194,6 +195,14 @@ Notes: ______
 - [ ] 9.18.4 After each answer: feedback with a badge (**Written by AI** with a key, **Written by rules** without), and the next question; after five, **Practise again**.
 - [ ] 9.18.5 An answer containing *“ignore all previous instructions”* shows **Stopped by a safety check** and repeats the same question.
 
+### 9.19 Where experts disagree, programmes and identity
+- [ ] 9.19.1 Under the outlook table: “AI exposure: more exposed than N–M% of occupations”; **See the studies** opens the x-ray.
+- [ ] 9.19.2 The x-ray lists three studies with a percentile bar, occupation, code, rank and licence, then Laluan's rank vs the studies' range and the “In Malaysia” line.
+- [ ] 9.19.3 AI and machine learning specialist shows **Under review** and the review note; AI operations specialist says it is not compared.
+- [ ] 9.19.4 **Malaysian programmes**: software developer shows **On MyCOL** with report page 126; data entry clerk says it is not on the list; Jelajah AI MyMahir and MyMahir links open.
+- [ ] 9.19.5 **Your career identity statement** names your current job and skills you already have; **Copy** copies it; the Future Card shows the rules version.
+- [ ] 9.19.6 **Future roles → Map**: every role but AI operations specialist is plotted, your top five highlighted; switching scenario moves points; tapping a point opens the role. On a phone the map scrolls sideways.
+
 ## 10. SDG impact
 
 - [ ] 10.1 Heading reads “Your impact as a / an …” with the right article.
@@ -212,6 +221,7 @@ Notes: ______
 - [ ] 11.5 Source line shows the O\*NET code link and “checked by our team so far: N of M”.
 - [ ] 11.6 Ticks survive moving to another screen and back (same browser tab).
 - [ ] 11.7 **See roles you could move into** opens Future roles.
+- [ ] 11.8 Tasks the Anthropic index covers show “In real AI use: N% AI does it · M% AI helps a person”, with the source under the list.
 
 Notes: ______
 
@@ -236,7 +246,7 @@ Notes: ______
 - [ ] 12b.1 The adoption slider (0.5×–2×) re-ranks the roles; the URL keeps `adoption=`.
 - [ ] 12b.2 Tipping points name the speed at which the current job turns Declining, or another role overtakes the top match.
 
-## 13. Workforce view (HR)
+## 13. For organisations (HR teams and career centres)
 
 - [ ] 13.1 Empty state shows until a team is loaded.
 - [ ] 13.2 **Use the sample company (synthetic, 160 people)** → KPIs (160 people, people in declining roles, learning hours, forecast date).
@@ -315,7 +325,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (270, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (290, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

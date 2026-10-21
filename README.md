@@ -32,10 +32,15 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Skill tree** | Skills you have at the bottom, your target role on top. Prove each level (Basic, Working, Advanced) with three questions Gemini writes on the spot; two right fills the next part of the ring. The server keeps the answers and grades. |
 | **What I enjoy** | A short survey of real tasks and settings from the roles you match. Like, dislike or say it in your own words; Laluan names the preferences your answers reveal, gives a small visible boost to roles that fit them and suggests roles you might not have considered. |
 | **Class view** | For TVET and university career centres: an anonymous class list in, the roles the class fits, the skills most students still need and the courses that help most students out. Totals only; groups under three are hidden. |
-| **Workforce view** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
+| **For organisations** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 160-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
 | **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
+| **Where experts disagree** | AI-exposure studies disagree, so each role shows three of them side by side inside its forecast x-ray: the Anthropic Economic Index (observed use), OpenAI's “GPTs are GPTs” and the ILO's 2025 global index, each as a percentile among the occupations it covers, next to Laluan's own estimate by rank. Display only; when Laluan's estimate falls outside every study, the role is flagged for the team to review. **Future roles → Map** plots every role's exposure against its outlook, with your top five highlighted. |
+| **How Malaysians use AI** | From the Anthropic Economic Index's Malaysia data: what people in Malaysia use AI for compared with the world (Skills Radar), and on each role how much AI use is about that kind of work and whether the AI does the task or helps a person. |
+| **AI does it, or helps you** | On **My job, task by task**, each O\*NET task the index covers shows how people actually use AI for it: the share where the AI does the task and the share where it helps a person do it. |
+| **Malaysian programmes** | On every role: whether employers listed it on TalentCorp's MyCOL 2024/2025 critical occupations list (with the report page), plus links to MyMahir and the free Jelajah AI MyMahir training. Links only, no endorsement implied. |
+| **Career identity statement** | One or two sentences for an interview or CV, built only from your current job, the skills you already have that the role uses and the next core skill you are building. Gemini rewrites it more naturally and is checked against those facts; the Future Card shows the rules version. |
 | **Open now in Malaysia** | On every role: how many live Malaysian postings mention it, and the three newest whose title names the role, each linking to the employer or JobStreet page. From [freehire.me](https://freehire.me)'s open, keyless API (MIT-licensed project), cached for six hours; if it is down, the plain job-board searches remain. |
 | **Practise an interview** | Five questions for one role: why this role, then the skills you are missing first. Short feedback after each answer (Gemini, or plain rules offline); answers pass the prompt-injection check and the personal-details scrubber, and nothing is saved. Voice input works here too. |
 | **Plain-language help** | A “?” beside jargon on Today (skill fit, outlook, robust pick), and a badge on each coach answer saying whether AI or plain rules wrote it, or a safety check stopped it. |
@@ -46,9 +51,9 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 
 | Criterion (weight) | Where to look |
 | --- | --- |
-| **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
+| **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
 | **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
-| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 270 automated tests. Public and synthetic data only. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 290 automated tests. Public and synthetic data only. |
 | **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
@@ -59,7 +64,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 4. Go to **Future roles**, switch between scenarios, drag the year slider and open **Why this rank?**.
 5. Open the top role, **Build my pathway**, and tick a course as finished: readiness and rankings update.
 6. **See my impact** for the SDG links, then **Create my Future Card** and scan the QR code.
-7. Finish with the **Workforce view** and the synthetic sample company.
+7. Finish with **For organisations** and the synthetic sample company.
 
 ## Run it locally
 
@@ -224,7 +229,7 @@ Each role page opens with a short **"A day in this job"** in EN / BM / 中文: w
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 270 tests: API, services, trends, review, guardrails, openings, interview, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 290 tests: API, services, trends, review, guardrails, openings, interview, exposure, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
@@ -301,6 +306,6 @@ How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](do
 
 ## Credits and licence
 
-Job growth figures from the [WEF Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/). Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
+AI-exposure estimates from the [Anthropic Economic Index](https://huggingface.co/datasets/Anthropic/EconomicIndex) (CC BY), OpenAI's [“GPTs are GPTs”](https://github.com/openai/GPTs-are-GPTs) (MIT) and [ILO Working Paper 140](https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure) (CC BY 4.0); critical occupations from TalentCorp's [MyCOL 2024/2025](https://www.talentcorp.com.my/mycol/). Job growth figures from the [WEF Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/). Occupation tasks from [O\*NET 30.0](https://www.onetcenter.org/) (U.S. Department of Labor), used under CC BY 4.0. SDG names and colours from the United Nations. Landing page photos from [Unsplash](https://unsplash.com) by Gema Saputera, Mimi Thian and Vitaly Gariev; the people shown are not the demo personas.
 
 Code under the [Apache License 2.0](LICENSE).

@@ -130,6 +130,9 @@ flowchart LR
 | Dataset | arXiv API metadata counts; OpenAlex | arXiv API terms; CC0 |
 | Dataset | Hacker News “Who is hiring?” posts, counted via the Algolia HN API | HN API terms (counts only, no posts stored) |
 | Dataset | Malaysian job postings via the freehire.me API (counts stored; openings shown live with links) | freehire terms; project MIT |
+| Dataset | Anthropic Economic Index (exposure, task-level AI use, Malaysia usage) | CC BY |
+| Dataset | OpenAI “GPTs are GPTs” occupation exposure scores | MIT |
+| Dataset | ILO Working Paper 140, Annex Table A1 | CC BY 4.0 |
 | Images | Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Unsplash License |
 | Model | Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
 

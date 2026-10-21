@@ -99,6 +99,10 @@ No model is trained or fine-tuned by the team. The model in use is shown in the 
 | OpenAlex paper counts (fallback) | <https://openalex.org/> | Public (counts only) | N | CC0 |
 | Hacker News “Who is hiring?” skill-mention counts | <https://hn.algolia.com/api> | Public (counts only; no posts stored) | N | HN / Algolia API terms |
 | Malaysian job postings (skill-mention counts, newest openings per role) | <https://freehire.me/docs/api> | Public (counts stored; postings shown live with links, not stored) | N | freehire terms; project MIT |
+| Anthropic Economic Index (observed AI exposure by occupation, task-level automation vs augmentation, Malaysia usage) | <https://huggingface.co/datasets/Anthropic/EconomicIndex> | Public (aggregates) | N | CC BY |
+| OpenAI “GPTs are GPTs” occupation exposure scores (2023) | <https://github.com/openai/GPTs-are-GPTs> | Public | N | MIT |
+| ILO Working Paper 140, Annex Table A1 (exposure by ISCO-08 occupation) | <https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure> | Public | N | CC BY 4.0 |
+| MyCOL 2024/2025 (TalentCorp critical occupations list) | <https://www.talentcorp.com.my/mycol/> | Public report (matches by job title, linked) | N | Cited with link |
 | Course catalogue (29 courses, prices and HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | N | Facts with links to the providers |
 | Roles, skills and SDG map | `backend/data/` | Self-created | N | Apache-2.0 (this repository) |
 | Demo personas (Aisyah, Wei Jie) and 5 evaluation CVs | `backend/data/demo_profiles.json`, `backend/data/eval/` | Synthetic | N (all invented) | Apache-2.0 (this repository) |
@@ -117,7 +121,7 @@ Did the team use any generative-AI tool to help create code, design, text or oth
 
 **How the team reviewed, tested and took responsibility for AI-generated output** *(100 words max)*
 
-The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 270 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
+The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 290 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
 
 *Word count: 93*
 
