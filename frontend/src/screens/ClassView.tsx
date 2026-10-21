@@ -49,7 +49,7 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
 
       {result && (
         <>
-          <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+          <div className="segmented" role="radiogroup" aria-label={t("sc.label")}>
             {SCENARIOS.map((s) => (
               <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => { setScenario(s.id); analyse(csv, s.id); }}>{t(`sc.${s.id}`)}</button>
             ))}

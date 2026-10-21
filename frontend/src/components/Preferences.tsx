@@ -61,7 +61,7 @@ export function LiteToggle({ lite, onChange }: { lite: boolean; onChange: (on: b
 
 export function ThemeButton({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   return (
-    <button className="icon-btn" onClick={onToggle} aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+    <button className="icon-btn" onClick={onToggle} aria-label={theme === "dark" ? t("pref.light") : t("pref.dark")}>
       <Icon name={theme === "dark" ? "sun" : "moon"} />
     </button>
   );

@@ -16,10 +16,10 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
   const [data, setData] = useState<RoleTasks | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { api.roles().then(setRoles).catch(() => setError("Couldn't load the role list.")); }, []);
+  useEffect(() => { api.roles().then(setRoles).catch(() => setError(t("tasks.rolesFailed"))); }, []);
   useEffect(() => {
     if (!roleId) return;
-    api.tasks(roleId, done).then((d) => { setData(d); setError(null); }).catch(() => setError("Couldn't load the tasks for this job."));
+    api.tasks(roleId, done).then((d) => { setData(d); setError(null); }).catch(() => setError(t("tasks.failed")));
     save(KEYS.tasksDone, JSON.stringify(done), "session");
   }, [roleId, done]);
 
@@ -30,19 +30,19 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
   return (
     <section>
       <div className="page-head"><h1>{t("h.tasks")}</h1>
-        <p className="muted">AI rarely replaces a whole job at once: it changes tasks. Tick the tasks you actually do to see how much of your work AI is likely to automate, assist with, or leave to you.</p></div>
+        <p className="muted">{t("tasks.sub")}</p></div>
       <label className="narrow">Job
         <select value={roleId} onChange={(e) => { setRoleId(e.target.value); setDone([]); }}>
-          <option value="">Choose a job</option>
+          <option value="">{t("tasks.choose")}</option>
           {roles.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
         </select>
       </label>
       {error && <p className="error" role="alert">{error}</p>}
-      {!roleId && <div className="empty-state"><p>Pick your current or most recent job to start.</p></div>}
-      {data && data.tasks.length === 0 && <div className="banner">{data.onet_note ?? "No task data for this job yet."}</div>}
+      {!roleId && <div className="empty-state"><p>{t("tasks.empty")}</p></div>}
+      {data && data.tasks.length === 0 && <div className="banner">{data.onet_note ?? t("tasks.none")}</div>}
       {data && data.tasks.length > 0 && (
         <>
-          <div className="task-split card" aria-label="Share of your tasks">
+          <div className="task-split card" aria-label={t("tasks.share")}>
             <div className="split-bar" aria-hidden="true">
               {ORDER.map((l) => <span key={l} className={`split ${l}`} style={{ width: `${data.shares[l] * 100}%` }} />)}
             </div>
@@ -52,8 +52,8 @@ export function Tasks({ profile, onNext }: { profile: Profile; onNext: () => voi
               ))}
             </ul>
             <p className="muted">{ticked.length
-              ? `Based on the ${data.counted} ${data.counted === 1 ? "task" : "tasks"} you ticked.`
-              : `Based on all ${data.counted} tasks. Tick yours to make it personal.`}</p>
+              ? `${t("tasks.basedTicked")} ${data.counted}.`
+              : `${t("tasks.basedAll")} ${data.counted}. ${t("tasks.tickYours")}`}</p>
           </div>
           <ul className="task-list">
             {data.tasks.map((task) => (

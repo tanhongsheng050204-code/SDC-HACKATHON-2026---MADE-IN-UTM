@@ -16,7 +16,7 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.pathway")}</button>
       <div className="page-head"><h1>Your impact as {/^[aeiou]/i.test(role.title) ? "an" : "a"} {role.title}</h1>
-        <p className="muted">How this role and its skills connect to the UN Sustainable Development Goals. Each link has a reason you can check.</p></div>
+        <p className="muted">{t("impact.sub")}</p></div>
       <div className="grid">
         {role.sdgs.map((g) => (
           <div key={g.number} className="card sdg-card" style={{ borderTopColor: g.colour }}>
@@ -29,16 +29,16 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
       </div>
 
       <h2>{t("impact.skills")}</h2>
-      {error && <p className="error" role="alert">Couldn't load the skill-level goals.</p>}
-      {!info && !error && <p className="muted">Loading…</p>}
-      {info && skills.length === 0 && <p className="muted">None of this role's skills has its own SDG link yet.</p>}
+      {error && <p className="error" role="alert">{t("impact.failed")}</p>}
+      {!info && !error && <p className="muted">{t("shell.loading")}</p>}
+      {info && skills.length === 0 && <p className="muted">{t("impact.none")}</p>}
       {skills.length > 0 && (
         <ul className="skill-sdgs">
           {skills.map((s) => (
             <li key={s.skill_id} className="card">
               <div className="card-row">
                 <strong>{s.name}</strong>
-                <span className={`badge ${s.learning ? "gold" : "good"}`}>{s.learning ? "In your plan" : "You have this"}</span>
+                <span className={`badge ${s.learning ? "gold" : "good"}`}>{s.learning ? t("impact.inPlan") : t("impact.have")}</span>
               </div>
               {info!.skill_sdgs[s.skill_id].map((g) => (
                 <p key={g.number} className="skill-sdg"><SdgTile sdg={g} small /><span><strong>SDG {g.number}</strong> {g.reason}</span></p>
@@ -47,7 +47,7 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
           ))}
         </ul>
       )}
-      <p className="source">Mappings: the Laluan team's SDG map (backend/data/sdg_map.json), using the UN goal and target list.</p>
+      <p className="source">{t("impact.source")}</p>
     </section>
   );
 }

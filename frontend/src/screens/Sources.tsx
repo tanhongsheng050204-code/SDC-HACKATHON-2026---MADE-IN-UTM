@@ -1,38 +1,38 @@
 import { useEffect, useState } from "react";
 import { api, Snapshot } from "../lib/api";
 import { monthsOld } from "../lib/format";
-import { t } from "../lib/i18n";
+import { getLang, t } from "../lib/i18n";
 
 // S9: every forecast snapshot the app has used, newest first, so anyone can trace a number back.
 export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onAdmin: () => void }) {
   const [snapshots, setSnapshots] = useState<Snapshot[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError("Couldn't load the list of sources.")); }, []);
+  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError(t("src.failed"))); }, []);
 
   return (
     <section>
       <div className="page-head"><h1>{t("h.sources")}</h1>
         <p className="muted">{t("note.sources")}</p></div>
       {error && <p className="error" role="alert">{error}</p>}
-      {!snapshots && !error && <p className="muted">Loading…</p>}
-      {snapshots?.length === 0 && <div className="empty-state"><p>No forecast has been imported yet.</p></div>}
+      {!snapshots && !error && <p className="muted">{t("shell.loading")}</p>}
+      {snapshots?.length === 0 && <div className="empty-state"><p>{t("src.none")}</p></div>}
       {snapshots && snapshots.length > 0 && (
         <div className="table-wrap card">
           <table className="heatmap sources-table">
-            <thead><tr><th>Snapshot</th><th>Source</th><th>Published</th><th>Imported</th><th>Horizon</th><th>Roles</th><th>Status</th></tr></thead>
+            <thead><tr><th>{t("src.snapshot")}</th><th>{t("src.source")}</th><th>{t("src.published")}</th><th>{t("src.imported")}</th><th>{t("src.horizon")}</th><th>{t("src.roles")}</th><th>{t("src.status")}</th></tr></thead>
             <tbody>
               {snapshots.map((s, i) => (
                 <tr key={s.snapshot_id}>
-                  <th scope="row">{s.snapshot_id}{i === 0 && <> <span className="badge good">In use</span></>}</th>
+                  <th scope="row">{s.snapshot_id}{i === 0 && <> <span className="badge good">{t("src.inUse")}</span></>}</th>
                   <td>{s.source_url ? <a href={s.source_url} target="_blank" rel="noreferrer">{s.source}</a> : s.source}</td>
                   <td>{s.published}</td>
                   <td>{s.imported}</td>
                   <td>{s.horizon_year}</td>
                   <td>{s.signal_count}</td>
                   <td>
-                    {s.illustrative ? <span className="badge risk">Illustrative</span>
-                      : monthsOld(s.imported) > 12 ? <span className="badge gold">Over a year old</span>
-                      : <span className="badge good">Cited</span>}
+                    {s.illustrative ? <span className="badge risk">{t("src.illustrative")}</span>
+                      : monthsOld(s.imported) > 12 ? <span className="badge gold">{t("src.old")}</span>
+                      : <span className="badge good">{t("src.cited")}</span>}
                     {s.reviewed_by && <small className="source"> Reviewed by {s.reviewed_by}</small>}
                   </td>
                 </tr>
@@ -42,7 +42,8 @@ export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onA
         </div>
       )}
       <div className="card">
-        <h2>Other data in Laluan</h2>
+        <h2>{t("src.other")}</h2>
+        {getLang() !== "en" && <p className="source">{t("src.english")}</p>}
         <ul className="plain-list">
           <li><strong>Tasks:</strong> O*NET 30.0 task statements (US Department of Labor), labelled automate / assist / human by our team with AI help.</li>
           <li><strong>Skills per role:</strong> the Laluan team's list, checked against O*NET occupations where one exists.</li>
@@ -59,9 +60,9 @@ export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onA
         </ul>
       </div>
       <div className="card">
-        <h2>Help us check it</h2>
-        <p className="muted">Native speakers, teammates and career counsellors can check our translations, mark the test CVs and review the demo pathways in the review kit.</p>
-        <button onClick={onReviewKit}>Open the review kit</button>
+        <h2>{t("src.help")}</h2>
+        <p className="muted">{t("src.helpBody")}</p>
+        <button onClick={onReviewKit}>{t("src.openKit")}</button>
         <button className="btn quiet" onClick={onAdmin}>Admin: review new data</button>
       </div>
     </section>

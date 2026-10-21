@@ -13,11 +13,11 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
     <button className={role.at_risk ? "card at-risk" : "card"} onClick={onOpen}>
       <div className="card-head">
         <span className="rank">#{role.rank}{move > 0 ? ` ▲${move}` : move < 0 ? ` ▼${-move}` : ""}</span>
-        {role.robust_pick && <span className="badge gold">Robust pick</span>}
-        {role.is_current_role && <span className="badge">Your current role</span>}
+        {role.robust_pick && <span className="badge gold">{t("k.robustPick")}</span>}
+        {role.is_current_role && <span className="badge">{t("card.currentRole")}</span>}
       </div>
       <h2>{role.title}</h2>
-      <div className="fit" role="img" aria-label={`Fit ${percent(role.fit)} percent`}>
+      <div className="fit" role="img" aria-label={`${t("k.fit")} ${percent(role.fit)}%`}>
         <div style={{ width: `${role.fit * 100}%` }} />
       </div>
       <div className="card-row">

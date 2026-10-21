@@ -1,3 +1,4 @@
+import { t } from "../lib/i18n";
 import type { Pathway, RoleMatch } from "../lib/api";
 import { percent } from "../lib/format";
 import { COST, HRD, priceText } from "../lib/labels";
@@ -10,7 +11,7 @@ export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: Rol
     <>
       <div className="readiness card">
         <div className="card-row"><h3>Readiness for {role.title}</h3><strong className="readiness-num">{percent(plan.readiness)}%</strong></div>
-        <div className="fit" role="img" aria-label={`Readiness ${percent(plan.readiness)} percent`}><div style={{ width: `${plan.readiness * 100}%` }} /></div>
+        <div className="fit" role="img" aria-label={`${t("card.readiness")} ${percent(plan.readiness)}%`}><div style={{ width: `${plan.readiness * 100}%` }} /></div>
         <p className="muted">Started at {percent(plan.fit)}% · {done.length} of {plan.steps.length} steps done · about {plan.hours_left} hours left</p>
         {done.length > 0 && (
           <div className="chips">{done.flatMap((s) => s.skills).map((k) => <span key={k.skill_id} className="badge gold">★ {k.name}</span>)}</div>
@@ -20,7 +21,7 @@ export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: Rol
       <p>{plan.summary}</p>
       {plan.grounding && (
         <p className={plan.grounding.all_supported ? "badge" : "banner warning"}>
-          {plan.grounding.all_supported ? "Every sentence is backed by the course catalogue" : `Check sentences ${plan.grounding.unsupported.join(", ")}: not found in the catalogue`}
+          {plan.grounding.all_supported ? t("path.grounded") : `${t("coach.check")} ${plan.grounding.unsupported.join(", ")}: ${t("path.notIn")}`}
         </p>
       )}
       {uncovered.length > 0 && (
@@ -40,8 +41,8 @@ export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: Rol
               <span className="muted">About {c.hours} hours · {c.level} · {s.why}</span>
               <span className="source">From the Laluan course catalogue · {c.url ? (c.checked ? `link checked ${c.checked}` : "link not yet checked") : "no single course page: search the provider"}</span>
               {c.price_note && <span className="source">{c.price_note}{c.hrd_note ? ` ${c.hrd_note}` : ""}{c.price_checked ? ` Price checked ${c.price_checked}.` : ""}</span>}
-              {c.cost === "paid" && <span className="source">Prices change: confirm with the provider, and ask your employer about an HRD Corp claim before enrolling.</span>}
-              <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => onToggle(c.id, e.target.checked)} /> I finished this</label>
+              {c.cost === "paid" && <span className="source">{t("path.prices")}</span>}
+              <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => onToggle(c.id, e.target.checked)} /> {t("path.finished")}</label>
             </li>
           );
         })}

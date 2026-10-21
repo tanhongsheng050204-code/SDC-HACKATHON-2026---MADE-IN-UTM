@@ -6,7 +6,7 @@ import { MicButton } from "./MicButton";
 
 interface Turn { question: string; reply: CoachReply | null; error?: string; dismissed?: boolean; applied?: boolean }
 
-const STARTERS = ["Why is this my top role?", "How long will the plan take?", "Is my current job at risk?", "What if AI adoption is faster?"];
+const STARTERS = () => [t("coach.q1"), t("coach.q2"), t("coach.q3"), t("coach.q4")];
 
 // The coach only proposes. A proposal changes nothing until the person presses Apply.
 export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onClose }: {
@@ -42,28 +42,28 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
     const index = turns.length;
     setTurns((all) => [...all, { question: text, reply: null }]);
     try { mark(index, { reply: await api.coach(profile.id, text, scenario, roleId) }); }
-    catch { mark(index, { error: "The coach is offline right now. Try one of the suggested questions later." }); }
+    catch { mark(index, { error: t("coach.offline") }); }
     finally { setBusy(false); }
   }
 
   async function apply(i: number, p: CoachProposal) {
     try { await onApply(p); mark(i, { applied: true }); }
-    catch { mark(i, { error: "Couldn't apply that change. Nothing was changed." }); }
+    catch { mark(i, { error: t("coach.applyFailed") }); }
   }
 
-  const suggestions = turns.at(-1)?.reply?.suggestions ?? STARTERS;
+  const suggestions = turns.at(-1)?.reply?.suggestions ?? STARTERS();
   return (
     <div className="coach" role="dialog" aria-modal="false" aria-labelledby="coach-title">
       <div className="coach-head">
         <h2 id="coach-title">{t("coach.title")}</h2>
-        <button className="icon-btn" onClick={onClose} aria-label="Close the coach">×</button>
+        <button className="icon-btn" onClick={onClose} aria-label={t("coach.close")}>×</button>
       </div>
       <p className="muted coach-note">{t("note.coach")}</p>
       <ol className="coach-log" aria-live="polite">
         {turns.map((turn, i) => (
           <li key={i}>
             <p className="coach-q">{turn.question}</p>
-            {!turn.reply && !turn.error && <p className="muted typing">Thinking…</p>}
+            {!turn.reply && !turn.error && <p className="muted typing">{t("coach.thinking")}</p>}
             {turn.error && <p className="error" role="alert">{turn.error}</p>}
             {turn.reply && (
               <div className="coach-a">
@@ -71,7 +71,7 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
                 <AiBadge mode={turn.reply.mode} />
                 {turn.reply.grounding && (
                   <span className={`badge ${turn.reply.grounding.all_supported ? "good" : "risk"}`}>
-                    {turn.reply.grounding.all_supported ? "Every sentence backed by a source" : `Check sentence ${turn.reply.grounding.unsupported.join(", ")}: not in the sources`}
+                    {turn.reply.grounding.all_supported ? t("coach.grounded") : `${t("coach.check")} ${turn.reply.grounding.unsupported.join(", ")}: ${t("coach.notIn")}`}
                   </span>
                 )}
                 <details><summary className="muted">Sources ({turn.reply.sources.length})</summary>
@@ -79,9 +79,9 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
                 </details>
                 {turn.reply.proposal && !turn.dismissed && (
                   <div className="proposal card">
-                    <p className="eyebrow">Suggested change</p>
+                    <p className="eyebrow">{t("coach.suggested")}</p>
                     <p><strong>{turn.reply.proposal.label}</strong></p>
-                    {turn.applied ? <span className="badge good">Applied</span> : (
+                    {turn.applied ? <span className="badge good">{t("coach.applied")}</span> : (
                       <div className="actions">
                         <button className="primary" onClick={() => apply(i, turn.reply!.proposal!)}>{t("a.apply")}</button>
                         <button onClick={() => mark(i, { dismissed: true })}>{t("a.dismiss")}</button>
@@ -98,8 +98,8 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
         {suggestions.map((s) => <button key={s} className="chip" onClick={() => ask(s)} disabled={busy}>{s}</button>)}
       </div>
       <form className="chat-form" onSubmit={(e) => { e.preventDefault(); ask(question); }}>
-        <label className="sr-only" htmlFor="coach-q">Ask about your results</label>
-        <input id="coach-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ask about your results" autoFocus />
+        <label className="sr-only" htmlFor="coach-q">{t("coach.ask")}</label>
+        <input id="coach-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t("coach.ask")} autoFocus />
         <MicButton onText={(text) => setQuestion((q) => `${q.trimEnd()} ${text}`.trim().slice(0, 500))} />
         <button className="primary" type="submit" disabled={busy || !question.trim()}>{t("a.ask")}</button>
       </form>

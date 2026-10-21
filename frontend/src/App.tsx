@@ -250,7 +250,7 @@ function MainApp({ demo }: { demo: string | null }) {
       // A profile saved to an account only opens when logged in: keep its ID and ask to log in.
       if (authEnabled && !getUserId()) { setError(t("auth.needLogin")); go("landing"); return; }
       save(KEYS.profile, null);
-      setError("That saved profile has expired. Start again.");
+      setError(t("shell.expired"));
       go("landing");
     }
   }

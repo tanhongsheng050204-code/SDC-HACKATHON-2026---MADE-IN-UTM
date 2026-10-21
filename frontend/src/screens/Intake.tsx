@@ -65,7 +65,7 @@ function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: 
   async function send() {
     setBusy(true); setError(null);
     try { onDone((await api.extract(text)).skills); }
-    catch { setError("We couldn't read that. Try picking skills from the list instead."); }
+    catch { setError(t("in.readFailed")); }
     finally { setBusy(false); }
   }
   return (
@@ -97,15 +97,15 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
     if (!file) return;
     setBusy(true); setError(null);
     try { setPreview(await api.previewUpload(file)); }
-    catch (e) { setError(e instanceof Error ? e.message : "Upload failed"); }
+    catch (e) { setError(e instanceof Error ? e.message : t("in.uploadFailed")); }
     finally { setBusy(false); }
   }
   if (preview) return <SendCheck preview={preview} onBack={() => setPreview(null)} onDone={onDone} />;
   return (
     <div className="dropzone">
       <Icon name="upload" />
-      <p><strong>Upload your CV</strong></p>
-      <p className="muted">PDF, Word (.docx) or text, up to 5 MB. Read in memory and never stored.</p>
+      <p><strong>{t("in.uploadTitle")}</strong></p>
+      <p className="muted">{t("in.uploadHint")}</p>
       <label className="btn ink file-btn">{busy ? t("in.reading") : "Choose a file"}
         <input type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
           disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
@@ -124,13 +124,13 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   async function check() {
     setBusy(true); setError(null);
     try { setPreview(await api.preview(text)); }
-    catch { setError("We couldn't read that. Try picking skills from the list instead."); }
+    catch { setError(t("in.readFailed")); }
     finally { setBusy(false); }
   }
   if (preview) return <SendCheck preview={preview} onBack={() => setPreview(null)} onDone={onDone} />;
   return (
     <>
-      <label htmlFor="cv">Paste your CV or describe your work (at least 50 characters)</label>
+      <label htmlFor="cv">{t("in.pasteLabel")}</label>
       <textarea id="cv" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} />
       <div className="row-between">
         <p className="muted counter" aria-live="polite">{length < 50 ? `${50 - length} more characters` : `${length.toLocaleString()} / 20,000`}</p>
@@ -154,7 +154,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   const [filter, setFilter] = useState("");
   const [field, setField] = useState<string>(FIELDS[0]);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.skills().then(setAll).catch(() => setError("Can't load the skill list.")); }, []);
+  useEffect(() => { api.skills().then(setAll).catch(() => setError(t("in.skillsFailed"))); }, []);
   const query = filter.trim().toLowerCase();
   const fields = [...FIELDS, ...new Set(all.map((s) => s.category).filter((c) => !(FIELDS as readonly string[]).includes(c)))];
   const fieldName = (c: string) => ((FIELDS as readonly string[]).includes(c) ? t(`pick.${c}` as StringKey) : c);
@@ -182,13 +182,13 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
         <div key={c} className="pick-group"><span className="kpi-label">{fieldName(c)}</span>
           <div className="chips">{shown.filter((s) => s.category === c).map(chip)}</div></div>
       )) : <div className="chips" role="tabpanel">{shown.map(chip)}</div>}
-      {all.length > 0 && query && shown.length === 0 && <p className="muted">No skill matches “{filter}”.</p>}
+      {all.length > 0 && query && shown.length === 0 && <p className="muted">{t("in.noMatch")} “{filter}”.</p>}
       {picked.length > 0 && (
         <div className="pick-group"><span className="kpi-label">{t("pick.picked")} ({picked.length})</span>
           <div className="chips">{all.filter((s) => picked.includes(s.id)).map(chip)}</div></div>
       )}
       <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked)}>
-        {picked.length < 3 ? "Pick at least 3 skills" : `Continue with ${picked.length} skills`}
+        {picked.length < 3 ? t("in.pickThree") : `${t("in.continueWith")} ${picked.length} ${t("in.skillsWord")}`}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
     </>
@@ -204,7 +204,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
   useEffect(() => {
     api.turn([], getLang())
       .then((first) => { setTurn(first); setMessages([{ role: "assistant", content: first.next_question }]); })
-      .catch(() => setError("The questionnaire is unavailable. Try another tab."));
+      .catch(() => setError(t("in.chatFailed")));
   }, []);
   async function send() {
     if (!answer.trim() || busy) return;
@@ -214,7 +214,7 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
       const reply = await api.turn(next, getLang());
       setTurn(reply);
       setMessages([...next, { role: "assistant", content: reply.next_question }]);
-    } catch { setError("Couldn't send that. Try again."); }
+    } catch { setError(t("in.sendFailed")); }
     finally { setBusy(false); }
   }
   return (
@@ -225,12 +225,12 @@ function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
       {turn && turn.skills_found.length > 0 && <p className="muted">Skills found so far: {turn.skills_found.length}</p>}
       {turn?.is_complete ? (
         <button className="primary" disabled={turn.skills_found.length === 0} onClick={() => onDone(turn.skills_found)}>
-          {turn.skills_found.length ? `Continue with ${turn.skills_found.length} skills` : "No skills found. Try another tab"}
+          {turn.skills_found.length ? `${t("in.continueWith")} ${turn.skills_found.length} ${t("in.skillsWord")}` : t("in.noneFound")}
         </button>
       ) : (
         <form className="chat-form" onSubmit={(e) => { e.preventDefault(); send(); }}>
-          <label className="sr-only" htmlFor="answer">Your answer</label>
-          <input id="answer" type="text" maxLength={1000} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer" />
+          <label className="sr-only" htmlFor="answer">{t("iv.answer")}</label>
+          <input id="answer" type="text" maxLength={1000} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={t("in.typeAnswer")} />
           <MicButton onText={(spoken) => setAnswer((a) => `${a.trimEnd()} ${spoken}`.trim().slice(0, 1000))} />
           <button className="primary" type="submit" disabled={busy || !answer.trim()}>{busy ? "…" : "Send"}</button>
         </form>

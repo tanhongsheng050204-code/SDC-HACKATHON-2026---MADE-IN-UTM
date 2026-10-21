@@ -47,7 +47,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       </div>
       {!data && loading && <SkeletonCards />}
       {data && <Kpis data={data} scenario={scenario} />}
-      <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+      <div className="segmented" role="radiogroup" aria-label={t("sc.label")}>
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
         ))}

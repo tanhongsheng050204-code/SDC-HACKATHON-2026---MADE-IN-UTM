@@ -12,10 +12,10 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
   const [data, setData] = useState<RadarData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [onlyMine, setOnlyMine] = useState(false);
-  useEffect(() => { api.radar(profile.id).then(setData).catch(() => setError("Couldn't load the radar.")); }, [profile.id]);
+  useEffect(() => { api.radar(profile.id).then(setData).catch(() => setError(t("radar.failed"))); }, [profile.id]);
 
   if (error) return <section><p className="error" role="alert">{error}</p></section>;
-  if (!data) return <section><p className="muted">Loading the radar…</p></section>;
+  if (!data) return <section><p className="muted">{t("radar.loading")}</p></section>;
 
   const visible = onlyMine ? data.skills.filter((s) => s.mine) : data.skills;
   const noData = data.skills.filter((s) => s.label === "no_data");
@@ -39,12 +39,12 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
                   <ul>
                     {skills.map((s) => (
                       <li key={s.skill_id} className={s.mine ? "mine" : ""} title={s.sources.join("\n")}>
-                        <span>{s.name}{s.mine && <span className="badge">Yours</span>}</span>
+                        <span>{s.name}{s.mine && <span className="badge">{t("radar.yours")}</span>}</span>
                         <span className="muted">{s.trend !== null ? `${signed(Math.round(s.trend * 100))}%` : ""}</span>
                         {s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}
                       </li>
                     ))}
-                    {skills.length === 0 && <li className="muted">None</li>}
+                    {skills.length === 0 && <li className="muted">{t("radar.none")}</li>}
                   </ul>
                 </div>
               );
@@ -53,8 +53,8 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         </>
       )}
       {noData.length > 0 && (
-        <details><summary className="muted">{noData.length} skills have no trend in these sources yet</summary>
-          <p className="muted">A trend needs two counts of the same source. Until then we show what we have instead of guessing.</p>
+        <details><summary className="muted">{noData.length} {t("radar.noTrend")}</summary>
+          <p className="muted">{t("radar.twoCounts")}</p>
           <ul className="plain-list">
             {noData.map((s) => <li key={s.skill_id}><strong>{s.name}</strong>{s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
           </ul>
@@ -63,8 +63,8 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
       <MalaysiaAiUseCard />
       {momentum && (
         <div className="card">
-          <h3>AI capabilities: research momentum</h3>
-          <p className="muted">Paper growth compared with AI research overall. Above zero means accelerating faster than average.</p>
+          <h3>{t("radar.momentum")}</h3>
+          <p className="muted">{t("radar.momentumSub")}</p>
           <ul className="momentum">
             {data.capability_momentum.map((c) => {
               const m = c.momentum ?? 0;
