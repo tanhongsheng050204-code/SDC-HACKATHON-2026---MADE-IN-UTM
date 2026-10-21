@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, CoachProposal, CoachReply, Profile, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
+import { AiBadge } from "./AiBadge";
 import { MicButton } from "./MicButton";
 
 interface Turn { question: string; reply: CoachReply | null; error?: string; dismissed?: boolean; applied?: boolean }
@@ -67,6 +68,7 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
             {turn.reply && (
               <div className="coach-a">
                 <p>{turn.reply.answer}</p>
+                <AiBadge mode={turn.reply.mode} />
                 {turn.reply.grounding && (
                   <span className={`badge ${turn.reply.grounding.all_supported ? "good" : "risk"}`}>
                     {turn.reply.grounding.all_supported ? "Every sentence backed by a source" : `Check sentence ${turn.reply.grounding.unsupported.join(", ")}: not in the sources`}

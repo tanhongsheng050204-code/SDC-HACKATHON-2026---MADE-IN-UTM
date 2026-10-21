@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
+import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
-import type { Profile, RoleMatch, Scenario } from "../lib/api";
+import { api, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { pick, t } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
@@ -13,6 +14,8 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
 }) {
   const [error] = useState<string | null>(null);
   const [xray, setXray] = useState<Scenario | null>(null);
+  const [roleCase, setRoleCase] = useState<RoleCaseData | null>(null);
+  useEffect(() => { api.roleCase(profile.id, role.role_id).then(setRoleCase).catch(() => setRoleCase(null)); }, [profile.id, role.role_id, profile.skills]);
 
   return (
     <section>
@@ -46,6 +49,8 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       <div className="job-links"><span className="muted">See open jobs:</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
       </div>
+
+      {roleCase && <RoleCase data={roleCase} />}
 
       <div className="two-col">
         {role.carry_over.length > 0 && (

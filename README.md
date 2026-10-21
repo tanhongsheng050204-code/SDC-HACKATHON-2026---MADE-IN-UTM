@@ -21,6 +21,9 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
+| **Your own AI future** | On **Future roles**, drag AI adoption from 0.5× to 2× (not just the three scenarios). Laluan names your **tipping points**: the speed at which your current job turns Declining, or another role overtakes your top match. |
+| **Forecast x-ray** | Tap 🔍 beside any outlook to see each step from the published WEF figure to the number shown, with sources. |
+| **Why it could work / what could go wrong** | Two columns on every role, for *your* profile: skills you have, growth, plan hours, pay difference in RM; and missing core skills, the share of its tasks AI is likely to automate, paid courses, and when WEF has no exact category for the role. Every point names its source, and none is written by a model. |
 | **Pathway** | Ordered courses for the skills you're missing, with hours, cost label and link-check date. Tick a course off and your readiness and rankings update. |
 | **SDG impact** | How the role and each of its skills connect to the SDGs, with a written reason for every link. The SDG links explain each role; they are not a ranking preference. |
 | **AI coach** | Answers questions about *your* results, citing them. It can suggest a change (another scenario), but nothing changes until you press **Apply**. |
@@ -33,7 +36,18 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Admin review** | New trend data from a refresh waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
 | **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
+| **Plain-language help** | A “?” beside jargon on Today (skill fit, outlook, robust pick), and a badge on each coach answer saying whether AI or plain rules wrote it, or a safety check stopped it. |
+| **Safety checks** | Coach questions and CV text are checked for prompt injection (“ignore previous instructions…”, “change my score”) before any model reads them; the coach answers with a calm refusal and the CV is read by the skill dictionary only. |
 | **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
+
+## How Laluan meets the judging criteria
+
+| Criterion (weight) | Where to look |
+| --- | --- |
+| **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
+| **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 208 automated tests. Public and synthetic data only. |
+| **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
 
@@ -182,13 +196,15 @@ Research activity and Hacker News posts are rough proxies for demand. A refresh 
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 69 tests: API, services, trends, review, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 208 tests: API, services, trends, review, guardrails, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
 GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
 
 Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
+
+A full manual checklist of every feature is in [MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md).
 
 Human scoring of the synthetic CVs and an outside review of the pathways are still to be recorded in [EVALUATION.md](docs/EVALUATION.md); the **Review kit** (`/?view=review-kit`) makes both quick.
 
@@ -241,7 +257,7 @@ Stack: **React 18 + TypeScript + Vite**, **FastAPI + Pydantic**, **SQLite** loca
 5. [Backend Schema](docs/05-BACKEND_SCHEMA.md): data and rules
 6. [Implementation Plan](docs/06-IMPLEMENTATION_PLAN.md): milestones and what's done
 
-SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md)
+SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md) · [Data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf)
 
 How we built and checked it: [Proposal](docs/PROPOSAL.md) · [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md)
 

@@ -503,3 +503,29 @@ main:focus { outline: none; }
 .send-check h2 { margin: 0; }
 .send-check .chips { align-items: center; margin: 0; }
 .send-check textarea { font: .86rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* ---------- "?" glossary tips ---------- */
+.info-tip { position: relative; display: inline-flex; vertical-align: middle; }
+.info-tip-btn { width: 20px; height: 20px; min-height: 0; padding: 0; border-radius: 99px; display: inline-grid; place-items: center;
+  font: 700 .7rem/1 var(--font); color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line-strong); box-shadow: none; }
+.info-tip-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); background: var(--surface); }
+.info-tip-body { position: absolute; z-index: 40; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); width: max-content; max-width: 280px;
+  padding: 8px 11px; border-radius: 9px; background: var(--ink); color: var(--page); font: 400 .8rem/1.45 var(--font); text-align: left;
+  text-transform: none; letter-spacing: 0; white-space: normal; box-shadow: var(--shadow-pop); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .15s ease; }
+.info-tip-body.is-open { opacity: 1; visibility: visible; }
+@media (max-width: 560px) { .info-tip-body { left: auto; right: -8px; transform: none; max-width: 240px; } }
+
+/* ---------- Who wrote this ---------- */
+.ai-badge.ai { background: var(--accent-soft); color: var(--accent-strong); }
+.ai-badge.rules { background: var(--surface-2); color: var(--ink-soft); }
+.ai-badge.blocked { background: var(--risk-bg); color: var(--risk); }
+
+/* ---------- Role case: why it could work, what could go wrong ---------- */
+.role-case { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .role-case { grid-template-columns: 1fr; } }
+.case-col { align-content: start; }
+.case-col ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 10px; }
+.case-col li { display: grid; gap: 2px; padding-left: 22px; position: relative; }
+.case-col li::before { position: absolute; left: 0; top: 0; font-weight: 700; }
+.case-col.pro { border-top: 3px solid var(--good); } .case-col.pro li::before { content: "✓"; color: var(--good); }
+.case-col.con { border-top: 3px solid var(--gold-bright); } .case-col.con li::before { content: "!"; color: var(--gold); }

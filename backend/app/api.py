@@ -15,8 +15,8 @@ from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, In
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, skills, skilltree, survey,
-                          tasks, tipping, workforce, xray)
+from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills,
+                          skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
 
 router = APIRouter(prefix="/api")
@@ -393,6 +393,15 @@ def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int 
 def profile_tipping(profile_id: str, year: int | None = None, user: str | None = User):
     """Where, on the AI-adoption slider, this person's picture changes."""
     return tipping.find(get_reference(), _profile_for(profile_id, user), year)
+
+
+@router.get("/profiles/{profile_id}/roles/{role_id}/case")
+def profile_role_case(profile_id: str, role_id: str, user: str | None = User):
+    """What speaks for this role and what could go wrong for this person, each with its source."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    return rolecase.case(ref, _profile_for(profile_id, user), role_id)
 
 
 @router.post("/profiles/{profile_id}/complete")

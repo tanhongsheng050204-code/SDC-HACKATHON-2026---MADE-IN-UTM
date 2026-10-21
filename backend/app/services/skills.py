@@ -12,6 +12,7 @@ import re
 from app import runpod
 from app.llm import generate_json
 from app.reference import get_reference
+from app.services import guardrails
 from app.services.deid import scrub_cv
 from app.services.embeddings import cosine, embed_many
 
@@ -77,6 +78,9 @@ def extract(text: str, names: list[str] | None = None) -> dict:
     skill_ids = dictionary_extract(text)  # local, so it may read what the scrubber removed ("Data Science Academy")
     unmatched: list[str] = []
     mode = "dictionary"
+    if not guardrails.check(clean).safe:
+        # A CV that tries to instruct the model is read by the dictionary only.
+        return {"skills": skill_ids, "unmatched": [], "mode": "dictionary (AI skipped: instructions found in text)"}
     prompt = EXTRACT_PROMPT.format(text=clean[:20_000])
     result = None
     if runpod.cv_model_available():

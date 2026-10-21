@@ -1,4 +1,5 @@
 import type { Matches, Scenario } from "../lib/api";
+import { InfoTip } from "./InfoTip";
 import { percent, signed } from "../lib/format";
 import { t } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
@@ -15,7 +16,7 @@ export function Kpis({ data, scenario }: { data: Matches; scenario: Scenario }) 
         {top && <span className="badge good">{percent(top.fit)}% {t("k.fit")}</span>}
       </div>
       <div className="kpi">
-        <span className="kpi-label">{t("k.robust")}</span><strong>{robust}</strong>
+        <span className="kpi-label">{t("k.robust")} <InfoTip term="gl.robust" label="robust pick" /></span><strong>{robust}</strong>
         <span className="badge">{t("k.robustNote")}</span>
       </div>
       <div className="kpi">

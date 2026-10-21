@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
+import { InfoTip } from "../components/InfoTip";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { t } from "../lib/i18n";
@@ -86,12 +87,12 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
       {data && top && (
         <div className="home-kpis">
           <div className="kpi">
-            <span className="kpi-label">{t("k.top")}</span><strong>{top.title}</strong>
+            <span className="kpi-label">{t("k.top")} <InfoTip term="gl.fit" label="skill fit" /></span><strong>{top.title}</strong>
             <span className="badge good">{percent(top.fit)}% {t("k.fit")}</span>
             <span className="kpi-foot">{OUTLOOK_TEXT[top.outlook[scenario].label]} · {signed(top.outlook[scenario].index)}% to {data.signal_source.horizon_year}</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">{t("k.current")}</span>
+            <span className="kpi-label">{t("k.current")} <InfoTip term="gl.outlook" label="outlook" /></span>
             <strong>{current ? `${signed(current.outlook[scenario].index)}%` : t("k.notSet")}</strong>
             {current
               ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span>
@@ -99,7 +100,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
             <span className="kpi-foot">{current ? current.title : audience === "graduate" ? t("lead.gradBody") : "Lets us compare your job with the alternatives"}</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">{t("k.robust")}</span><strong>{robust.length}</strong>
+            <span className="kpi-label">{t("k.robust")} <InfoTip term="gl.robust" label="robust pick" /></span><strong>{robust.length}</strong>
             <span className="badge">{t("k.robustNote")}</span>
             <span className="kpi-foot">{robust.slice(0, 2).map((r) => r.title).join(", ") || "None yet"}</span>
           </div>

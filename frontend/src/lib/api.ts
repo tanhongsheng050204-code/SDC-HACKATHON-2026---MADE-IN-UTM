@@ -94,6 +94,8 @@ export interface FutureCard {
   proven?: { name: string; level: number; level_name: string }[];
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
+export interface CasePoint { text: string; source: string }
+export interface RoleCase { role_id: string; pros: CasePoint[]; cons: CasePoint[] }
 export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
@@ -339,6 +341,7 @@ export const api = {
     request<Profile>(`/profiles/${p.id}`, { method: "PUT", body: JSON.stringify({
       display_name: p.display_name, current_role_id: p.current_role_id, skills: p.skills,
       experience_years: p.experience_years, audience: p.audience ?? null }) }),
+  roleCase: (id: string, roleId: string) => request<RoleCase>(`/profiles/${id}/roles/${encodeURIComponent(roleId)}/case`),
   coach: (profileId: string, question: string, scenario: Scenario, roleId?: string) =>
     request<CoachReply>("/coach", { method: "POST", body: JSON.stringify({ profile_id: profileId, question, scenario, role_id: roleId ?? null }) }),
   createCard: (id: string, roleId: string) =>

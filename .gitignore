@@ -16,3 +16,6 @@ backend/data/signals/pending/
 
 # Local Claude Code settings, skills and preview config
 .claude/
+
+# Vite dependency cache
+.vite/
