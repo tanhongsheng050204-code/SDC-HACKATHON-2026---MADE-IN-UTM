@@ -119,6 +119,11 @@ Notes: ______
 - [ ] 7.4 “N skills have no data in these sources” opens to list them.
 - [ ] 7.5 AI capability momentum bars appear after a refresh.
 - [ ] 7.6 Source line shows snapshot and dates; **See my future roles** opens Future roles.
+- [ ] 7.7 After a refresh with history: each forecast skill shows “+N% by 2030”, **Likely** or **Uncertain**, its 80% range and a small chart (solid history, dashed forecast, shaded range).
+- [ ] 7.8 Switching **Slow / Baseline / Accelerated** changes the numbers for skills AI automates or boosts (e.g. Office administration falls further under Accelerated) and can move skills between columns.
+- [ ] 7.9 **Jobs rising and declining** lists every role with its change by 2030 for the chosen scenario, the range across scenarios and the Malaysian employment line.
+- [ ] 7.10 **How well does this forecast do?** shows the backtest numbers in plain words, and the method.
+- [ ] 7.11 BM and 中文: every new line above is translated.
 
 Notes: ______
 
@@ -308,7 +313,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (208, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (297, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

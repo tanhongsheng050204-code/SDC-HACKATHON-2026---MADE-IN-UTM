@@ -52,7 +52,7 @@ snapshot stays in use and its date is shown.
 ## Matching and scoring
 
 `fit = covered skill weight ÷ total weight` (core 3, important 2, useful 1) ·
-`score = 0.6 × fit + 0.4 × outlook (0–1) + 0.05 if the role serves a goal the user chose` ·
+`score = 0.6 × fit + 0.4 × outlook (0–1) + up to 0.05 for fitting “What I enjoy” (+ 0.05 for graduates on roles open to new graduates)` ·
 declining roles rank last · every role returns the breakdown, an estimate range across scenarios and a citation.
 
 ## Architecture
