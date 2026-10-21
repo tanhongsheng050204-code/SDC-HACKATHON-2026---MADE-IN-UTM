@@ -1,0 +1,18 @@
+{
+  "_note": "Each role's occupation codes in the classifications the AI-exposure studies use. soc: US SOC 2018 (Anthropic Economic Index, OpenAI 'GPTs are GPTs'); onet: O*NET-SOC (OpenAI, task data); isco08: ISCO-08 4-digit (ILO, and close to Malaysia's MASCO 2020). The closest match is used where no code fits exactly, and 'note' says so. null means no published code fits, and the role is not compared. Drafted with AI assistance; team to review (REVIEW_LOG.md).",
+  "roles": {
+    "data_entry_clerk": {"soc": "43-9021", "onet": "43-9021.00", "isco08": "4132", "note": null},
+    "admin_assistant": {"soc": "43-6014", "onet": "43-6014.00", "isco08": "4120", "note": "ISCO: Secretaries (general)."},
+    "customer_service_rep": {"soc": "43-4051", "onet": "43-4051.00", "isco08": "4222", "note": "ISCO: Contact centre information clerks."},
+    "data_analyst": {"soc": "15-2051", "onet": "15-2051.01", "isco08": "2120", "note": "SOC: Data Scientists (Business Intelligence Analysts in O*NET). ISCO: Mathematicians, actuaries and statisticians."},
+    "ai_ml_engineer": {"soc": "15-2051", "onet": "15-2051.00", "isco08": "2519", "note": "SOC: Data Scientists. ISCO: Software and applications developers and analysts not elsewhere classified."},
+    "ai_operations_specialist": {"soc": null, "onet": null, "isco08": null, "note": "A new role with no published occupation code, so it is not compared."},
+    "software_developer": {"soc": "15-1252", "onet": "15-1252.00", "isco08": "2512", "note": null},
+    "cybersecurity_analyst": {"soc": "15-1212", "onet": "15-1212.00", "isco08": "2529", "note": "ISCO: Database and network professionals not elsewhere classified, where ICT security sits."},
+    "digital_marketing_specialist": {"soc": "13-1161", "onet": "13-1161.01", "isco08": "2431", "note": "SOC: Market research analysts and marketing specialists (Search Marketing Strategists in O*NET)."},
+    "ux_designer": {"soc": "15-1255", "onet": "15-1255.00", "isco08": "2166", "note": "ISCO: Graphic and multimedia designers."},
+    "renewable_energy_technician": {"soc": "47-2231", "onet": "47-2231.00", "isco08": "7411", "note": "SOC: Solar photovoltaic installers. ISCO: Building and related electricians."},
+    "sustainability_analyst": {"soc": "13-1199", "onet": "13-1199.05", "isco08": "2133", "note": "SOC: Business operations specialists, all other (Sustainability Specialists in O*NET). ISCO: Environmental protection professionals."},
+    "care_worker": {"soc": "31-1122", "onet": "31-1122.00", "isco08": "5322", "note": "SOC: Personal care aides. ISCO: Home-based personal care workers."}
+  }
+}

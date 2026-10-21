@@ -1,0 +1,31 @@
+{
+  "_note": "Malaysian public programmes linked from role pages. Links only: Laluan is not affiliated with or endorsed by TalentCorp or any agency. MyCOL matches were read from the 2024/2025 report by job titles employers nominated (PDF page numbers below); 'related' means a listed occupation overlaps the role but is not the same job. Drafted with AI assistance; team to review (REVIEW_LOG.md).",
+  "mycol": {
+    "name": "MyMahir Malaysia Critical Occupations List (MyCOL) 2024/2025",
+    "publisher": "TalentCorp, Ministry of Human Resources",
+    "about": "Occupations where Malaysian employers report demand exceeding the supply of qualified people, across 18 sectors (66 occupations in this edition).",
+    "url": "https://www.talentcorp.com.my/mycol/",
+    "report_url": "https://www.talentcorp.com.my/images/uploads/publication/204/MyMahir-Malaysia-Critical-Occupations-List-MyCOL20242025-1773385490.pdf",
+    "checked": "2026-10-21",
+    "roles": {
+      "software_developer": {"match": "listed", "titles": ["Software Developer", "Software Engineer"], "page": 126},
+      "data_analyst": {"match": "listed", "titles": ["Data Scientist", "Data Analyst", "Business Data Analyst"], "page": 138},
+      "ai_ml_engineer": {"match": "listed", "titles": ["Data Scientist"], "page": 138},
+      "cybersecurity_analyst": {"match": "listed", "titles": ["Information Security Officer", "Cybersecurity Analyst"], "page": 140},
+      "ux_designer": {"match": "related", "titles": ["Graphic Artist", "Designer Artist"], "page": 142},
+      "digital_marketing_specialist": {"match": "related", "titles": ["Marketing Manager", "Digital Marketing Assistant Manager"], "page": 66},
+      "sustainability_analyst": {"match": "related", "titles": ["Sustainability Manager"], "page": 62}
+    }
+  },
+  "mymahir": {
+    "name": "MyMahir",
+    "about": "TalentCorp's national skills platform: roles and skills by sector, in-demand and emerging roles, and training programmes.",
+    "url": "https://www.mymahir.my/"
+  },
+  "jelajah_ai": {
+    "name": "Jelajah AI MyMahir",
+    "about": "Free, hands-on AI training sessions run by TalentCorp with EY Malaysia in communities across Malaysia, open to everyone, with a MyMahir Skills Passport certificate.",
+    "url": "https://www.mymahir.my/",
+    "source": "https://www.businesstoday.com.my/2026/08/09/more-than-400-malaysians-get-hands-on-with-ai-in-bandar-utama/"
+  }
+}

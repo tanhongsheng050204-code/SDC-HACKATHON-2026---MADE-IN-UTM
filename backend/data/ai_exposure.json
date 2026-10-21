@@ -1,0 +1,593 @@
+{
+ "_note": "Built by scripts/build_ai_exposure.py. Scores are each source's own; percentiles are among all occupations in that source.",
+ "built": "2026-10-21",
+ "sources": {
+  "anthropic": {
+   "name": "Anthropic Economic Index",
+   "measure": "Observed exposure: how much of the occupation's work shows up in real Claude conversations",
+   "url": "https://huggingface.co/datasets/Anthropic/EconomicIndex",
+   "file": "labor_market_impacts/job_exposure.csv",
+   "licence": "CC BY",
+   "occupations": 756
+  },
+  "openai": {
+   "name": "OpenAI, “GPTs are GPTs” (Eloundou et al., 2023)",
+   "measure": "Share of tasks a language model could do at least twice as fast (β rating, 2023)",
+   "url": "https://github.com/openai/GPTs-are-GPTs",
+   "file": "data/occ_level.csv",
+   "licence": "MIT",
+   "occupations": 923
+  },
+  "ilo": {
+   "name": "ILO Working Paper 140 (Gmyrek et al., 2025)",
+   "measure": "Mean generative-AI exposure of the occupation's tasks, global index",
+   "url": "https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure",
+   "file": "Annex Table A1",
+   "licence": "CC BY 4.0",
+   "occupations": 426
+  },
+  "usage": {
+   "name": "Anthropic Economic Index, monthly release",
+   "url": "https://huggingface.co/datasets/Anthropic/EconomicIndex",
+   "file": "aei.csv",
+   "month": "2026-05",
+   "licence": "CC BY"
+  }
+ },
+ "roles": {
+  "data_entry_clerk": {
+   "anthropic": {
+    "code": "43-9021",
+    "occupation": "Data Entry Keyers",
+    "score": 0.6707,
+    "percentile": 99.7
+   },
+   "openai": {
+    "code": "43-9021.00",
+    "occupation": "Data Entry Keyers",
+    "score": 0.8928571428571428,
+    "percentile": 98.8
+   },
+   "ilo": {
+    "code": "4132",
+    "occupation": "Data Entry Clerks",
+    "score": 0.7,
+    "percentile": 99.9,
+    "gradient": "Gradient 4"
+   }
+  },
+  "admin_assistant": {
+   "anthropic": {
+    "code": "43-6014",
+    "occupation": "Secretaries and Administrative Assistants, Except Legal, Medical, and Executive",
+    "score": 0.4528,
+    "percentile": 97.4
+   },
+   "openai": {
+    "code": "43-6014.00",
+    "occupation": "Secretaries and Administrative Assistants, Except Legal, Medical, and Executive",
+    "score": 0.6442307692307693,
+    "percentile": 92.1
+   },
+   "ilo": {
+    "code": "4120",
+    "occupation": "Secretaries (general)",
+    "score": 0.58,
+    "percentile": 96.2,
+    "gradient": "Gradient 3"
+   }
+  },
+  "customer_service_rep": {
+   "anthropic": {
+    "code": "43-4051",
+    "occupation": "Customer Service Representatives",
+    "score": 0.7011,
+    "percentile": 99.8
+   },
+   "openai": {
+    "code": "43-4051.00",
+    "occupation": "Customer Service Representatives",
+    "score": 0.5681818181818182,
+    "percentile": 86.9
+   },
+   "ilo": {
+    "code": "4222",
+    "occupation": "Contact Centre Information Clerks",
+    "score": 0.58,
+    "percentile": 96.2,
+    "gradient": "Gradient 3"
+   }
+  },
+  "data_analyst": {
+   "anthropic": {
+    "code": "15-2051",
+    "occupation": "Data Scientists",
+    "score": 0.4605,
+    "percentile": 97.7
+   },
+   "openai": {
+    "code": "15-2051.01",
+    "occupation": "Business Intelligence Analysts",
+    "score": 0.696969696969697,
+    "percentile": 95.0
+   },
+   "ilo": {
+    "code": "2120",
+    "occupation": "Mathematicians, Actuaries and Statisticians",
+    "score": 0.56,
+    "percentile": 93.7,
+    "gradient": "Gradient 3"
+   }
+  },
+  "ai_ml_engineer": {
+   "anthropic": {
+    "code": "15-2051",
+    "occupation": "Data Scientists",
+    "score": 0.4605,
+    "percentile": 97.7
+   },
+   "openai": {
+    "code": "15-2051.00",
+    "occupation": "Data Scientists",
+    "score": 0.75,
+    "percentile": 96.3
+   },
+   "ilo": {
+    "code": "2519",
+    "occupation": "Software and Applications Developers and Analysts Not Elsewhere Classified",
+    "score": 0.55,
+    "percentile": 92.6,
+    "gradient": "Gradient 3"
+   }
+  },
+  "ai_operations_specialist": {},
+  "software_developer": {
+   "anthropic": {
+    "code": "15-1252",
+    "occupation": "Software Developers",
+    "score": 0.288,
+    "percentile": 90.4
+   },
+   "openai": {
+    "code": "15-1252.00",
+    "occupation": "Software Developers",
+    "score": 0.8684210526315789,
+    "percentile": 98.0
+   },
+   "ilo": {
+    "code": "2512",
+    "occupation": "Software Developers",
+    "score": 0.53,
+    "percentile": 90.4,
+    "gradient": "Gradient 3"
+   }
+  },
+  "cybersecurity_analyst": {
+   "anthropic": {
+    "code": "15-1212",
+    "occupation": "Information Security Analysts",
+    "score": 0.4859,
+    "percentile": 98.5
+   },
+   "openai": {
+    "code": "15-1212.00",
+    "occupation": "Information Security Analysts",
+    "score": 0.6521739130434783,
+    "percentile": 93.0
+   },
+   "ilo": {
+    "code": "2529",
+    "occupation": "Database and Network Professionals Not Elsewhere Classified",
+    "score": 0.49,
+    "percentile": 87.3,
+    "gradient": "Gradient 2"
+   }
+  },
+  "digital_marketing_specialist": {
+   "anthropic": {
+    "code": "13-1161",
+    "occupation": "Market Research Analysts and Marketing Specialists",
+    "score": 0.6483,
+    "percentile": 99.4
+   },
+   "openai": {
+    "code": "13-1161.01",
+    "occupation": "Search Marketing Strategists",
+    "score": 0.5491803278688525,
+    "percentile": 84.9
+   },
+   "ilo": {
+    "code": "2431",
+    "occupation": "Advertising and Marketing Professionals",
+    "score": 0.55,
+    "percentile": 92.6,
+    "gradient": "Gradient 3"
+   }
+  },
+  "ux_designer": {
+   "anthropic": {
+    "code": "15-1255",
+    "occupation": "Web and Digital Interface Designers",
+    "score": 0.249,
+    "percentile": 88.6
+   },
+   "openai": {
+    "code": "15-1255.00",
+    "occupation": "Web and Digital Interface Designers",
+    "score": 0.8333333333333333,
+    "percentile": 97.5
+   },
+   "ilo": {
+    "code": "2166",
+    "occupation": "Graphic and Multimedia Designers",
+    "score": 0.49,
+    "percentile": 87.3,
+    "gradient": "Gradient 2"
+   }
+  },
+  "renewable_energy_technician": {
+   "anthropic": {
+    "code": "47-2231",
+    "occupation": "Solar Photovoltaic Installers",
+    "score": 0.0,
+    "percentile": 27.2
+   },
+   "openai": {
+    "code": "47-2231.00",
+    "occupation": "Solar Photovoltaic Installers",
+    "score": 0.11,
+    "percentile": 20.5
+   },
+   "ilo": {
+    "code": "7411",
+    "occupation": "Building and Related Electricians",
+    "score": 0.19,
+    "percentile": 30.4,
+    "gradient": "Not Exposed"
+   }
+  },
+  "sustainability_analyst": {
+   "anthropic": {
+    "code": "13-1199",
+    "occupation": "Business Operations Specialists, All Other",
+    "score": 0.1846,
+    "percentile": 83.1
+   },
+   "openai": {
+    "code": "13-1199.05",
+    "occupation": "Sustainability Specialists",
+    "score": 0.6071428571428571,
+    "percentile": 90.2
+   },
+   "ilo": {
+    "code": "2133",
+    "occupation": "Environmental Protection Professionals",
+    "score": 0.38,
+    "percentile": 72.9,
+    "gradient": "Minimal Exposure"
+   }
+  },
+  "care_worker": {
+   "openai": {
+    "code": "31-1122.00",
+    "occupation": "Personal Care Aides",
+    "score": 0.2222222222222222,
+    "percentile": 32.8
+   },
+   "ilo": {
+    "code": "5322",
+    "occupation": "Home-based Personal Care Workers",
+    "score": 0.25,
+    "percentile": 45.9,
+    "gradient": "Minimal Exposure"
+   }
+  }
+ },
+ "tasks": {
+  "11402": {
+   "automation_pct": 68.84,
+   "augmentation_pct": 31.16
+  },
+  "11403": {
+   "automation_pct": 58.82,
+   "augmentation_pct": 41.18
+  },
+  "11404": {
+   "automation_pct": 100.0,
+   "augmentation_pct": 0.0
+  },
+  "11405": {
+   "automation_pct": 59.2,
+   "augmentation_pct": 40.8
+  },
+  "16139": {
+   "automation_pct": 88.63,
+   "augmentation_pct": 11.37
+  },
+  "16141": {
+   "automation_pct": 35.55,
+   "augmentation_pct": 64.45
+  },
+  "16144": {
+   "automation_pct": 50.96,
+   "augmentation_pct": 49.04
+  },
+  "16146": {
+   "automation_pct": 59.2,
+   "augmentation_pct": 40.8
+  },
+  "16149": {
+   "automation_pct": 49.9,
+   "augmentation_pct": 50.1
+  },
+  "16150": {
+   "automation_pct": 60.82,
+   "augmentation_pct": 39.18
+  },
+  "16186": {
+   "automation_pct": 58.84,
+   "augmentation_pct": 41.16
+  },
+  "18565": {
+   "automation_pct": 28.59,
+   "augmentation_pct": 71.41
+  },
+  "20281": {
+   "automation_pct": 82.89,
+   "augmentation_pct": 17.11
+  },
+  "20284": {
+   "automation_pct": 66.67,
+   "augmentation_pct": 33.33
+  },
+  "21662": {
+   "automation_pct": 44.48,
+   "augmentation_pct": 55.52
+  },
+  "21664": {
+   "automation_pct": 40.98,
+   "augmentation_pct": 59.02
+  },
+  "21667": {
+   "automation_pct": 42.08,
+   "augmentation_pct": 57.92
+  },
+  "21669": {
+   "automation_pct": 50.0,
+   "augmentation_pct": 50.0
+  },
+  "21670": {
+   "automation_pct": 69.12,
+   "augmentation_pct": 30.88
+  },
+  "21688": {
+   "automation_pct": 47.76,
+   "augmentation_pct": 52.24
+  },
+  "21693": {
+   "automation_pct": 36.46,
+   "augmentation_pct": 63.54
+  },
+  "21823": {
+   "automation_pct": 50.0,
+   "augmentation_pct": 50.0
+  },
+  "21826": {
+   "automation_pct": 58.65,
+   "augmentation_pct": 41.35
+  },
+  "21827": {
+   "automation_pct": 51.67,
+   "augmentation_pct": 48.33
+  },
+  "21829": {
+   "automation_pct": 70.59,
+   "augmentation_pct": 29.41
+  },
+  "2371": {
+   "automation_pct": 65.19,
+   "augmentation_pct": 34.81
+  },
+  "2373": {
+   "automation_pct": 46.12,
+   "augmentation_pct": 53.88
+  },
+  "2376": {
+   "automation_pct": 46.67,
+   "augmentation_pct": 53.33
+  },
+  "2581": {
+   "automation_pct": 91.63,
+   "augmentation_pct": 8.37
+  },
+  "2797": {
+   "automation_pct": 20.92,
+   "augmentation_pct": 79.08
+  },
+  "5314": {
+   "automation_pct": 67.57,
+   "augmentation_pct": 32.43
+  },
+  "5317": {
+   "automation_pct": 90.0,
+   "augmentation_pct": 10.0
+  }
+ },
+ "malaysia": {
+  "usage_index": 0.87,
+  "groups": {
+   "39": {
+    "name": "Personal Care and Service",
+    "mys_pct": 1.09,
+    "global_pct": 1.23,
+    "automation_pct": 55.97,
+    "augmentation_pct": 44.03
+   },
+   "37": {
+    "name": "Building and Grounds Cleaning and Maintenance",
+    "mys_pct": 0.16,
+    "global_pct": 0.13,
+    "automation_pct": 37.5,
+    "augmentation_pct": 62.5
+   },
+   "33": {
+    "name": "Protective Service",
+    "mys_pct": 0.29,
+    "global_pct": 0.33,
+    "automation_pct": 76.67,
+    "augmentation_pct": 23.33
+   },
+   "49": {
+    "name": "Installation, Maintenance, and Repair",
+    "mys_pct": 0.55,
+    "global_pct": 0.62,
+    "automation_pct": 70.18,
+    "augmentation_pct": 29.82
+   },
+   "17": {
+    "name": "Architecture and Engineering",
+    "mys_pct": 3.82,
+    "global_pct": 3.56,
+    "automation_pct": 43.65,
+    "augmentation_pct": 56.35
+   },
+   "13": {
+    "name": "Business and Financial Operations",
+    "mys_pct": 6.45,
+    "global_pct": 5.77,
+    "automation_pct": 43.12,
+    "augmentation_pct": 56.88
+   },
+   "11": {
+    "name": "Management",
+    "mys_pct": 6.32,
+    "global_pct": 5.9,
+    "automation_pct": 42.64,
+    "augmentation_pct": 57.36
+   },
+   "29": {
+    "name": "Healthcare Practitioners and Technical",
+    "mys_pct": 2.43,
+    "global_pct": 3.31,
+    "automation_pct": 43.31,
+    "augmentation_pct": 56.69
+   },
+   "21": {
+    "name": "Community and Social Service",
+    "mys_pct": 2.7,
+    "global_pct": 2.57,
+    "automation_pct": 40.28,
+    "augmentation_pct": 59.72
+   },
+   "15": {
+    "name": "Computer and Mathematical",
+    "mys_pct": 25.03,
+    "global_pct": 23.8,
+    "automation_pct": 61.27,
+    "augmentation_pct": 38.73
+   },
+   "43": {
+    "name": "Office and Administrative Support",
+    "mys_pct": 8.13,
+    "global_pct": 7.89,
+    "automation_pct": 53.81,
+    "augmentation_pct": 46.19
+   },
+   "31": {
+    "name": "Healthcare Support",
+    "mys_pct": 0.58,
+    "global_pct": 0.62,
+    "automation_pct": 39.8,
+    "augmentation_pct": 60.2
+   },
+   "35": {
+    "name": "Food Preparation and Serving Related",
+    "mys_pct": 0.37,
+    "global_pct": 0.48,
+    "automation_pct": 40.58,
+    "augmentation_pct": 59.42
+   },
+   "25": {
+    "name": "Educational Instruction and Library",
+    "mys_pct": 11.6,
+    "global_pct": 12.79,
+    "automation_pct": 39.75,
+    "augmentation_pct": 60.25
+   },
+   "41": {
+    "name": "Sales and Related",
+    "mys_pct": 8.05,
+    "global_pct": 9.14,
+    "automation_pct": 38.13,
+    "augmentation_pct": 61.87
+   },
+   "23": {
+    "name": "Legal",
+    "mys_pct": 0.8,
+    "global_pct": 1.02,
+    "automation_pct": 33.13,
+    "augmentation_pct": 66.87
+   },
+   "53": {
+    "name": "Transportation and Material Moving",
+    "mys_pct": 0.32,
+    "global_pct": 0.34,
+    "automation_pct": 37.31,
+    "augmentation_pct": 62.69
+   },
+   "51": {
+    "name": "Production",
+    "mys_pct": 0.97,
+    "global_pct": 1.04,
+    "automation_pct": 67.17,
+    "augmentation_pct": 32.83
+   },
+   "19": {
+    "name": "Life, Physical, and Social Science",
+    "mys_pct": 4.56,
+    "global_pct": 4.51,
+    "automation_pct": 40.72,
+    "augmentation_pct": 59.28
+   },
+   "27": {
+    "name": "Arts, Design, Entertainment, Sports, and Media",
+    "mys_pct": 14.54,
+    "global_pct": 13.55,
+    "automation_pct": 36.92,
+    "augmentation_pct": 63.08
+   }
+  },
+  "requests": [
+   {
+    "name": "Content Creation & Copywriting",
+    "mys_pct": 24.3,
+    "global_pct": 22.72
+   },
+   {
+    "name": "Education & Learning",
+    "mys_pct": 13.89,
+    "global_pct": 13.23
+   },
+   {
+    "name": "Software Development",
+    "mys_pct": 12.99,
+    "global_pct": 11.51
+   },
+   {
+    "name": "Research & Intelligence",
+    "mys_pct": 9.94,
+    "global_pct": 10.94
+   },
+   {
+    "name": "Hobbies & Lifestyle",
+    "mys_pct": 7.11,
+    "global_pct": 9.49
+   },
+   {
+    "name": "Business Process & Operations",
+    "mys_pct": 5.17,
+    "global_pct": 4.7
+   }
+  ]
+ }
+}
