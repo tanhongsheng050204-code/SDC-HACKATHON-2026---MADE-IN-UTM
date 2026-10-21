@@ -16,6 +16,7 @@ import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
+import { Onboarding } from "./screens/Onboarding";
 import { Admin } from "./screens/Admin";
 import { Home, TargetScreen } from "./screens/Home";
 import { Landing } from "./screens/landing/Landing";
@@ -43,7 +44,8 @@ let entryHandled = false;  // React dev mode runs effects twice; handle the entr
 function MainApp({ demo }: { demo: string | null }) {
   const [route, setRoute] = useState<Route>(() => {
     const r = readRoute();
-    return NEEDS_PROFILE.includes(r.screen) || r.screen === "review" ? { ...r, screen: "landing" } : r;
+    // An old ?view=review link (checking a new CV) starts the onboarding.
+    return r.screen === "review" ? { ...r, screen: "intake" } : NEEDS_PROFILE.includes(r.screen) ? { ...r, screen: "landing" } : r;
   });
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
@@ -345,7 +347,10 @@ function MainApp({ demo }: { demo: string | null }) {
               <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => (s === "intake" ? goProfile() : go(s))}
                 onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
-            {screen === "intake" && (
+            {screen === "intake" && !profile && (
+              <Onboarding audience={audience} onAudience={setAudience} onSaved={profileSaved} />
+            )}
+            {screen === "intake" && profile && (
               <Intake audience={profile?.audience ?? audience} onAudience={setAudience}
                 onDone={(skills) => { setDraftSkills(profile ? [...new Set([...profile.skills, ...skills])] : skills); go("review"); }} />
             )}

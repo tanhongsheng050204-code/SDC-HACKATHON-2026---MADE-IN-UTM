@@ -962,3 +962,31 @@ button.role-row:focus-visible { outline: 3px solid var(--accent); outline-offset
 .story-stage .pay-card strong, .story-stage .pay-card b { color: #fff; }
 .story-stage .pay-card a { color: #F2C94C; }
 .share-face-nums strong { font-size: clamp(1.15rem, 5.5vw, 1.8rem); overflow-wrap: anywhere; }
+
+/* ---- Onboarding: one question per screen ---- */
+.onboarding { max-width: 680px; margin: 0 auto; display: grid; gap: 18px; padding-bottom: 96px; }
+.ob-top { display: flex; align-items: center; gap: 12px; }
+.ob-progress { flex: 1; height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.ob-progress span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .25s ease-out; }
+.ob-slide { animation: ob-in .25s ease-out both; }
+@keyframes ob-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.ob-question { display: grid; gap: 14px; }
+.ob-question h1 { margin: 0; font-size: clamp(1.6rem, 5vw, 2.1rem); }
+.ob-question > p { margin: 0; }
+.ob-options { display: grid; gap: 10px; }
+.ob-option { display: grid; grid-template-columns: 40px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; align-items: center; text-align: left;
+  padding: 16px 18px; min-height: 72px; border-radius: 16px; border: 2px solid var(--line); background: var(--surface); box-shadow: none; }
+.ob-option .icon { grid-row: span 2; width: 28px; height: 28px; color: var(--accent); justify-self: center; }
+.ob-option strong { font-size: 1.05rem; }
+.ob-option:hover, .ob-option[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.ob-chips { min-height: 40px; }
+.ob-goals { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.ob-goal { display: flex; align-items: center; gap: 10px; text-align: left; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); box-shadow: none; font-weight: 500; }
+.ob-goal[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.ob-goal > span:last-child[aria-hidden] { margin-left: auto; color: var(--accent); font-weight: 700; }
+.ob-continue { position: sticky; bottom: 0; padding: 12px 0; background: linear-gradient(to top, var(--canvas) 70%, transparent); z-index: 4; }
+.ob-continue .primary { width: 100%; min-height: 52px; font-size: 1.05rem; }
+.ob-dests { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ob-dests li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.ob-dests strong { flex: 1 1 200px; }
+@media (prefers-reduced-motion: reduce) { .ob-slide { animation: none; } .ob-progress span { transition: none; } }

@@ -43,7 +43,7 @@ export function Intake({ audience, onAudience, onDone: finish }: {
   return (
     <section>
       <div className="page-head"><h1>{t("h.skills")}</h1></div>
-      {audience === "graduate" && <DegreeStart onChange={setFromDegree} onUse={() => finish(fromDegree)} />}
+      {audience === "graduate" && <DegreeStart onChange={setFromDegree} onUse={finish} />}
       <div className="tabs" role="tablist">
         {tabs.map((x) => (
           <button key={x.id} role="tab" id={`tab-${x.id}`} aria-selected={tab === x.id} aria-controls="intake-panel"
@@ -61,21 +61,24 @@ export function Intake({ audience, onAudience, onDone: finish }: {
   );
 }
 
-/** What gets sent: the scrubbed text, editable, before any language model reads it. */
-function DegreeStart({ onChange, onUse }: { onChange: (skills: string[]) => void; onUse: () => void }) {
+// Start from a degree programme: its usual skills, each confirmed on the next screen. In the new-
+// profile onboarding it is a step of its own (`standalone`), so it says when the list is loading.
+export function DegreeStart({ onChange, onUse, standalone = false }: {
+  onChange?: (skills: string[]) => void; onUse: (skills: string[]) => void; standalone?: boolean;
+}) {
   const [list, setList] = useState<Programme[]>([]);
   const [all, setAll] = useState<Skill[]>([]);
   const [chosen, setChosen] = useState("");
   useEffect(() => { api.programmes().then(setList).catch(() => setList([])); api.skills().then(setAll).catch(() => setAll([])); }, []);
   const prog = list.find((p) => p.id === chosen);
   const name = (id: string) => tr(all.find((s) => s.id === id)?.name ?? id);
-  if (list.length === 0) return null;
+  if (list.length === 0) return standalone ? <p className="muted">{t("ob.loadingList")}</p> : null;
   return (
-    <div className="card degree-start">
-      <h2>{t("deg.title")}</h2>
+    <div className={standalone ? "degree-start" : "card degree-start"}>
+      {!standalone && <h2>{t("deg.title")}</h2>}
       <p className="muted">{t("deg.sub")}</p>
       <label className="narrow">{t("deg.label")}
-        <select value={chosen} onChange={(e) => { setChosen(e.target.value); onChange(list.find((p) => p.id === e.target.value)?.skills ?? []); }}>
+        <select value={chosen} onChange={(e) => { setChosen(e.target.value); onChange?.(list.find((p) => p.id === e.target.value)?.skills ?? []); }}>
           <option value="">{t("deg.choose")}</option>
           {list.map((p) => <option key={p.id} value={p.id}>{p.name[getLang()] || p.name.en}</option>)}
         </select>
@@ -85,13 +88,14 @@ function DegreeStart({ onChange, onUse }: { onChange: (skills: string[]) => void
           <p>{t("deg.usually")}</p>
           <div className="chips">{prog.skills.map((s) => <span key={s} className="chip covered">✓ {name(s)}</span>)}</div>
           <p className="source">{t("deg.note")}</p>
-          <button className="primary" onClick={onUse}>{tf("in.continueWith", { n: prog.skills.length })}</button>
+          <button className="primary" onClick={() => onUse(prog.skills)}>{tf("in.continueWith", { n: prog.skills.length })}</button>
         </>
       )}
     </div>
   );
 }
 
+/** What gets sent: the scrubbed text, editable, before any language model reads it. */
 function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: () => void; onDone: (skills: string[]) => void }) {
   const [text, setText] = useState(preview.text);
   const [busy, setBusy] = useState(false);
@@ -124,7 +128,7 @@ function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: 
   );
 }
 
-function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+export function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<SendPreview | null>(null);
@@ -150,7 +154,7 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
+export function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -183,13 +187,13 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
 // searches every field. What is picked stays listed whichever field is open.
 const FIELDS = ["digital", "data", "ai", "technical", "business", "human", "green"] as const;
 
-function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
+export function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   const [all, setAll] = useState<Skill[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
   const [filter, setFilter] = useState("");
   const [field, setField] = useState<string>(FIELDS[0]);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.skills().then(setAll).catch(() => setError("Can't load the skill list.")); }, []);
+  useEffect(() => { api.skills().then(setAll).catch(() => setError(t("review.listsFailed"))); }, []);
   const query = filter.trim().toLowerCase();
   const fields = [...FIELDS, ...new Set(all.map((s) => s.category).filter((c) => !(FIELDS as readonly string[]).includes(c)))];
   const fieldName = (c: string) => ((FIELDS as readonly string[]).includes(c) ? t(`pick.${c}` as StringKey) : c);
@@ -230,7 +234,7 @@ function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
-function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
+export function Questionnaire({ onDone }: { onDone: (skills: string[]) => void }) {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [turn, setTurn] = useState<ChatTurn | null>(null);
   const [answer, setAnswer] = useState("");

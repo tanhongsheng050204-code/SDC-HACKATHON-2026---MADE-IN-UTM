@@ -83,8 +83,17 @@ Notes: ______
 
 ## 5. My profile: skills intake
 
+### 5.0 New profile: one question per screen (start with no profile, e.g. a private window → **Start**)
+- [ ] 5.0.1 A progress bar sits on top and grows with each step; **← Back** returns to the previous question (not on the first).
+- [ ] 5.0.2 Steps: who you are (three big cards) → how to start (Upload CV, Paste CV, Questionnaire, Pick skills; graduates also see **Start from my degree**) → that input → **Here's what we found** → **What is your job now?** → **Which goals matter to you?** → **Your route is ready**.
+- [ ] 5.0.3 **Continue** stays at the bottom of the screen on a phone; it is disabled with no skills, and on the job step for workers and career switchers until a job is chosen (optional for students).
+- [ ] 5.0.4 Goals can be skipped; they are kept on this device only and do not change the ranking.
+- [ ] 5.0.5 **Your route is ready** creates the profile, shows the top three destinations (fit and outlook, “Serves your goals” where it applies) with a small burst of confetti (not with reduce-motion or Lite mode); **Start my route** goes on to What I enjoy.
+- [ ] 5.0.6 An old `?view=review` link opens this onboarding. Slides move in (not with reduce-motion). Everything is in BM and 中文.
+- [ ] 5.0.7 An existing profile's **My profile → Add skills from a CV** still uses the tabbed intake and the one-page check (section 6).
+
 ### 5.1 Upload CV
-- [ ] 5.1.1 Upload `cv1_clerk.txt` → goes to **Check your skills** with skills found.
+- [ ] 5.1.1 Upload `cv1_clerk.txt` → **What gets sent** → **Here's what we found** with the skills.
 - [ ] 5.1.2 Upload a PDF and a DOCX CV → both work.
 - [ ] 5.1.3 Upload an image or `.xlsx` → error **“Upload a PDF, DOCX or TXT file”**.
 - [ ] 5.1.4 Upload a file over 5 MB → error **“File is larger than 5 MB”**.
@@ -107,15 +116,14 @@ Notes: ______
 
 Notes: ______
 
-## 6. Check your skills (review)
+## 6. My profile (existing profile) and adding skills from a CV
 
 - [ ] 6.1 Each skill chip has **×** to remove it.
 - [ ] 6.2 **Add a skill we missed** adds a skill from the list.
 - [ ] 6.3 Current job dropdown and years of experience can be set.
-- [ ] 6.4 SDG goals can be ticked and unticked.
-- [ ] 6.5 With zero skills: message and **Back to my skills** button; **Save and continue** disabled.
-- [ ] 6.6 **Save and continue** → goes to the Future Skills Radar; sidebar now shows the new profile.
-- [ ] 6.7 Picking SDG 13 here moves climate roles up on Future roles with “Serves your goals: SDG 13”.
+- [ ] 6.4 With zero skills: message and **Back to my skills** button; **Save** disabled.
+- [ ] 6.5 **Add skills from a CV** opens the tabbed intake; the skills found are merged into the profile on the check screen.
+- [ ] 6.6 **Save** keeps the target role and progress and returns to Today with “Saved”.
 
 Notes: ______
 

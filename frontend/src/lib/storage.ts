@@ -11,7 +11,8 @@ export const KEYS = {
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",
   nameSkipped: "laluan.nameSkipped.",
-  storyCard: "laluan.storyCard.",  // + profile, role and progress: the card made for the Today banner  // + user id, session only: "Skip" holds until the next login
+  storyCard: "laluan.storyCard.",
+  goals: "laluan.goals.",  // + profile id: SDGs picked during onboarding, kept on this device only  // + profile, role and progress: the card made for the Today banner  // + user id, session only: "Skip" holds until the next login
 } as const;
 
 type Area = "local" | "session";
