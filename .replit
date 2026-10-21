@@ -1,6 +1,9 @@
 # Replit: one process serves the API (/api) and the built React app (/).
-# Secrets (Replit "Secrets" tab): GEMINI_API_KEY, ADMIN_TOKEN, DATABASE_URL, SUPABASE_URL,
-# SUPABASE_JWT_SECRET (legacy projects only), VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY.
+# Secrets (Replit "Secrets" tab; README "Deployment" explains each):
+#   required: DATABASE_URL, SUPABASE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, ADMIN_TOKEN
+#   AI:       GEMINI_API_KEY, GEMINI_MODEL
+#   RunPod:   RUNPOD_API_KEY, RUNPOD_LLM_ENDPOINT, RUNPOD_WHISPER_ENDPOINT (+ RUNPOD_LLM_MODEL if not the default)
+#   optional: CONTACT_EMAIL
 modules = ["python-3.12", "nodejs-20"]
 run = "cd frontend && npm ci && npm run build && cd ../backend && pip install -r requirements.txt && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
 
