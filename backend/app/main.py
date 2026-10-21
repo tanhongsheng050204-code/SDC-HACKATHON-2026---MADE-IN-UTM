@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -10,9 +11,17 @@ from app.config import get_settings
 from app.reference import get_reference
 
 
+log = logging.getLogger(__name__)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     store.init_db()  # first: reference data reads approved snapshots from the database
+    try:
+        removed = store.purge_stale()  # demo copies after a day, anonymous profiles after 30 days
+        log.info("Removed %d old demo copies and %d old anonymous profiles", removed["demo"], removed["anonymous"])
+    except Exception as error:  # housekeeping must never stop the API from starting
+        log.warning("Profile clean-up skipped: %s", type(error).__name__)
     get_reference()  # fail fast on broken reference data
     yield
     store.close_pools()

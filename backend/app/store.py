@@ -312,6 +312,24 @@ def purge_older_than(days: int = 30) -> int:
         return conn.execute("DELETE FROM profiles WHERE updated_at < ? AND user_id IS NULL", (cutoff,)).rowcount
 
 
+DEMO_HOURS = 24        # each visitor gets a private demo copy; copies left alone a day are removed
+ANONYMOUS_DAYS = 30    # retention rule in docs/05-BACKEND_SCHEMA.md
+
+
+def purge_stale() -> dict[str, int]:
+    """Remove demo copies left alone for a day and anonymous profiles left alone for 30 days.
+    Profiles saved to an account are never touched. Runs at every API start (app/main.py)."""
+    now = dt.datetime.now(dt.UTC)
+    demo_cutoff = (now - dt.timedelta(hours=DEMO_HOURS)).isoformat(timespec="seconds")
+    anon_cutoff = (now - dt.timedelta(days=ANONYMOUS_DAYS)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        demo = conn.execute("DELETE FROM profiles WHERE is_demo = 1 AND user_id IS NULL AND updated_at < ?",
+                            (demo_cutoff,)).rowcount
+        anonymous = conn.execute("DELETE FROM profiles WHERE is_demo = 0 AND user_id IS NULL AND updated_at < ?",
+                                 (anon_cutoff,)).rowcount
+    return {"demo": demo, "anonymous": anonymous}
+
+
 # --- trend snapshots ----------------------------------------------------------------------------
 # Snapshots imported or built at runtime, and every review decision, live here rather than in
 # files: hosted containers lose runtime file writes on redeploy, and the approval log is evidence.

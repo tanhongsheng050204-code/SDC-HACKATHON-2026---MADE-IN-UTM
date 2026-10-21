@@ -11,12 +11,17 @@ const client: SupabaseClient | null = authEnabled ? createClient(URL!, KEY!) : n
 
 let token: string | null = null;
 let userId: string | null = null;
+let googleName: string | null = null;  // offered as the default display name; stored only if the person saves it
 type Listener = (userId: string | null) => void;
 const listeners = new Set<Listener>();
 
-function set(session: { access_token: string; user: { id: string } } | null) {
+type Session = { access_token: string; user: { id: string; user_metadata?: Record<string, unknown> } };
+
+function set(session: Session | null) {
   const next = session?.user.id ?? null;
   token = session?.access_token ?? null;
+  const meta = session?.user.user_metadata ?? {};
+  googleName = String(meta.full_name ?? meta.name ?? "").trim().slice(0, 60) || null;
   if (next !== userId) {
     userId = next;
     listeners.forEach((l) => l(userId));
@@ -49,9 +54,14 @@ export async function refreshToken(): Promise<string | null> {
   return token;
 }
 export const getUserId = () => userId;
+export const getGoogleName = () => googleName;
 
+// Tells the listener the current user straight away, then on every change: the stored session can
+// finish loading before a screen subscribes, and that screen must not miss it (it showed "Log in"
+// while the person was logged in).
 export function onAuth(listener: Listener): () => void {
   listeners.add(listener);
+  listener(userId);
   return () => { listeners.delete(listener); };
 }
 
