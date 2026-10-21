@@ -60,7 +60,7 @@ export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
   return (
     <details className="card admin" open={!!preview || undefined}>
       <summary>Admin: refresh trend data{preview && <span className="badge gold">1 waiting for review</span>}</summary>
-      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy) and job-posting counts and builds a new dated forecast. <strong>Nothing changes for users until a person approves it.</strong> Older forecasts are kept.</p>
+      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy), job-posting counts and Malaysian employment by occupation (OpenDOSM) and builds a new dated forecast. <strong>Nothing changes for users until a person approves it.</strong> Older forecasts are kept.</p>
       <div className="two-col">
         <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
         <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
