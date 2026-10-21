@@ -15,7 +15,7 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence")
 _MIGRATIONS = {
@@ -103,6 +103,11 @@ _MIGRATIONS = {
         decided_at TEXT,
         reason TEXT
     );
+    """,
+    # The role a person chose to aim for, and when they last finished interview practice (journey steps 2 and 4).
+    11: """
+    ALTER TABLE profiles ADD COLUMN target_role_id TEXT;
+    ALTER TABLE profiles ADD COLUMN practised_at TEXT;
     """,
 }
 
@@ -195,6 +200,8 @@ def _row(row) -> dict | None:
         "is_demo": bool(row["is_demo"]),
         "preferences": json.loads(row["preferences"]),
         "audience": row["audience"],
+        "target_role_id": row["target_role_id"],
+        "practised_at": row["practised_at"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
@@ -269,6 +276,27 @@ def set_preferences(profile_id: str, prefs: dict[str, float]) -> None:
     with _connect() as conn:
         conn.execute("UPDATE profiles SET preferences=?, updated_at=? WHERE id=?",
                      (json.dumps(prefs), _now(), profile_id))
+
+
+def set_target(profile_id: str, role_id: str | None) -> dict | None:
+    with _connect() as conn:
+        cursor = conn.execute("UPDATE profiles SET target_role_id=?, updated_at=? WHERE id=?",
+                              (role_id, _now(), profile_id))
+        if cursor.rowcount == 0:
+            return None
+    return get_profile(profile_id)
+
+
+def mark_practised(profile_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE profiles SET practised_at=? WHERE id=?", (_now(), profile_id))
+
+
+def card_roles(profile_id: str) -> set[str]:
+    """Roles this profile has made a Future Card for."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT role_id FROM cards WHERE profile_id=?", (profile_id,)).fetchall()
+    return {r["role_id"] for r in rows}
 
 
 def create_card(profile_id: str, role_id: str) -> str:

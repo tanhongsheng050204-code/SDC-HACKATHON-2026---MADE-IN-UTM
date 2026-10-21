@@ -17,7 +17,8 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | Feature | What you can do |
 | --- | --- |
 | **Skills profile** | Upload a CV (PDF, DOCX or TXT), paste one, answer a short questionnaire, or pick skills from a list. Names, emails, phone and IC numbers, addresses, birth dates and employer or school names are removed before any AI reads the text, and **What gets sent** shows you the exact text (which you can still edit) before it goes. The file is never stored. With a RunPod open model configured, CV text goes to it instead of Gemini. A mic button on skill entry, the survey and the coach turns speech into text (Whisper on RunPod, else the browser's own recognition, else typing); audio is never stored. Only that one extraction step sees CV text: afterwards the language model receives only skill names, role titles and your scrubbed questions (a test checks this). Use a paid-tier Gemini key for any public deployment; Google does not use paid-tier requests to improve its products. You confirm the skill list before it is saved. Profiles you don't save to an account are deleted after 30 days; log in with Google to keep yours until you delete it. |
-| **Today** | Your home screen after opening a profile: top match, how your current role is trending, robust picks, your best five roles and next steps. Ask the coach straight from here. |
+| **Today** | One **next step** in plain words, a four-step journey (**Where I stand → Explore roles → Build my skills → Apply and share**) showing what is done, the coach, how your current job is trending and your best three roles. The sidebar follows the same four steps. |
+| **Target role** | **Make this my target** on any role page. Pathway, SDG impact, practice and sharing follow it, and it is saved with your profile. |
 | **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
@@ -53,16 +54,16 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | --- | --- |
 | **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
 | **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
-| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 291 automated tests. Public and synthetic data only. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 297 automated tests. Public and synthetic data only. |
 | **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
 
 1. Open the **worker demo**. Aisyah is a data-entry clerk whose team just started using an AI tool that reads invoices.
-2. On **Today**, ask the coach *“Is my current job at risk?”*.
-3. Open **My job, task by task** to see which of her tasks AI is likely to automate.
-4. Go to **Future roles**, switch between scenarios, drag the year slider and open **Why this rank?**.
-5. Open the top role, **Build my pathway**, and tick a course as finished: readiness and rankings update.
+2. On **Today**, point out the one **next step** and the four-step journey, then ask the coach *“Is my current job at risk?”*.
+3. Open **My job, task by task** to see which of her tasks AI is likely to automate, and how people actually use AI for them.
+4. Go to **Future roles**, switch between scenarios, drag the year slider, try the **Map**, and open **Why this rank?**.
+5. Open the top role, press **Make this my target**, then **Build my pathway** and tick a course as finished: readiness, rankings and the journey on Today update.
 6. **See my impact** for the SDG links, then **Create my Future Card** and scan the QR code.
 7. Finish with **For organisations** and the synthetic sample company.
 
@@ -229,7 +230,7 @@ Each role page opens with a short **"A day in this job"** in EN / BM / 中文: w
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 291 tests: API, services, trends, review, guardrails, openings, interview, exposure, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 297 tests: API, services, trends, review, guardrails, openings, interview, exposure, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 

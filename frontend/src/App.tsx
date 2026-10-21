@@ -8,7 +8,7 @@ import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
@@ -16,7 +16,7 @@ import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
-import { Home } from "./screens/Home";
+import { Home, TargetScreen } from "./screens/Home";
 import { Landing } from "./screens/landing/Landing";
 import { Radar } from "./screens/Radar";
 import { Review } from "./screens/Review";
@@ -46,6 +46,7 @@ function MainApp({ demo }: { demo: string | null }) {
   });
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
+  const [journey, setJourney] = useState<Journey | null>(null);
   const [draftSkills, setDraftSkills] = useState<string[]>([]);
   const [audience, setAudience] = useState<Audience | null>(null);
   const [workforceTab, setWorkforceTab] = useState<"company" | "class">("company");
@@ -86,10 +87,6 @@ function MainApp({ demo }: { demo: string | null }) {
     writeRoute(r, "push");
     window.scrollTo(0, 0);
   }
-  function setScenario(s: Scenario) {
-    const r = { ...route, scenario: s };
-    setRoute(r); writeRoute(r, "replace");
-  }
   function setAdoption(a: number | undefined) {
     const r = { ...route, adoption: a };
     setRoute(r); writeRoute(r, "replace");
@@ -101,6 +98,17 @@ function MainApp({ demo }: { demo: string | null }) {
   function openRole(r: RoleMatch) {
     setRole(r);
     go("role", { role: r.role_id });
+  }
+  // Steps 3 and 4 of the journey follow the target role: open it, fetching its match if needed.
+  async function openTarget(next: TargetScreen | "impact") {
+    const target = profile?.target_role_id;
+    if (!profile || !target) { go("roles"); return; }
+    if (role?.role_id === target) { go(next, { role: target }); return; }
+    try {
+      const m = await api.matches(profile.id, scenario, route.year, route.adoption);
+      const found = m.roles.find((r) => r.role_id === target);
+      if (found) { setRole(found); go(next, { role: target }); } else go("roles");
+    } catch { setError(t("home.loadFailed")); }
   }
   function flash(message: string) {
     setToast(message);
@@ -119,6 +127,12 @@ function MainApp({ demo }: { demo: string | null }) {
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+
+  // Journey progress, refreshed when the profile changes or Today opens (cards and practice change it too).
+  useEffect(() => {
+    if (!profile) { setJourney(null); return; }
+    api.journey(profile.id).then(setJourney).catch(() => setJourney(null));
+  }, [profile, screen === "home"]);
 
   function checkServer() {
     api.health().then((h) => { setModel(h.llm_model); setOffline(false); }).catch(() => setOffline(true));
@@ -291,13 +305,14 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: t("nav.pathway"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
   };
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} profile={profile} hasRole={!!role} model={model} prefs={prefs} userId={userId}
-        onGo={(s) => go(s)} onHome={() => go("landing")} onDelete={deleteProfile} />
+      <Sidebar current={screen} profile={profile} journey={journey} model={model} prefs={prefs} userId={userId}
+        onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : go(s))}
+        onHome={() => go("landing")} onDelete={deleteProfile} />
       <div className="workspace">
         <header className="workbar">
           <span className="workbar-title">{titles[screen]}</span>
@@ -311,8 +326,8 @@ function MainApp({ demo }: { demo: string | null }) {
         <main id="main" tabIndex={-1}>
           <ScreenBoundary key={screen}>
             {screen === "home" && profile && (
-              <Home profile={profile} scenario={scenario} onScenario={setScenario} onOpenRole={openRole} onGo={(s) => go(s)}
-                onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
+              <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => go(s)}
+                onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
             {screen === "intake" && <Intake audience={audience} onAudience={setAudience} onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
             {screen === "review" && (

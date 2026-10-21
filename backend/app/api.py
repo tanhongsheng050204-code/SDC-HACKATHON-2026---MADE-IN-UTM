@@ -12,12 +12,13 @@ from app import runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, matching, openings,
-                          pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, workforce, xray)
+from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
+                          openings, pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, workforce,
+                          xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
 
@@ -524,6 +525,21 @@ def delete_profile(profile_id: str, user: str | None = User):
         raise HTTPException(404, "Profile not found")
 
 
+@router.put("/profiles/{profile_id}/target")
+def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
+    """Choose the role you are aiming for (or clear it). Pathway and practice follow it."""
+    _profile_for(profile_id, user)
+    if body.role_id is not None and body.role_id not in get_reference().roles:
+        raise HTTPException(422, "Unknown role")
+    return store.set_target(profile_id, body.role_id)
+
+
+@router.get("/profiles/{profile_id}/journey")
+def profile_journey(profile_id: str, user: str | None = User):
+    """Which of the four journey steps are done, and which comes next."""
+    return journey.progress(get_reference(), _profile_for(profile_id, user))
+
+
 @router.get("/profiles/{profile_id}/matches")
 def profile_matches(profile_id: str, scenario: Scenario = "baseline", year: int | None = None,
                     adoption: float | None = Query(default=None, ge=0.5, le=2.0),
@@ -597,7 +613,10 @@ def practise_interview(body: InterviewRequest, user: str | None = User):
     if body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
     turns = [t.model_dump() for t in body.turns]
-    return interview.next_turn(ref, _profile_for(body.profile_id, user), body.role_id, turns, body.language)
+    reply = interview.next_turn(ref, _profile_for(body.profile_id, user), body.role_id, turns, body.language)
+    if reply["done"]:
+        store.mark_practised(body.profile_id)  # journey step 4
+    return reply
 
 
 @router.post("/coach")

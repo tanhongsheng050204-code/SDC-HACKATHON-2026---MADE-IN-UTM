@@ -63,6 +63,10 @@ class InterviewRequest(BaseModel):
     language: Literal["en", "ms", "zh"] = "en"
 
 
+class TargetRequest(BaseModel):
+    role_id: str | None = Field(default=None, max_length=80)  # null clears the target
+
+
 class ClaimRequest(BaseModel):
     profile_id: str = Field(min_length=1, max_length=64)
     replace: bool = False

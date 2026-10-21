@@ -648,3 +648,21 @@ main:focus { outline: none; }
 @media (max-width: 560px) { .mys-list li { grid-template-columns: 1fr auto; } .mys-list .bar, .mys-list small { display: none; } }
 .task-observed { display: block; color: var(--ink-soft); }
 .identity blockquote, .card-identity { margin: 8px 0; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; font-size: 1.02rem; }
+
+/* ---------- Journey: next step, progress strip, target role ---------- */
+.next-step { gap: 8px; border-left: 4px solid var(--accent); }
+.next-step h2 { margin: 0; font-size: 1.35rem; }
+.next-step p { margin: 0; }
+.next-step .btn { justify-self: start; margin-top: 4px; }
+.journey { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.journey-step button { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); box-shadow: none; font-weight: 600; min-height: 56px; }
+.journey-step small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .78rem; }
+.journey-num { flex: none; width: 26px; height: 26px; border-radius: 99px; display: grid; place-items: center; background: var(--surface-2); color: var(--ink-soft); font-size: .85rem; }
+.journey-step.is-done .journey-num { background: var(--good-bg); color: var(--good); }
+.journey-step.is-now button { border-color: var(--accent); background: var(--accent-soft); }
+.journey-step.is-now .journey-num { background: var(--accent); color: #fff; }
+@media (max-width: 760px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.role-head { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-start; justify-content: space-between; }
+.target-button { display: inline-flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.target-button .badge svg, .target-button .btn svg, .home-role-title .badge svg { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; }
+.side-done { color: var(--good); }

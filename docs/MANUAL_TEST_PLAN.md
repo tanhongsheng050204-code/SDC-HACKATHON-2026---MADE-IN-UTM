@@ -50,11 +50,11 @@ Notes: ______
 
 ## 3. App shell (sidebar and top bar)
 
-- [ ] 3.1 Sidebar groups: Today, My profile · Signals: Future Skills Radar, My job task by task, Sources · My future: Future roles, Pathway, SDG impact · Organisation: Workforce view.
-- [ ] 3.2 Without a profile, Today / Radar / Tasks / Future roles are greyed out; hovering says **“Add your skills first”**.
-- [ ] 3.3 Pathway and SDG impact stay greyed out until you open a role.
-- [ ] 3.4 Profile chip shows the name and number of skills.
-- [ ] 3.5 Top bar shows the screen title, the persona badge, **Ask the coach** and the theme button.
+- [ ] 3.1 Sidebar groups follow the journey: Today · 1 Where I stand (My profile, What I enjoy, My job task by task, Future Skills Radar) · 2 Explore roles (Future roles) · 3 Build my skills (Pathway, SDG impact) · 4 Apply and share (My target role) · More (Sources, HR teams and career centres).
+- [ ] 3.2 A finished step shows ✓ beside its group name.
+- [ ] 3.3 Without a profile, the profile-based items are greyed out with “Add your skills first”; with a profile but no target, Pathway, SDG impact and My target role say “Choose a target role first”.
+- [ ] 3.4 Pathway, SDG impact and My target role open the **target** role, whichever role you opened last.
+- [ ] 3.5 Profile chip shows the name and number of skills; the top bar shows the screen title (a role page shows the role's name), the persona badge, **Ask the coach** and the theme button.
 - [ ] 3.6 Sidebar footer shows the AI model, “Estimates, not predictions. You decide.”, language picker and Lite mode.
 - [ ] 3.7 **Delete my profile** asks for confirmation; **Cancel** keeps it; **OK** deletes it and returns to the landing page.
 
@@ -63,13 +63,15 @@ Notes: ______
 ## 4. Today (home)
 
 - [ ] 4.1 Greeting matches the time of day (“Good morning / afternoon / evening, Aisyah.”) and shows today's date.
-- [ ] 4.2 Typing a question and pressing **Ask** opens the coach already answering it.
-- [ ] 4.3 Four cards: Top match (AI operations specialist, 50% fit), Your current role (−25.9%, Declining), Robust picks (3), Skills on your profile (6).
-- [ ] 4.4 Scenario switch (Slow / Baseline / Accelerated) changes the top-5 list and outlooks.
-- [ ] 4.5 Clicking a role in the top 5 opens its detail.
-- [ ] 4.6 **See all 13 roles →** opens Future roles.
-- [ ] 4.7 Next steps: each **Open** button goes to Pathway, Radar and My job respectively.
-- [ ] 4.8 Source line at the bottom names the WEF snapshot.
+- [ ] 4.2 **Your next step** (clerk demo): “Pick a target role. Your best fit now: AI operations specialist” with **Open the role**.
+- [ ] 4.3 The four-step strip shows ✓ Where I stand, **Next** Explore roles, and Later for steps 3 and 4; each step opens its screen.
+- [ ] 4.4 On the role, **Make this my target** turns into **Your target** with **Clear target**; back on Today the next step is “Build your skills for …”, step 2 shows ✓, and the role is marked **Your target** in the list.
+- [ ] 4.5 **Open my pathway** opens the target's Pathway; after proving a skill or finishing a course, the next step becomes “Get ready to apply for …”.
+- [ ] 4.6 After finishing interview practice or making a Future Card for the target, every step shows ✓ and the card says “You're on track”.
+- [ ] 4.7 Typing a question and pressing **Ask** opens the coach already answering it.
+- [ ] 4.8 The worker card shows the current job's outlook and opens My job, task by task; the student demo shows roles open to graduates instead.
+- [ ] 4.9 **Your best next roles** shows three roles; **See all roles (13)** opens Future roles. Scenario switch, KPIs and tipping points are on Future roles, not here.
+- [ ] 4.10 With the API stopped, Today shows “Couldn't load your results.” with **Try again**.
 
 Notes: ______
 
@@ -325,7 +327,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (291, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (297, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

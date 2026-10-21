@@ -6,6 +6,7 @@ import { InterviewPractice } from "../components/InterviewPractice";
 import { IdentityStatement, Programmes } from "../components/MalaysiaPanels";
 import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
+import { TargetButton } from "../components/TargetButton";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
@@ -27,7 +28,10 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
-      <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
+      <div className="page-head role-head">
+        <div><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
+        <TargetButton profile={profile} roleId={role.role_id} onProfile={onProfile} />
+      </div>
 
       {day && (
         <section className="card day-in-job" aria-labelledby="day-title">

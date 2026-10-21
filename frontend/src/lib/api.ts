@@ -17,6 +17,12 @@ export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
   skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;
   audience?: Audience | null; user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
+  target_role_id?: string | null; practised_at?: string | null;
+}
+export type JourneyStep = "stand" | "explore" | "build" | "apply";
+export interface Journey {
+  steps: { id: JourneyStep; done: boolean }[]; next: JourneyStep | null;
+  target_role_id: string | null; target_title: string | null;
 }
 export interface Citation { url: string; title: string; employer: string; kind: "job_ad" | "web"; grounded: boolean; quote: string }
 export interface SkillEvidence { status: "confirmed" | "single" | "none"; sources: number; job_ads: number; citations: Citation[] }
@@ -348,6 +354,9 @@ export const api = {
     request<Profile>("/profiles", { method: "POST", body: JSON.stringify(body) }),
   demoProfile: (key: string) => request<Profile>(`/profiles/demo/${key}`, { method: "POST" }),
   getProfile: (id: string) => request<Profile>(`/profiles/${id}`),
+  setTarget: (id: string, roleId: string | null) =>
+    request<Profile>(`/profiles/${id}/target`, { method: "PUT", body: JSON.stringify({ role_id: roleId }) }),
+  journey: (id: string) => request<Journey>(`/profiles/${id}/journey`),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),
