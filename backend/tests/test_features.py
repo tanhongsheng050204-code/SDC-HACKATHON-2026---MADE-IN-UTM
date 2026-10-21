@@ -84,7 +84,83 @@ def test_pathway_without_summary_makes_no_llm_call(monkeypatch):
     assert pathway.build(get_reference(), CLERK, "data_analyst", summarize=False)["summary_mode"] == "template"
 
 
+# ---------- free_only pathway ----------
+
+EMPTY = {"skills": [], "current_role_id": None, "audience": None, "completed_courses": []}
+
+
+def test_free_only_excludes_paid_courses():
+    ref = get_reference()
+    plan = pathway.build(ref, EMPTY, "renewable_energy_technician", summarize=False, free_only=True)
+    costs = {s["course"]["cost"] for s in plan["steps"]}
+    assert costs <= {"free", "free_audit"}, f"paid course slipped through: {costs}"
+
+
+def test_free_only_moves_paid_skill_to_uncovered():
+    ref = get_reference()
+    full = pathway.build(ref, EMPTY, "renewable_energy_technician", summarize=False)
+    free = pathway.build(ref, EMPTY, "renewable_energy_technician", summarize=False, free_only=True)
+    assert len(free["uncovered_skills"]) > 0, "expected some skills without a free route"
+    assert len(free["steps"]) < len(full["steps"]), "free plan should have fewer steps"
+    # skills covered by paid-only courses must appear in uncovered_skills
+    paid_skill_ids = {sk for c in ref.courses if c.get("cost") == "paid" for sk in c["skills"]}
+    assert set(free["uncovered_skills"]) & paid_skill_ids
+
+
+def test_free_only_false_behaves_like_default(client):
+    pid = client.post("/api/profiles", json={"skills": CLERK["skills"]}).json()["id"]
+    default = client.get(f"/api/profiles/{pid}/pathway", params={"role": "data_analyst"}).json()
+    explicit = client.get(f"/api/profiles/{pid}/pathway", params={"role": "data_analyst", "free_only": "false"}).json()
+    assert default["steps"] == explicit["steps"]
+
+
+def test_free_only_api_param_filters_courses(client):
+    pid = client.post("/api/profiles", json={"skills": ["communication"]}).json()["id"]
+    plan = client.get(f"/api/profiles/{pid}/pathway",
+                      params={"role": "renewable_energy_technician", "free_only": "true"}).json()
+    costs = {s["course"]["cost"] for s in plan["steps"]}
+    assert costs <= {"free", "free_audit"}
+    assert plan["uncovered_skills"]  # at least one paid-only skill becomes uncovered
+
+
 # ---------- HR workforce ----------
+
+def test_free_only_empty_route_keeps_uncovered_and_zero_eta():
+    from copy import deepcopy
+    ref = deepcopy(get_reference())
+    # In-memory fixture: no catalogue file is changed.
+    ref.courses[:] = [dict(c, cost="paid") for c in ref.courses]
+    plan = pathway.build(ref, EMPTY, "data_analyst", summarize=False, free_only=True)
+    assert plan["steps"] == []
+    assert plan["hours_left"] == 0
+    assert set(plan["uncovered_skills"]) == {s["skill_id"] for s in ref.roles["data_analyst"]["skills"]}
+    assert plan["summary_template"]["key"] == "unavailable"
+    assert "already have" not in plan["summary"]
+    assert pathway.build(ref, EMPTY, "data_analyst", summarize=False, free_only=False)["steps"]
+
+
+def test_already_ready_route_has_zero_eta():
+    ref = get_reference()
+    profile = dict(EMPTY, skills=[s["skill_id"] for s in ref.roles["data_analyst"]["skills"]])
+    for free_only in (False, True):
+        plan = pathway.build(ref, profile, "data_analyst", summarize=False, free_only=free_only)
+        assert plan["hours_left"] == 0
+        assert plan["steps"] == plan["uncovered_skills"] == []
+        assert plan["readiness"] == 1
+        assert plan["summary_template"]["key"] == "ready"
+
+
+def test_free_audit_is_eligible_and_completion_survives_filter():
+    from copy import deepcopy
+    ref = deepcopy(get_reference())
+    ref.courses[:] = [dict(c, cost="free_audit") for c in ref.courses]
+    plan = pathway.build(ref, EMPTY, "data_analyst", summarize=False, free_only=True)
+    assert plan["steps"]
+    last = plan["steps"][-1]["course"]
+    after = pathway.build(ref, dict(EMPTY, completed_courses=[last["id"]]), "data_analyst", summarize=False, free_only=True)
+    assert after["steps"][-1]["done"]
+    assert after["hours_left"] == plan["hours_left"] - last["hours"]
+    assert all(s["course"]["cost"] == "free_audit" for s in after["steps"])
 
 SAMPLE = "role,department,skills\n" + "\n".join(
     ["Data entry clerk,Ops,Excel; data entry"] * 5 + ["Data analyst,Digital,SQL; Python; dashboards"] * 2

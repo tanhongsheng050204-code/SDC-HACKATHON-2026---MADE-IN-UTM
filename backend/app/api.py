@@ -814,8 +814,8 @@ def class_analyse(body: WorkforceRequest):
 
 
 @router.get("/profiles/{profile_id}/pathway")
-def profile_pathway(profile_id: str, role: str = Query(...), user: str | None = User):
+def profile_pathway(profile_id: str, role: str = Query(...), free_only: bool = Query(False), user: str | None = User):
     ref = get_reference()
     if role not in ref.roles:
         raise HTTPException(404, "Role not found")
-    return pathway.build(ref, _profile_for(profile_id, user), role)
+    return pathway.build(ref, _profile_for(profile_id, user), role, free_only=free_only)

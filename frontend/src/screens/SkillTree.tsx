@@ -1,76 +1,238 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Tabs } from "../components/Tabs";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { RouteMap } from "../components/RouteMap";
 import { StudyCalendar } from "../components/StudyCalendar";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
-import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
+import { api, Pathway, Profile, RoleInfo, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
 import { percent } from "../lib/format";
-import { levelName, t, tr } from "../lib/i18n";
+import { levelName, t, tf, tr } from "../lib/i18n";
 
+function EtaNumber({ value, format }: { value: number; format: (n: number) => string }) {
+  const [shown, setShown] = useState(value);
+  const previous = useRef(value);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    const from = previous.current;
+    previous.current = value;
+    const finish = () => { cancelAnimationFrame(frame); setShown(value); };
+    const reduced = () => media.matches || document.documentElement.dataset.lite === "1";
+    const start = performance.now();
+    const tick = (now: number) => {
+      if (reduced()) { finish(); return; }
+      const progress = Math.min(1, (now - start) / 600);
+      setShown(Math.round(from + (value - from) * (1 - (1 - progress) ** 3)));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    if (reduced()) finish(); else frame = requestAnimationFrame(tick);
+    const observer = new MutationObserver(() => { if (reduced()) finish(); });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-lite"] });
+    media.addEventListener("change", finish);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); media.removeEventListener("change", finish); };
+  }, [value]);
+  return <><span aria-hidden="true">{format(shown)}</span><span className="sr-only">{format(value)}</span></>;
+}
 
-// My pathway: the skill tree is the map (skills you have at the bottom, the role on top), each
-// node carries the course that teaches it, and the ring fills as levels are proven. The List tab
-// is the same plan as ordered courses, for hours, cost and printing.
-export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }: {
+function spawnConfetti(anchor: HTMLElement) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    || document.documentElement.dataset.lite === "1") return;
+  const colors = ["var(--accent)", "var(--gold-bright)", "var(--good)", "var(--accent-soft)"];
+  const rect = anchor.getBoundingClientRect();
+  const wrap = document.createElement("div");
+  wrap.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;pointer-events:none;overflow:visible;z-index:100`;
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2;
+    const d = 36 + Math.random() * 36;
+    const p = document.createElement("div");
+    const sz = 4 + Math.random() * 4;
+    p.style.cssText = `position:absolute;left:50%;top:50%;width:${sz}px;height:${sz}px;`
+      + `background:${colors[i % colors.length]};border-radius:${Math.random() > 0.5 ? "50%" : "3px"};`
+      + `--dx:${(Math.cos(a) * d).toFixed(1)}px;--dy:${(Math.sin(a) * d - 28).toFixed(1)}px;`
+      + `animation:confetti-burst 700ms ease-out forwards;animation-delay:${Math.round(i * 12)}ms`;
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 800);
+}
+
+// My pathway: GPS-style route map from your skills to a destination role.
+// The Tree tab shows the skill dependency graph; the List tab shows ordered courses.
+export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, onDestinations }: {
   profile: Profile; role: RoleMatch; userId: string | null;
-  onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void;
+  onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void; onDestinations: () => void;
 }) {
   const [tab, setTab] = useState<"tree" | "list">("tree");
   const [tree, setTree] = useState<Tree | null>(null);
   const [plan, setPlan] = useState<Pathway | null>(null);
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [currentRole, setCurrentRole] = useState<RoleInfo | null>(null);
   const [open, setOpen] = useState<TreeNode | null>(null);
   const [proving, setProving] = useState<TreeNode | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const dragStart = useRef<number | null>(null);
+  const completions = profile.completed_courses.join(",");
 
-  function load() {
+  function loadTree() {
     api.tree(profile.id, role.role_id).then(setTree).catch(() => setError(t("tree.loadFailed")));
   }
-  useEffect(load, [profile.id, role.role_id, profile.completed_courses.length]);
   useEffect(() => {
-    if (tab === "list" && !plan) api.pathway(profile.id, role.role_id).then(setPlan).catch(() => setError(t("tree.loadFailed")));
-  }, [tab, plan, profile.id, role.role_id]);
+    let cancelled = false;
+    api.tree(profile.id, role.role_id).then(p => { if (!cancelled) setTree(p); })
+      .catch(() => { if (!cancelled) setError(t("tree.loadFailed")); });
+    return () => { cancelled = true; };
+  }, [profile.id, role.role_id, completions, profile.skill_levels]);
+
+  // Load plan on mount and whenever role, profile completions, or freeOnly changes
+  useEffect(() => {
+    let cancelled = false;
+    setError(null);
+    api.pathway(profile.id, role.role_id, freeOnly)
+      .then((p) => { if (!cancelled) setPlan(p); })
+      .catch(() => { if (!cancelled) setError(t("tree.loadFailed")); });
+    return () => { cancelled = true; };
+  }, [profile.id, role.role_id, freeOnly, completions, profile.skill_levels]);
+
+  // Fetch current role title for GPS header
+  useEffect(() => {
+    let cancelled = false;
+    setCurrentRole(null);
+    if (!profile.current_role_id) return;
+    api.role(profile.current_role_id).then(p => { if (!cancelled) setCurrentRole(p); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [profile.current_role_id]);
 
   async function refreshProfile() {
-    try { onProfile(await api.getProfile(profile.id)); } catch { /* the tree already shows the change */ }
+    try { onProfile(await api.getProfile(profile.id)); } catch { /* tree already shows change */ }
   }
-  async function setCourse(courseId: string, done: boolean) {
+
+  async function setCourse(courseId: string, done: boolean, anchor?: HTMLElement) {
+    if (saving) return;
+    setSaving(true); setError(null);
     try {
       onProfile(await api.complete(profile.id, courseId, done));
-      setPlan(null);
-      if (tab === "list") setPlan(await api.pathway(profile.id, role.role_id));
-    } catch { setError(t("tree.loadFailed")); }
+      if (done && anchor) spawnConfetti(anchor);
+      setOpen(previous => previous?.course?.id === courseId ? { ...previous, course_done: done } : previous);
+    } catch { setError(t("target.failed")); }
+    finally { setSaving(false); }
   }
+
   async function proven(passed: boolean) {
     if (!passed) return;
-    load();
+    loadTree();
     refreshProfile();
   }
 
-  if (error) return <p className="error" role="alert">{error}</p>;
-  if (!tree) return <p className="muted">{t("a.loading")}</p>;
+  // ETA bar calculations (only when plan is loaded)
+  const paidKnown = plan
+    ? plan.steps.filter((s) => s.course.price_rm != null)
+        .reduce((sum, s) => sum + (s.course.price_rm ?? 0), 0)
+    : 0;
+  const paidUnknownCount = plan
+    ? plan.steps.filter((s) => s.course.cost === "paid" && s.course.price_rm == null).length
+    : 0;
+
+  const totalWeight = [...role.covered, ...role.missing].reduce((s, r) => s + r.weight, 0);
+  const uncoveredWeight = plan
+    ? [...role.covered, ...role.missing]
+        .filter((m) => plan.uncovered_skills.includes(m.skill_id))
+        .reduce((s, m) => s + m.weight, 0)
+    : 0;
+  const readinessAfter = totalWeight > 0 ? (totalWeight - uncoveredWeight) / totalWeight : 1;
+
+  if (!tree) return <p className={error ? "error" : "muted"} role="status">{error || t("a.loading")}</p>;
 
   const depths = Array.from(new Set(tree.nodes.map((n) => n.depth))).sort((a, b) => b - a);
+
   return (
-    <section>
+    <section className="pathway-page">
       <button className="link back-link" onClick={onBack}>← {tr(tree.role.title)}</button>
-      <div className="page-head"><h1>{t("path.title")}: {tr(tree.role.title)}</h1><p className="muted">{t("path.sub")}</p></div>
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
+      {error && <p className="error" role="alert">{error}</p>}
 
-      <div className="card path-head">
-        <div className="card-row"><strong>{t("path.readiness")}</strong><strong className="readiness-num">{percent(tree.readiness)}%</strong></div>
-        <div className="fit" role="img" aria-label={`${t("path.readiness")} ${percent(tree.readiness)}%`}><div style={{ width: `${tree.readiness * 100}%` }} /></div>
-        <span className="muted">{tree.total_steps} {t("path.steps")} · {tree.hours_left} {t("path.hoursLeft")}</span>
+      {/* GPS header */}
+      <div className="gps-header">
+        <h1 className="gps-route">
+          <span className="eyebrow">
+            {profile.current_role_id ? `${t("path.from")} ${currentRole ? tr(currentRole.title) : t("a.loading")}` : t("path.fromSkills")}
+          </span>
+          <span className="gps-sep">{t("path.to")}</span>
+          <strong>{tr(role.title)}</strong>
+        </h1>
+        <button className="btn ink" onClick={onDestinations}>{t("path.changeDestination")}</button>
       </div>
 
-      <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={tab === "tree"} onClick={() => setTab("tree")}>{t("path.tabTree")}</button>
-        <button role="tab" aria-selected={tab === "list"} onClick={() => setTab("list")}>{t("path.tabList")}</button>
-      </div>
+      {/* Sticky ETA bar (only when plan is loaded) */}
+      {plan && (
+        <div className="eta-bar">
+          <div className="eta-item">
+            <span className="eta-value"><EtaNumber value={plan.hours_left} format={h => tf("path.etaHours", { h })} /></span>
+          </div>
+          {(
+            <>
+              <div className="eta-divider" />
+              <div className="eta-item">
+                <span className="eta-value">
+                  {`RM ${paidKnown.toLocaleString()}`}
+                  {paidKnown > 0 && paidUnknownCount > 0 ? " " : ""}
+                  {paidUnknownCount > 0 ? tf("path.priceToConfirm", { n: paidUnknownCount }) : ""}
+                </span>
+              </div>
+            </>
+          )}
+          <div className="eta-divider" />
+          <div className="eta-item">
+            <span className="eta-value">{tf("path.etaStops", { n: plan.steps.length })}</span>
+          </div>
+          <div className="eta-divider" />
+          <div className="eta-item">
+            <span className="eta-value"><EtaNumber value={percent(plan.readiness)} format={n => `${n}%`} /></span>
+            <span className="eta-label">{t("path.readinessNow")}</span>
+          </div>
+          <span className="eta-label">→</span>
+          <div className="eta-item">
+            <span className="eta-value">{percent(readinessAfter)}%</span>
+            <span className="eta-label">{t("path.readinessAfter")}</span>
+          </div>
+        </div>
+      )}
+      {plan && <div className="route-notes">
+        <p className="source">{t("path.etaSource")} {Array.from(new Set(plan.steps.map(s => s.course.checked).filter(Boolean))).map(date => tf("pl.checked", { date: date! })).join(" · ")}</p>
+        {plan.uncovered_skills.length > 0 && <p className="banner">{tf("pl.uncovered", { list: plan.uncovered_skills.map(id => tr([...role.covered, ...role.missing].find(s => s.skill_id === id)?.name ?? id)).join(", ") })}</p>}
+      </div>}
+
+      {/* Route map + free-only toggle */}
+      <div className="pathway-layout">
+          {plan && <RouteMap key={`${plan.role_id}-${freeOnly}`} plan={plan} title={role.title} />}
+          <div className={`pathway-sheet ${expanded ? "expanded" : ""}`}>
+            <button className="sheet-handle" aria-expanded={expanded} aria-controls="pathway-steps"
+              onPointerDown={e => { dragStart.current = e.clientY; e.currentTarget.setPointerCapture(e.pointerId); }}
+              onPointerUp={e => { if (dragStart.current !== null) setExpanded(Math.abs(e.clientY - dragStart.current) > 20 ? e.clientY < dragStart.current : !expanded); dragStart.current = null; }}
+              onPointerCancel={() => { dragStart.current = null; }}
+              onClick={e => { if (e.detail === 0) setExpanded(!expanded); }}
+              onKeyDown={e => { if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); setExpanded(e.key === "ArrowUp"); } }}>
+              <span aria-hidden="true" />{t("path.sheetHandle")}
+            </button>
+          <div id="pathway-steps">
+            <label className="free-toggle">
+              <input
+                type="checkbox"
+                checked={freeOnly}
+                disabled={saving}
+                onChange={(e) => { setPlan(null); setFreeOnly(e.target.checked); }}
+              />
+              {t("path.freeOnly")}
+            </label>
+      <Tabs id="pathway" label={t("path.title")} tabs={[{ id: "tree", label: t("path.tabTree") }, { id: "list", label: t("path.tabList") }]} value={tab} onChange={setTab}>
 
       {tab === "tree" && (
         <div className="tree">
+          <p className="source">{t("path.sub")}</p>
           <div className="tree-target">🎯 {tr(tree.role.title)}</div>
           {depths.map((d) => (
             <div key={d} className="tree-row">
@@ -96,7 +258,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
 
       {tab === "list" && (plan
         ? <>
-            <PathwayList plan={plan} role={role} onToggle={setCourse} />
+            <PathwayList plan={plan} role={role} freeOnly={freeOnly} saving={saving} onToggle={setCourse} />
             <StudyCalendar plan={plan} roleTitle={role.title} />
             <div className="actions">
               <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
@@ -104,6 +266,8 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
             </div>
           </>
         : <p className="muted">{t("a.loading")}</p>)}
+      </Tabs>
+      </div></div></div>
 
       {open && !proving && (
         <div className="dialog-backdrop" onClick={() => setOpen(null)}>
@@ -114,8 +278,8 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
               ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{tr(open.course.title)} ↗</a> · {open.course.hours} h</p>
               : <p className="muted">{t("path.noCourse")}</p>}
             {open.step && open.course && (
-              <label className="check"><input type="checkbox" checked={open.course_done}
-                onChange={(e) => { setCourse(open.course!.id, e.target.checked); setOpen({ ...open, course_done: e.target.checked }); }} /> {t("path.courseDone")}</label>
+              <label className="check"><input type="checkbox" checked={open.course_done} disabled={saving}
+                onChange={(e) => { setCourse(open.course!.id, e.target.checked, e.currentTarget); }} /> {t("path.courseDone")}</label>
             )}
             {open.evidence && open.evidence.job_ads > 0 && (
               <details className="evidence-row">

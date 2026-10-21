@@ -1,7 +1,8 @@
 // Line icons drawn on a 24 px grid, one path each, so we don't ship an icon library.
 export type IconName =
   | "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash"
-  | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target";
+  | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target"
+  | "mapPin" | "arrowUp";
 
 const ICONS: Record<IconName, string> = {
   chat: "M4 5h16v11H9l-5 4z",
@@ -20,6 +21,8 @@ const ICONS: Record<IconName, string> = {
   mic: "M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6",
   book: "M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h9",
   target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 12.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z",
+  mapPin: "M12 22C7 17 5 14 5 10a7 7 0 0 1 14 0c0 4-2 7-7 12zM12 10.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z",
+  arrowUp: "M12 19V5M5 12l7-7 7 7",
 };
 
 export function Icon({ name }: { name: IconName }) {

@@ -375,8 +375,8 @@ function MainApp({ demo }: { demo: string | null }) {
               <Survey profile={profile} userId={userId} onDone={(p) => { setProfile(p); go("roles"); }} onSkip={() => go("home")} />
             )}
             {screen === "tree" && profile && role && (
-              <SkillTree profile={profile} role={role} userId={userId} onProfile={setProfile}
-                onImpact={() => go("impact")} onBack={() => go("role")} />
+              <SkillTree key={`${profile.id}-${role.role_id}`} profile={profile} role={role} userId={userId} onProfile={setProfile}
+                onImpact={() => go("impact")} onBack={() => go("role")} onDestinations={() => go("roles")} />
             )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
             {screen === "review-kit" && <ReviewKit />}

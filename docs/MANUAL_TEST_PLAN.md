@@ -348,4 +348,69 @@ Notes: ______
 
 ---
 
-**Summary:** ___ of 20 sections fully passed · Issues found: ___ (logged in REVIEW_LOG.md rows ___)
+## 21. GPS Pathway redesign (Phase 1)
+
+Test on **375 px** (phone) and **1280 px** (desktop), both light and dark theme, English and BM.
+
+### 21.1 GPS header
+
+- [ ] 21.1.1 Header shows "From [current role]" when `current_role_id` is set; "From your current skills" when it is not.
+- [ ] 21.1.2 The destination role title matches the role you navigated to.
+- [ ] 21.1.3 "Change destination" button navigates back to the Future Roles list.
+
+### 21.2 ETA bar
+
+- [ ] 21.2.1 "X h left" shows the hours of uncompleted courses (0 when all courses are marked done).
+- [ ] 21.2.2 A paid course with a known RM price shows "RM X,XXX" in the bar.
+- [ ] 21.2.3 A plan with N paid courses that have no price shows "+ N price to confirm".
+- [ ] 21.2.4 Readiness "now" matches the plan readiness percentage.
+- [ ] 21.2.5 Readiness "after plan" is 100% when `uncovered_skills` is empty.
+- [ ] 21.2.6 ETA bar stays sticky when scrolling on both phone and desktop.
+
+### 21.3 Route map
+
+- [ ] 21.3.1 Route draws from origin dot to destination pin over ~800 ms on first load.
+- [ ] 21.3.2 Stop circles appear sequentially as the line animation plays.
+- [ ] 21.3.3 Completed (ticked) stops are filled accent; pending stops are hollow with accent border.
+- [ ] 21.3.4 Completed route segment is solid; upcoming segment is dashed.
+- [ ] 21.3.5 Enable "Reduce motion" in OS settings → route appears instantly with no animation.
+- [ ] 21.3.6 Set `html[data-lite="1"]` (Lite mode) → same as reduced motion.
+- [ ] 21.3.7 On desktop (≥900 px): route map is on the left, step list on the right.
+- [ ] 21.3.8 On phone: route stays visible above the steps sheet. Drag its handle up/down, tap it, or use Enter/Space and Up/Down arrows to expand/lower it. Scroll within the sheet to reach every course and proof check.
+
+### 21.4 Free courses only toggle
+
+- [ ] 21.4.1 Toggle "Free courses only" → plan re-fetches; only courses with cost `free` or `free_audit` appear.
+- [ ] 21.4.2 Skills with no free course appear with the "No free route for this skill" badge (not silently dropped).
+- [ ] 21.4.3 Unticking the toggle returns the full plan.
+- [ ] 21.4.4 ETA bar and route map both update after toggling.
+
+### 21.5 Step list (List tab)
+
+- [ ] 21.5.1 Each step (except the last) shows an upward arrow manoeuvre icon.
+- [ ] 21.5.2 The last step shows a map pin icon.
+- [ ] 21.5.3 Saving a completed step fires a confetti burst from its checkbox (14 pieces, accent / gold / good colours) visible for ≤800 ms.
+- [ ] 21.5.4 Ticked step card transitions background from white to green-tinted in ~300 ms.
+- [ ] 21.5.5 Confetti does not appear with reduced-motion or Lite mode.
+
+### 21.6 GPS header labels in BM and 中文
+
+- [ ] 21.6.1 All new strings in section 21.1–21.5 render correctly in Bahasa Malaysia.
+- [ ] 21.6.2 All new strings render correctly in 中文.
+
+### 21.7 Regression and honesty checks
+
+- [ ] Complete the last course before the first: only that stop/segment fills. Undo it; the stop and hours revert after saving. Failed saves show an error without celebrating.
+- [ ] Use ArrowLeft/ArrowRight/Home/End in Tree/List; selected tab and focus move together. Open a tree node and start a proof check.
+- [ ] Free-only with uncovered skills: name each gap and show weighted readiness below 100%. Restore the full plan; known prices sum correctly and unknown paid prices remain explicitly unconfirmed.
+- [ ] A zero-step API plan includes `hours_left: 0`; missing skills remain uncovered and the summary does not claim the person already has them. An already-ready profile has no uncovered skills.
+- [ ] Free plans display RM 0. ETA has catalogue provenance and checked dates; course source/price/HRD Corp details remain in List. Print hides the ETA and removes the sheet scroll limit.
+- [ ] Set, change and remove a destination on the role page in EN/BM/Chinese; Pathway's Change destination opens Future roles.
+
+Verification on 21 Oct 2026 (AI-assisted): frontend production build passed; backend **323 passed, 1 skipped** (Postgres integration needs `TEST_DATABASE_URL`, intentionally not configured). Seven Phase 1 backend tests cover filtering on/off, free audit, completions and empty plans. The repository now contains more tests than the brief's historical 297 count.
+
+Local Chrome checks: 36 combinations of 375/1280 px, light/dark, EN/BM/Chinese, normal/reduced motion/Lite; no page-level horizontal overflow or JavaScript errors. Course completion/undo, out-of-order stops, free-only gaps, keyboard tabs, destination navigation, sheet keyboard resizing and print ETA hiding passed. Screenshots and detailed evidence are recorded in `docs/phase1/README.md`. Native-speaker review of AI-drafted BM/Chinese remains pending in the Review kit.
+
+---
+
+**Summary:** ___ of 21 sections fully passed · Issues found: ___ (logged in REVIEW_LOG.md rows ___)

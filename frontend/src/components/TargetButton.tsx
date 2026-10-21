@@ -3,7 +3,7 @@ import { api, Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import { Icon } from "./Icon";
 
-// "Make this my target": the role the journey's later steps (Pathway, practice, sharing) follow.
+// The destination is the role the journey's later steps (Pathway, practice, sharing) follow.
 export function TargetButton({ profile, roleId, onProfile }: {
   profile: Profile; roleId: string; onProfile: (p: Profile) => void;
 }) {

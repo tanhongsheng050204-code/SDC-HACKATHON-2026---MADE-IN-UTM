@@ -523,5 +523,5 @@ export const api = {
     request<SurveyResult>(`/profiles/${id}/survey`, { method: "POST", body: JSON.stringify({ answers, language }) }),
   xray: (roleId: string, scenario: Scenario, year?: number, adoption?: number) =>
     request<Xray>(`/roles/${encodeURIComponent(roleId)}/xray?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption ? `&adoption=${adoption}` : ""}`),
-  pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
+  pathway: (id: string, role: string, freeOnly = false) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}${freeOnly ? "&free_only=true" : ""}`),
 };

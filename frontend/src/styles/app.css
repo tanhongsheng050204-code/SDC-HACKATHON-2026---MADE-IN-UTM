@@ -772,3 +772,102 @@ main:focus { outline: none; }
 .audience-pick legend { font-weight: 600; padding: 0; margin-bottom: 6px; }
 .review-more { display: grid; gap: 6px; align-content: end; }
 .review-more .btn { justify-self: start; }
+
+/* ---------- GPS Pathway (redesign Phase 1) ---------- */
+.gps-header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-card); }
+.gps-route { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: .95rem; }
+.gps-route strong { font-weight: 650; }
+.gps-sep { color: var(--ink-soft); }
+
+.eta-bar { position: sticky; top: 60px; z-index: 10; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center;
+  padding: 10px 18px; background: color-mix(in srgb, var(--surface) 94%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line); border-radius: 0 0 var(--radius-card) var(--radius-card); margin: -1px 0 0; }
+.eta-item { display: flex; align-items: center; gap: 5px; font-size: .86rem; white-space: nowrap; }
+.eta-value { font-weight: 650; }
+.eta-label { color: var(--ink-soft); font-size: .78rem; }
+.eta-divider { width: 1px; height: 14px; background: var(--line); align-self: center; }
+.free-toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: .88rem; cursor: pointer; padding: 6px 0; }
+.free-toggle input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+.route-map { padding: 8px 0 4px; }
+
+@media (max-width: 900px) {
+  .eta-bar { top: 101px; }
+}
+
+/* Step card segment-fill transition when ticked */
+.steps > li { transition: background-color 300ms ease-out, border-color 300ms ease-out; }
+
+/* Confetti burst on step completion */
+@keyframes confetti-burst {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) rotate(360deg) scale(0.6); }
+}
+
+/* Desktop: route left, steps right */
+@media (min-width: 900px) {
+  .pathway-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .route-map { position: sticky; top: 80px; }
+}
+
+/* Route and directions share the same surface vocabulary as the rest of Laluan. */
+.pathway-page .gps-header { padding: 22px; }
+.pathway-page .gps-route { display: grid; gap: 5px; font-size: 1.5rem; }
+.pathway-page .gps-sep { font-size: .85rem; font-weight: 400; }
+.pathway-page .eta-bar { margin-top: -16px; padding: 16px 20px; gap: 10px 16px; }
+.pathway-page .eta-value { font-variant-numeric: tabular-nums; }
+.route-notes { display: grid; gap: 10px; }
+.pathway-layout { min-width: 0; }
+.pathway-layout > * { min-width: 0; }
+.route-map { margin: 0; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-card); text-align: center; }
+.route-map figcaption { display: grid; gap: 8px; margin-bottom: 20px; }
+.route-map svg { width: 100%; max-height: 430px; display: block; margin: auto; }
+.route-origin { font-size: .85rem; }
+.route-destination { display: grid; gap: 4px; font-size: .8rem; color: var(--ink-soft); margin-bottom: 16px; }
+.route-destination strong { color: var(--ink); font-size: .95rem; }
+.route-segment { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 6 7; fill: none; stroke-linecap: round; }
+.route-segment.done { stroke-dasharray: none; stroke-width: 5; }
+.route-stop circle { fill: var(--surface); stroke: var(--accent); stroke-width: 2; transition: fill 300ms ease-out; }
+.route-stop text { fill: var(--accent); font-size: 13px; font-weight: 650; }
+.route-stop.done circle { fill: var(--accent); }
+.route-stop.done text { fill: var(--surface); }
+.route-stop { animation: route-stop-in 200ms ease-out backwards; }
+@keyframes route-stop-in { from { opacity: 0; } to { opacity: 1; } }
+.route-reveal { stroke-dasharray: 1; stroke-dashoffset: 0; animation: route-draw 800ms ease-out; }
+@keyframes route-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.pathway-sheet { min-width: 0; }
+.pathway-sheet #pathway-steps { display: grid; gap: 16px; }
+.pathway-sheet .tree { margin-top: 0; }
+.pathway-page .free-toggle, .pathway-page .check { min-height: 44px; }
+.pathway-page .tabs button, .pathway-page button.link { min-height: 44px; }
+.pathway-page .steps > li { overflow-wrap: anywhere; }
+.pathway-page .badge { white-space: normal; }
+.sheet-handle { display: none; }
+.pathway-sheet .tab-panel { min-width: 0; }
+@media (min-width: 901px) {
+  .pathway-layout { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.7fr); }
+  .route-map { top: 150px; }
+}
+@media (max-width: 900px) {
+  .pathway-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .route-map { position: static; }
+  .route-map svg { max-height: 250px; }
+  .pathway-sheet { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 0 14px 20px; max-height: 55dvh; overflow: auto; overscroll-behavior-y: contain; box-shadow: var(--shadow-pop); }
+  .pathway-sheet.expanded { max-height: calc(100dvh - 112px); }
+  .sheet-handle { display: grid; justify-items: center; gap: 6px; width: 100%; position: sticky; top: 0; z-index: 2; background: var(--surface); border: 0; border-radius: 0; box-shadow: none; min-height: 52px; touch-action: none; cursor: ns-resize; color: var(--ink-soft); font-size: .78rem; }
+  .sheet-handle span { display: block; width: 36px; height: 4px; border-radius: 99px; background: var(--line-strong); }
+  .pathway-page .eta-bar { gap: 10px; padding: 12px; }
+  .pathway-page .eta-item { flex-wrap: wrap; white-space: normal; }
+  .pathway-page .eta-divider { display: none; }
+  .pathway-page .steps > li { padding: 16px 12px 16px 44px; }
+  .pathway-page .steps > li::before { left: 10px; }
+  .workspace:has(.pathway-page) .workbar { min-height: 70px; }
+  .pathway-page .eta-bar { top: 123px; }
+}
+@media print {
+  .eta-bar, .sheet-handle, .free-toggle { display: none !important; }
+  .pathway-layout { display: block; }
+  .pathway-sheet { position: static; max-height: none !important; overflow: visible; border: 0; box-shadow: none; }
+  .route-map { position: static; break-inside: avoid; }
+}
