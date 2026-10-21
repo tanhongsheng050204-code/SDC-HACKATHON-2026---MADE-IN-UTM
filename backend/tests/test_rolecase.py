@@ -64,3 +64,10 @@ def test_cv_with_instructions_skips_the_model(client):
     result = client.post("/api/intake/extract", json={"text": text}).json()
     assert result["mode"].startswith("dictionary (AI skipped")
     assert "excel" in result["skills"]
+
+
+def test_every_point_carries_a_sentence_key_for_translation(client):
+    pid = client.post("/api/profiles", json={"skills": ["excel", "data_entry"], "current_role_id": "data_entry_clerk"}).json()["id"]
+    body = client.get(f"/api/profiles/{pid}/roles/data_analyst/case").json()
+    points = body["pros"] + body["cons"]
+    assert points and all(p["key"] and isinstance(p["vars"], dict) and p["source_key"] for p in points)

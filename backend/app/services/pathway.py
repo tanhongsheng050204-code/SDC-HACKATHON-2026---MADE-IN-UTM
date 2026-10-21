@@ -71,6 +71,7 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True) -
             "course": course,
             "why": ("Core skill" if weight == 3 else "Important skill" if weight == 2 else "Useful skill")
                    + f" for {role['title']}.",
+            "why_key": "core" if weight == 3 else "important" if weight == 2 else "useful",  # the app words it per language
             "done": course["id"] in done,
         })
     uncovered = [rs["skill_id"] for rs in missing
@@ -109,6 +110,11 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True) -
         "total_hours": total_hours,
         "summary": summary,
         "summary_mode": mode,
+        # The template sentence as a key and values, so the app can show it in BM or 中文 (the Gemini
+        # summary is English only).
+        "summary_template": {"key": "start", "vars": {"role": role["title"], "course": steps[0]["course"]["title"],
+                                                      "provider": steps[0]["course"]["provider"], "n": len(steps),
+                                                      "h": total_hours}},
         "grounding": report.as_dict() if report else None,
         "uncovered_skills": uncovered,
     }

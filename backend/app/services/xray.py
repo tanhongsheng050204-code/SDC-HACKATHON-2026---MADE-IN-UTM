@@ -13,8 +13,11 @@ from app.trends.builder import CAP_POINTS, LOCAL_CAP
 NO_REFRESH = "no trend refresh approved yet, so this adds nothing"
 
 
-def _step(label: str, value: float, running: float, source: str, cap: str | None = None) -> dict:
-    return {"label": label, "value": round(value, 1), "running_total": round(running, 1), "source": source, "cap": cap}
+def _step(label: str, value: float, running: float, source: str, cap: str | None = None,
+          key: str = "", **vars) -> dict:
+    """`key` and `vars` let the app word the label in BM or 中文; `label` and `source` stay English."""
+    return {"label": label, "value": round(value, 1), "running_total": round(running, 1), "source": source, "cap": cap,
+            "key": key, "vars": vars}
 
 
 def explain(ref: Reference, role_id: str, scenario_id: str, year: int | None = None,
@@ -29,7 +32,8 @@ def explain(ref: Reference, role_id: str, scenario_id: str, year: int | None = N
     cap = f"±{CAP_POINTS:g} points"
 
     steps = [_step(f"Published baseline, {snapshot['published'][:4]} to {snapshot['horizon_year']}", baseline, baseline,
-                   f"{snapshot['source']} (snapshot {snapshot.get('baseline_snapshot_id', snapshot['snapshot_id'])})")]
+                   f"{snapshot['source']} (snapshot {snapshot.get('baseline_snapshot_id', snapshot['snapshot_id'])})",
+                   None, "baseline", start=snapshot["published"][:4], end=snapshot["horizon_year"])]
     running = baseline
     parts = [("demand_points", "Job-posting demand", "change in postings that mention this role's skills", cap)]
     if "local_points" in row:  # snapshots refreshed before OpenDOSM was added have no such step
@@ -41,7 +45,7 @@ def explain(ref: Reference, role_id: str, scenario_id: str, year: int | None = N
         value = float(row.get(key, 0.0)) if trend else 0.0
         running += value
         steps.append(_step(label, value, running, f"{source}; snapshot {snapshot['snapshot_id']}" if trend else NO_REFRESH,
-                           limit if trend else None))
+                           limit if trend else None, key.split("_")[0], refreshed=trend))
     running = signal.net_growth_pct
     swing = (adopt - 1.0) * AI_SWING * (signal.ai_complementarity - signal.automation_exposure)
     running += swing
@@ -49,9 +53,12 @@ def explain(ref: Reference, role_id: str, scenario_id: str, year: int | None = N
         f"AI adoption {adopt:g}× ({'your own setting' if adoption is not None else ref.scenarios[scenario_id]['label']})",
         swing, running,
         f"({adopt:g} − 1) × {AI_SWING:g} × (works with AI {signal.ai_complementarity:g} − exposed to automation "
-        f"{signal.automation_exposure:g}); both are team estimates"))
+        f"{signal.automation_exposure:g}); both are team estimates",
+        None, "adoption", x=f"{adopt:g}", own=adoption is not None, scenario=scenario_id))
     result = outlook(signal, scenario_id, adopt, fraction)
     steps.append(_step(f"Scaled to {year_used}", result.index - running, result.index,
-                       f"{fraction:.0%} of the way from {snapshot['published'][:4]} to {snapshot['horizon_year']}"))
+                       f"{fraction:.0%} of the way from {snapshot['published'][:4]} to {snapshot['horizon_year']}",
+                       None, "scaled", year=year_used, pct=f"{fraction:.0%}", start=snapshot["published"][:4],
+                       end=snapshot["horizon_year"]))
     return {"role_id": role_id, "title": ref.roles[role_id]["title"], "scenario": scenario_id, "year": year_used,
             "adoption": adopt, "steps": steps, "final": result.index, "label": result.label}

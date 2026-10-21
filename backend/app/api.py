@@ -56,6 +56,12 @@ def list_skills():
     return sorted(get_reference().skills.values(), key=lambda s: (s["category"], s["name"]))
 
 
+@router.get("/translations")
+def translations():
+    """BM / 中文 for the text in our reference data, keyed by its English wording (AI-drafted)."""
+    return get_reference().translations
+
+
 @router.get("/roles")
 def list_roles():
     return list(get_reference().roles.values())

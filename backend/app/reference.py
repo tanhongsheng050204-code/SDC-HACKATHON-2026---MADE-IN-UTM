@@ -34,6 +34,7 @@ class Reference:
     work_dimensions: list[dict]
     survey_cards: dict[str, dict]
     salaries: dict
+    translations: dict[str, dict]  # English text -> {"ms", "zh"}, AI-drafted (scripts/build_translations.py)
     day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
 
     @property
@@ -98,6 +99,7 @@ def get_reference() -> Reference:
         work_dimensions=_read(data_dir / "work_dimensions.json"),
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
         salaries=_read(data_dir / "salaries.json"),
+        translations=_read(data_dir / "translations.json")["strings"],
         day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
     )
 
