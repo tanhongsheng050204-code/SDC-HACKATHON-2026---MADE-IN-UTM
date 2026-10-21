@@ -1,11 +1,92 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { LogoMark, Rosette } from "../../components/Brand";
-import { t, type StringKey } from "../../lib/i18n";
+import { t, tf, type StringKey } from "../../lib/i18n";
+import { api } from "../../lib/api";
 import "../../styles/landing.css";
 import { HeroPreview } from "./HeroPreview";
 import { Journey } from "./Journey";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
+
+// Decorative GPS route — "You are here" → two stops → destination.
+// The path length is set via pathLength="1" so stroke-dasharray/dashoffset can use 0–1.
+function HeroRoute() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="hero-route"
+      viewBox="0 0 480 100"
+      height={100}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Winding route line */}
+      <path
+        className="hero-route-line"
+        d="M 30 80 C 80 80 80 20 160 20 S 240 80 320 80 S 400 20 450 20"
+        pathLength="1"
+      />
+      {/* Start dot */}
+      <circle className="hero-route-stop" cx={30} cy={80} r={7} fill="var(--accent)" style={{ animationDelay: ".3s" }} />
+      {/* Stop 1 */}
+      <circle className="hero-route-stop" cx={160} cy={20} r={5} fill="var(--accent)" style={{ animationDelay: ".65s" }} />
+      {/* Stop 2 */}
+      <circle className="hero-route-stop" cx={320} cy={80} r={5} fill="var(--accent)" style={{ animationDelay: ".8s" }} />
+      {/* End pin */}
+      <circle className="hero-route-stop" cx={450} cy={20} r={8} fill="var(--accent)" style={{ animationDelay: "1s" }} />
+      <circle cx={450} cy={20} r={4} fill="var(--surface)" style={{ animationDelay: "1s" }} />
+      {/* Start label */}
+      <text x={30} y={98} textAnchor="middle" fontSize={10} fill="var(--ink-soft)" style={{ fontFamily: "inherit" }}>
+        {t("lp.heroYouAreHere").split(":")[0]}
+      </text>
+      {/* End label */}
+      <text x={450} y={12} textAnchor="middle" fontSize={10} fill="var(--ink)" style={{ fontFamily: "inherit" }}>
+        {t("lp.heroDestination")}
+      </text>
+    </svg>
+  );
+}
+
+// Stripe-style one-liner with live stats from the API, falls back to fixed text.
+function LiveFactLine() {
+  const [line, setLine] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      // Show fixed fallback after 3 s if fetch hasn't resolved
+      if (line === null) {
+        setLine(`${tf("lp.rolesTracked", { n: "—" })} · ${t("lp.forecastSource")}`);
+      }
+    }, 3000);
+
+    Promise.all([
+      api.roles().catch(() => null),
+      api.health().catch(() => null),
+    ]).then(([roles, health]) => {
+      clearTimeout(timeout);
+      const n = Array.isArray(roles) ? roles.length : "—";
+      const date = health?.snapshot_imported
+        ? health.snapshot_imported.slice(0, 10)
+        : null;
+      const parts = [
+        tf("lp.rolesTracked", { n }),
+        t("lp.forecastSource"),
+      ];
+      if (date) parts.push(tf("lp.updatedDate", { date }));
+      setLine(parts.join(" · "));
+    });
+
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!line) return null;
+  return (
+    <p className="live-fact">
+      <strong>{line.split(" · ")[0]}</strong>
+      {" · "}{line.split(" · ").slice(1).join(" · ")}
+    </p>
+  );
+}
 
 // Read through t() at render time, so the page follows the chosen language.
 const people = () => [
@@ -40,6 +121,8 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             <button className="btn ink lg" onClick={() => onDemo("clerk")}>{t("landing.demo")}</button>
             <button className="btn quiet lg" onClick={onStart}>{t("landing.mine")}</button>
           </div>
+          <LiveFactLine />
+          <HeroRoute />
           <HeroPreview />
         </header>
 

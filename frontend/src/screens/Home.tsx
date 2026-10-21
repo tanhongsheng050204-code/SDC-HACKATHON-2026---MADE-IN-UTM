@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useId, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { Icon } from "../components/Icon";
 import { api, Journey, JourneyStep, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
@@ -60,6 +60,12 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         <h1>{name ? tf("home.helloName", { g: greeting(), name }) : tf("home.hello", { g: greeting() })}</h1>
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
+
+      <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
+
+      {target !== null && data !== null && (
+        <StoryBanner profile={profile} target={target} />
+      )}
 
       {journey && data && <NextStep journey={journey} top={top ?? null} target={target} onOpenRole={onOpenRole} onStep={openStep} />}
       {journey && (
@@ -141,6 +147,90 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
       {!data && !error && <div className="grid" aria-hidden="true">{[0, 1].map((i) => <div key={i} className="card skeleton" />)}</div>}
       {data && <p className="source">{tf("home.forecast", { id: data.signal_source.snapshot_id, date: data.signal_source.imported })} {t("shell.estimates")}</p>}
     </section>
+  );
+}
+
+// "Where to?": typing filters roles; Enter with no match sends text to the coach.
+function WhereTo({ roles, onOpenRole, onAsk }: { roles: RoleMatch[]; onOpenRole: (r: RoleMatch) => void; onAsk: (q: string) => void }) {
+  const [q, setQ] = useState("");
+  const [active, setActive] = useState(0);
+  const id = useId();
+  const needle = q.trim().toLowerCase();
+  const matches = needle.length < 2 ? [] : roles.filter((r) =>
+    tr(r.title).toLowerCase().includes(needle) || r.title.toLowerCase().includes(needle)).slice(0, 5);
+
+  function ask() { if (!q.trim()) return; onAsk(q.trim()); setQ(""); }
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (matches.length) onOpenRole(matches[Math.min(active, matches.length - 1)]);
+    else ask();
+  }
+  function keys(e: KeyboardEvent<HTMLInputElement>) {
+    if (!matches.length) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive((a) => (a + 1) % matches.length); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive((a) => (a - 1 + matches.length) % matches.length); }
+    else if (e.key === "Escape") setQ("");
+  }
+  return (
+    <form className="where-to" onSubmit={submit} role="search">
+      <label htmlFor={`${id}-q`}><span className="where-to-title">{t("home.whereTo")}</span><small className="muted">{t("home.whereToHint")}</small></label>
+      <div className="where-to-row">
+        <input id={`${id}-q`} type="text" maxLength={500} value={q} autoComplete="off"
+          role="combobox" aria-expanded={matches.length > 0} aria-controls={`${id}-list`} aria-autocomplete="list"
+          aria-activedescendant={matches.length ? `${id}-o${Math.min(active, matches.length - 1)}` : undefined}
+          onChange={(e) => { setQ(e.target.value); setActive(0); }} onKeyDown={keys} placeholder={t("home.whereToPlaceholder")} />
+        <button className="primary" type="button" onClick={ask} disabled={!q.trim()}>{t("home.askCoach")}</button>
+      </div>
+      {matches.length > 0 && (
+        <ul id={`${id}-list`} role="listbox" className="where-to-list" aria-label={t("home.whereTo")}>
+          {matches.map((r, i) => (
+            <li key={r.role_id} id={`${id}-o${i}`} role="option" aria-selected={i === Math.min(active, matches.length - 1)}
+              onMouseDown={(e) => e.preventDefault()} onClick={() => onOpenRole(r)}>
+              <Icon name="route" /><span>{tr(r.title)}</span><small className="muted">#{r.rank} · {percent(r.fit)}%</small>
+            </li>
+          ))}
+        </ul>
+      )}
+      {needle.length >= 2 && !matches.length && <small className="muted">{t("home.noMatch")}</small>}
+    </form>
+  );
+}
+
+// Story banner: shown when user has a target role and matches have loaded.
+function StoryBanner({ profile, target }: { profile: Profile; target: RoleMatch }) {
+  const [creating, setCreating] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function openRoute() {
+    setCreating(true);
+    setErr(null);
+    try {
+      const { card_id } = await api.createCard(profile.id, target.role_id);
+      window.location.href = window.location.pathname + "?card=" + card_id;
+    } catch {
+      setErr(t("fc.offline"));
+      setCreating(false);
+    }
+  }
+
+  return (
+    <div className="card story-banner" onClick={creating ? undefined : openRoute} role="button" tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") openRoute(); }}>
+      <span className="eyebrow">{t("fc.storyReady")}</span>
+      <h3>{tf("fc.storyReadySub", { role: tr(target.title) })}</h3>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+        <button
+          className="btn ink"
+          style={{ fontSize: ".9rem", padding: "7px 14px" }}
+          onClick={(e) => { e.stopPropagation(); openRoute(); }}
+          disabled={creating}
+          aria-busy={creating}
+        >
+          {creating ? t("fc.storyCreating") : `${t("fc.storyOpen")} →`}
+        </button>
+        {err && <span className="error" role="alert">{err}</span>}
+      </div>
+    </div>
   );
 }
 

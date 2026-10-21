@@ -48,21 +48,14 @@ export function HeroPreview() {
           </div>
         </div>
         <div className="lp-aside">
-          <small>{t("hp.next")}</small>
+          <small>{t("home.resume")}</small>
           <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> {t("hp.step1")}</span>
-            <b>{tr("Critical thinking")}</b>
-            <span className="lp-meta">{t("cost.free_audit")} · {t("hp.tenHours")} <i>{t("hp.start")}</i></span>
+            <span className="lp-tag">{t("home.whereTo")}</span>
           </div>
           <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> {t("hp.coach")}</span>
-            <b>{t("hp.compare")}</b>
-            <span className="lp-meta">{t("hp.youDecide")} <i>{t("a.apply")}</i></span>
-          </div>
-          <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> {t("share.title")}</span>
-            <b>{t("hp.share")}</b>
-            <span className="lp-meta">{t("hp.shareSub")}</span>
+            <span className="lp-tag"><LogoMark size={16} /> {t("home.resume")}</span>
+            <b>{tr("AI operations specialist")}</b>
+            <span className="lp-meta">≈ 11 h · 2 {t("path.steps")} · 50%→100%</span>
           </div>
         </div>
       </div>

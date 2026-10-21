@@ -166,3 +166,13 @@
 .lp-closing p { color: var(--ink-soft); font-size: 1.1rem; margin-bottom: 10px; }
 .lp-closing .ctas { justify-content: center; }
 .jp-span { grid-column: 1 / -1; }
+
+/* ---------- Hero route SVG ---------- */
+.hero-route { width: 100%; max-width: 480px; margin: 24px auto 0; display: block; overflow: visible; }
+.hero-route-line { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; stroke-dashoffset: 1; stroke-dasharray: 1; animation: route-draw .9s ease-out .3s forwards; }
+.hero-route-stop { animation: route-pop .35s ease-out both; transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) { .hero-route-line, .hero-route-stop { animation: none; stroke-dashoffset: 0; } }
+
+/* ---------- Live fact line ---------- */
+.live-fact { text-align: center; font-size: .85rem; color: var(--ink-soft); margin: 16px 0 0; letter-spacing: .02em; }
+.live-fact strong { color: var(--ink); }

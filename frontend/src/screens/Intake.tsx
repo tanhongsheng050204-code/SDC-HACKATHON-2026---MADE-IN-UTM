@@ -5,6 +5,7 @@ import { api, Audience, ChatTurn, Programme, SendPreview, Skill } from "../lib/a
 import { getLang, StringKey, t, tf, tr } from "../lib/i18n";
 
 type Tab = "upload" | "cv" | "chat" | "pick";
+type Step = "audience" | "degree" | "method" | "input";
 
 const AUDIENCES: { id: Audience; label: string; hint: string }[] = [
   { id: "worker", label: "aud.worker", hint: "aud.workerHint" },
@@ -12,82 +13,180 @@ const AUDIENCES: { id: Audience; label: string; hint: string }[] = [
   { id: "switcher", label: "aud.switcher", hint: "aud.switcherHint" },
 ];
 
+const METHODS: { id: Tab; labelKey: string; hintKey: string }[] = [
+  { id: "upload", labelKey: "in.methodUpload", hintKey: "in.methodUploadHint" },
+  { id: "cv",     labelKey: "in.methodPaste",  hintKey: "in.methodPasteHint"  },
+  { id: "chat",   labelKey: "in.methodChat",   hintKey: "in.methodChatHint"   },
+  { id: "pick",   labelKey: "in.methodPick",   hintKey: "in.methodPickHint"   },
+];
+
+function ProgressBar({ step, total }: { step: number; total: number }) {
+  const pct = Math.round((step / total) * 100);
+  return (
+    <div className="intake-progress" aria-label={tf("in.step", { n: step, total })}>
+      <div className="intake-progress-fill" style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
 export function Intake({ audience, onAudience, onDone: finish }: {
   audience: Audience | null; onAudience: (a: Audience) => void; onDone: (skills: string[]) => void;
 }) {
-  const [tab, setTab] = useState<Tab>("upload");
-  // Graduates can start from their degree: its usual skills are added to whatever else they give,
-  // and they confirm every one on the next screen.
+  const [step, setStep] = useState<Step>("audience");
+  const [method, setMethod] = useState<Tab>("upload");
   const [fromDegree, setFromDegree] = useState<string[]>([]);
+
   const onDone = (skills: string[]) => finish([...new Set([...fromDegree, ...skills])]);
-  if (!audience) {
+
+  // Steps for non-grad: audience(1) → method(2) → input(3) = 3 total
+  // Steps for grad:     audience(1) → degree(2) → method(3) → input(4) = 4 total
+  const isGrad = audience === "graduate";
+  const totalSteps = isGrad ? 4 : 3;
+
+  const stepNumber: Record<Step, number> = isGrad
+    ? { audience: 1, degree: 2, method: 3, input: 4 }
+    : { audience: 1, degree: 1, method: 2, input: 3 };
+
+  function goBack() {
+    if (step === "method") {
+      setStep(isGrad ? "degree" : "audience");
+    } else if (step === "degree") {
+      setStep("audience");
+    } else if (step === "input") {
+      setStep("method");
+    }
+  }
+
+  // --- Audience step ---
+  if (step === "audience") {
     return (
-      <section>
-        <div className="page-head"><h1>{t("aud.title")}</h1><p className="muted">{t("aud.sub")}</p></div>
+      <section className="intake-step">
+        <ProgressBar step={1} total={totalSteps} />
+        <h1>{t("aud.title")}</h1>
+        <p className="muted">{t("aud.sub")}</p>
         <div className="audience-choices" role="radiogroup" aria-label={t("aud.title")}>
           {AUDIENCES.map((a) => (
-            <button key={a.id} role="radio" aria-checked={false} className="card audience" onClick={() => onAudience(a.id)}>
-              <strong>{t(a.label as never)}</strong><span className="muted">{t(a.hint as never)}</span>
+            <button
+              key={a.id}
+              role="radio"
+              aria-checked={audience === a.id}
+              className="card audience"
+              onClick={() => {
+                onAudience(a.id);
+                setStep(a.id === "graduate" ? "degree" : "method");
+              }}
+            >
+              <strong>{t(a.label as never)}</strong>
+              <span className="muted">{t(a.hint as never)}</span>
             </button>
           ))}
         </div>
       </section>
     );
   }
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "upload", label: t("in.upload") },
-    { id: "cv", label: t("in.paste") },
-    { id: "chat", label: t("in.chat") },
-    { id: "pick", label: t("in.pick") },
-  ];
+
+  // --- Degree step (graduates only) ---
+  if (step === "degree") {
+    return (
+      <section className="intake-step">
+        <ProgressBar step={stepNumber.degree} total={totalSteps} />
+        <button className="intake-back" onClick={goBack}>{t("in.back")}</button>
+        <DegreeStart
+          onChange={setFromDegree}
+          onUse={(skills) => {
+            setFromDegree(skills);
+            setStep("method");
+          }}
+          onSkip={() => setStep("method")}
+        />
+      </section>
+    );
+  }
+
+  // --- Method step ---
+  if (step === "method") {
+    return (
+      <section className="intake-step">
+        <ProgressBar step={stepNumber.method} total={totalSteps} />
+        <button className="intake-back" onClick={goBack}>{t("in.back")}</button>
+        <h1>{t("in.methodTitle")}</h1>
+        <p className="muted">{t("in.methodSub")}</p>
+        <div className="method-grid">
+          {METHODS.map((m) => (
+            <button
+              key={m.id}
+              className="method-card"
+              onClick={() => { setMethod(m.id); setStep("input"); }}
+            >
+              <strong>{t(m.labelKey as never)}</strong>
+              <small>{t(m.hintKey as never)}</small>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // --- Input step ---
   return (
-    <section>
-      <div className="page-head"><h1>{t("h.skills")}</h1></div>
-      {audience === "graduate" && <DegreeStart onChange={setFromDegree} onUse={() => finish(fromDegree)} />}
-      <div className="tabs" role="tablist">
-        {tabs.map((x) => (
-          <button key={x.id} role="tab" id={`tab-${x.id}`} aria-selected={tab === x.id} aria-controls="intake-panel"
-            onClick={() => setTab(x.id)}>{x.label}</button>
-        ))}
-      </div>
-      <p className="source">{t("note.cv")}</p>
-      <div id="intake-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-        {tab === "upload" && <UploadCv onDone={onDone} />}
-        {tab === "cv" && <PasteCv onDone={onDone} />}
-        {tab === "chat" && <Questionnaire onDone={onDone} />}
-        {tab === "pick" && <PickSkills onDone={onDone} />}
-      </div>
+    <section className="intake-step">
+      <ProgressBar step={stepNumber.input} total={totalSteps} />
+      <button className="intake-back" onClick={goBack}>{t("in.back")}</button>
+      {method === "upload" && <UploadCv onDone={onDone} />}
+      {method === "cv"     && <PasteCv onDone={onDone} />}
+      {method === "chat"   && <Questionnaire onDone={onDone} />}
+      {method === "pick"   && <PickSkills onDone={onDone} />}
     </section>
   );
 }
 
-/** What gets sent: the scrubbed text, editable, before any language model reads it. */
-function DegreeStart({ onChange, onUse }: { onChange: (skills: string[]) => void; onUse: () => void }) {
+/** Degree start card — used on the degree step for graduates. */
+function DegreeStart({
+  onChange,
+  onUse,
+  onSkip,
+}: {
+  onChange: (skills: string[]) => void;
+  onUse: (skills: string[]) => void;
+  onSkip: () => void;
+}) {
   const [list, setList] = useState<Programme[]>([]);
   const [all, setAll] = useState<Skill[]>([]);
   const [chosen, setChosen] = useState("");
-  useEffect(() => { api.programmes().then(setList).catch(() => setList([])); api.skills().then(setAll).catch(() => setAll([])); }, []);
+  useEffect(() => {
+    api.programmes().then(setList).catch(() => setList([]));
+    api.skills().then(setAll).catch(() => setAll([]));
+  }, []);
   const prog = list.find((p) => p.id === chosen);
   const name = (id: string) => tr(all.find((s) => s.id === id)?.name ?? id);
-  if (list.length === 0) return null;
   return (
     <div className="card degree-start">
       <h2>{t("deg.title")}</h2>
       <p className="muted">{t("deg.sub")}</p>
-      <label className="narrow">{t("deg.label")}
-        <select value={chosen} onChange={(e) => { setChosen(e.target.value); onChange(list.find((p) => p.id === e.target.value)?.skills ?? []); }}>
-          <option value="">{t("deg.choose")}</option>
-          {list.map((p) => <option key={p.id} value={p.id}>{p.name[getLang()] || p.name.en}</option>)}
-        </select>
-      </label>
+      {list.length > 0 && (
+        <label className="narrow">{t("deg.label")}
+          <select value={chosen} onChange={(e) => {
+            setChosen(e.target.value);
+            onChange(list.find((p) => p.id === e.target.value)?.skills ?? []);
+          }}>
+            <option value="">{t("deg.choose")}</option>
+            {list.map((p) => <option key={p.id} value={p.id}>{p.name[getLang()] || p.name.en}</option>)}
+          </select>
+        </label>
+      )}
       {prog && (
         <>
           <p>{t("deg.usually")}</p>
           <div className="chips">{prog.skills.map((s) => <span key={s} className="chip covered">✓ {name(s)}</span>)}</div>
           <p className="source">{t("deg.note")}</p>
-          <button className="primary" onClick={onUse}>{tf("in.continueWith", { n: prog.skills.length })}</button>
+          <button className="primary" onClick={() => onUse(prog.skills)}>
+            {tf("in.continueWith", { n: prog.skills.length })}
+          </button>
         </>
       )}
+      <button className="intake-back" style={{ marginTop: 8 }} onClick={onSkip}>
+        {t("in.degreeSkip")}
+      </button>
     </div>
   );
 }

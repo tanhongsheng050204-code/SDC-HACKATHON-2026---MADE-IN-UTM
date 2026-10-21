@@ -871,3 +871,48 @@ main:focus { outline: none; }
   .pathway-sheet { position: static; max-height: none !important; overflow: visible; border: 0; box-shadow: none; }
   .route-map { position: static; break-inside: avoid; }
 }
+
+/* ---- Phase 4: Future Card story slides ---- */
+.story-page { max-width: 560px; margin: 0 auto; padding: 24px 16px; min-height: 100dvh; display: grid; align-content: start; gap: 0; }
+.story { display: grid; gap: 0; position: relative; min-height: 420px; }
+.story-dashes { display: flex; gap: 4px; padding: 0 0 20px; }
+.story-dash { flex: 1; height: 3px; border-radius: 2px; background: var(--line); transition: background .2s; }
+.story-dash.done { background: var(--accent); }
+.story-dash.active { background: var(--accent); opacity: .6; }
+.story-slide { padding: 12px 0 80px; animation: slide-in .35s ease-out; }
+@keyframes slide-in { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce), html[data-lite="1"] { .story-slide { animation: none; } }
+.story-big { display: block; font-size: clamp(3rem, 14vw, 5.5rem); font-weight: 800; color: var(--accent); line-height: 1.05; margin: 12px 0 4px; letter-spacing: -.03em; }
+.story-title { font-size: clamp(1.4rem, 5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin: 8px 0 12px; }
+.story-label { font-size: 1.05rem; color: var(--ink-soft); margin: 4px 0 16px; }
+.story-body { font-size: 1rem; margin: 8px 0; }
+.story-identity { margin: 16px 0 0; }
+.story-skills { margin: 16px 0 0; }
+.story-nav { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 24px; }
+.story-nav-btn { background: none; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; color: var(--ink-soft); display: flex; align-items: center; }
+.story-nav-btn:disabled { opacity: .3; cursor: default; }
+.story-tap-areas { position: absolute; inset: 0; bottom: 64px; display: grid; grid-template-columns: 1fr 1fr; pointer-events: none; }
+.story-tap { background: none; border: none; cursor: pointer; pointer-events: all; }
+.share-screen { margin-top: 16px; }
+.share-block { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin: 16px 0; }
+.share-actions { display: flex; flex-direction: column; gap: 10px; }
+.share-link { word-break: break-all; font-size: .8rem; color: var(--ink-soft); display: block; margin-top: 4px; }
+/* Story banner on Today */
+.story-banner { cursor: pointer; border-left: 4px solid var(--gold-bright); gap: 8px; }
+.story-banner h3 { margin: 0; font-size: 1.05rem; }
+.story-banner p { margin: 0; }
+
+/* ---- Phase 5: Duolingo-style intake ---- */
+.intake-progress { height: 6px; border-radius: 3px; background: var(--line); margin: 0 0 28px; overflow: hidden; }
+.intake-progress-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width .3s ease; }
+.intake-step { display: grid; gap: 12px; }
+.intake-step h1 { margin: 0 0 4px; }
+.intake-step .muted { margin: 0 0 8px; }
+.method-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 8px 0; }
+@media (max-width: 480px) { .method-grid { grid-template-columns: 1fr; } }
+.method-card { text-align: left; border: 1.5px solid var(--line); border-radius: 14px; padding: 16px; background: var(--surface); cursor: pointer; display: grid; gap: 4px; transition: border-color .15s, box-shadow .15s; }
+.method-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.method-card strong { font-size: 1.05rem; }
+.method-card small { color: var(--ink-soft); font-size: .88rem; }
+.intake-back { background: none; border: none; color: var(--ink-soft); font-size: .9rem; cursor: pointer; padding: 0; text-decoration: underline; justify-self: start; }
+.intake-sticky { position: sticky; bottom: 16px; padding-top: 16px; }
