@@ -79,7 +79,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <button className="link" onClick={dismissTip}>{t("tip.ok")}</button>
         </div>
       )}
-      {data && <p className="muted">{data.scenario.description}</p>}
+      {data && <p className="muted scenario-note">{data.scenario.description}</p>}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
       <RefreshPanel onDone={afterRefresh} />
