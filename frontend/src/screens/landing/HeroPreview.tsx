@@ -1,12 +1,14 @@
 // A still of the app's home screen for the landing hero. Figures are copied from the synthetic
 // demo profile (Aisyah) so the picture matches what "Open the demo profile" shows.
 import { LogoMark } from "../../components/Brand";
+import { t, tf, tr } from "../../lib/i18n";
+import { OUTLOOK_TEXT } from "../../lib/labels";
 
 const ROLES = [
-  { title: "AI operations specialist", fit: 50, outlook: "▲ Growing", tone: "good" },
-  { title: "Data analyst", fit: 24, outlook: "▲ Growing", tone: "good" },
-  { title: "UX / UI designer", fit: 25, outlook: "▲ Growing", tone: "good" },
-  { title: "Data entry clerk", fit: 88, outlook: "▼ Declining", tone: "risk" },
+  { title: "AI operations specialist", fit: 50, outlook: "growing", tone: "good" },
+  { title: "Data analyst", fit: 24, outlook: "growing", tone: "good" },
+  { title: "UX / UI designer", fit: 25, outlook: "growing", tone: "good" },
+  { title: "Data entry clerk", fit: 88, outlook: "declining", tone: "risk" },
 ];
 
 export function HeroPreview() {
@@ -15,57 +17,56 @@ export function HeroPreview() {
       <div className="lp-window">
         <div className="lp-side">
           <div className="lp-who"><span className="avatar">A</span><span>Aisyah (demo)</span></div>
-          <span className="lp-search">Ask the coach <kbd>/</kbd></span>
-          <span className="lp-nav is-on">Today</span>
-          <span className="lp-nav">Future Skills Radar</span>
-          <span className="lp-nav">My job, task by task</span>
-          <span className="lp-nav">Future roles <i>13</i></span>
-          <span className="lp-nav">Pathway</span>
-          <span className="lp-nav">SDG impact</span>
+          <span className="lp-search">{t("shell.coach")} <kbd>/</kbd></span>
+          <span className="lp-nav is-on">{t("nav.home")}</span>
+          <span className="lp-nav">{t("nav.radar")}</span>
+          <span className="lp-nav">{t("nav.tasks")}</span>
+          <span className="lp-nav">{t("nav.roles")} <i>13</i></span>
+          <span className="lp-nav">{t("nav.pathway")}</span>
+          <span className="lp-nav">{t("nav.impact")}</span>
         </div>
         <div className="lp-main">
-          <p className="lp-hello">Good morning, Aisyah.</p>
-          <div className="lp-ask">Which job should I aim for?</div>
+          <p className="lp-hello">{t("hp.hello")}</p>
+          <div className="lp-ask">{t("hp.ask")}</div>
           <div className="lp-kpis">
-            <div><small>Top match</small><b>AI operations</b><em className="good">50% fit</em></div>
-            <div><small>Robust picks</small><b>3</b><em>every scenario</em></div>
-            <div><small>Current role</small><b>−25.9%</b><em className="risk">▼ Declining</em></div>
-            <div><small>Plan</small><b>2 steps</b><em>about 12 h</em></div>
+            <div><small>{t("k.top")}</small><b>{tr("AI operations specialist")}</b><em className="good">{tf("card.fit", { n: 50 })}</em></div>
+            <div><small>{t("k.robust")}</small><b>3</b><em>{t("hp.every")}</em></div>
+            <div><small>{t("k.current")}</small><b>−25.9%</b><em className="risk">{OUTLOOK_TEXT.declining}</em></div>
+            <div><small>{t("fc.plan")}</small><b>{tf("fc.steps", { n: 2 })}</b><em>{t("hp.hours")}</em></div>
           </div>
           <div className="lp-card">
-            <p><b>Not without a plan.</b> The WEF expects data-entry jobs to shrink by about a quarter by 2030, but four of your six skills
-              already count toward AI operations work. The gap is three skills.</p>
+            <p><b>{t("hp.cardH")}</b> {t("hp.cardText")}</p>
             <ol className="lp-roles">
               {ROLES.map((r) => (
                 <li key={r.title} className={r.tone === "risk" ? "dim" : ""}>
-                  <span>{r.title}</span>
+                  <span>{tr(r.title)}</span>
                   <span className="lp-bar"><span style={{ width: `${r.fit}%` }} /></span>
-                  <em className={r.tone}>{r.outlook}</em>
+                  <em className={r.tone}>{OUTLOOK_TEXT[r.outlook]}</em>
                 </li>
               ))}
             </ol>
           </div>
         </div>
         <div className="lp-aside">
-          <small>Your next steps</small>
+          <small>{t("hp.next")}</small>
           <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> Pathway step 1</span>
-            <b>Critical thinking and problem solving</b>
-            <span className="lp-meta">Free to audit · about 10 hours <i>Start</i></span>
+            <span className="lp-tag"><LogoMark size={16} /> {t("hp.step1")}</span>
+            <b>{tr("Critical thinking")}</b>
+            <span className="lp-meta">{t("cost.free_audit")} · {t("hp.tenHours")} <i>{t("hp.start")}</i></span>
           </div>
           <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> Coach suggested</span>
-            <b>Compare with the Accelerated scenario</b>
-            <span className="lp-meta">You decide <i>Apply</i></span>
+            <span className="lp-tag"><LogoMark size={16} /> {t("hp.coach")}</span>
+            <b>{t("hp.compare")}</b>
+            <span className="lp-meta">{t("hp.youDecide")} <i>{t("a.apply")}</i></span>
           </div>
           <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> Future Card</span>
-            <b>Share your plan with a counsellor</b>
-            <span className="lp-meta">Read-only link and QR</span>
+            <span className="lp-tag"><LogoMark size={16} /> {t("share.title")}</span>
+            <b>{t("hp.share")}</b>
+            <span className="lp-meta">{t("hp.shareSub")}</span>
           </div>
         </div>
       </div>
-      <p className="lp-caption">An example from the app, using the synthetic demo profile.</p>
+      <p className="lp-caption">{t("hp.caption")}</p>
     </div>
   );
 }

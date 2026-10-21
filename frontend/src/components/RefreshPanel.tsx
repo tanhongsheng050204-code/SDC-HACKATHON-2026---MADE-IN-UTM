@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, Matches, PendingPreview, RefreshStatus, Scenario } from "../lib/api";
 import { signed } from "../lib/format";
 import { KEYS, load, save } from "../lib/storage";
+import { t, tf, tr } from "../lib/i18n";
 
 // New trend data never reaches users on its own: a refresh saves a snapshot for review, and an
 // admin approves it (with their name) or rejects it (with a reason) after seeing what would change.
@@ -83,7 +84,7 @@ export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
                 <tbody>
                   {moved.map((r) => (
                     <tr key={r.role_id}>
-                      <th scope="row">{r.title}</th>
+                      <th scope="row">{tr(r.title)}</th>
                       <td>{r.before !== null ? `${signed(r.before)}%` : "new"}</td>
                       <td>{signed(r.after)}%{r.label_after !== r.label_before && <span className="badge">{r.label_after}</span>}</td>
                       <td className={r.change! < 0 ? "hm-risk" : "hm-good"}>{signed(r.change!)}</td>
@@ -127,16 +128,16 @@ export function compareMatches(before: Matches, after: Matches, scenario: Scenar
 export function WhatChanged({ changes, snapshot, onClose }: { changes: Change[]; snapshot: string; onClose: () => void }) {
   return (
     <div className="card changed" role="status">
-      <p className="eyebrow">New trend data · {snapshot}</p>
-      <h3>{changes.length === 0 ? "Nothing changed for you" : "Your plan changed because the trend data changed"}</h3>
+      <p className="eyebrow">{tf("chg.eyebrow", { id: snapshot })}</p>
+      <h3>{changes.length === 0 ? t("chg.nothing") : t("chg.changed")}</h3>
       <ul>
         {changes.slice(0, 6).map((c) => (
           <li key={c.role_id}>
-            <strong>{c.title}</strong>: rank #{c.before} → #{c.after}, outlook {signed(c.outlookBefore)}% → {signed(c.outlookAfter)}%
+            <strong>{tr(c.title)}</strong>: {tf("chg.line", { from: c.before, to: c.after, o1: signed(c.outlookBefore), o2: signed(c.outlookAfter) })}
           </li>
         ))}
       </ul>
-      <button className="link" onClick={onClose}>Dismiss</button>
+      <button className="link" onClick={onClose}>{t("a.dismiss")}</button>
     </div>
   );
 }

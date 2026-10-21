@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lang, LANGS, getLang, setLang, t } from "../lib/i18n";
+import { getLang, Lang, LANGS, setLang, t } from "../lib/i18n";
 import { KEYS, load, save } from "../lib/storage";
 import { Icon } from "./Icon";
 
@@ -61,7 +61,7 @@ export function LiteToggle({ lite, onChange }: { lite: boolean; onChange: (on: b
 
 export function ThemeButton({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   return (
-    <button className="icon-btn" onClick={onToggle} aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+    <button className="icon-btn" onClick={onToggle} aria-label={theme === "dark" ? t("pref.light") : t("pref.dark")}>
       <Icon name={theme === "dark" ? "sun" : "moon"} />
     </button>
   );

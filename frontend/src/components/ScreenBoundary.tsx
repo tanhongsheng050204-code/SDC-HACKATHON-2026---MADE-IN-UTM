@@ -1,4 +1,5 @@
 import { Component, ReactNode } from "react";
+import { t } from "../lib/i18n";
 
 // One screen failing to render must not blank the whole app: the sidebar stays usable and the
 // person gets a way out. Keyed by screen, so moving to another screen resets it.
@@ -11,9 +12,9 @@ export class ScreenBoundary extends Component<{ children: ReactNode }, { failed:
     return (
       <section>
         <div className="banner error" role="alert">
-          <strong>Something went wrong on this screen.</strong> Your profile is safe. Reload the page or pick another section on the left.
+          <strong>{t("err.screen")}</strong> {t("err.screenNext")}
         </div>
-        <button className="primary" onClick={() => window.location.reload()}>Reload</button>
+        <button className="primary" onClick={() => window.location.reload()}>{t("err.reload")}</button>
       </section>
     );
   }

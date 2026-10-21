@@ -7,7 +7,7 @@ import { EvidenceList } from "../components/SkillEvidence";
 import { SdgReasons } from "../components/Sdgs";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
-import { getLang, pick, t } from "../lib/i18n";
+import { getLang, pick, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 
 export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree, onProfile, onBack }: {
@@ -24,7 +24,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
-      <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
+      <div className="page-head"><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p></div>
 
       {day && (
         <section className="card day-in-job" aria-labelledby="day-title">
@@ -37,18 +37,18 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       )}
 
       <details className="card why" open>
-        <summary>Why this rank? Score {role.why.score.toFixed(2)}</summary>
+        <summary>{tf("rd.why", { n: role.why.score.toFixed(2) })}</summary>
         <ul>
-          <li>Skill fit {percent(role.why.fit)}% × 0.6 = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
-          <li>Outlook in this scenario, scaled 0–1, × 0.4 = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
+          <li>{tf("rd.fitPart", { n: percent(role.why.fit) })} = <strong>{role.why.fit_points.toFixed(2)}</strong></li>
+          <li>{t("rd.outlookPart")} = <strong>{role.why.outlook_points.toFixed(2)}</strong></li>
           {role.why.entry_points > 0 && <li>{t("lead.openToGrads")}: <strong>+{role.why.entry_points.toFixed(2)}</strong></li>}
-          {role.why.preference_points > 0 && <li>Fits your work preferences: <strong>+{role.why.preference_points.toFixed(2)}</strong>{role.why.matched_preferences.length > 0 && ` (${role.why.matched_preferences.map((m) => pick(m.labels, m.label)).join(", ")})`}</li>}
+          {role.why.preference_points > 0 && <li>{t("rd.prefPart")}: <strong>+{role.why.preference_points.toFixed(2)}</strong>{role.why.matched_preferences.length > 0 && ` (${role.why.matched_preferences.map((m) => pick(m.labels, m.label)).join(", ")})`}</li>}
         </ul>
-        <p className="source">Outlook source: {role.citation.snapshot_id}, imported {role.citation.imported}{role.citation.note && ` · ${role.citation.note}`}</p>
+        <p className="source">{tf("rd.outlookSource", { id: role.citation.snapshot_id, date: role.citation.imported })}{role.citation.note && ` · ${role.citation.note}`}</p>
       </details>
 
       <table className="outlooks">
-        <caption>Outlook in each scenario (current: {scenario})</caption>
+        <caption>{tf("rd.caption", { s: t(`sc.${scenario}`) })}</caption>
         <tbody>{SCENARIOS.map((s) => {
           const o = role.outlook[s.id];
           return <tr key={s.id}><th scope="row">{s.id === scenario && adoption !== undefined ? `${t("adopt.label")} ${adoption}×` : s.label}</th><td className={`outlook ${o.label}`}>{OUTLOOK_TEXT[o.label]}</td>
@@ -60,7 +60,7 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
       <PayLine pay={role.pay} change={role.pay_change_rm} />
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year}
         adoption={xray === scenario ? adoption : undefined} onClose={() => setXray(null)} />}
-      <div className="job-links"><span className="muted">See open jobs:</span>
+      <div className="job-links"><span className="muted">{t("rd.jobs")}</span>
         {jobLinks(role.title).map((l) => <a key={l.label} href={l.url} target="_blank" rel="noreferrer">{l.label} ↗</a>)}
       </div>
 
@@ -68,14 +68,14 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
 
       <div className="two-col">
         {role.carry_over.length > 0 && (
-          <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {s.name}</span>)}</div></div>
+          <div className="carry-block"><h2>{t("lead.bring")}</h2><div className="chips">{role.carry_over.map((s) => <span key={s.skill_id} className="chip covered">↪ {tr(s.name)}</span>)}</div></div>
         )}
-        <div><h2>You have</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}{s.added_from_ads && " ⁺"}</span>)}</div></div>
-        <div><h2>You need</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing" title={s.added_from_ads ? t("ev.added") : undefined}>{s.name}{s.weight === 3 ? " (core)" : ""}{s.added_from_ads && " ⁺"}</span>)}</div></div>
+        <div><h2>{t("rd.have")}</h2><div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}{s.added_from_ads && " ⁺"}</span>)}</div></div>
+        <div><h2>{t("rd.need")}</h2><div className="chips">{role.missing.map((s) => <span key={s.skill_id} className="chip missing" title={s.added_from_ads ? t("ev.added") : undefined}>{tr(s.name)}{s.weight === 3 ? ` ${t("rd.core")}` : ""}{s.added_from_ads && " ⁺"}</span>)}</div></div>
       </div>
-      <p className="source">Skills for this role: the Laluan team's list{role.skills_source.onet_code
-        ? <>, checked against O*NET occupation <a href={onetUrl(role.skills_source.onet_code)} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
-        : " (a new role with no O*NET occupation yet)"}.</p>
+      <p className="source">{t("rd.skillsSource")}{role.skills_source.onet_code
+        ? <>{t("rd.onetChecked")} <a href={onetUrl(role.skills_source.onet_code)} target="_blank" rel="noreferrer">{role.skills_source.onet_code}</a>{role.skills_source.onet_note && ` (${role.skills_source.onet_note.replace(/\.$/, "")})`}</>
+        : ` ${t("rd.noOnet")}`}.</p>
       {role.evidence && (
         <EvidenceList evidence={role.evidence}
           names={Object.fromEntries([...role.covered, ...role.missing].map((s) => [s.skill_id, s.name]))}
@@ -86,9 +86,9 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
 
       {role.missing.length === 0 && (
         <div className="empty-state">
-          <p><strong>You already have every skill on our list for this role.</strong> Apply for it now, or pick a stretch role higher up the list to keep growing.</p>
+          <p><strong>{t("rd.allSkills")}</strong> {t("rd.allSkillsNext")}</p>
           <div className="actions">
-            <button onClick={onBack}>Choose a stretch role</button>
+            <button onClick={onBack}>{t("rd.stretch")}</button>
             <button onClick={onImpact}>{t("a.impact")}</button>
           </div>
         </div>

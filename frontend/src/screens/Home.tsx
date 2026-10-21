@@ -4,7 +4,7 @@ import { DataBanner } from "../components/DataBanner";
 import { InfoTip } from "../components/InfoTip";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
-import { t } from "../lib/i18n";
+import { t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE, SCENARIOS } from "../lib/labels";
 
 function greeting(now = new Date()) {
@@ -23,7 +23,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
 
   useEffect(() => {
     api.matches(profile.id, scenario).then((d) => { setData(d); setError(null); })
-      .catch(() => setError("Couldn't load your results. Check your connection and try again."));
+      .catch(() => setError(t("home.loadFailed")));
   }, [profile.id, profile.completed_courses.length, scenario]);
 
   function submit(e: FormEvent) {
@@ -44,7 +44,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
   return (
     <section className="home">
       <div className="page-head">
-        <h1>{greeting()}{name ? `, ${name}` : ""}.</h1>
+        <h1>{name ? tf("home.helloName", { g: greeting(), name }) : tf("home.hello", { g: greeting() })}</h1>
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
       <form className="home-ask" onSubmit={submit}>
@@ -58,7 +58,7 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
       {data && top && audience === "worker" && current && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.workerTitle")}</span>
-          <strong>{current.title}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
+          <strong>{tr(current.title)}: <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span> {signed(current.outlook[scenario].index)}%</strong>
           <p className="muted">{t("lead.workerBody")}</p>
           <button className="btn quiet sm" onClick={() => onGo("tasks")}>{t("nav.tasks")} →</button>
         </div>
@@ -69,45 +69,45 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
           <span className="kpi-label">{t("lead.gradTitle")}</span>
           <p className="muted">{t("lead.gradBody")}</p>
           <div className="actions">{entryRoles.map((r) => (
-            <button key={r.role_id} className="btn quiet sm" onClick={() => onOpenRole(r)}>{r.title} · {percent(r.fit)}%</button>
+            <button key={r.role_id} className="btn quiet sm" onClick={() => onOpenRole(r)}>{tr(r.title)} · {percent(r.fit)}%</button>
           ))}</div>
         </div>
       )}
       {data && top && audience === "switcher" && current && (
         <div className="card lead">
           <span className="kpi-label">{t("lead.switchTitle")}</span>
-          <strong>{current.title}: {OUTLOOK_TEXT[current.outlook[scenario].label]} {signed(current.outlook[scenario].index)}%</strong>
-          <p className="muted">{t("lead.switchBody")} <strong>{top.title}</strong>:</p>
+          <strong>{tr(current.title)}: {OUTLOOK_TEXT[current.outlook[scenario].label]} {signed(current.outlook[scenario].index)}%</strong>
+          <p className="muted">{t("lead.switchBody")} <strong>{tr(top.title)}</strong>:</p>
           <div className="chips">{top.carry_over.length
-            ? top.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)
+            ? top.carry_over.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}</span>)
             : <span className="muted">{t("lead.noCarry")}</span>}</div>
-          <button className="btn quiet sm" onClick={() => onOpenRole(top)}>{top.title} →</button>
+          <button className="btn quiet sm" onClick={() => onOpenRole(top)}>{tr(top.title)} →</button>
         </div>
       )}
       {data && top && (
         <div className="home-kpis">
           <div className="kpi">
-            <span className="kpi-label">{t("k.top")} <InfoTip term="gl.fit" label="skill fit" /></span><strong>{top.title}</strong>
+            <span className="kpi-label">{t("k.top")} <InfoTip term="gl.fit" label={t("gl.fitShort")} /></span><strong>{tr(top.title)}</strong>
             <span className="badge good">{percent(top.fit)}% {t("k.fit")}</span>
-            <span className="kpi-foot">{OUTLOOK_TEXT[top.outlook[scenario].label]} · {signed(top.outlook[scenario].index)}% to {data.signal_source.horizon_year}</span>
+            <span className="kpi-foot">{OUTLOOK_TEXT[top.outlook[scenario].label]} · {tf("home.toYear", { n: signed(top.outlook[scenario].index), year: data.signal_source.horizon_year })}</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">{t("k.current")} <InfoTip term="gl.outlook" label="outlook" /></span>
+            <span className="kpi-label">{t("k.current")} <InfoTip term="gl.outlook" label={t("gl.outlookShort")} /></span>
             <strong>{current ? `${signed(current.outlook[scenario].index)}%` : t("k.notSet")}</strong>
             {current
               ? <span className={`badge ${OUTLOOK_TONE[current.outlook[scenario].label]}`}>{OUTLOOK_TEXT[current.outlook[scenario].label]}</span>
-              : <span className="badge">{audience === "graduate" ? t("lead.openToGrads") : "Add it on My profile"}</span>}
-            <span className="kpi-foot">{current ? current.title : audience === "graduate" ? t("lead.gradBody") : "Lets us compare your job with the alternatives"}</span>
+              : <span className="badge">{audience === "graduate" ? t("lead.openToGrads") : t("home.addJob")}</span>}
+            <span className="kpi-foot">{current ? tr(current.title) : audience === "graduate" ? t("lead.gradBody") : t("home.addJobWhy")}</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">{t("k.robust")} <InfoTip term="gl.robust" label="robust pick" /></span><strong>{robust.length}</strong>
+            <span className="kpi-label">{t("k.robust")} <InfoTip term="gl.robust" label={t("card.robust")} /></span><strong>{robust.length}</strong>
             <span className="badge">{t("k.robustNote")}</span>
-            <span className="kpi-foot">{robust.slice(0, 2).map((r) => r.title).join(", ") || "None yet"}</span>
+            <span className="kpi-foot">{robust.slice(0, 2).map((r) => tr(r.title)).join(", ") || t("home.noneYet")}</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">Skills on your profile</span><strong>{profile.skills.length}</strong>
-            <span className="badge">{profile.completed_courses.length} {profile.completed_courses.length === 1 ? "course" : "courses"} finished</span>
-            <span className="kpi-foot">{top.missing.length} still needed for your top match</span>
+            <span className="kpi-label">{t("home.skillsOn")}</span><strong>{profile.skills.length}</strong>
+            <span className="badge">{tf("home.coursesDone", { n: profile.completed_courses.length })}</span>
+            <span className="kpi-foot">{tf("home.stillNeeded", { n: top.missing.length })}</span>
           </div>
         </div>
       )}
@@ -116,53 +116,53 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
         <div className="home-grid">
           <div className="card home-roles">
             <div className="home-roles-head">
-              <h2>Your best next roles</h2>
-              <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+              <h2>{t("home.bestRoles")}</h2>
+              <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
                 {SCENARIOS.map((s) => (
                   <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
                 ))}
               </div>
-              <p className="muted scenario-note">{data.scenario.description}</p>
+              <p className="muted scenario-note">{tr(data.scenario.description)}</p>
             </div>
             <ol className="home-list">
               {data.roles.slice(0, 5).map((r) => (
                 <li key={r.role_id}>
                   <button className="home-role" onClick={() => onOpenRole(r)}>
                     <span className="rank">#{r.rank}</span>
-                    <span className="home-role-title">{r.title}{r.robust_pick && <span className="badge gold">Robust</span>}</span>
-                    <span className="fit" role="img" aria-label={`Fit ${percent(r.fit)} percent`}><span style={{ width: `${r.fit * 100}%` }} /></span>
+                    <span className="home-role-title">{tr(r.title)}{r.robust_pick && <span className="badge gold">{t("home.robust")}</span>}</span>
+                    <span className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(r.fit) })}><span style={{ width: `${r.fit * 100}%` }} /></span>
                     <span className={`badge ${OUTLOOK_TONE[r.outlook[scenario].label]}`}>{OUTLOOK_TEXT[r.outlook[scenario].label]}</span>
                   </button>
                 </li>
               ))}
             </ol>
-            <button className="link" onClick={() => onGo("roles")}>See all {data.roles.length} roles →</button>
+            <button className="link" onClick={() => onGo("roles")}>{tf("home.seeAll", { n: data.roles.length })} →</button>
           </div>
 
           <aside className="home-next">
             <p className="eyebrow">{t("home.next")}</p>
             {top && (
               <div className="card next-card">
-                <span className="next-tag">Pathway</span>
-                <strong>Build a plan for {top.title}</strong>
-                <div className="card-row"><span className="muted">{top.missing.length} skills to learn</span><button className="btn sm" onClick={() => onOpenRole(top)}>Open</button></div>
+                <span className="next-tag">{t("home.tagPathway")}</span>
+                <strong>{tf("home.buildFor", { role: tr(top.title) })}</strong>
+                <div className="card-row"><span className="muted">{tf("home.toLearn", { n: top.missing.length })}</span><button className="btn sm" onClick={() => onOpenRole(top)}>{t("home.open")}</button></div>
               </div>
             )}
             <div className="card next-card">
-              <span className="next-tag">Signals</span>
-              <strong>See which of your skills are rising</strong>
-              <div className="card-row"><span className="muted">Research and job postings</span><button className="btn sm" onClick={() => onGo("radar")}>Open</button></div>
+              <span className="next-tag">{t("home.tagSignals")}</span>
+              <strong>{t("home.rising")}</strong>
+              <div className="card-row"><span className="muted">{t("home.risingSub")}</span><button className="btn sm" onClick={() => onGo("radar")}>{t("home.open")}</button></div>
             </div>
             <div className="card next-card">
-              <span className="next-tag">Your job</span>
-              <strong>Tick the tasks you do today</strong>
-              <div className="card-row"><span className="muted">Automate, assist or human</span><button className="btn sm" onClick={() => onGo("tasks")}>Open</button></div>
+              <span className="next-tag">{t("home.tagJob")}</span>
+              <strong>{t("home.tick")}</strong>
+              <div className="card-row"><span className="muted">{t("home.tickSub")}</span><button className="btn sm" onClick={() => onGo("tasks")}>{t("home.open")}</button></div>
             </div>
           </aside>
         </div>
       )}
       {!data && !error && <div className="grid" aria-hidden="true">{[0, 1, 2].map((i) => <div key={i} className="card skeleton" />)}</div>}
-      {data && <p className="source">Forecast: {data.signal_source.snapshot_id}, imported {data.signal_source.imported}. {t("shell.estimates")}</p>}
+      {data && <p className="source">{tf("home.forecast", { id: data.signal_source.snapshot_id, date: data.signal_source.imported })} {t("shell.estimates")}</p>}
     </section>
   );
 }

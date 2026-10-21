@@ -127,7 +127,7 @@ export interface FutureCard {
   proven?: { name: string; level: number; level_name: string }[];
 }
 export interface CoachProposal { kind: "scenario"; value: string; label: string }
-export interface CasePoint { text: string; source: string }
+export interface CasePoint { text: string; source: string; key?: string; vars?: Record<string, unknown>; source_key?: string }
 export interface RoleCase { role_id: string; pros: CasePoint[]; cons: CasePoint[] }
 export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
@@ -184,7 +184,7 @@ export interface ClassResult {
 
 export interface Xray {
   role_id: string; title: string; scenario: Scenario; year: number; adoption: number; final: number; label: string;
-  steps: { label: string; value: number; running_total: number; source: string; cap: string | null }[];
+  steps: { label: string; value: number; running_total: number; source: string; cap: string | null; key?: string; vars?: Record<string, unknown> }[];
 }
 
 export interface Tipping {
@@ -195,7 +195,8 @@ export interface Tipping {
 
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
-  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; done: boolean }[];
+  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean }[];
+  summary_template?: { key: string; vars: Record<string, unknown> };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   uncovered_skills: string[];
 }
@@ -399,6 +400,7 @@ export const api = {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
+  translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
   updateProfile: (p: Profile) =>

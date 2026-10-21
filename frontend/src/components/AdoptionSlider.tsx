@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Tipping } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tr } from "../lib/i18n";
 
 // "Your own AI future": AI adoption speed from 0.5x to 2x, beside the three presets.
 export function AdoptionSlider({ value, onChange }: { value: number | undefined; onChange: (v: number | undefined) => void }) {
@@ -32,10 +32,10 @@ export function TippingPoints({ profileId, year }: { profileId: string; year?: n
   const lines: string[] = [];
   const c = tip.current_role;
   if (c && c.declining_at !== null) {
-    lines.push(`${t("adopt.yourJob")} (${c.title}) ${t("adopt.becomes")} ${c.declining_below ? t("adopt.below") : t("adopt.above")} ${c.declining_at}× ${t("adopt.adoption")}.`);
+    lines.push(`${t("adopt.yourJob")} (${tr(c.title)}) ${t("adopt.becomes")} ${c.declining_below ? t("adopt.below") : t("adopt.above")} ${c.declining_at}× ${t("adopt.adoption")}.`);
   }
   for (const m of tip.overtakes) {
-    lines.push(`${m.title} ${t("adopt.overtakes")} ${m.overtakes_title} ${m.direction === "above" ? t("adopt.above") : t("adopt.below")} ${m.at}× ${t("adopt.adoption")}.`);
+    lines.push(`${tr(m.title)} ${t("adopt.overtakes")} ${tr(m.overtakes_title)} ${m.direction === "above" ? t("adopt.above") : t("adopt.below")} ${m.at}× ${t("adopt.adoption")}.`);
   }
   if (!lines.length) return null;
   return (
