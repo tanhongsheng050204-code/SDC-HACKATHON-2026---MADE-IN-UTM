@@ -580,6 +580,9 @@ main:focus { outline: none; }
 .emerging { margin-top: 28px; display: grid; gap: 12px; }
 .emerging h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .emerging-card { align-content: start; gap: 10px; }
+.day-in-job { margin: 0 0 16px; }
+.day-in-job h2 { margin: 0 0 6px; }
+.day-in-job p { margin: 0 0 6px; }
 .emerging-card .card-head { display: flex; justify-content: space-between; align-items: center; }
 .emerging-start .kpi-label { display: block; }
 .emerging-start .link { font-weight: 600; padding: 0; }

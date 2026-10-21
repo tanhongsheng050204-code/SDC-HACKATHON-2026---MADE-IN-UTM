@@ -32,6 +32,9 @@ export interface EvidenceDetail {
   skill_names: Record<string, string>; role_skills: string[];
 }
 export type Texts = { en: string; ms: string; zh: string };
+export interface DayInJob { role_id: string; text: Texts; basis: "data" | "job_ads"; drafted: string; reviewed_by: string | null }
+export interface DayPending { id: string; kind: "day"; role_id: string; title: string; drafted: string; basis: "data" | "job_ads" }
+export interface DayDetail extends DayPending { text: Texts; current: Texts | null; facts: { from_malaysian_job_ads?: string[] } }
 export interface EmergingSource { url: string; title: string; kind: "job_ad" | "web"; grounded: boolean; quote: string; employer?: string }
 export interface EmergingCard {
   capability_id: string; capability_name: string; momentum: number | null; snapshot_id: string; searched: string;
@@ -375,6 +378,10 @@ export const api = {
     request<EvidencePending[]>("/evidence/pending", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   emergingPending: (token: string) =>
     request<EmergingPending[]>("/evidence/pending?kind=emerging", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  dayPending: (token: string) =>
+    request<DayPending[]>("/evidence/pending?kind=day", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  dayDetail: (token: string, id: string) =>
+    request<DayDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   emergingDetail: (token: string, id: string) =>
     request<EmergingDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   emerging: (profileId?: string) =>
@@ -388,6 +395,7 @@ export const api = {
     request<{ id: string; role_id: string; added?: string[] }>(`/evidence/pending/${encodeURIComponent(id)}/${decision}`, {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
+  day: (roleId: string) => request<DayInJob>(`/roles/${encodeURIComponent(roleId)}/day`),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),
   updateProfile: (p: Profile) =>
