@@ -872,3 +872,43 @@ main:focus { outline: none; }
 .route-legs .journey-step:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -9px; width: 10px; border-top: 3px dotted var(--line-strong); z-index: 1; }
 .route-legs .journey-step.is-done:not(:last-child)::after { border-top-style: solid; border-color: var(--accent); }
 @media (max-width: 760px) { .route-legs .journey-step:nth-child(2)::after { display: none; } }
+
+/* ---- Future roles: route options, AI road conditions, dense list ---- */
+.route-options { display: grid; gap: 10px; }
+.route-options h2 { margin: 0; }
+.route-options ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.route-option { width: 100%; height: 100%; display: grid; align-content: start; gap: 8px; text-align: left; }
+.route-option.is-first { border: 2px solid var(--accent); }
+.route-option.is-dest { background: var(--accent-soft); }
+.route-option-badges { display: flex; flex-wrap: wrap; gap: 6px; min-height: 24px; }
+.route-option-title { font-size: 1.1rem; }
+.route-option-eta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.route-option-eta b { font-size: 1.25rem; color: var(--accent-strong); }
+.route-option-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .9rem; }
+@media (max-width: 760px) { .route-options ol { grid-template-columns: 1fr; } }
+
+.road-conditions { display: grid; gap: 6px; }
+.road-conditions h2 { margin: 0; font-size: 1.1rem; }
+.road-conditions p { margin: 0; }
+
+.role-list { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.role-list ul { list-style: none; margin: 0; padding: 0; }
+.role-list li + li { border-top: 1px solid var(--line); }
+.role-row { width: 100%; display: grid; grid-template-columns: 52px minmax(0, 2.2fr) minmax(90px, 1fr) minmax(0, 1.4fr) 110px; gap: 12px; align-items: center;
+  text-align: left; padding: 10px 14px; min-height: 52px; background: transparent; border: 0; border-radius: 0; box-shadow: none; font-weight: 500; }
+button.role-row:hover { background: var(--accent-soft); }
+button.role-row:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.role-row.at-risk { box-shadow: inset 3px 0 0 var(--risk, #B42318); }
+.role-list-head { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); min-height: 0; padding-top: 8px; padding-bottom: 8px; background: var(--surface-2); }
+.role-row .rank small.up { color: var(--good); } .role-row .rank small.down { color: var(--risk, #B42318); }
+.role-row-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.role-row-fit { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; }
+.role-row-outlook { display: grid; gap: 2px; justify-items: start; }
+.role-row-hours { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .role-list-head { display: none; }
+  .role-row { grid-template-columns: 44px minmax(0, 1fr); grid-template-areas: "rank title" "rank fit" "rank outlook" "rank hours"; row-gap: 6px; }
+  .role-row-fit { max-width: 220px; }
+  .role-row .rank { grid-area: rank; align-self: start; }
+  .role-row-title { grid-area: title; } .role-row-fit { grid-area: fit; } .role-row-outlook { grid-area: outlook; } .role-row-hours { grid-area: hours; font-size: .85rem; }
+}

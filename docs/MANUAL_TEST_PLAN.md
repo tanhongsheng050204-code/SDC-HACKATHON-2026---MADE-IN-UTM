@@ -140,16 +140,17 @@ Notes: ______
 
 ### 8.1 Header and controls
 - [ ] 8.1.1 Four KPI cards: Top match, Robust picks, Your current role, Forecast data (dated, “Cited sources”).
-- [ ] 8.1.2 Scenario switch re-ranks the cards; ▲/▼ arrows show movement compared with baseline.
+- [ ] 8.1.2 **AI road conditions** re-ranks the list; ▲/▼ arrows show movement compared with baseline.
 - [ ] 8.1.3 Year slider 2026–2030 works with the mouse and with the arrow keys; numbers change.
 - [ ] 8.1.4 One-time tip appears; **Got it** hides it for good (also after reload).
 - [ ] 8.1.5 No “illustrative data” banner (the WEF data is in use).
 
-### 8.2 Role cards
-- [ ] 8.2.1 Each card: rank, title, fit bar and %, outlook word + arrow, estimate range to the year, SDG tiles, source line.
-- [ ] 8.2.2 **Robust pick** and **Your current role** badges appear on the right cards.
-- [ ] 8.2.3 Declining roles (administrative assistant, data entry clerk) sit at the bottom.
-- [ ] 8.2.4 SDG tile numbers are readable on every colour (dark text on light tiles).
+### 8.2 Route options and the role list
+- [ ] 8.2.0 **Route options**: three cards for the top three roles, each with “≈ N h to ready” and the RM cost (“…” while loading), fit and outlook; **Recommended** on #1, **Robust pick** and **Destination** where they apply. Switching **AI road conditions** (Slow / Baseline / Accelerated, with a one-line explanation) does not reload plans already shown; the address keeps `scenario`, `year` and `adoption`.
+- [ ] 8.2.1 The **List** view is one dense list: rank (with ▲/▼ moves), title, fit bar and %, outlook word + arrow and the range to the year, course hours. Rows slide to their new place when the scenario changes (not with reduce-motion or Lite mode). One source line sits under the list.
+- [ ] 8.2.2 **Robust pick**, **Your current role**, **Destination** and **Long-term goal** badges appear on the right rows; Up / Down / Home / End move between rows, Enter opens the role.
+- [ ] 8.2.3 Declining roles (administrative assistant, data entry clerk) sit at the bottom with a red edge.
+- [ ] 8.2.4 On a phone each row stacks (title, fit, outlook, hours) with no sideways scroll; Map and AI exposure views are unchanged.
 
 ### 8.3 Edge states
 - [ ] 8.3.1 A profile with skills unrelated to any role shows **“None of these roles is a close match yet…”**.

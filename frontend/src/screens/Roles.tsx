@@ -4,7 +4,8 @@ import { DataBanner } from "../components/DataBanner";
 import { Kpis } from "../components/Kpis";
 import { EmergingRoles } from "../components/EmergingRoles";
 import { ExposureMap } from "../components/ExposureMap";
-import { RoleCard } from "../components/RoleCard";
+import { RoleList } from "../components/RoleList";
+import { RouteOptions } from "../components/RouteOptions";
 import { RoleGraph } from "../components/RoleGraph";
 import { percent } from "../lib/format";
 import { AiAssisted } from "../components/AiAssisted";
@@ -60,10 +61,15 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       </div>
       {!data && loading && <SkeletonCards />}
       {data && <Kpis data={data} scenario={scenario} />}
-      <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
-        {SCENARIOS.map((s) => (
-          <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
-        ))}
+      {data && <RouteOptions profile={profile} roles={data.roles} scenario={scenario} onOpen={onOpen} />}
+      <div className="road-conditions">
+        <h2 id="roads-h">{t("roads.title")}</h2>
+        <p className="muted">{t("roads.sub")}</p>
+        <div className="segmented" role="radiogroup" aria-labelledby="roads-h">
+          {SCENARIOS.map((s) => (
+            <button key={s.id} role="radio" aria-checked={scenario === s.id && adoption === undefined} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
+          ))}
+        </div>
       </div>
       <AdoptionSlider value={adoption} onChange={onAdoption} />
       {data && <TippingPoints profileId={profile.id} year={year} />}
@@ -75,7 +81,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <div className="year-ticks" aria-hidden="true">
             {Array.from({ length: data.year_range[1] - data.year_range[0] + 1 }, (_, i) => <span key={i}>{data.year_range[0] + i}</span>)}
           </div>
-          <p className="source">The sources forecast to {data.year_range[1]}; we do not extend them further.</p>
+          <p className="source">{tf("roles.horizonNote", { year: data.year_range[1] })}</p>
         </div>
       )}
       {data && !tipSeen && (
@@ -134,8 +140,8 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <RoleGraph data={data} profile={profile} scenario={scenario} onOpen={onOpen} />
         </div>
       ) : data && view === "exposure" ? <ExposureMap data={data} scenario={scenario} onOpen={onOpen} /> : (
-        <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
-          {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
+        <div className={loading && data ? "is-updating" : undefined} aria-busy={loading}>
+          {data && <RoleList roles={data.roles} scenario={scenario} targetId={profile.target_role_id} onOpen={onOpen} />}
         </div>
       )}
       {data && (
@@ -145,8 +151,8 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         }} />
       )}
       {data && (
-        <p className="source">Source: {data.signal_source.source} · published {data.signal_source.published} ·
-          imported {data.signal_source.imported} · horizon {data.signal_source.horizon_year}</p>
+        <p className="source">{tf("roles.sourceLine", { source: data.signal_source.source, published: data.signal_source.published,
+          imported: data.signal_source.imported, year: data.signal_source.horizon_year })}</p>
       )}
     </section>
   );
