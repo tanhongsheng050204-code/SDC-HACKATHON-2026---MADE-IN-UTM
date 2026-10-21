@@ -91,7 +91,8 @@ def _ranked(ref: Reference, skills: set[str], by_role: dict[str, Outlook],
 def _skill_view(ref: Reference, rs: dict) -> dict:
     skill = ref.skills[rs["skill_id"]]
     return {"skill_id": skill["id"], "name": skill["name"], "weight": rs["weight"],
-            "sdgs": [t["sdg"] for t in ref.skill_sdgs(skill["id"])]}
+            "sdgs": [t["sdg"] for t in ref.skill_sdgs(skill["id"])],
+            "added_from_ads": rs.get("source") == "evidence"}
 
 
 def _sdg_view(ref: Reference, tags: list[dict]) -> list[dict]:
@@ -196,6 +197,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
                            for rs in covered if rs["skill_id"] in carry_from and role_id != current_id],
             "missing": [_skill_view(ref, rs) for rs in missing],
             "sdgs": _sdg_view(ref, ref.role_sdgs(role_id)),
+            "evidence": role.get("evidence"),  # approved job-ad citations per skill, or None
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},
             "skills_source": _skills_source(ref, role_id),

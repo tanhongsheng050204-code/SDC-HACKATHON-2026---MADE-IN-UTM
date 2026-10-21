@@ -9,6 +9,7 @@ export const KEYS = {
   tasksDone: "laluan.tasksDone",
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",
+  nameAsked: "laluan.nameAsked.",  // + user id: asked once per account on this browser
 } as const;
 
 type Area = "local" | "session";

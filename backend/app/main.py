@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -10,9 +11,17 @@ from app.config import get_settings
 from app.reference import get_reference
 
 
+log = logging.getLogger(__name__)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     store.init_db()  # first: reference data reads approved snapshots from the database
+    try:
+        removed = store.purge_stale()  # demo copies after a day, anonymous profiles after 30 days
+        log.info("Removed %d old demo copies and %d old anonymous profiles", removed["demo"], removed["anonymous"])
+    except Exception as error:  # housekeeping must never stop the API from starting
+        log.warning("Profile clean-up skipped: %s", type(error).__name__)
     get_reference()  # fail fast on broken reference data
     yield
     store.close_pools()
@@ -29,7 +38,7 @@ app.add_middleware(
 app.include_router(router)
 
 
-# The built frontend, when present (Replit runs one process for both). The app keeps its state in
+# The built frontend, when present (one process for both, e.g. Docker Compose or a single-host deploy). The app keeps its state in
 # the query string (?view=roles), so any path that isn't a file gets index.html.
 _dist = get_settings().frontend_dist
 if _dist is not None:

@@ -11,13 +11,14 @@ from app import runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision,
+from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, ProfileIn, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (cards, classview, coach, documents, intake, matching, pathway, proofcheck, rolecase, skills,
                           skilltree, survey, tasks, tipping, workforce, xray)
 from app.trends import refresh, review
+from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
 
 router = APIRouter(prefix="/api")
 
@@ -176,6 +177,98 @@ def reject_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str =
         return review.reject(snapshot_id, body.reviewer, body.reason or "")
     except review.NotFound:
         raise HTTPException(404, "No snapshot waiting with that ID") from None
+
+
+
+# --- emerging roles (a prediction; public) -------------------------------------------------------
+
+def _emerging_card(ref, body: dict, have: set[str]) -> dict:
+    name = lambda sid: ref.skills[sid]["name"]
+    sdg = body.get("sdg")
+    return {
+        **{k: body[k] for k in ("capability_id", "capability_name", "momentum", "snapshot_id", "searched",
+                                "title", "summary", "sources")},
+        "reviewed_by": body.get("reviewed_by"), "reviewed_at": body.get("reviewed_at"),
+        "carry_over": [{"skill_id": s, "name": name(s)} for s in body["skills"] if s in have],
+        "to_learn": [{"skill_id": s, "name": name(s)} for s in body["skills"] if s not in have],
+        "stepping_stone": {"role_id": body["stepping_stone"], "title": ref.roles[body["stepping_stone"]]["title"],
+                           "reason": body["stepping_reason"]},
+        "sdg": {**ref.sdgs[sdg["number"]], "number": sdg["number"], "reason": sdg["reason"]} if sdg else None,
+    }
+
+
+@router.get("/emerging")
+def emerging_roles(profile_id: str | None = None, user: str | None = User):
+    """Approved emerging-role cards, with the person's carry-over skills when a profile is given."""
+    ref = get_reference()
+    have = matching.effective_skills(ref, _profile_for(profile_id, user)) if profile_id else set()
+    cards = emerging.shown(store.latest_approved_evidence("emerging"))
+    return {"label": "prediction", "roles": [_emerging_card(ref, b, have) for b in cards if b["stepping_stone"] in ref.roles]}
+
+
+@router.post("/emerging/{capability_id}/search")
+def emerging_live_search(capability_id: str, body: LiveSearchRequest, user: str | None = User):
+    """Current job ads for an emerging title: not reviewed, never scored, limited per profile."""
+    _profile_for(body.profile_id, user)
+    card = store.latest_approved_evidence("emerging").get(capability_id)
+    if card is None:
+        raise HTTPException(404, "No emerging role with that ID")
+    try:
+        return emerging.live_search(card, body.profile_id, get_reference())
+    except emerging.RateLimited:
+        raise HTTPException(429, "You have searched a lot this hour. Try again later.") from None
+    except Exception:
+        raise HTTPException(503, "The web search is unavailable right now.") from None
+
+# --- cited skill evidence (admin) ---------------------------------------------------------------
+
+@router.post("/evidence/refresh", status_code=202)
+def start_evidence_refresh(mode: str = Query("roles", pattern="^(roles|emerging)$"), x_admin_token: str = Header(default="")):
+    """Search Malaysian job ads for every role's skills (mode=roles), or search for emerging roles
+    (mode=emerging), in the background, for review."""
+    _require_admin(x_admin_token)
+    if not evidence_refresh.start(mode):
+        raise HTTPException(409, "An evidence search is already running")
+    return evidence_refresh.status()
+
+
+@router.get("/evidence/refresh")
+def evidence_refresh_status(x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return evidence_refresh.status()
+
+
+@router.get("/evidence/pending")
+def pending_evidence(kind: str = Query("role", pattern="^(role|emerging)$"), x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return evidence_review.list_pending(kind)
+
+
+@router.get("/evidence/pending/{evidence_id}")
+def pending_evidence_detail(evidence_id: str, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.detail(evidence_id)
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
+
+
+@router.post("/evidence/pending/{evidence_id}/approve")
+def approve_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.approve(evidence_id, body.reviewer, body.drop_sources, body.drop_added)
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
+
+
+@router.post("/evidence/pending/{evidence_id}/reject")
+def reject_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    try:
+        return evidence_review.reject(evidence_id, body.reviewer, body.reason or "")
+    except evidence_review.NotFound:
+        raise HTTPException(404, "No evidence waiting with that ID") from None
 
 
 @router.get("/radar")

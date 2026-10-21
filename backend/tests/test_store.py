@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 
 import pytest
@@ -101,3 +102,42 @@ def test_postgres_round_trip(monkeypatch):
         assert [r["tablename"] for r in open_tables] == []
     finally:
         get_settings.cache_clear()
+
+
+def test_evidence_round_trip_and_latest_approved_per_subject(db):
+    store.save_evidence("ev-1", "role", "data_analyst", {"n": 1})
+    store.save_evidence("ev-2", "role", "data_analyst", {"n": 2})
+    store.save_evidence("ev-3", "role", "ux_designer", {"n": 3})
+    assert [e["id"] for e in store.list_evidence("pending")] == ["ev-3", "ev-2", "ev-1"]  # newest first
+    store.decide_evidence("ev-1", "approved", "Team Reviewer", {"n": 1, "ok": True})
+    store.decide_evidence("ev-2", "approved", "Team Reviewer", {"n": 2, "ok": True})
+    store.decide_evidence("ev-3", "rejected", "Team Reviewer", {"n": 3}, "quotes did not match")
+    latest = store.latest_approved_evidence("role")
+    assert latest == {"data_analyst": {"n": 2, "ok": True}}  # ev-2 decided last; rejected ignored
+    got = store.get_evidence("ev-3")
+    assert got["state"] == "rejected" and got["reason"] == "quotes did not match" and got["subject"] == "ux_designer"
+    assert store.get_evidence("nope") is None
+
+
+def _age(profile_id: str, hours: float) -> None:
+    old = (dt.datetime.now(dt.UTC) - dt.timedelta(hours=hours)).isoformat(timespec="seconds")
+    with store._connect() as conn:
+        conn.execute("UPDATE profiles SET updated_at=? WHERE id=?", (old, profile_id))
+
+
+def test_old_demo_copies_are_purged_but_real_profiles_stay(db):
+    stale_demo = store.create_profile("Aisyah (demo)", "data_entry_clerk", ["excel"], is_demo=True)["id"]
+    fresh_demo = store.create_profile("Aisyah (demo)", "data_entry_clerk", ["excel"], is_demo=True)["id"]
+    anonymous = store.create_profile(None, "data_entry_clerk", ["excel"])["id"]
+    owned = store.create_profile("Siti", "data_entry_clerk", ["excel"])["id"]
+    store.attach_user(owned, "user-1")
+    for pid in (stale_demo, anonymous, owned):
+        _age(pid, 48)
+    _age(fresh_demo, 2)
+    assert store.purge_stale() == {"demo": 1, "anonymous": 0}
+    assert store.get_profile(stale_demo) is None
+    assert all(store.get_profile(p) for p in (fresh_demo, anonymous, owned))
+    _age(anonymous, 24 * 31)
+    _age(owned, 24 * 400)
+    assert store.purge_stale() == {"demo": 0, "anonymous": 1}
+    assert store.get_profile(owned) is not None  # a profile saved to an account is never purged

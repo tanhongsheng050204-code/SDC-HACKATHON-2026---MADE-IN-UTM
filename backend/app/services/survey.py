@@ -1,8 +1,9 @@
 """The work-preference survey: concrete cards about real tasks and settings, from the roles a
 person already matches, and the hidden preferences their answers reveal.
 
-Deterministic on purpose: a Like or Dislike moves the card's dimensions (data/work_dimensions.json),
-so the same answers always give the same preferences, and the person can see why. A free-text
+Deterministic on purpose: each card is answered on a five-point scale (strongly disagree to
+strongly agree), which moves the card's dimensions (data/work_dimensions.json) by its weight in
+SCALE, so the same answers always give the same preferences, and the person can see why. A free-text
 "Other" answer counts only after the person confirms how it was read; otherwise it stays a note.
 Preferences then add a small, visible boost in matching (matching.PREFERENCE_BOOST).
 """
@@ -17,6 +18,11 @@ PREFERENCE_BOOST = matching.PREFERENCE_BOOST
 TOP_ROLES = 8
 MIN_CARDS, MAX_CARDS = 8, 10
 STRONG = 0.5  # a preference worth naming
+# How far each answer moves a card's dimensions. Neutral counts as an answer (it pulls the average
+# toward no preference) but leans nowhere. "like" / "dislike" are the earlier two-button answers,
+# still accepted so saved surveys and the demo profiles keep their results.
+SCALE = {"strongly_agree": 1.0, "agree": 0.5, "neutral": 0.0, "disagree": -0.5, "strongly_disagree": -1.0,
+         "like": 1.0, "dislike": -1.0}
 
 SENTENCE = {"en": "You seem to prefer {label}.", "ms": "Anda nampaknya lebih suka {label}.", "zh": "您似乎更喜欢{label}。"}
 FIRST = {"en": "Based on your answers to {n} cards, you seem to prefer {label}.",
@@ -93,10 +99,8 @@ def preferences(ref: Reference, answers: list[dict]) -> dict[str, float]:
     counts: dict[str, int] = {}
     for a in answers:
         card = ref.survey_cards[a["card_id"]]
-        if a["answer"] == "like":
-            dims = card["dims"]
-        elif a["answer"] == "dislike":
-            dims = {d: -v for d, v in card["dims"].items()}
+        if a["answer"] in SCALE:
+            dims = {d: SCALE[a["answer"]] * v for d, v in card["dims"].items()}
         else:
             dims = a.get("dims") or {}  # sent only once the person confirmed the reading
         for d, v in dims.items():

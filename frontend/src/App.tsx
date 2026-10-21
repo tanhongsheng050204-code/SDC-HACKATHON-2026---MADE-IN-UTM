@@ -9,7 +9,7 @@ import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from 
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Profile, RoleMatch, Scenario } from "./lib/api";
-import { authEnabled, getUserId, onAuth, ready as authReady } from "./lib/auth";
+import { authEnabled, getGoogleName, getUserId, onAuth, ready as authReady } from "./lib/auth";
 import { t } from "./lib/i18n";
 import { readRoute, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
@@ -330,6 +330,44 @@ function MainApp({ demo }: { demo: string | null }) {
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
       {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}
+      {!conflict && userId && profile && profile.user_id === userId && !profile.is_demo && !profile.display_name
+        && load(KEYS.nameAsked + userId) !== "1" && (
+        <NameDialog suggestion={getGoogleName() ?? ""} onDone={(saved) => {
+          save(KEYS.nameAsked + userId, "1");
+          if (saved) setProfile(saved);
+          else setProfile({ ...profile });  // re-render without the dialog
+        }} profile={profile} />
+      )}
+    </div>
+  );
+}
+
+// After the first Google login: ask once for the name to show, pre-filled with the Google account's
+// name. Only the display name is stored (with the profile); the email never is.
+function NameDialog({ profile, suggestion, onDone }: { profile: Profile; suggestion: string; onDone: (p: Profile | null) => void }) {
+  const [name, setName] = useState(suggestion);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  async function saveName() {
+    setBusy(true); setFailed(false);
+    try { onDone(await api.updateProfile({ ...profile, display_name: name.trim() })); }
+    catch { setFailed(true); }
+    finally { setBusy(false); }
+  }
+  return (
+    <div className="dialog-backdrop">
+      <form className="dialog" role="dialog" aria-modal="true" aria-labelledby="name-title" onSubmit={(e) => { e.preventDefault(); saveName(); }}>
+        <h2 id="name-title">{t("name.title")}</h2>
+        <p className="muted">{t("name.body")}</p>
+        <label>{t("name.label")}
+          <input type="text" autoFocus maxLength={60} value={name} onChange={(e) => setName(e.target.value)} />
+        </label>
+        {failed && <p className="error" role="alert">{t("name.failed")}</p>}
+        <div className="dialog-actions">
+          <button type="submit" className="btn ink" disabled={busy || name.trim().length < 1}>{t("name.save")}</button>
+          <button type="button" className="btn quiet" onClick={() => onDone(null)}>{t("name.skip")}</button>
+        </div>
+      </form>
     </div>
   );
 }

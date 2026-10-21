@@ -71,7 +71,8 @@ Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open i
 | --- | --- | --- |
 | Vercel | Hobby (free), global edge | Hosts the built React frontend; `VITE_API_URL` points to the API |
 | Render | Free web service, Singapore | Runs the FastAPI backend as a Docker container (from `render.yaml` and `backend/Dockerfile`) |
-| SQLite (inside the Render container) | n/a | Profiles, course progress and Future Cards; reset when the container is replaced |
+| Supabase | Free, Singapore | Postgres for profiles, progress, Future Cards, trend snapshots and review decisions (row-level security on); Google login through Supabase Auth |
+| RunPod Serverless | Pay per second (US$25 credit) | Optional: an open model (Qwen2.5-7B) reads CVs and Whisper transcribes voice, so raw CV text and audio stay away from Google |
 | GitHub | Free, public repository | Source code; GitHub Actions runs tests and the build on every push |
 | Docker / Docker Compose | Local | One-command local run of the whole app (`docker compose up --build`) |
 
@@ -183,7 +184,7 @@ flowchart LR
     FE -->|HTTPS JSON| API["FastAPI · Docker<br/>Render, Singapore"]
     API --> DEID["De-identification"] --> G["Gemini API (optional)"]
     G --> GR["Grounding check"] --> API
-    API --> DB[("SQLite")]
+    API --> DB[("Supabase Postgres")]
     API --> REF[("JSON reference data:<br/>WEF · O*NET · courses · SDGs")]
     T["Trend refresh"] --> AX["arXiv / OpenAlex"]
     T --> HN["Algolia HN API"]

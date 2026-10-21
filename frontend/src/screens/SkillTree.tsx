@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
 import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
@@ -113,6 +114,12 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
             {open.step && open.course && (
               <label className="check"><input type="checkbox" checked={open.course_done}
                 onChange={(e) => { setCourse(open.course!.id, e.target.checked); setOpen({ ...open, course_done: e.target.checked }); }} /> {t("path.courseDone")}</label>
+            )}
+            {open.evidence && open.evidence.job_ads > 0 && (
+              <details className="evidence-row">
+                <summary>{t("ev.seenIn").replace("{n}", String(open.evidence.job_ads))}{open.added_from_ads && <span className="badge good">{t("ev.added")}</span>}</summary>
+                <Citations items={open.evidence.citations} />
+              </details>
             )}
             {!open.unlocked && <p className="muted">{t("path.lockedNote")}</p>}
             {open.level >= 3 && <p className="muted">{t("path.topLevel")}</p>}

@@ -50,6 +50,8 @@ export function Sources({ onReviewKit }: { onReviewKit: () => void }) {
           <li><strong>SDGs:</strong> UN Sustainable Development Goals and targets, with a written reason for every link.</li>
           <li><strong>Courses' prices and HRD Corp status:</strong> from each provider's own page, with the date we checked; ask the provider before enrolling.</li>
           <li><strong>Trend refresh:</strong> arXiv (or OpenAlex) paper counts, Hacker News “Who is hiring?” posts, and Malaysian employment by occupation group from the <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">OpenDOSM public API</a> (Salaries &amp; Wages Survey, latest year vs three years earlier). Raw counts are kept in <code>backend/data/raw/</code>.</li>
+          <li><strong>Skill evidence:</strong> current Malaysian job ads found by Gemini with Google Search grounding. Each role's ads and quotes are checked and approved by a named reviewer before they count; the role page shows them.</li>
+          <li><strong>Emerging roles:</strong> new job titles found by Gemini with Google Search grounding, one per AI capability we track, each with its quoted sources and approved by a named reviewer. Shown as a prediction and never ranked.</li>
           <li><strong>Pay:</strong> median monthly salaries by MASCO occupation group from the <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> (table A10). These are group medians, not job offers.</li>
         </ul>
       </div>

@@ -11,15 +11,45 @@ export interface Skill { id: string; name: string; category: string }
 /** The scrubbed CV text that would go to a language model, and how many details were removed. */
 export interface SendPreview { text: string; removed: Partial<Record<"NAME" | "EMAIL" | "PHONE" | "IC" | "DOB" | "AGE" | "ADDRESS" | "ORG", number>>; characters: number }
 export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
-export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[] }
+export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[]; added_from_ads?: boolean }
 export interface RoleOption { id: string; title: string }
 export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
   skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;
   audience?: Audience | null; user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
 }
+export interface Citation { url: string; title: string; employer: string; kind: "job_ad" | "web"; grounded: boolean; quote: string }
+export interface SkillEvidence { status: "confirmed" | "single" | "none"; sources: number; job_ads: number; citations: Citation[] }
+export interface RoleEvidence {
+  searched: string; widened: boolean; reviewed_by: string | null; reviewed_at: string | null;
+  skills: Record<string, SkillEvidence>;
+}
+export interface EvidencePage { url: string; title: string; employer: string; kind: "job_ad" | "web"; grounded: boolean; quotes: { skill_id: string | null; skill_name: string; quote: string }[] }
+export interface EvidencePending { id: string; role_id: string; title: string; searched: string; widened: boolean; job_ads: number; pages: number; added: string[]; added_names: string[] }
+export interface EvidenceDetail {
+  id: string; role_id: string; title: string; searched: string; widened: boolean; sources: EvidencePage[];
+  summary: { skills: Record<string, SkillEvidence>; added: { skill_id: string; job_ads: number }[]; not_in_catalogue: { name: string; count: number }[] };
+  skill_names: Record<string, string>; role_skills: string[];
+}
+export type Texts = { en: string; ms: string; zh: string };
+export interface EmergingSource { url: string; title: string; kind: "job_ad" | "web"; grounded: boolean; quote: string; employer?: string }
+export interface EmergingCard {
+  capability_id: string; capability_name: string; momentum: number | null; snapshot_id: string; searched: string;
+  title: Texts; summary: Texts; sources: EmergingSource[]; reviewed_by: string | null; reviewed_at: string | null;
+  carry_over: { skill_id: string; name: string }[]; to_learn: { skill_id: string; name: string }[];
+  stepping_stone: { role_id: string; title: string; reason: Texts };
+  sdg: (Sdg & { reason: Texts }) | null;
+}
+export interface EmergingPending { id: string; kind: "emerging"; subject: string; title: string; capability_name: string; momentum: number | null; searched: string; sources: number }
+export interface EmergingDetail {
+  id: string; kind: "emerging"; subject: string; capability_name: string; momentum: number | null; searched: string;
+  title: Texts; summary: Texts; skills: string[]; stepping_stone: string; stepping_stone_title: string; stepping_reason: Texts;
+  sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
+}
+export interface EvidenceStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null }
 export interface RoleMatch {
   role_id: string; title: string; family: string; summary: string;
+  evidence: RoleEvidence | null;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
   carry_over: { skill_id: string; name: string }[];
   rank_without_extra?: number;
@@ -112,6 +142,7 @@ export interface TreeNode {
   prereqs: string[]; depth: number; in_role: boolean;
   course: { id: string; title: string; url: string; hours: number; cost: string } | null;
   step: number | null; course_done: boolean;
+  evidence?: SkillEvidence | null; added_from_ads?: boolean;
 }
 export interface SkillTree {
   role: { role_id: string; title: string }; nodes: TreeNode[];
@@ -128,7 +159,8 @@ export interface CheckResult {
 
 export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }
 export interface WorkDimension { id: string; plus: Record<string, string>; minus: Record<string, string> }
-export interface SurveyAnswer { card_id: string; answer: "like" | "dislike" | "other"; note?: string; dims?: Record<string, number> }
+export type ScaleAnswer = "strongly_disagree" | "disagree" | "neutral" | "agree" | "strongly_agree";
+export interface SurveyAnswer { card_id: string; answer: ScaleAnswer | "other"; note?: string; dims?: Record<string, number> }
 export interface AlsoLike {
   role_id: string; title: string; rank: number; fit: number; preference_match: number;
   matched_preferences: PrefMatch[];
@@ -164,7 +196,7 @@ export interface Pathway {
   uncovered_skills: string[];
 }
 
-// The hosted API can sleep when idle (free plans, Replit Autoscale) and take up to a minute to wake. While it does,
+// The hosted API can sleep when idle (Render's free plan) and take up to a minute to wake. While it does,
 // requests fail to connect or get 502/503/504, so we retry for a while and let the shell show
 // a "waking up" notice instead of an error.
 const WAKE_STATUSES = new Set([502, 503, 504]);
@@ -334,6 +366,27 @@ export const api = {
     request<{ snapshot_id: string; state: string }>(`/signals/pending/${encodeURIComponent(id)}/${decision}`, {
       method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },
       body: JSON.stringify({ reviewer, reason: reason || null }),
+    }),
+  evidenceStart: (token: string, mode: "roles" | "emerging" = "roles") =>
+    request<EvidenceStatus>(`/evidence/refresh?mode=${mode}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidenceStatus: (token: string) =>
+    request<EvidenceStatus>("/evidence/refresh", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidencePending: (token: string) =>
+    request<EvidencePending[]>("/evidence/pending", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emergingPending: (token: string) =>
+    request<EmergingPending[]>("/evidence/pending?kind=emerging", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emergingDetail: (token: string, id: string) =>
+    request<EmergingDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emerging: (profileId?: string) =>
+    request<{ label: string; roles: EmergingCard[] }>(`/emerging${profileId ? `?profile_id=${encodeURIComponent(profileId)}` : ""}`),
+  emergingSearch: (capabilityId: string, profileId: string) =>
+    requestDetail<{ reviewed: false; searched: string; sources: EmergingSource[] }>(`/emerging/${encodeURIComponent(capabilityId)}/search`, {
+      method: "POST", body: JSON.stringify({ profile_id: profileId }) }),
+  evidenceDetail: (token: string, id: string) =>
+    request<EvidenceDetail>(`/evidence/pending/${encodeURIComponent(id)}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  evidenceDecide: (token: string, id: string, decision: "approve" | "reject", body: { reviewer: string; reason?: string; drop_sources?: string[]; drop_added?: string[] }) =>
+    request<{ id: string; role_id: string; added?: string[] }>(`/evidence/pending/${encodeURIComponent(id)}/${decision}`, {
+      method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token }, body: JSON.stringify(body),
     }),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),

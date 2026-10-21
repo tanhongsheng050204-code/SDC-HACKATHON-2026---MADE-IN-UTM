@@ -1,5 +1,7 @@
 """Reference data: skills, roles, courses, SDGs, scenarios and dated signal snapshots.
 
+Roles also carry their latest approved skill evidence (app/evidence), stored in the database.
+
 All of it is versioned JSON under backend/data/, read once and kept in memory. Snapshots are
 immutable: committed ones are files; ones imported or approved at runtime are rows in the database.
 The latest by `imported` date is the one used.
@@ -65,10 +67,14 @@ def _tasks(path: Path) -> dict:
 
 @lru_cache
 def get_reference() -> Reference:
+    from app import store  # imported here, like load_snapshots, to avoid an import cycle
+    from app.evidence.apply import apply as apply_evidence
+
     data_dir = get_settings().data_dir
     return Reference(
         skills={s["id"]: s for s in _read(data_dir / "skills.json")},
-        roles={r["id"]: r for r in _read(data_dir / "roles.json")},
+        roles=apply_evidence({r["id"]: r for r in _read(data_dir / "roles.json")},
+                             store.latest_approved_evidence("role")),
         courses=_read(data_dir / "courses.json"),
         sdgs={g["number"]: g for g in _read(data_dir / "sdgs.json")},
         sdg_map=_read(data_dir / "sdg_map.json"),

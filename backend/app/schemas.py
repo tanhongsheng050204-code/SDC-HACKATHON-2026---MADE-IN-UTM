@@ -67,7 +67,8 @@ class CheckAnswers(BaseModel):
 
 class SurveyAnswer(BaseModel):
     card_id: str = Field(min_length=1, max_length=80)
-    answer: Literal["like", "dislike", "other"]
+    answer: Literal["strongly_agree", "agree", "neutral", "disagree", "strongly_disagree", "other",
+                    "like", "dislike"]  # like / dislike: the earlier two-button answers
     note: str | None = Field(default=None, max_length=300)
     dims: dict[str, int] | None = None  # an "other" answer's reading, sent only once confirmed
 
@@ -112,6 +113,12 @@ class ReviewDecision(BaseModel):
     """An admin's decision on a new snapshot. The name is stored with the snapshot."""
     reviewer: str = Field(min_length=2, max_length=60)
     reason: str | None = Field(default=None, max_length=500)
+
+
+class EvidenceDecision(ReviewDecision):
+    """An admin's decision on one role's skill evidence, with the citations and added skills unticked."""
+    drop_sources: list[str] = Field(default_factory=list, max_length=200)  # page URLs, or "URL#skill_id"
+    drop_added: list[str] = Field(default_factory=list, max_length=50)
 
 
 class WorkforceRequest(BaseModel):
@@ -170,3 +177,7 @@ class ProfileIn(BaseModel):
             raise ValueError(f"Unknown skills: {', '.join(unknown)}")
         return list(dict.fromkeys(value))
 
+
+
+class LiveSearchRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)

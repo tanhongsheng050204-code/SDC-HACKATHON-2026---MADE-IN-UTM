@@ -50,6 +50,7 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
     plan = pathway.build(ref, profile, role_id, summarize=False)
     steps = {k["skill_id"]: (s["step"], s["course"]) for s in plan["steps"] for k in s["skills"]}
     memo: dict[str, int] = {}
+    evidence = (role.get("evidence") or {}).get("skills", {})  # approved job-ad citations
     nodes = []
     for skill_id in _closure(ref, [rs["skill_id"] for rs in role["skills"]]):
         prereqs = ref.skill_prereqs.get(skill_id, [])
@@ -66,6 +67,8 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
                        if skill_id in steps else course_for(ref, skill_id)),
             "step": steps[skill_id][0] if skill_id in steps else None,
             "course_done": skill_id in steps and steps[skill_id][1]["id"] in done,
+            "evidence": evidence.get(skill_id),
+            "added_from_ads": any(rs["skill_id"] == skill_id and rs.get("source") == "evidence" for rs in role["skills"]),
         })
     nodes.sort(key=lambda n: (n["depth"], n["name"]))
     return {"role": {"role_id": role_id, "title": role["title"]}, "nodes": nodes,
