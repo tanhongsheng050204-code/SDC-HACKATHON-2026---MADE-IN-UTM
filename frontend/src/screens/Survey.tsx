@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { api, Profile, ScaleAnswer, SurveyAnswer, SurveyCard, SurveyResult } from "../lib/api";
-import { getLang, t } from "../lib/i18n";
+import { getLang, t, tr } from "../lib/i18n";
 import { MicButton } from "../components/MicButton";
 
 const textFor = (text: Record<string, string>) => text[getLang()] || text.en;
@@ -135,7 +135,7 @@ export function Survey({ profile, userId, onDone, onSkip }: {
           {result.also_like.length > 0 && (
             <>
               <h3>{t("survey.alsoLike")}</h3>
-              <ul>{result.also_like.map((r) => <li key={r.role_id}>{r.title}</li>)}</ul>
+              <ul>{result.also_like.map((r) => <li key={r.role_id}>{tr(r.title)}</li>)}</ul>
             </>
           )}
           <button className="btn ink" onClick={finish}>{t("survey.seeRoles")}</button>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, EmergingCard, Matches, Profile, RoleMatch, Scenario, SkillRef } from "../lib/api";
-import { getLang, t } from "../lib/i18n";
+import { getLang, t, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
 
 // Future roles as a map, for comparing options at a glance. The ring is your top roles by rank;
@@ -23,13 +23,13 @@ type Node = {
 
 const asSkill = (s: { skill_id: string; name: string }): SkillRef => ({ ...s, weight: 1, sdgs: [] });
 const short = (text: string, n: number) => (text.length > n ? text.slice(0, n - 1) + "…" : text);
-const titleOf = (n: Node) => n.role?.title ?? (n.prediction ? n.prediction.title[getLang()] || n.prediction.title.en : "");
+const titleOf = (n: Node) => (n.role ? tr(n.role.title) : null) ?? (n.prediction ? n.prediction.title[getLang()] || n.prediction.title.en : "");
 
 // Up to two lines: the two most important skills, then how many more. Phones get the count only.
 function skillLines(missing: SkillRef[], compact: boolean, prefix = ""): string[] {
   if (missing.length === 0) return [t("graph.ready")];
   if (compact) return [prefix + t("graph.count").replace("{n}", String(missing.length))];
-  const top = [...missing].sort((a, b) => b.weight - a.weight).slice(0, 2).map((s) => short(s.name, 16));
+  const top = [...missing].sort((a, b) => b.weight - a.weight).slice(0, 2).map((s) => short(tr(s.name), 16));
   if (missing.length > 2) top[1] = `${top[1]} +${missing.length - 2}`;
   top[0] = prefix + top[0];
   return top;
@@ -197,7 +197,7 @@ export function RoleGraph({ data, profile, scenario, onOpen }: {
   const selected = last ?? ring.find((n) => n.key === picked) ?? null;
   const dim = (n: Node) => (hover !== null ? hover !== n.key && !openPath.includes(n)
     : !last && picked !== null && picked !== n.key);
-  const you = data.current_role?.title
+  const you = (data.current_role ? tr(data.current_role.title) : null)
     ?? (profile.audience === "graduate" ? t("graph.student") : profile.audience === "switcher" ? t("graph.switcher") : t("graph.you"));
 
   return (
@@ -291,8 +291,8 @@ function GraphNode({ node, at, scenario, compact, state, onHover, onClick }: {
   const match = role ? t("graph.match").replace("{n}", String(Math.round(role.fit * 100))) : t("graph.prediction");
   const top = y - NODE_H / 2;
   const label = role
-    ? `${role.title}. ${match}. ${OUTLOOK_TEXT[o!.label]}. ${t("graph.needs")}: ${node.via.map((s) => s.name).join(", ") || t("graph.ready")}`
-    : `${titleOf(node)}, ${t("graph.prediction")}. ${t("graph.needs")}: ${node.via.map((s) => s.name).join(", ") || t("graph.ready")}`;
+    ? `${tr(role.title)}. ${match}. ${OUTLOOK_TEXT[o!.label]}. ${t("graph.needs")}: ${node.via.map((s) => tr(s.name)).join(", ") || t("graph.ready")}`
+    : `${titleOf(node)}, ${t("graph.prediction")}. ${t("graph.needs")}: ${node.via.map((s) => tr(s.name)).join(", ") || t("graph.ready")}`;
   return (
     <g className={`graph-node tone-${tone}${state}`} tabIndex={0} role="button" aria-label={label}
       onMouseEnter={() => onHover(true)} onMouseLeave={() => onHover(false)}
@@ -331,16 +331,16 @@ function RoleDetails({ role, scenario, onLead, onOpen }: { role: RoleMatch; scen
   const o = role.outlook[scenario];
   return (
     <div className="graph-details">
-      <h3>{role.title}</h3>
+      <h3>{tr(role.title)}</h3>
       <p><strong>{t("graph.match").replace("{n}", String(Math.round(role.fit * 100)))}</strong> · {OUTLOOK_TEXT[o.label]} {o.index > 0 ? "+" : ""}{o.index}%</p>
       <p className="muted">{t("pay.median")} RM{role.pay.median_rm.toLocaleString("en-MY")} ({role.pay.group})</p>
       <span className="kpi-label">{t("graph.toLearn")} ({role.missing.length})</span>
       {role.missing.length
-        ? <div className="chips">{[...role.missing].sort((a, b) => b.weight - a.weight).map((s) => <span key={s.skill_id} className="chip missing">{s.name}{s.weight === 3 ? " (core)" : ""}</span>)}</div>
+        ? <div className="chips">{[...role.missing].sort((a, b) => b.weight - a.weight).map((s) => <span key={s.skill_id} className="chip missing">{tr(s.name)}{s.weight === 3 ? ` ${t("rd.core")}` : ""}</span>)}</div>
         : <p>{t("graph.ready")}</p>}
       {role.covered.length > 0 && <>
         <span className="kpi-label">{t("graph.have")} ({role.covered.length})</span>
-        <div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {s.name}</span>)}</div>
+        <div className="chips">{role.covered.map((s) => <span key={s.skill_id} className="chip covered">✓ {tr(s.name)}</span>)}</div>
       </>}
       <div className="actions">
         <button className="primary" onClick={onLead}>{t("graph.lead")}</button>
@@ -361,7 +361,7 @@ function PathDetails({ steps, hasNext, onOpen, onBack }: {
         {steps.map((s) => (
           <li key={s.key}>
             <strong>{titleOf(s)}</strong>{s.prediction && <> <span className="badge gold">{t("graph.prediction")}</span></>}: {s.via.length
-              ? `${s.parent ? t("graph.thenAdd") : t("graph.learn")} ${s.via.map((v) => v.name).join(", ")}`
+              ? `${s.parent ? t("graph.thenAdd") : t("graph.learn")} ${s.via.map((v) => tr(v.name)).join(", ")}`
               : t("graph.ready")}
           </li>
         ))}

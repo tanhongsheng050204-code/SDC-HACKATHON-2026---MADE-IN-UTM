@@ -1,39 +1,39 @@
 import { useEffect, useState } from "react";
 import { api, Snapshot } from "../lib/api";
 import { monthsOld } from "../lib/format";
-import { t } from "../lib/i18n";
+import { t, tf } from "../lib/i18n";
 
 // S9: every forecast snapshot the app has used, newest first, so anyone can trace a number back.
 export function Sources({ onReviewKit }: { onReviewKit: () => void }) {
   const [snapshots, setSnapshots] = useState<Snapshot[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError("Couldn't load the list of sources.")); }, []);
+  useEffect(() => { api.snapshots().then(setSnapshots).catch(() => setError(t("src.loadFailed"))); }, []);
 
   return (
     <section>
       <div className="page-head"><h1>{t("h.sources")}</h1>
         <p className="muted">{t("note.sources")}</p></div>
       {error && <p className="error" role="alert">{error}</p>}
-      {!snapshots && !error && <p className="muted">Loading…</p>}
-      {snapshots?.length === 0 && <div className="empty-state"><p>No forecast has been imported yet.</p></div>}
+      {!snapshots && !error && <p className="muted">{t("a.loading")}</p>}
+      {snapshots?.length === 0 && <div className="empty-state"><p>{t("src.none")}</p></div>}
       {snapshots && snapshots.length > 0 && (
         <div className="table-wrap card">
           <table className="heatmap sources-table">
-            <thead><tr><th>Snapshot</th><th>Source</th><th>Published</th><th>Imported</th><th>Horizon</th><th>Roles</th><th>Status</th></tr></thead>
+            <thead><tr><th>{t("src.snapshot")}</th><th>{t("src.source")}</th><th>{t("src.published")}</th><th>{t("src.imported")}</th><th>{t("src.horizon")}</th><th>{t("src.roles")}</th><th>{t("src.status")}</th></tr></thead>
             <tbody>
               {snapshots.map((s, i) => (
                 <tr key={s.snapshot_id}>
-                  <th scope="row">{s.snapshot_id}{i === 0 && <> <span className="badge good">In use</span></>}</th>
+                  <th scope="row">{s.snapshot_id}{i === 0 && <> <span className="badge good">{t("src.inUse")}</span></>}</th>
                   <td>{s.source_url ? <a href={s.source_url} target="_blank" rel="noreferrer">{s.source}</a> : s.source}</td>
                   <td>{s.published}</td>
                   <td>{s.imported}</td>
                   <td>{s.horizon_year}</td>
                   <td>{s.signal_count}</td>
                   <td>
-                    {s.illustrative ? <span className="badge risk">Illustrative</span>
-                      : monthsOld(s.imported) > 12 ? <span className="badge gold">Over a year old</span>
-                      : <span className="badge good">Cited</span>}
-                    {s.reviewed_by && <small className="source"> Reviewed by {s.reviewed_by}</small>}
+                    {s.illustrative ? <span className="badge risk">{t("src.illustrative")}</span>
+                      : monthsOld(s.imported) > 12 ? <span className="badge gold">{t("src.old")}</span>
+                      : <span className="badge good">{t("src.cited")}</span>}
+                    {s.reviewed_by && <small className="source"> {tf("src.reviewedBy", { name: s.reviewed_by })}</small>}
                   </td>
                 </tr>
               ))}
@@ -42,24 +42,24 @@ export function Sources({ onReviewKit }: { onReviewKit: () => void }) {
         </div>
       )}
       <div className="card">
-        <h2>Other data in Laluan</h2>
+        <h2>{t("src.other")}</h2>
         <ul className="plain-list">
-          <li><strong>Tasks:</strong> O*NET 30.0 task statements (US Department of Labor), labelled automate / assist / human by our team with AI help.</li>
-          <li><strong>Skills per role:</strong> the Laluan team's list, checked against O*NET occupations where one exists.</li>
-          <li><strong>Courses:</strong> the Laluan catalogue; each link shows the date we last opened it.</li>
-          <li><strong>SDGs:</strong> UN Sustainable Development Goals and targets, with a written reason for every link.</li>
-          <li><strong>Courses' prices and HRD Corp status:</strong> from each provider's own page, with the date we checked; ask the provider before enrolling.</li>
-          <li><strong>Trend refresh:</strong> arXiv (or OpenAlex) paper counts, Hacker News “Who is hiring?” posts, and Malaysian employment by occupation group from the <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">OpenDOSM public API</a> (Salaries &amp; Wages Survey, latest year vs three years earlier). Raw counts are kept in <code>backend/data/raw/</code>.</li>
-          <li><strong>Skill evidence:</strong> current Malaysian job ads found by Gemini with Google Search grounding. Each role's ads and quotes are checked and approved by a named reviewer before they count; the role page shows them.</li>
-          <li><strong>Emerging roles:</strong> new job titles found by Gemini with Google Search grounding, one per AI capability we track, each with its quoted sources and approved by a named reviewer. Shown as a prediction and never ranked.</li>
-          <li><strong>A day in this job:</strong> written by Gemini from our own data only (O*NET tasks, work context, main skills, DOSM pay group and SDG reason), committed for team review. A richer version using approved Malaysian job ads replaces it only after a named reviewer approves it.</li>
-          <li><strong>Pay:</strong> median monthly salaries by MASCO occupation group from the <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> (table A10). These are group medians, not job offers.</li>
+          <li><strong>{t("src.tasksT")}:</strong> {t("src.tasks")}</li>
+          <li><strong>{t("src.skillsT")}:</strong> {t("src.skills")}</li>
+          <li><strong>{t("src.coursesT")}:</strong> {t("src.courses")}</li>
+          <li><strong>SDGs:</strong> {t("src.sdgs")}</li>
+          <li><strong>{t("src.pricesT")}:</strong> {t("src.prices")}</li>
+          <li><strong>{t("src.trendT")}:</strong> {t("src.trend1")} <a href="https://open.dosm.gov.my/data-catalogue/wages_occupation" target="_blank" rel="noreferrer">{t("src.opendosm")}</a> {t("src.trend2")} <code>backend/data/raw/</code>.</li>
+          <li><strong>{t("src.evidenceT")}:</strong> {t("src.evidence")}</li>
+          <li><strong>{t("em.title")}:</strong> {t("src.emerging")}</li>
+          <li><strong>{t("day.title")}:</strong> {t("src.day")}</li>
+          <li><strong>{t("src.payT")}:</strong> {t("src.pay1")} <a href="https://storage.dosm.gov.my/labour/salaries_wages_2025.pdf" target="_blank" rel="noreferrer">DOSM Salaries &amp; Wages Survey Report 2025</a> {t("src.pay2")}</li>
         </ul>
       </div>
       <div className="card">
-        <h2>Help us check it</h2>
-        <p className="muted">Native speakers, teammates and career counsellors can check our translations, mark the test CVs and review the demo pathways in the review kit.</p>
-        <button onClick={onReviewKit}>Open the review kit</button>
+        <h2>{t("src.help")}</h2>
+        <p className="muted">{t("src.helpSub")}</p>
+        <button onClick={onReviewKit}>{t("src.openKit")}</button>
       </div>
     </section>
   );

@@ -34,14 +34,14 @@ export function Sidebar({ current, profile, hasRole, model, prefs, userId, onGo,
 
   return (
     <aside className="sidebar">
-      <button className="brand" onClick={onHome} aria-label="Laluan home"><LogoMark /><span>Laluan</span></button>
+      <button className="brand" onClick={onHome} aria-label={t("nav.homeAria")}><LogoMark /><span>Laluan</span></button>
       {profile && (
         <div className="who">
           <span className="avatar" aria-hidden="true">{(profile.display_name ?? "You").slice(0, 1)}</span>
           <span><strong>{profile.display_name ?? t("shell.yourProfile")}</strong><small>{profile.skills.length} {t("shell.skills")}</small></span>
         </div>
       )}
-      <nav className="side-nav" aria-label="Sections">
+      <nav className="side-nav" aria-label={t("nav.sections")}>
         {groups.map((g) => (
           <div key={g.label ?? "top"} className="side-group">
             {g.label && <div className="side-label">{g.label}</div>}

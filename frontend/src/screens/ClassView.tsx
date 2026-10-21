@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { SdgTile } from "../components/Sdgs";
 import { api, ClassResult, Scenario } from "../lib/api";
-import { t } from "../lib/i18n";
+import { t, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE, SCENARIOS } from "../lib/labels";
 
 // For TVET and university career centres: an anonymous class list in, the cohort's picture out.
@@ -49,7 +49,7 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
 
       {result && (
         <>
-          <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
+          <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
             {SCENARIOS.map((s) => (
               <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => { setScenario(s.id); analyse(csv, s.id); }}>{t(`sc.${s.id}`)}</button>
             ))}
@@ -57,14 +57,14 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
           <p className="banner info" role="note">{t("class.totalsOnly")}</p>
           <div className="home-kpis">
             <div className="kpi"><span className="kpi-label">{t("class.students")}</span><strong>{result.students}</strong>
-              <span className="kpi-foot">{result.programmes.map((p) => `${p.name}: ${p.students}`).join(" · ")}</span></div>
+              <span className="kpi-foot">{result.programmes.map((p) => `${tr(p.name)}: ${p.students}`).join(" · ")}</span></div>
           </div>
 
           <div className="card">
             <h2>{t("class.bestFit")}</h2>
             <table className="heatmap"><tbody>
               {result.best_fit.map((r) => (
-                <tr key={r.role_id}><th scope="row">{r.title}</th><td>{r.students}</td>
+                <tr key={r.role_id}><th scope="row">{tr(r.title)}</th><td>{r.students}</td>
                   <td><span className={`badge ${OUTLOOK_TONE[r.outlook[scenario].label]}`}>{OUTLOOK_TEXT[r.outlook[scenario].label]}</span></td></tr>
               ))}
             </tbody></table>
@@ -74,8 +74,8 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
             <h2>{t("class.gaps")}</h2>
             <table className="heatmap"><tbody>
               {result.top_gaps.map((g) => (
-                <tr key={g.skill_id}><th scope="row">{g.name}</th><td>{g.students}</td>
-                  <td>{g.course && <a href={g.course.url} target="_blank" rel="noreferrer">{g.course.title} ↗</a>}</td></tr>
+                <tr key={g.skill_id}><th scope="row">{tr(g.name)}</th><td>{g.students}</td>
+                  <td>{g.course && <a href={g.course.url} target="_blank" rel="noreferrer">{tr(g.course.title)} ↗</a>}</td></tr>
               ))}
             </tbody></table>
           </div>
@@ -83,7 +83,7 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
           <div className="card">
             <h2>{t("class.courses")}</h2>
             <ol>{result.courses.map((c) => (
-              <li key={c.course.id}><a href={c.course.url} target="_blank" rel="noreferrer">{c.course.title}</a> · {c.course.provider} · {c.hours} h · {t("class.helps")} {c.students_helped}</li>
+              <li key={c.course.id}><a href={c.course.url} target="_blank" rel="noreferrer">{tr(c.course.title)}</a> · {c.course.provider} · {c.hours} h · {t("class.helps")} {c.students_helped}</li>
             ))}</ol>
           </div>
 
@@ -91,7 +91,7 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
             <div className="card">
               <h2>{t("class.sdgs")}</h2>
               <div className="chips">{result.sdg_contribution.map((s) => (
-                <span key={s.number} className="chip"><SdgTile sdg={s} small />{s.name}: {s.students}</span>
+                <span key={s.number} className="chip"><SdgTile sdg={s} small />{tr(s.name)}: {s.students}</span>
               ))}</div>
             </div>
           )}

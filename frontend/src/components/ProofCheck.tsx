@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, CheckResult, CheckStart, TreeNode } from "../lib/api";
-import { getLang, levelName, t } from "../lib/i18n";
+import { getLang, levelName, t, tr } from "../lib/i18n";
 import { SdgReasons } from "./Sdgs";
 
 // One proof check: three questions, one at a time, graded on the server. Two right proves the level.
@@ -44,7 +44,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
   return (
     <div className="dialog-backdrop">
       <div className="dialog proof" role="dialog" aria-modal="true" aria-labelledby="proof-title">
-        <h2 id="proof-title">{node.name}{check && ` · ${t("tree.prove")} ${levelName(check.level)}`}</h2>
+        <h2 id="proof-title">{tr(node.name)}{check && ` · ${t("tree.prove")} ${levelName(check.level)}`}</h2>
         {busy && !check && <p className="muted">{t("tree.writing")}</p>}
         {error && <p className="error" role="alert">{error}</p>}
         {question && check && (
@@ -75,7 +75,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
             {!result.passed && (
               <p>
                 {!isDemo && <>{t("tree.tomorrow")} </>}
-                {result.course && <a href={result.course.url} target="_blank" rel="noreferrer">{result.course.title} ↗</a>}
+                {result.course && <a href={result.course.url} target="_blank" rel="noreferrer">{tr(result.course.title)} ↗</a>}
               </p>
             )}
           </div>

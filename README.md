@@ -38,7 +38,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
 | **Plain-language help** | A “?” beside jargon on Today (skill fit, outlook, robust pick), and a badge on each coach answer saying whether AI or plain rules wrote it, or a safety check stopped it. |
 | **Safety checks** | Coach questions and CV text are checked for prompt injection (“ignore previous instructions…”, “change my score”) before any model reads them; the coach answers with a calm refusal and the CV is read by the skill dictionary only. |
-| **Inclusive design** | English, Bahasa Malaysia and Chinese interface; lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
+| **Inclusive design** | English, Bahasa Malaysia and Chinese throughout: every screen, plus role titles, skill names, summaries, scenario and task text (`backend/data/translations.json`, drafted with [`build_translations.py`](backend/scripts/build_translations.py)). Course names, job-ad quotes and coach answers stay in English, the coach so each sentence can be checked against its English sources. Lite mode for slow connections; light and dark themes; keyboard and screen-reader friendly. |
 
 ## How Laluan meets the judging criteria
 
