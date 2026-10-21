@@ -70,7 +70,9 @@ If Phase 1 runs late, the order inside it is: login + database, then skill tree,
 
 ## 2. Hosting (Phase 1)
 
-**Decided:** both frontend and backend on Replit. No Vercel, no Render.
+**Changed 21 Oct 2026:** the team kept the frontend on Vercel and the API on Render, with Supabase for data (DECISIONS #38); the Replit plan below was not used.
+
+**Decided (20 Oct, superseded):** both frontend and backend on Replit. No Vercel, no Render.
 
 - **(My call)** One Replit Deployment: FastAPI serves the built frontend (`frontend/dist`) as static files plus `/api`. One address, no CORS setup. Use an always-on Deployment (Autoscale or Reserved VM), not a sleeping Repl; the "waking up the server" notice can stay as a safety net.
 - Secrets in Replit: `GEMINI_API_KEY` (paid tier for the demo), `ADMIN_TOKEN`, Supabase URL / anon key / JWT secret (or JWKS URL), database URL, later RunPod keys.

@@ -40,7 +40,7 @@ Laluan takes a person from “who I am today” to “where I can be in the AI e
 5. **An AI coach** answers questions about the user's own results with citations; it may suggest a change, but nothing happens until the user presses Apply.
 6. **SDG impact, a shareable Future Card and an HR workforce view** (aggregate only, never a ranking of people).
 
-From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and embeddings, with an offline fallback), **database architecture** (SQLite for profiles, progress and shared cards; versioned JSON reference data) and **cloud deployment** (Docker container on Render, frontend on Vercel, CI on GitHub Actions).
+From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and embeddings, with an offline fallback), **database architecture** (Supabase Postgres for profiles, progress and shared cards; versioned JSON reference data) and **cloud deployment** (Docker container on Render, frontend on Vercel, CI on GitHub Actions).
 
 *Word count: 296*
 
@@ -53,7 +53,7 @@ From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and emb
 | Frontend | React 18 + TypeScript + Vite; responsive; EN / BM / 中文; lite mode for slow connections |
 | Backend API | Python 3.12, FastAPI, Pydantic |
 | AI | Google Gemini API (`gemini-2.5-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
-| Data | SQLite (profiles, progress, Future Cards); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
+| Data | Supabase Postgres (profiles, progress, Future Cards, review decisions); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
 | Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API |
 | Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
 
@@ -62,7 +62,7 @@ flowchart LR
     U["User: worker, student or HR"] --> FE["React frontend<br/>(Vercel)"]
     FE -->|HTTPS JSON| API["FastAPI backend<br/>(Docker on Render)"]
     API --> DEID["De-identify CV text"] --> LLM["Gemini API<br/>skills · coach · summaries"]
-    API --> DB[("SQLite<br/>profiles · progress · cards")]
+    API --> DB[("Supabase Postgres<br/>profiles · progress · cards")]
     API --> REF[("Reference data<br/>WEF · O*NET · courses · SDGs")]
     PIPE["Trend refresh<br/>arXiv / OpenAlex · job posts"] --> PEND["Snapshot waiting for review"]
     PEND -->|admin approves| REF
