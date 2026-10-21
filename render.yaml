@@ -35,3 +35,5 @@ services:
         sync: false
       - key: CONTACT_EMAIL
         sync: false
+      - key: OPENALEX_API_KEY
+        sync: false

@@ -350,7 +350,7 @@ def test_my_postings_compares_with_a_run_at_least_four_weeks_old(tmp_path):
 def test_first_malaysian_run_shows_a_share_but_no_trend():
     ref = get_reference()
     first = mypostings.with_prior(fake_my_postings({"patient_care": 30}), None)
-    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), first)
+    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), my_postings=first)
     care = skills["patient_care"]
     assert care["label"] == "no_data"
     assert any("30 of 1,000 postings mention it" in line and "second count" in line for line in care["sources"])
@@ -361,7 +361,7 @@ def test_malaysian_trend_averages_with_hacker_news():
     prior = {"retrieved": "2026-09-01", "postings": 1000,
              "mentions": {**fake_my_postings()["mentions"], "patient_care": 30}}
     now = mypostings.with_prior(fake_my_postings({"patient_care": 60}), prior)
-    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), now)
+    skills = builder.skill_signals(ref.skills, ref.capabilities, fake_research(), fake_jobs(), my_postings=now)
     assert skills["patient_care"]["trend"] == 1.0 and skills["patient_care"]["label"] == "rising"
     sql = skills["sql"]  # Hacker News flat (0) and Malaysia flat (0): steady, with both sources named
     assert sql["label"] == "steady" and len([s for s in sql["sources"] if "postings" in s]) == 2

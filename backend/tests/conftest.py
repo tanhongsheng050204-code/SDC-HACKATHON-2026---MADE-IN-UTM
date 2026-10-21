@@ -33,3 +33,27 @@ def client(tmp_path, monkeypatch):
         yield test_client
     get_settings.cache_clear()
     get_reference.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def offline_history(monkeypatch):
+    """Trend refreshes in tests never reach the network for the forecast history; tests that need
+    history patch these again with fake series."""
+    from app.trends import jobs, research
+
+    def offline(*_args, **_kwargs):
+        raise RuntimeError("no network in tests")
+
+    monkeypatch.setattr(jobs, "collect_series", offline)
+    monkeypatch.setattr(research, "collect_series", offline)
+
+
+@pytest.fixture(autouse=True)
+def offline_my_postings(monkeypatch):
+    """Nor for Malaysian postings on freehire.me; test_trends patches in fake counts."""
+    from app.trends import mypostings
+
+    def offline(*_args, **_kwargs):
+        raise ValueError("no network in tests")
+
+    monkeypatch.setattr(mypostings, "collect", offline)

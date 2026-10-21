@@ -128,6 +128,11 @@ Notes: ______
 - [ ] 7.5 AI capability momentum bars appear after a refresh.
 - [ ] 7.6 Source line shows snapshot and dates; **See my future roles** opens Future roles.
 - [ ] 7.7 **What Malaysians use AI for** lists six topics with Malaysia's share and the world's, the usage index and the Anthropic source.
+- [ ] 7.8 After a refresh with history: each forecast skill shows “+N% by 2030”, **Likely** or **Uncertain**, its 80% range and a small chart (solid history, dashed forecast, shaded range).
+- [ ] 7.9 Switching **Slow / Baseline / Accelerated** changes the numbers for skills AI automates or boosts (e.g. Office administration falls further under Accelerated) and can move skills between columns.
+- [ ] 7.10 **Jobs rising and declining** lists every role with its change by 2030 for the chosen scenario, the range across scenarios and the Malaysian employment line.
+- [ ] 7.11 **How well does this forecast do?** shows the backtest numbers in plain words, and the method.
+- [ ] 7.12 BM and 中文: every new line above is translated.
 
 Notes: ______
 
