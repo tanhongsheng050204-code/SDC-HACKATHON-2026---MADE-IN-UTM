@@ -50,9 +50,9 @@
 
 ## C. A day in this job
 
-- [ ] **C1** Script `scripts/build_day_in_job.py` drafts, for every role, a short text in EN / BM / 中文 from O*NET tasks, work context, skills, DOSM pay group and the SDG reason only; output committed to `data/day_in_job.json` and listed in REVIEW_LOG.
-- [ ] **C2** Approving a role's evidence drafts a richer version (adds facts from approved ads) into the review queue; the approved version is stored in the database and replaces the file version for that role.
-- [ ] **C3** Role page section "A day in this job", in the chosen language.
+- [x] **C1** Script `scripts/build_day_in_job.py` drafts, for every role, a short text in EN / BM / 中文 from O*NET tasks, work context, skills, DOSM pay group and the SDG reason only; output committed to `data/day_in_job.json` and listed in REVIEW_LOG.
+- [x] **C2** Approving a role's evidence drafts a richer version (adds facts from approved ads) into the review queue; the approved version is stored in the database and replaces the file version for that role.
+- [x] **C3** Role page section "A day in this job", in the chosen language.
 
 ## D. SDG reasons shown
 
