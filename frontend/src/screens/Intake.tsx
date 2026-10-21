@@ -144,26 +144,49 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   );
 }
 
+// Skills are shown one field at a time, so the list is never a wall of words; typing a filter
+// searches every field. What is picked stays listed whichever field is open.
+const FIELDS = ["digital", "data", "ai", "technical", "business", "human", "green"] as const;
+
 function PickSkills({ onDone }: { onDone: (skills: string[]) => void }) {
   const [all, setAll] = useState<Skill[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
   const [filter, setFilter] = useState("");
+  const [field, setField] = useState<string>(FIELDS[0]);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { api.skills().then(setAll).catch(() => setError("Can't load the skill list.")); }, []);
-  const shown = all.filter((s) => s.name.toLowerCase().includes(filter.trim().toLowerCase()));
+  const query = filter.trim().toLowerCase();
+  const fields = [...FIELDS, ...new Set(all.map((s) => s.category).filter((c) => !(FIELDS as readonly string[]).includes(c)))];
+  const fieldName = (c: string) => ((FIELDS as readonly string[]).includes(c) ? t(`pick.${c}` as StringKey) : c);
+  const shown = all.filter((s) => (query ? s.name.toLowerCase().includes(query) : s.category === field));
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  const chip = (s: Skill) => (
+    <button key={s.id} className={picked.includes(s.id) ? "chip covered" : "chip"} aria-pressed={picked.includes(s.id)}
+      onClick={() => toggle(s.id)}>{picked.includes(s.id) && "✓ "}{s.name}</button>
+  );
   return (
     <>
-      <label className="narrow">Filter skills
+      <label className="narrow">{t("pick.filter")}
         <input type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="e.g. Excel" />
       </label>
-      <div className="chips">
-        {shown.map((s) => (
-          <button key={s.id} className={picked.includes(s.id) ? "chip covered" : "chip"} aria-pressed={picked.includes(s.id)}
-            onClick={() => toggle(s.id)}>{s.name}</button>
-        ))}
-        {all.length > 0 && shown.length === 0 && <p className="muted">No skill matches “{filter}”.</p>}
-      </div>
+      {!query && (
+        <div className="tabs pick-fields" role="tablist" aria-label={t("pick.fields")}>
+          {fields.filter((c) => all.some((s) => s.category === c)).map((c) => {
+            const n = all.filter((s) => s.category === c && picked.includes(s.id)).length;
+            return <button key={c} role="tab" aria-selected={field === c} onClick={() => setField(c)}>
+              {fieldName(c)}{n > 0 && <span className="badge good">{n}</span>}</button>;
+          })}
+        </div>
+      )}
+      {query ? fields.filter((c) => shown.some((s) => s.category === c)).map((c) => (
+        <div key={c} className="pick-group"><span className="kpi-label">{fieldName(c)}</span>
+          <div className="chips">{shown.filter((s) => s.category === c).map(chip)}</div></div>
+      )) : <div className="chips" role="tabpanel">{shown.map(chip)}</div>}
+      {all.length > 0 && query && shown.length === 0 && <p className="muted">No skill matches “{filter}”.</p>}
+      {picked.length > 0 && (
+        <div className="pick-group"><span className="kpi-label">{t("pick.picked")} ({picked.length})</span>
+          <div className="chips">{all.filter((s) => picked.includes(s.id)).map(chip)}</div></div>
+      )}
       <button className="primary" disabled={picked.length < 3} onClick={() => onDone(picked)}>
         {picked.length < 3 ? "Pick at least 3 skills" : `Continue with ${picked.length} skills`}
       </button>

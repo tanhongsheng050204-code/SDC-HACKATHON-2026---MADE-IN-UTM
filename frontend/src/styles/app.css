@@ -288,6 +288,9 @@ code { font-size: .88em; background: var(--surface-2); padding: 1px 5px; border-
 
 /* Your job, task by task */
 .narrow { max-width: 420px; }
+.pick-fields { margin: 4px 0 2px; }
+.pick-fields .badge { margin-left: 6px; }
+.pick-group { display: grid; gap: 6px; margin-top: 4px; }
 .task-split { display: grid; gap: 10px; }
 .split-bar { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
 .split.automate, .swatch.automate { background: var(--risk); }
@@ -580,6 +583,9 @@ main:focus { outline: none; }
 .emerging { margin-top: 28px; display: grid; gap: 12px; }
 .emerging h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .emerging-card { align-content: start; gap: 10px; }
+.day-in-job { margin: 0 0 16px; }
+.day-in-job h2 { margin: 0 0 6px; }
+.day-in-job p { margin: 0 0 6px; }
 .emerging-card .card-head { display: flex; justify-content: space-between; align-items: center; }
 .emerging-start .kpi-label { display: block; }
 .emerging-start .link { font-weight: 600; padding: 0; }

@@ -6,9 +6,9 @@ import { Openings } from "../components/Openings";
 import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
-import { api, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
-import { onetUrl, percent } from "../lib/format";
-import { pick, t } from "../lib/i18n";
+import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
+import { jobLinks, onetUrl, percent } from "../lib/format";
+import { getLang, pick, t } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 
 export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree, onProfile, onBack }: {
@@ -18,12 +18,24 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
   const [error] = useState<string | null>(null);
   const [xray, setXray] = useState<Scenario | null>(null);
   const [roleCase, setRoleCase] = useState<RoleCaseData | null>(null);
+  const [day, setDay] = useState<DayInJob | null>(null);
+  useEffect(() => { api.day(role.role_id).then(setDay).catch(() => setDay(null)); }, [role.role_id]);
   useEffect(() => { api.roleCase(profile.id, role.role_id).then(setRoleCase).catch(() => setRoleCase(null)); }, [profile.id, role.role_id, profile.skills]);
 
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
       <div className="page-head"><h1>{role.title}</h1><p className="muted">{role.summary}</p></div>
+
+      {day && (
+        <section className="card day-in-job" aria-labelledby="day-title">
+          <h2 id="day-title">{t("day.title")}</h2>
+          <p>{day.text[getLang()] || day.text.en}</p>
+          <p className="source">{day.basis === "job_ads"
+            ? t("day.ads").replace("{name}", day.reviewed_by ?? "—").replace("{date}", day.drafted)
+            : t("day.data")}</p>
+        </section>
+      )}
 
       <details className="card why" open>
         <summary>Why this rank? Score {role.why.score.toFixed(2)}</summary>

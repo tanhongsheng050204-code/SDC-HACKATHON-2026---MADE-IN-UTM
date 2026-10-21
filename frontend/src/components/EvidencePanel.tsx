@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, EmergingDetail, EmergingPending, EvidenceDetail, EvidencePending, EvidenceStatus } from "../lib/api";
+import { api, DayDetail, DayPending, EmergingDetail, EmergingPending, EvidenceDetail, EvidencePending, EvidenceStatus } from "../lib/api";
 import { KEYS, load, save } from "../lib/storage";
 import { EvidenceBadge } from "./SkillEvidence";
 
@@ -13,6 +13,8 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   const [detail, setDetail] = useState<EvidenceDetail | null>(null);
   const [emerging, setEmerging] = useState<EmergingPending[]>([]);
   const [card, setCard] = useState<EmergingDetail | null>(null);
+  const [days, setDays] = useState<DayPending[]>([]);
+  const [dayItem, setDayItem] = useState<DayDetail | null>(null);
   const [dropSources, setDropSources] = useState<Set<string>>(new Set());
   const [dropAdded, setDropAdded] = useState<Set<string>>(new Set());
   const [reason, setReason] = useState("");
@@ -21,7 +23,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
 
   async function loadPending(t = token) {
     if (!t) return;
-    try { setPending(await api.evidencePending(t)); setEmerging(await api.emergingPending(t)); }
+    try { setPending(await api.evidencePending(t)); setEmerging(await api.emergingPending(t)); setDays(await api.dayPending(t)); }
     catch { /* wrong token or offline: buttons report it */ }
   }
   useEffect(() => { loadPending(); }, []);  // eslint-disable-line react-hooks/exhaustive-deps
@@ -60,6 +62,23 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
     try { setCard(await api.emergingDetail(token, id)); } catch { setError("Couldn't open that card."); }
   }
 
+  async function openDay(id: string) {
+    setError(null); setNote(null); setReason("");
+    try { setDayItem(await api.dayDetail(token, id)); } catch { setError("Couldn't open that draft."); }
+  }
+
+  async function decideDay(decision: "approve" | "reject") {
+    if (!dayItem) return;
+    setError(null);
+    save(KEYS.reviewer, reviewer.trim());
+    try {
+      await api.evidenceDecide(token, dayItem.id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined });
+      setNote(`${decision === "approve" ? "Approved" : "Rejected"}: a day as ${dayItem.title}, by ${reviewer.trim()}.`);
+      setDayItem(null);
+      await loadPending();
+    } catch (e) { setError(String(e).includes("401") ? "Admin token required." : "Couldn't save the decision. Try again."); }
+  }
+
   async function decideCard(decision: "approve" | "reject") {
     if (!card) return;
     setError(null);
@@ -91,10 +110,12 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
 
   const running = status?.state === "running";
   const name = (id: string) => detail?.skill_names[id] ?? id;
+  const waiting = pending.length + emerging.length + days.length;
+  const busy = Boolean(detail || card || dayItem);
   return (
-    <details className="card admin" open={pending.length + emerging.length > 0 || undefined}>
-      <summary>Admin: skill evidence and emerging roles{pending.length + emerging.length > 0 && <span className="badge gold">{pending.length + emerging.length} waiting for review</span>}</summary>
-      <p className="muted">Searches the web for current Malaysian job ads for every role and the exact sentences that ask for each skill (about 2 minutes). Skills that 2+ ads ask for are proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
+    <details className="card admin" open={waiting > 0 || undefined}>
+      <summary>Admin: skill evidence and emerging roles{waiting > 0 && <span className="badge gold">{waiting} waiting for review</span>}</summary>
+      <p className="muted">Searches the web for current Malaysian job ads for every role and the exact sentences that ask for each skill (about 2 minutes). Skills that 2+ ads ask for are proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Approving a role also drafts a richer "A day in this job" from its ads, which waits here for review too. Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
       <div className="two-col">
         <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
         <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
@@ -106,7 +127,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       {status && status.steps.length > 0 && <ol className="muted steps-log">{status.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>}
       {status?.state === "failed" && <p className="error" role="alert">Search failed: {status.error}</p>}
 
-      {emerging.length > 0 && !detail && !card && (
+      {emerging.length > 0 && !busy && (
         <div className="table-wrap">
           <table className="heatmap">
             <thead><tr><th>Emerging role (prediction)</th><th>From AI capability</th><th>Sources</th><th></th></tr></thead>
@@ -148,7 +169,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
         </div>
       )}
 
-      {pending.length > 0 && !detail && !card && (
+      {pending.length > 0 && !busy && (
         <div className="table-wrap">
           <table className="heatmap">
             <thead><tr><th>Role</th><th>Job ads</th><th>Other pages</th><th>Proposed skills</th><th></th></tr></thead>
@@ -211,6 +232,38 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
             <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decide("approve")}>Approve</button>
             <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decide("reject")}>Reject</button>
             <button className="link" onClick={() => setDetail(null)}>Back to the list</button>
+          </div>
+        </div>
+      )}
+      {days.length > 0 && !busy && (
+        <div className="table-wrap">
+          <table className="heatmap">
+            <thead><tr><th>"A day in this job" from approved ads</th><th>Drafted</th><th></th></tr></thead>
+            <tbody>{days.map((d) => (
+              <tr key={d.id}><th scope="row">{d.title}</th><td>{d.drafted}</td>
+                <td><button className="link" onClick={() => openDay(d.id)}>Review</button></td></tr>
+            ))}</tbody>
+          </table>
+        </div>
+      )}
+
+      {dayItem && (
+        <div className="review">
+          <p className="eyebrow">"A day in this job" waiting for review · {dayItem.title} · drafted {dayItem.drafted} from approved job ads</p>
+          <div className="two-col">
+            <div><h3>Shown now</h3>{dayItem.current ? (["en", "ms", "zh"] as const).map((l) => <p key={l}>{dayItem.current![l]}</p>) : <p className="muted">Nothing yet.</p>}</div>
+            <div><h3>New draft</h3>{(["en", "ms", "zh"] as const).map((l) => <p key={l}>{dayItem.text[l]}</p>)}</div>
+          </div>
+          {(dayItem.facts.from_malaysian_job_ads ?? []).length > 0 && (
+            <details><summary>Job-ad quotes the draft could use ({dayItem.facts.from_malaysian_job_ads!.length})</summary>
+              <ul className="citations">{dayItem.facts.from_malaysian_job_ads!.map((q, i) => <li key={i}><q>{q}</q></li>)}</ul></details>
+          )}
+          <p className="muted">Check that every claim comes from our data or the quotes (no invented tools, employers or numbers), and that the BM and 中文 read naturally. Approving replaces the text on this role's page in all three languages.</p>
+          <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. it names a tool the ads don't mention" /></label>
+          <div className="actions">
+            <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decideDay("approve")}>Approve</button>
+            <button disabled={reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decideDay("reject")}>Reject</button>
+            <button className="link" onClick={() => setDayItem(null)}>Back to the list</button>
           </div>
         </div>
       )}
