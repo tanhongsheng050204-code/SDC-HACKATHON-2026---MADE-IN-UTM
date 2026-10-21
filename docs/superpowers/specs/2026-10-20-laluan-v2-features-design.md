@@ -169,6 +169,20 @@ Gemini stays the model. Protection in layers:
 
 - Each role page gets a short description of the work setting, typical tasks and who you work with, built from the same O\*NET tasks and work context the survey uses, plus the role's SDG reason. Generated once per role, reviewed, stored in data, not live.
 
+## Phase 3 decisions (grill session, 21 Oct 2026)
+
+These refine sections 5, 8, 9 and 10. Plan: `docs/superpowers/plans/2026-10-21-laluan-v2-phase3.md`.
+
+- **Timing:** all of Phase 3 is aimed at 25 Oct, in the order cited evidence → emerging roles → a day in this job → SDG reasons. A feature merges only when tested; anything not solid by the evening of 24 Oct stays on its branch and is listed as in progress.
+- **Evidence search:** Gemini with Google Search grounding looks for **Malaysian job ads**. If fewer than 2 usable ads come back, it widens to any page, labelled as weaker evidence. Checked on 21 Oct: one role takes about 25 s and returns Hiredly ads with exact quotes.
+- **What evidence changes:** each of a role's skills gets confirmed / single source / no evidence. A skill already in the catalogue is **added** to the role when 2+ job ads mention it, at weight 1; pages from the widened search never add skills. Names not in the catalogue are listed for the team and change nothing.
+- **Honesty:** every citation keeps the exact quote and link, and is flagged when its domain is not among Google's grounding sources. The reviewer spot-checks quotes.
+- **Review:** a separate "Refresh skill evidence" button with its own queue, approved per role; the reviewer can untick citations and added skills first.
+- **Shown on:** the role page skill list and the skill tree node panel.
+- **Emerging roles:** Gemini with web search, starting from AI capabilities with rising momentum, with citations, reviewed in the same queue. A panel labelled as a prediction on the Future roles screen, 3–6 cards, each with the person's carry-over skills and a stepping-stone catalogue role. Not ranked (that would need an invented growth figure). The live "Search the web" button stays on these cards only: unreviewed label, rate-limited, never scored.
+- **A day in this job:** from our data (O\*NET tasks, work context, skills, DOSM pay group, SDG reason) plus approved job-ad evidence, AI-drafted in EN / BM / 中文. A data-only version is committed for every role; approving a role's evidence drafts a richer version into the review queue.
+- **SDG reasons:** already exist for every role and skill; shown on role pages, proof-check pass results and emerging-role cards, with AI-drafted BM / 中文 for native review.
+
 ---
 
 ## Left to the builder
