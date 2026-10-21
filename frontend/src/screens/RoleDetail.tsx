@@ -4,6 +4,7 @@ import { PayLine } from "../components/PayLine";
 import { RoleCase } from "../components/RoleCase";
 import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
+import { SdgReasons } from "../components/Sdgs";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, Scenario } from "../lib/api";
 import { jobLinks, onetUrl, percent } from "../lib/format";
 import { getLang, pick, t } from "../lib/i18n";
@@ -80,6 +81,8 @@ export function RoleDetail({ profile, role, scenario, adoption, onImpact, onTree
           names={Object.fromEntries([...role.covered, ...role.missing].map((s) => [s.skill_id, s.name]))}
           added={new Set([...role.covered, ...role.missing].filter((s) => s.added_from_ads).map((s) => s.skill_id))} />
       )}
+
+      <SdgReasons sdgs={role.sdgs} title={t("sdg.roleTitle")} />
 
       {role.missing.length === 0 && (
         <div className="empty-state">

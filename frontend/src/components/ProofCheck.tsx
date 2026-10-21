@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, CheckResult, CheckStart, TreeNode } from "../lib/api";
 import { getLang, levelName, t } from "../lib/i18n";
+import { SdgReasons } from "./Sdgs";
 
 // One proof check: three questions, one at a time, graded on the server. Two right proves the level.
 export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
@@ -70,6 +71,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
                 </li>
               ))}
             </ol>
+            {result.passed && <SdgReasons sdgs={result.sdgs ?? []} title={t("sdg.skillTitle")} />}
             {!result.passed && (
               <p>
                 {!isDemo && <>{t("tree.tomorrow")} </>}

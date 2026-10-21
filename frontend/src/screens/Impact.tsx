@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SdgTile } from "../components/Sdgs";
+import { sdgReason, SdgTile } from "../components/Sdgs";
 import { api, RoleInfo, RoleMatch } from "../lib/api";
 import { t } from "../lib/i18n";
 
@@ -23,7 +23,7 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
             <SdgTile sdg={g} />
             <h2>SDG {g.number}: {g.name}</h2>
             {g.target && <span className="muted">Target {g.target}</span>}
-            <p>{g.reason}</p>
+            <p>{sdgReason(g)}</p>
           </div>
         ))}
       </div>
@@ -41,7 +41,7 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
                 <span className={`badge ${s.learning ? "gold" : "good"}`}>{s.learning ? "In your plan" : "You have this"}</span>
               </div>
               {info!.skill_sdgs[s.skill_id].map((g) => (
-                <p key={g.number} className="skill-sdg"><SdgTile sdg={g} small /><span><strong>SDG {g.number}</strong> {g.reason}</span></p>
+                <p key={g.number} className="skill-sdg"><SdgTile sdg={g} small /><span><strong>SDG {g.number}</strong> {sdgReason(g)}</span></p>
               ))}
             </li>
           ))}

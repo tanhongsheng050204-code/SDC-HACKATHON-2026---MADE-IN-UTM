@@ -95,10 +95,6 @@ def _skill_view(ref: Reference, rs: dict) -> dict:
             "added_from_ads": rs.get("source") == "evidence"}
 
 
-def _sdg_view(ref: Reference, tags: list[dict]) -> list[dict]:
-    return [{**ref.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"]} for t in tags]
-
-
 def pay(ref: Reference, role_id: str) -> dict:
     """The DOSM median for the role's occupation group: a group figure, never a job offer."""
     group = next(g for g in ref.salaries["groups"] if g["id"] == ref.roles[role_id]["masco_major"])
@@ -132,7 +128,7 @@ def _current_role_card(ref: Reference, role_id: str, skills: set[str], all_outlo
         "outlook": {sid: {"index": o[role_id].index, "label": o[role_id].label} for sid, o in all_outlooks.items()},
         "at_risk": all_outlooks[scenario_id][role_id].label == "declining",
         "covered": [_skill_view(ref, rs) for rs in covered], "missing": [_skill_view(ref, rs) for rs in missing],
-        "sdgs": _sdg_view(ref, ref.role_sdgs(role_id)),
+        "sdgs": ref.sdg_view(ref.role_sdgs(role_id)),
         "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"], "note": signals[role_id].note},
     }
 
@@ -196,7 +192,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "carry_over": [{"skill_id": rs["skill_id"], "name": ref.skills[rs["skill_id"]]["name"]}
                            for rs in covered if rs["skill_id"] in carry_from and role_id != current_id],
             "missing": [_skill_view(ref, rs) for rs in missing],
-            "sdgs": _sdg_view(ref, ref.role_sdgs(role_id)),
+            "sdgs": ref.sdg_view(ref.role_sdgs(role_id)),
             "evidence": role.get("evidence"),  # approved job-ad citations per skill, or None
             "citation": {"snapshot_id": snapshot["snapshot_id"], "imported": snapshot["imported"],
                          "note": signals[role_id].note},

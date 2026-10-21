@@ -56,5 +56,5 @@
 
 ## D. SDG reasons shown
 
-- [ ] **D1** Script drafts BM / 中文 for every reason in `sdg_map.json` (`reason_ms`, `reason_zh`), committed and listed in REVIEW_LOG.
-- [ ] **D2** Reasons shown under the SDG tiles on the role page, in the proof-check pass result for the proven skill, and on emerging-role cards.
+- [x] **D1** Script drafts BM / 中文 for every reason in `sdg_map.json` (`reason_ms`, `reason_zh`), committed and listed in REVIEW_LOG.
+- [x] **D2** Reasons shown under the SDG tiles on the role page, in the proof-check pass result for the proven skill, and on emerging-role cards.

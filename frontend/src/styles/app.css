@@ -663,3 +663,7 @@ main:focus { outline: none; }
 .role-graph.compact .graph-you .graph-you-name { font-size: 17px; }
 .actions button.danger { color: var(--risk); border-color: var(--risk); }
 .review-top { scroll-margin-top: 130px; outline: none; }
+.sdg-reasons { display: grid; gap: 8px; margin: 12px 0; }
+.sdg-reasons h2 { margin: 0; font-size: 1.05rem; }
+.sdg-reasons ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.proof-result .sdg-reasons h2 { font-size: .95rem; }
