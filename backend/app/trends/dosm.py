@@ -15,6 +15,7 @@ import httpx
 API_URL = "https://api.data.gov.my/data-catalogue/"
 DATASET = "wages_occupation"
 WINDOW_YEARS = 3
+SERIES_YEARS = 8  # yearly history for the forecast
 
 # OpenDOSM occupation names -> MASCO 2020 major group ids (as in roles.json and salaries.json).
 MASCO = {"managers": "1", "professionals": "2", "technicians": "3", "clerical": "4",
@@ -31,8 +32,13 @@ def summarise(rows: list[dict]) -> dict:
     def pair(name: str) -> dict:
         return {"recent": by_year[(latest, name)], "prior": by_year[(prior, name)]}
 
+    def series(name: str) -> dict[str, float]:
+        return {str(y): v for (y, n), v in sorted(by_year.items()) if n == name and y > latest - SERIES_YEARS}
+
     return {"years": [prior, latest], "overall": pair("overall"),
-            "groups": {masco: pair(name) for name, masco in MASCO.items()}}
+            "groups": {masco: pair(name) for name, masco in MASCO.items()},
+            "series": {"overall": series("overall"),
+                       "groups": {masco: series(name) for name, masco in MASCO.items()}}}
 
 
 def collect(today: dt.date, *, client: httpx.Client | None = None,

@@ -1,6 +1,6 @@
 {
-  "source": "openalex",
-  "source_url": "https://api.openalex.org/works",
+  "source": "arxiv",
+  "source_url": "https://export.arxiv.org/api/query",
   "retrieved": "2026-10-21",
   "windows": {
     "recent": [
@@ -24,36 +24,36 @@
   },
   "counts": {
     "document_understanding": {
-      "recent": 1526,
-      "prior": 516
+      "recent": 104,
+      "prior": 62
     },
     "conversational_ai": {
-      "recent": 12892,
-      "prior": 7283
+      "recent": 146,
+      "prior": 102
     },
     "code_generation": {
-      "recent": 14218,
-      "prior": 5079
+      "recent": 1025,
+      "prior": 771
     },
     "llm_agents": {
-      "recent": 14512,
-      "prior": 2317
+      "recent": 1782,
+      "prior": 523
     },
     "automated_data_analysis": {
-      "recent": 1204,
-      "prior": 448
+      "recent": 133,
+      "prior": 99
     },
     "generative_media": {
-      "recent": 3248,
-      "prior": 2454
+      "recent": 214,
+      "prior": 267
     },
     "ai_security": {
-      "recent": 8901,
-      "prior": 6121
+      "recent": 403,
+      "prior": 552
     },
     "mlops": {
-      "recent": 1946,
-      "prior": 947
+      "recent": 25,
+      "prior": 18
     }
   }
 }

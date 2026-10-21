@@ -15,6 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from app import store  # noqa: E402
 from app.trends import refresh, review  # noqa: E402
 
 if __name__ == "__main__":
@@ -22,6 +23,7 @@ if __name__ == "__main__":
     parser.add_argument("--force", action="store_true", help="collect again even if today's counts exist")
     parser.add_argument("--approve-as", metavar="NAME", help="publish straight away, recorded as reviewed by NAME")
     args = parser.parse_args()
+    store.init_db()  # the database may be new: the app creates its tables on start, this script must too
     refresh._log = print  # show progress on the console
     snapshot = refresh.run(force=args.force)
     print(f"\nNew snapshot: {snapshot['snapshot_id']}")
@@ -34,8 +36,6 @@ if __name__ == "__main__":
               f"   (demand {s['demand_points']:+.1f}, Malaysia {s.get('local_points', 0):+.1f}, AI {s['ai_points']:+.1f})")
     if args.approve_as:
         review.approve(snapshot["snapshot_id"], args.approve_as)
-        print(f"
-Published, reviewed by {args.approve_as}.")
+        print(f"\nPublished, reviewed by {args.approve_as}.")
     else:
-        print("
-Waiting for review: approve or reject it under Admin on the Future roles screen.")
+        print("\nWaiting for review: approve or reject it under Admin on the Future roles screen.")
