@@ -5,7 +5,7 @@ Every function in Laluan, as a checklist to run by hand. Tick each box when it b
 - **Where:** the live site <https://laluan-psi.vercel.app> (or <http://localhost:5173> locally).
 - **Before you start:** open the site once and wait for the API to wake (up to a minute on the free plan). Use a **desktop browser** first, then repeat section 17 on a phone.
 - **Test data:** only synthetic data. CVs to upload or paste are in `backend/data/eval/` (`cv1_clerk.txt` … `cv5_manager.txt`). The sample company is built in.
-- **Admin token:** Render → laluan-api → Environment → `ADMIN_TOKEN` (needed only for section 8.4).
+- **Admin token:** Render → laluan-api → Environment → `ADMIN_TOKEN` (needed only for section 8.4, on the Admin page).
 
 > Written before Laluan v2. The v2 screens (Google login, skill tree with proof checks, “What I enjoy” survey, class view, voice input) are not covered here yet; add a section for each before the final test run.
 
@@ -75,6 +75,12 @@ Notes: ______
 
 Notes: ______
 
+## 4b. My profile (edit)
+- [ ] 4b.1 With a profile, **My profile** opens the edit page (not the intake): situation, skills, current job and years are filled in.
+- [ ] 4b.2 Changing years and pressing **Save changes** shows “Profile saved”, returns to Today, and the change is still there when you reopen it; the target role is unchanged.
+- [ ] 4b.3 **Add skills from a CV** goes to the intake without asking the situation again; after reading, the review keeps your old skills plus the new ones and saves to the same profile.
+- [ ] 4b.4 **Start over (deletes this profile)** asks for confirmation before deleting.
+
 ## 5. My profile: skills intake
 
 ### 5.1 Upload CV
@@ -143,13 +149,14 @@ Notes: ______
 ### 8.3 Edge states
 - [ ] 8.3.1 A profile with skills unrelated to any role shows **“None of these roles is a close match yet…”**.
 
-### 8.4 Admin: refresh trend data (needs the admin token)
+### 8.4 Admin page: refresh trend data (Sources → **Admin: review new data**, needs the admin token)
+- [ ] 8.4.0 Future roles shows **no** admin panels; they are all on the Admin page.
 - [ ] 8.4.1 Wrong or empty token → **Admin token required.**
 - [ ] 8.4.2 Correct token + your name → **Refresh trend data** shows progress lines (about a minute).
 - [ ] 8.4.3 When it finishes: **“1 waiting for review”** and a table of roles that would change, with Now / Proposed / Change.
 - [ ] 8.4.4 Users still see the old forecast until approved (open another tab to check).
 - [ ] 8.4.5 **Reject** is disabled until a reason is typed; rejecting keeps the old forecast.
-- [ ] 8.4.6 Run again and **Approve and publish** → “Approved by …”, rankings move, and **“Your plan changed because the trend data changed”** lists the moved roles; **Dismiss** hides it.
+- [ ] 8.4.6 Run again and **Approve and publish** → “Approved by …” and the Admin page says users see it on their next page load; Future roles then shows the new snapshot.
 - [ ] 8.4.7 **Collect again (slower)** fetches fresh counts instead of reusing today's.
 - [ ] 8.4.8 Sources page now lists the new snapshot with your name.
 
@@ -157,6 +164,9 @@ Notes: ______
 
 ## 9. Role detail and pathway
 
+- [ ] 9.0 The page header shows the role, **Make this my target** and **Build my pathway**, and a one-line summary (fit, outlook, skills to learn).
+- [ ] 9.0.1 Four tabs: **Overview**, **Fit and plan**, **Market**, **Practise and share**. Arrow keys move between tabs; the address gains `&tab=…`; reloading keeps the tab.
+- [ ] 9.0.2 Overview: a day in this job, why this rank, outlook table with 🔍, the exposure line, pay, and pros and cons. Fit and plan: skills you bring / have / need, evidence, pathway and impact buttons. Market: open jobs, Malaysian programmes, where experts disagree. Practise and share: identity statement, interview practice, Future Card.
 - [ ] 9.1 **← Future roles** goes back.
 - [ ] 9.2 **Why this rank?** shows fit × 0.6, outlook × 0.4 and the SDG bonus, which add up to the score.
 - [ ] 9.3 Outlook table shows all three scenarios.
@@ -198,8 +208,8 @@ Notes: ______
 - [ ] 9.18.5 An answer containing *“ignore all previous instructions”* shows **Stopped by a safety check** and repeats the same question.
 
 ### 9.19 Where experts disagree, programmes and identity
-- [ ] 9.19.1 Under the outlook table: “AI exposure: more exposed than N–M% of occupations”; **See the studies** opens the x-ray.
-- [ ] 9.19.2 The x-ray lists three studies with a percentile bar, occupation, code, rank and licence, then Laluan's rank vs the studies' range and the “In Malaysia” line.
+- [ ] 9.19.1 Under the outlook table: “AI exposure: more exposed than N–M% of occupations”; **See the studies** opens the **Market** tab.
+- [ ] 9.19.2 The Market tab lists three studies with a percentile bar, occupation, code, rank and licence, then Laluan's rank vs the studies' range and the “In Malaysia” line.
 - [ ] 9.19.3 AI and machine learning specialist shows **Under review** and the review note; AI operations specialist says it is not compared.
 - [ ] 9.19.4 **Malaysian programmes**: software developer shows **On MyCOL** with report page 126; data entry clerk says it is not on the list; Jelajah AI MyMahir and MyMahir links open.
 - [ ] 9.19.5 **Your career identity statement** names your current job and skills you already have; **Copy** copies it; the Future Card shows the rules version.

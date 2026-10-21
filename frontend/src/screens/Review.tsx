@@ -2,74 +2,112 @@ import { useEffect, useState } from "react";
 import { api, Audience, Profile, RoleOption, Skill } from "../lib/api";
 import { t } from "../lib/i18n";
 
-export function Review({ initial, audience, onSaved, onBack }: {
-  initial: string[]; audience: Audience | null; onSaved: (p: Profile) => void; onBack: () => void;
+const AUDIENCES: { id: Audience; label: "aud.worker" | "aud.graduate" | "aud.switcher" }[] = [
+  { id: "worker", label: "aud.worker" }, { id: "graduate", label: "aud.graduate" }, { id: "switcher", label: "aud.switcher" },
+];
+
+// Two uses: checking the skills read from a new CV (creates the profile), and "My profile" for an
+// existing one (edits it in place, keeping its target role, progress and account).
+export function Review({ initial, audience: startAudience, existing, onSaved, onBack, onAddMore, onStartOver }: {
+  initial: string[]; audience: Audience | null; existing: Profile | null;
+  onSaved: (p: Profile) => void; onBack: () => void; onAddMore?: () => void; onStartOver?: () => void;
 }) {
   const [skills, setSkills] = useState(initial);
+  const [audience, setAudience] = useState<Audience | null>(existing?.audience ?? startAudience);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [roles, setRoles] = useState<RoleOption[]>([]);
-  const [currentRole, setCurrentRole] = useState("");
-  const [years, setYears] = useState("");
+  const [listsFailed, setListsFailed] = useState(false);
+  const [currentRole, setCurrentRole] = useState(existing?.current_role_id ?? "");
+  const [years, setYears] = useState(existing?.experience_years != null ? String(existing.experience_years) : "");
   const [adding, setAdding] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    api.skills().then(setAllSkills).catch(() => undefined);
-    api.roles().then(setRoles).catch(() => undefined);
-  }, []);
+    setListsFailed(false);
+    Promise.all([api.skills(), api.roles()])
+      .then(([s, r]) => { setAllSkills(s); setRoles(r); })
+      .catch(() => setListsFailed(true));
+  }, [attempt]);
 
+  const editing = existing !== null;
   const needsRole = audience === "worker" || audience === "switcher";
   const name = (id: string) => allSkills.find((s) => s.id === id)?.name ?? id;
   const notYet = allSkills.filter((s) => !skills.includes(s.id));
 
   async function save() {
     setBusy(true); setError(null);
+    const fields = { current_role_id: currentRole || null, skills, audience, experience_years: years === "" ? null : Number(years) };
     try {
-      onSaved(await api.createProfile({
-        display_name: null, current_role_id: currentRole || null, skills, audience,
-        experience_years: years === "" ? null : Number(years),
-      }));
-    } catch { setError("Couldn't save your profile. Try again."); }
+      onSaved(editing
+        ? await api.updateProfile({ ...existing, ...fields })
+        : await api.createProfile({ display_name: null, ...fields }));
+    } catch { setError(t("review.saveFailed")); }
     finally { setBusy(false); }
   }
 
   return (
     <section>
-      <div className="page-head"><h1>{t("h.check")}</h1>
-        <p className="muted">Remove anything that isn't right and add what we missed. Only these skills are saved, never your CV.</p></div>
+      <div className="page-head"><h1>{editing ? t("nav.profile") : t("h.check")}</h1>
+        <p className="muted">{editing ? t("review.editSub") : t("review.sub")}</p></div>
+      {listsFailed && (
+        <p className="error" role="alert">{t("review.listsFailed")} <button className="link" onClick={() => setAttempt((n) => n + 1)}>{t("shell.retry")}</button></p>
+      )}
+      {editing && (
+        <fieldset className="audience-pick">
+          <legend>{t("aud.title")}</legend>
+          <div className="segmented" role="radiogroup" aria-label={t("aud.title")}>
+            {AUDIENCES.map((a) => (
+              <button key={a.id} type="button" role="radio" aria-checked={audience === a.id} onClick={() => setAudience(a.id)}>{t(a.label)}</button>
+            ))}
+          </div>
+        </fieldset>
+      )}
       {skills.length === 0 && (
         <div className="empty-state">
-          <p>We didn't find any skills. Add them below or go back and pick from the list.</p>
-          <button onClick={onBack}>Back to my skills</button>
+          <p>{t("review.none")}</p>
+          <button onClick={onBack}>{t("review.back")}</button>
         </div>
       )}
+      <h2 className="sr-only">{t("review.skills")}</h2>
       <div className="chips">
         {skills.map((id) => (
           <span key={id} className="chip covered">{name(id)}
-            <button aria-label={`Remove ${name(id)}`} onClick={() => setSkills(skills.filter((s) => s !== id))}>×</button>
+            <button aria-label={`${t("review.remove")} ${name(id)}`} onClick={() => setSkills(skills.filter((s) => s !== id))}>×</button>
           </span>
         ))}
       </div>
-      <label className="narrow">Add a skill we missed
-        <select value={adding} onChange={(e) => { if (e.target.value) setSkills([...skills, e.target.value]); setAdding(""); }}>
-          <option value="">Choose a skill</option>
-          {notYet.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
-      </label>
       <div className="two-col">
-        <label>Current or most recent job
+        <label>{t("review.add")}
+          <select value={adding} onChange={(e) => { if (e.target.value) setSkills([...skills, e.target.value]); setAdding(""); }}>
+            <option value="">{t("review.choose")}</option>
+            {notYet.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </label>
+        {editing && onAddMore && (
+          <div className="review-more"><span className="muted">{t("review.fromCv")}</span>
+            <button className="btn quiet sm" onClick={onAddMore}>{t("review.addMore")}</button></div>
+        )}
+      </div>
+      <div className="two-col">
+        <label>{t("review.job")}
           <select value={currentRole} onChange={(e) => setCurrentRole(e.target.value)}>
-            <option value="">Not working yet / not listed</option>
+            <option value="">{t("review.noJob")}</option>
             {roles.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
           </select>
         </label>
-        <label>Years of work experience
+        <label>{t("review.years")}
           <input type="number" min={0} max={60} value={years} onChange={(e) => setYears(e.target.value)} />
         </label>
       </div>
       {needsRole && !currentRole && <p className="muted" role="note">{t("aud.needRole")}</p>}
-      <button className="primary" disabled={busy || skills.length === 0 || (needsRole && !currentRole)} onClick={save}>{busy ? "Saving…" : t("a.continue")}</button>
+      <div className="actions">
+        <button className="primary" disabled={busy || skills.length === 0 || (needsRole && !currentRole)} onClick={save}>
+          {busy ? t("review.saving") : editing ? t("review.save") : t("a.continue")}
+        </button>
+        {editing && onStartOver && <button className="btn quiet" onClick={onStartOver}>{t("review.startOver")}</button>}
+      </div>
       {error && <p className="error" role="alert">{error} <button className="link" onClick={save}>{t("shell.retry")}</button></p>}
     </section>
   );

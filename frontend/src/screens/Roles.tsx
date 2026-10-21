@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { AdoptionSlider, TippingPoints } from "../components/AdoptionSlider";
 import { DataBanner } from "../components/DataBanner";
 import { Kpis } from "../components/Kpis";
-import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components/RefreshPanel";
-import { EvidencePanel } from "../components/EvidencePanel";
 import { EmergingRoles } from "../components/EmergingRoles";
 import { ExposureMap } from "../components/ExposureMap";
 import { RoleCard } from "../components/RoleCard";
@@ -22,10 +20,8 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [extra, setExtra] = useState<string[]>([]);
-  const [emergingKey, setEmergingKey] = useState(0);  // reload emerging cards after an admin approves one
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [changes, setChanges] = useState<Change[] | null>(null);
   const [tipSeen, setTipSeen] = useState(() => load(KEYS.sliderTip) === "1");
   const [view, setView] = useState<"list" | "map">("list");
 
@@ -40,12 +36,6 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
     return () => { live = false; };
   }, [profile.id, profile.completed_courses.length, scenario, year, adoption, extra.join(",")]);
 
-  async function afterRefresh() {
-    const before = data;
-    const after = await api.matches(profile.id, scenario, year, adoption, extra);
-    setData(after);
-    if (before) setChanges(compareMatches(before, after, scenario));
-  }
   function dismissTip() { setTipSeen(true); save(KEYS.sliderTip, "1"); }
 
   const noCloseRole = data && data.roles.length > 0 && data.roles.every((r) => r.fit < CLOSE_FIT);
@@ -84,9 +74,6 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
       {data && <p className="muted scenario-note">{data.scenario.description}</p>}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
-      <RefreshPanel onDone={afterRefresh} />
-      <EvidencePanel onDone={async () => { await afterRefresh(); setEmergingKey((k) => k + 1); }} />
-      {changes && <WhatChanged changes={changes} snapshot={data?.signal_source.snapshot_id ?? ""} onClose={() => setChanges(null)} />}
       {noCloseRole && (
         <div className="banner">{t("roles.noClose")}</div>
       )}
@@ -125,7 +112,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         </div>
       )}
       {data && (
-        <EmergingRoles profile={profile} refreshKey={emergingKey} onStart={(roleId) => {
+        <EmergingRoles profile={profile} refreshKey={0} onStart={(roleId) => {
           const match = data.roles.find((r) => r.role_id === roleId);
           if (match) onOpen(match);
         }} />

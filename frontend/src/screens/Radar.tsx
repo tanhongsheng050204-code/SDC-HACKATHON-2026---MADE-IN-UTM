@@ -26,7 +26,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         <p className="muted">{t("note.estimate")}</p></div>
       <DataBanner illustrative={data.illustrative} imported={data.imported} />
       {data.skills.length === 0 ? (
-        <div className="banner warning">This forecast has no skill trends yet. An admin can run <strong>Refresh trend data</strong> on the Roles screen to pull the latest research and job-posting data.</div>
+        <div className="banner warning">{t("radar.noTrends")}</div>
       ) : (
         <>
           <label className="check"><input type="checkbox" checked={onlyMine} onChange={(e) => setOnlyMine(e.target.checked)} /> {t("radar.onlyMine")}</label>

@@ -666,3 +666,11 @@ main:focus { outline: none; }
 .target-button { display: inline-flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
 .target-button .badge svg, .target-button .btn svg, .home-role-title .badge svg { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; }
 .side-done { color: var(--good); }
+.role-actions { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.role-summary { margin: -6px 0 4px; color: var(--ink-soft); }
+.role-summary .outlook { font-weight: 600; }
+.tab-panel { display: grid; gap: 16px; margin-top: 4px; }
+.audience-pick { border: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.audience-pick legend { font-weight: 600; padding: 0; margin-bottom: 6px; }
+.review-more { display: grid; gap: 6px; align-content: end; }
+.review-more .btn { justify-self: start; }

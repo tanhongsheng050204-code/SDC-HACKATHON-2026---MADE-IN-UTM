@@ -11,11 +11,12 @@ import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
 import { t } from "./lib/i18n";
-import { readRoute, Route, Screen, writeRoute } from "./lib/route";
+import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
 import { CardPage } from "./screens/CardPage";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
+import { Admin } from "./screens/Admin";
 import { Home, TargetScreen } from "./screens/Home";
 import { Landing } from "./screens/landing/Landing";
 import { Radar } from "./screens/Radar";
@@ -29,7 +30,7 @@ import { Sources } from "./screens/Sources";
 import { Tasks } from "./screens/Tasks";
 import { Workforce } from "./screens/Workforce";
 
-const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree", "survey"];
+const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "impact", "tree", "survey", "profile"];
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -97,17 +98,24 @@ function MainApp({ demo }: { demo: string | null }) {
   }
   function openRole(r: RoleMatch) {
     setRole(r);
-    go("role", { role: r.role_id });
+    go("role", { role: r.role_id, tab: undefined });
   }
+  function setTab(tab: RoleTab) {
+    const r = { ...route, tab };
+    setRoute(r); writeRoute(r, "replace");
+  }
+  // "My profile" edits the profile once there is one; before that it starts the intake.
+  function goProfile() { go(profile ? "profile" : "intake"); }
   // Steps 3 and 4 of the journey follow the target role: open it, fetching its match if needed.
   async function openTarget(next: TargetScreen | "impact") {
     const target = profile?.target_role_id;
     if (!profile || !target) { go("roles"); return; }
-    if (role?.role_id === target) { go(next, { role: target }); return; }
+    const extra = { role: target, tab: next === "role" ? "practise" as RoleTab : undefined };  // step 4 opens practise and share
+    if (role?.role_id === target) { go(next, extra); return; }
     try {
       const m = await api.matches(profile.id, scenario, route.year, route.adoption);
       const found = m.roles.find((r) => r.role_id === target);
-      if (found) { setRole(found); go(next, { role: target }); } else go("roles");
+      if (found) { setRole(found); go(next, extra); } else go("roles");
     } catch { setError(t("home.loadFailed")); }
   }
   function flash(message: string) {
@@ -201,6 +209,10 @@ function MainApp({ demo }: { demo: string | null }) {
       if (claimed.conflict) setConflict({ local: p.id, saved: claimed.conflict });
       else setProfile(await api.getProfile(p.id));
     } catch { setError(t("auth.expired")); }
+  }
+
+  function profileEdited(p: Profile) {
+    setProfile(p); flash(t("review.saved")); go("home");
   }
 
   async function resolveConflict(replace: boolean) {
@@ -305,13 +317,14 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": "Review kit",
+    roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": t("nav.reviewKit"),
+    profile: t("nav.profile"), admin: "Admin",
   };
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} profile={profile} journey={journey} model={model} prefs={prefs} userId={userId}
-        onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : go(s))}
+      <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey} model={model} prefs={prefs} userId={userId}
+        onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : s === "intake" ? goProfile() : go(s))}
         onHome={() => go("landing")} onDelete={deleteProfile} />
       <div className="workspace">
         <header className="workbar">
@@ -326,14 +339,22 @@ function MainApp({ demo }: { demo: string | null }) {
         <main id="main" tabIndex={-1}>
           <ScreenBoundary key={screen}>
             {screen === "home" && profile && (
-              <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => go(s)}
+              <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => (s === "intake" ? goProfile() : go(s))}
                 onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
             )}
-            {screen === "intake" && <Intake audience={audience} onAudience={setAudience} onDone={(skills) => { setDraftSkills(skills); go("review"); }} />}
-            {screen === "review" && (
-              <Review initial={draftSkills} audience={audience} onBack={() => go("intake")}
-                onSaved={profileSaved} />
+            {screen === "intake" && (
+              <Intake audience={profile?.audience ?? audience} onAudience={setAudience}
+                onDone={(skills) => { setDraftSkills(profile ? [...new Set([...profile.skills, ...skills])] : skills); go("review"); }} />
             )}
+            {screen === "review" && (
+              <Review key="review" initial={draftSkills} audience={audience} existing={profile} onBack={() => go("intake")}
+                onSaved={(p) => (profile ? profileEdited(p) : profileSaved(p))} />
+            )}
+            {screen === "profile" && profile && (
+              <Review key="profile" initial={profile.skills} audience={profile.audience ?? null} existing={profile}
+                onBack={() => go("home")} onSaved={profileEdited} onAddMore={() => go("intake")} onStartOver={deleteProfile} />
+            )}
+            {screen === "admin" && <Admin />}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
             {screen === "roles" && profile && (
@@ -343,6 +364,7 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "role" && profile && role && (
               <RoleDetail profile={profile} role={role} scenario={scenario} adoption={route.adoption} onProfile={setProfile}
+                tab={route.tab ?? "overview"} onTab={setTab}
                 onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
@@ -353,7 +375,7 @@ function MainApp({ demo }: { demo: string | null }) {
               <SkillTree profile={profile} role={role} userId={userId} onProfile={setProfile}
                 onImpact={() => go("impact")} onBack={() => go("role")} />
             )}
-            {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} />}
+            {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
             {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce initialTab={workforceTab} />}
           </ScreenBoundary>

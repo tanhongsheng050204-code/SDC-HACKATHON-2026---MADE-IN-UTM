@@ -10,8 +10,8 @@ interface Item { id: Screen; label: string; icon: IconName; enabled: boolean; hi
 
 // The sidebar follows the four-step journey (lib/api Journey): where I stand, explore roles,
 // build my skills, apply and share. Steps 3 and 4 open the target role, so they wait for one.
-export function Sidebar({ current, profile, journey, model, prefs, userId, onGo, onHome, onDelete }: {
-  current: Screen; profile: Profile | null; journey: Journey | null; model: string | null; prefs: ReactNode;
+export function Sidebar({ current, roleId, profile, journey, model, prefs, userId, onGo, onHome, onDelete }: {
+  current: Screen; roleId: string | null; profile: Profile | null; journey: Journey | null; model: string | null; prefs: ReactNode;
   userId: string | null; onGo: (s: Screen) => void; onHome: () => void; onDelete: () => void;
 }) {
   const hasTarget = !!profile?.target_role_id;
@@ -40,7 +40,9 @@ export function Sidebar({ current, profile, journey, model, prefs, userId, onGo,
       { id: "workforce", label: t("nav.workforce"), icon: "users", enabled: true },
     ] },
   ];
-  const here = current === "review" ? "intake" : current;
+  // A role page counts as "My target role" only for the target; any other role sits under Future roles.
+  const here = current === "review" || current === "profile" ? "intake"
+    : current === "role" && roleId !== profile?.target_role_id ? "roles" : current;
 
   return (
     <aside className="sidebar">

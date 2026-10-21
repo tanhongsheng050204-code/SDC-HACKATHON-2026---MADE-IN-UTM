@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Scenario, Xray } from "../lib/api";
 import { t } from "../lib/i18n";
-import { ExposureBand } from "./Exposure";
 
 // How one forecast number is built: baseline, trend adjustments, scenario swing, year scaling.
 export function SignalXray({ roleId, scenario, year, adoption, onClose }: {
@@ -29,7 +28,6 @@ export function SignalXray({ roleId, scenario, year, adoption, onClose }: {
           </table>
         )}
         {xray && <p className="muted">{t("xray.foot")}</p>}
-        <ExposureBand roleId={roleId} />
         <div className="dialog-actions"><button className="btn ink" onClick={onClose}>{t("tree.close")}</button></div>
       </div>
     </div>

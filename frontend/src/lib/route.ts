@@ -4,12 +4,14 @@ import type { Scenario } from "./api";
 
 export type Screen =
   | "landing" | "home" | "intake" | "review" | "radar" | "tasks"
-  | "roles" | "role" | "impact" | "tree" | "survey" | "sources" | "workforce" | "review-kit";
+  | "roles" | "role" | "impact" | "tree" | "survey" | "sources" | "workforce" | "review-kit" | "profile" | "admin";
+export type RoleTab = "overview" | "fit" | "market" | "practise";
 
-const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "tree", "survey", "sources", "workforce", "review-kit"];
+const SCREENS: Screen[] = ["landing", "home", "intake", "review", "radar", "tasks", "roles", "role", "impact", "tree", "survey", "sources", "workforce", "review-kit", "profile", "admin"];
+const ROLE_TABS: RoleTab[] = ["overview", "fit", "market", "practise"];
 const SCENARIO_IDS: Scenario[] = ["slow", "baseline", "accelerated"];
 
-export interface Route { screen: Screen; scenario: Scenario; year?: number; role?: string; adoption?: number }
+export interface Route { screen: Screen; scenario: Scenario; year?: number; role?: string; adoption?: number; tab?: RoleTab }
 
 export function readRoute(search = window.location.search): Route {
   const p = new URLSearchParams(search);
@@ -17,12 +19,14 @@ export function readRoute(search = window.location.search): Route {
   const scenario = p.get("scenario") as Scenario | null;
   const year = Number(p.get("year"));
   const adoption = Number(p.get("adoption"));
+  const tab = p.get("tab") as RoleTab | null;
   return {
     screen: view && SCREENS.includes(view) ? view : "landing",
     scenario: scenario && SCENARIO_IDS.includes(scenario) ? scenario : "baseline",
     year: Number.isInteger(year) && year > 2000 ? year : undefined,
     role: p.get("role") ?? undefined,
     adoption: adoption >= 0.5 && adoption <= 2 ? adoption : undefined,
+    tab: tab && ROLE_TABS.includes(tab) ? tab : undefined,
   };
 }
 
@@ -33,6 +37,7 @@ export function routeUrl(r: Route): string {
   if (r.year) p.set("year", String(r.year));
   if (r.adoption !== undefined && r.screen === "roles") p.set("adoption", String(r.adoption));
   if (r.role && (r.screen === "role" || r.screen === "impact" || r.screen === "tree")) p.set("role", r.role);
+  if (r.tab && r.tab !== "overview" && r.screen === "role") p.set("tab", r.tab);
   return `${window.location.pathname}?${p}`;
 }
 
