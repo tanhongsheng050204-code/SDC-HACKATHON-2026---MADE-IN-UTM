@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { LogoMark, Rosette } from "../../components/Brand";
-import { t, tf, type StringKey } from "../../lib/i18n";
+import { t, tf, tr, type StringKey } from "../../lib/i18n";
+import { OUTLOOK_TEXT } from "../../lib/labels";
 import { api } from "../../lib/api";
 import "../../styles/landing.css";
 import { HeroPreview } from "./HeroPreview";
@@ -8,91 +9,101 @@ import { Journey } from "./Journey";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
 
-// Decorative GPS route — "You are here" → two stops → destination.
-// The path length is set via pathLength="1" so stroke-dasharray/dashoffset can use 0–1.
-function HeroRoute() {
+// The headline with its second half in the accent colour (falls back to plain text).
+function TwoTone({ text, em }: { text: string; em: string }) {
+  const i = text.indexOf(em);
+  return i < 0 ? <>{text}</> : <>{text.slice(0, i)}<em>{em}</em>{text.slice(i + em.length)}</>;
+}
+
+// The hero route: a wide Stripe-style ribbon with the career route drawn on it. Figures are copied
+// from the three synthetic demo profiles (as HeroPreview does), so the picture matches each demo.
+type Persona = "clerk" | "student" | "switcher";
+const ROUTES: Record<Persona, { from: string | null; fromWord: string; fromTone: string; to: string; toWord: string; toIndex: string; hours: number;
+  stops: { course: string; hours: number; audit: boolean }[] }> = {
+  clerk: { from: "Data entry clerk", fromWord: "declining", fromTone: "risk", to: "AI operations specialist", toWord: "growing", toIndex: "+35.0", hours: 11,
+    stops: [{ course: "Critical Thinking Skills for the Professional", hours: 9, audit: true }, { course: "ChatGPT Prompt Engineering for Developers", hours: 2, audit: false }] },
+  student: { from: null, fromWord: "", fromTone: "", to: "Digital marketing specialist", toWord: "growing", toIndex: "+29.2", hours: 190,
+    stops: [{ course: "Google Digital Marketing & E-commerce Professional Certificate", hours: 190, audit: true }] },
+  switcher: { from: "Customer service representative", fromWord: "stable", fromTone: "gold", to: "UX / UI designer", toWord: "growing", toIndex: "+47.8", hours: 500,
+    stops: [{ course: "Google UX Design Professional Certificate", hours: 200, audit: true }, { course: "The Odin Project: Full Stack JavaScript", hours: 300, audit: false }] },
+};
+const RIBBON = "M-20,370 C 200,370 300,260 460,260 S 700,310 860,210 S 1120,90 1300,80";
+const STOP_AT: [number, number][][] = [[], [[660, 262]], [[460, 260], [860, 210]]];
+
+function RibbonRoute() {
+  const [who, setWho] = useState<Persona>("clerk");
+  const r = ROUTES[who];
+  const at = STOP_AT[r.stops.length];
+  const cost = (s: { audit: boolean }) => (s.audit ? t("v3.freeAudit") : t("v3.free"));
+  const toLine = tf("v3.byYear", { word: `▲ ${OUTLOOK_TEXT[r.toWord]}`, n: r.toIndex });
   return (
-    <svg
-      aria-hidden="true"
-      className="hero-route"
-      viewBox="0 0 480 100"
-      height={100}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Winding route line */}
-      <path
-        className="hero-route-line"
-        d="M 30 80 C 80 80 80 20 160 20 S 240 80 320 80 S 400 20 450 20"
-        pathLength="1"
-      />
-      {/* Start dot */}
-      <circle className="hero-route-stop" cx={30} cy={80} r={7} fill="var(--accent)" style={{ animationDelay: ".3s" }} />
-      {/* Stop 1 */}
-      <circle className="hero-route-stop" cx={160} cy={20} r={5} fill="var(--accent)" style={{ animationDelay: ".65s" }} />
-      {/* Stop 2 */}
-      <circle className="hero-route-stop" cx={320} cy={80} r={5} fill="var(--accent)" style={{ animationDelay: ".8s" }} />
-      {/* End pin */}
-      <circle className="hero-route-stop" cx={450} cy={20} r={8} fill="var(--accent)" style={{ animationDelay: "1s" }} />
-      <circle cx={450} cy={20} r={4} fill="var(--surface)" style={{ animationDelay: "1s" }} />
-      {/* Start label */}
-      <text x={30} y={98} textAnchor="middle" fontSize={10} fill="var(--ink-soft)" style={{ fontFamily: "inherit" }}>
-        {t("lp.heroYouAreHere").split(":")[0]}
-      </text>
-      {/* End label */}
-      <text x={450} y={12} textAnchor="middle" fontSize={10} fill="var(--ink)" style={{ fontFamily: "inherit" }}>
-        {t("lp.heroDestination")}
-      </text>
-    </svg>
+    <>
+      <div className="lp-ribbon" aria-hidden="true">
+        <svg viewBox="0 0 1280 400" preserveAspectRatio="none">
+          <path className="rb-wide" d={RIBBON} />
+          <path className="rb-mid" d="M-20,380 C 220,380 320,250 470,255 S 720,300 870,205 S 1130,95 1300,75" />
+          <path className="rb-sun" d="M-20,365 C 190,365 300,270 450,268 S 690,320 850,218 S 1110,100 1300,90" />
+          <path key={who} className="rb-line" d={RIBBON} pathLength={1} />
+        </svg>
+        <span className="rb-dot start" style={{ left: "7%", top: 358 }} />
+        <div className="rb-card here" style={{ left: "calc(7% - 10px)", top: 380 }}>
+          <small>{t("v3.youAreHere")}</small>
+          <b>{r.from ? tr(r.from) : t("v3.yourSkills")} {r.from && <span className={r.fromTone}>{OUTLOOK_TEXT[r.fromWord]}</span>}</b>
+        </div>
+        {r.stops.map((s, i) => (
+          <div key={`${who}-${i}`}>
+            <span className="rb-dot" style={{ left: `${(at[i][0] / 1280) * 100}%`, top: at[i][1] }} />
+            <div className="rb-card" style={{ left: `calc(${(at[i][0] / 1280) * 100}% - 30px)`, top: at[i][1] + 24, animationDelay: `${0.5 + i * 0.25}s` }}>
+              <small>{tf("v3.stop", { n: i + 1 })} · {s.hours} h · {cost(s)}</small>
+              <b>{tr(s.course)}</b>
+            </div>
+          </div>
+        ))}
+        <div className="rb-card dest" style={{ right: "calc(8% - 10px)", top: 8, animationDelay: ".9s" }}>
+          <small>{t("v3.destination")}</small><b>{tr(r.to)}</b><span>{toLine}</span>
+        </div>
+      </div>
+      <ol className="rb-list" aria-label={t("v3.tryRoute")}>
+        <li><i />{r.from ? tr(r.from) : t("v3.yourSkills")}</li>
+        {r.stops.map((s) => <li key={s.course}><i />{tr(s.course)} · {s.hours} h · {cost(s)}</li>)}
+        <li><i /><b>{tr(r.to)}</b>&nbsp;· {toLine}</li>
+      </ol>
+      <div className="lp-try">
+        <div className="segmented" role="radiogroup" aria-label={t("v3.tryRoute")}>
+          {(["clerk", "student", "switcher"] as Persona[]).map((k) => (
+            <button key={k} role="radio" aria-checked={who === k} onClick={() => setWho(k)}>{t(`v3.${k}` as StringKey)}</button>
+          ))}
+        </div>
+        <strong>{r.stops.length === 1 ? tf("v3.eta1", { h: r.hours }) : tf("v3.eta", { h: r.hours, n: r.stops.length })}</strong>
+        <small>{t("v3.demoNote")}</small>
+      </div>
+    </>
   );
 }
 
-// Stripe-style one-liner with live stats from the API, falls back to fixed text.
-function LiveFactLine() {
-  const [line, setLine] = useState<string | null>(null);
-
+// Live numbers from the API; if the server is asleep the tiles keep fixed text instead of waiting.
+function LiveStats() {
+  const [roles, setRoles] = useState<number | null>(null);
+  const [date, setDate] = useState<string | null>(null);
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      // Show fixed fallback after 3 s if fetch hasn't resolved
-      if (line === null) {
-        setLine(`${tf("lp.rolesTracked", { n: "—" })} · ${t("lp.forecastSource")}`);
-      }
-    }, 3000);
-
-    Promise.all([
-      api.roles().catch(() => null),
-      api.health().catch(() => null),
-    ]).then(([roles, health]) => {
-      clearTimeout(timeout);
-      const n = Array.isArray(roles) ? roles.length : "—";
-      const date = health?.snapshot_imported
-        ? health.snapshot_imported.slice(0, 10)
-        : null;
-      const parts = [
-        tf("lp.rolesTracked", { n }),
-        t("lp.forecastSource"),
-      ];
-      if (date) parts.push(tf("lp.updatedDate", { date }));
-      setLine(parts.join(" · "));
-    });
-
-    return () => clearTimeout(timeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    api.roles().then((r) => setRoles(Array.isArray(r) ? r.length : null)).catch(() => {});
+    api.health().then((h) => setDate(h.snapshot_imported?.slice(0, 10) ?? null)).catch(() => {});
   }, []);
-
-  if (!line) return null;
   return (
-    <p className="live-fact">
-      <strong>{line.split(" · ")[0]}</strong>
-      {" · "}{line.split(" · ").slice(1).join(" · ")}
-    </p>
+    <div className="lp-stats">
+      <div className="lp-stat"><b>{roles ?? "—"}</b><span>{t("v3.statRoles")}</span><small>{t("lp.forecastSource")}{date ? ` · ${tf("lp.updatedDate", { date })}` : ""}</small></div>
+      <div className="lp-stat"><b>RM 0</b><span>{t("v3.statCourses")}</span><small>{t("v3.freeAudit")}</small></div>
+      <div className="lp-stat"><b>3</b><span>{t("v3.statFutures")}</span><small>{t("v3.statFuturesSub")}</small></div>
+      <div className="lp-stat"><b>0</b><span>{t("v3.statCv")}</span><small>{t("v3.statCvSub")}</small></div>
+    </div>
   );
 }
 
 // Read through t() at render time, so the page follows the chosen language.
 const people = () => [
-  { key: "clerk", photo: "worker", alt: t("lp.clerkAlt"), who: t("lp.clerkWho"), text: t("lp.clerkText"), cta: t("lp.clerkCta"), chips: [t("lp.clerkChip1"), t("lp.clerkChip2"), t("lp.clerkChip3")] },
-  { key: "student", photo: "student", alt: t("lp.studentAlt"), who: t("lp.studentWho"), text: t("lp.studentText"), cta: t("lp.studentCta"), chips: [t("card.robust"), t("lead.openToGrads"), t("lp.studentChip3")] },
-  { key: "hr", photo: "hr-team", alt: t("lp.hrAlt"), who: t("lp.hrWho"), text: t("lp.hrText"), cta: t("lp.hrCta"), chips: [t("lp.hrChip1"), t("lp.hrChip2"), t("lp.hrChip3")] },
+  { key: "clerk", photo: "worker", alt: t("lp.clerkAlt"), who: t("lp.clerkWho"), text: t("lp.clerkText"), cta: t("lp.clerkCta"), big: "11 h", chips: [t("lp.clerkChip1"), t("lp.clerkChip2"), t("lp.clerkChip3")] },
+  { key: "student", photo: "student", alt: t("lp.studentAlt"), who: t("lp.studentWho"), text: t("lp.studentText"), cta: t("lp.studentCta"), big: "190 h", chips: [t("card.robust"), t("lead.openToGrads"), t("lp.studentChip3")] },
+  { key: "hr", photo: "hr-team", alt: t("lp.hrAlt"), who: t("lp.hrWho"), text: t("lp.hrText"), cta: t("lp.hrCta"), big: "73 / 160", chips: [t("lp.hrChip1"), t("lp.hrChip2"), t("lp.hrChip3")] },
 ];
 
 const principles = () => [1, 2, 3, 4].map((i) => ({ title: t(`lp.p${i}` as StringKey), text: t(`lp.p${i}Text` as StringKey) }));
@@ -115,14 +126,14 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
         <header className="lp-hero">
           <Rosette className="hero-rosette" />
           <p className="pill-tag">{t("landing.tag")}</p>
-          <h1>{t("landing.title")}</h1>
+          <h1><TwoTone text={t("landing.title")} em={t("landing.titleEm")} /></h1>
           <p className="lp-lede">{t("landing.lede")}</p>
           <div className="ctas">
             <button className="btn ink lg" onClick={() => onDemo("clerk")}>{t("landing.demo")}</button>
             <button className="btn quiet lg" onClick={onStart}>{t("landing.mine")}</button>
           </div>
-          <LiveFactLine />
-          <HeroRoute />
+          <RibbonRoute />
+          <LiveStats />
           <HeroPreview />
         </header>
 
@@ -135,6 +146,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
                   <img src={`/images/people/${p.photo}.webp`} alt={p.alt} width={880} height={748} loading="lazy" decoding="async" />
                   <div className="lp-person-tags" aria-hidden="true">{p.chips.map((c) => <span key={c}>{c}</span>)}</div>
                 </div>
+                <b className="lp-person-big">{p.big}</b>
                 <h3>{p.who}</h3>
                 <p>{p.text}</p>
                 <button className="link" onClick={() => openPerson(p.key)}>{p.cta} →</button>
@@ -174,7 +186,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           <Rosette className="lp-band-rosette" />
           <div className="lp-band-inner">
             <div className="lp-band-head">
-              <h2>{t("landing.bandTitle")}</h2>
+              <h2>{t("landing.bandTitle")} <em>{t("v3.bandEm")}</em></h2>
               <p>{t("landing.bandText")}</p>
               <button className="btn outline-light" onClick={onSources}>{t("lp.seeSources")}</button>
             </div>
