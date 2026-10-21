@@ -116,7 +116,7 @@ class ReviewDecision(BaseModel):
 
 class EvidenceDecision(ReviewDecision):
     """An admin's decision on one role's skill evidence, with the citations and added skills unticked."""
-    drop_sources: list[str] = Field(default_factory=list, max_length=50)
+    drop_sources: list[str] = Field(default_factory=list, max_length=200)  # page URLs, or "URL#skill_id"
     drop_added: list[str] = Field(default_factory=list, max_length=50)
 
 

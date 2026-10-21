@@ -504,4 +504,11 @@ main:focus { outline: none; }
 .send-check .chips { align-items: center; margin: 0; }
 .send-check textarea { font: .86rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
 
+/* Cited skill evidence */
+.evidence-row { border-top: 1px solid var(--line); padding: 8px 0; }
+.evidence-row summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.citations { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 8px; }
+.citations q { color: var(--ink-2); }
+.evidence-page { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; overflow-wrap: anywhere; }
+.evidence-page.dropped { opacity: .5; }
 .grid .badge { white-space: normal; }  /* long "fits your preference" badges must not widen the card */

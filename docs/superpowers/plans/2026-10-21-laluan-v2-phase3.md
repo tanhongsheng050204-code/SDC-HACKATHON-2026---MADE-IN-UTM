@@ -31,15 +31,15 @@
 
 ## A. Cited skill evidence
 
-- [ ] **A1 Storage.** `store.py`: migration 10 creates `evidence (id, role_id, state, created, body, decided_by, decided_at, reason)`; add to `APP_TABLES` (RLS on Postgres). Functions `save_evidence`, `get_evidence`, `list_evidence(state)`, `decide_evidence`. Test in `test_store.py`.
-- [ ] **A2 Collector** `app/evidence/search.py`: `search_role(role, catalogue, grounded=...)` runs the job-ad prompt (catalogue ids listed in the prompt, Gemini tags each quote with an id or `other`), widens to "any page" when fewer than 2 job ads come back, classifies each URL (job board list → `job_ad`), marks `grounded` from the grounding metadata, and returns sources. `aggregate(role, sources, catalogue)` → `{skills: {id: status + citations}, added: [...], not_in_catalogue: [...]}`.
-- [ ] **A3 Refresh** `app/evidence/refresh.py`: background run over all catalogue roles (3 in parallel), progress steps like the trend refresh, one pending record per role; a failed role is reported and skipped.
-- [ ] **A4 Review** `app/evidence/review.py`: list pending, detail, approve with `drop_sources` and `drop_added`, reject with reason; approval recomputes the aggregate, stamps reviewer and date, reloads reference data.
-- [ ] **A5 Apply** `reference.py`: latest approved evidence per role adds `{"skill_id", "weight": 1, "source": "evidence"}` entries and an `evidence` summary to each role.
-- [ ] **A6 API**: `POST/GET /api/evidence/refresh`, `GET /api/evidence/pending`, `GET /api/evidence/pending/{id}`, `POST .../approve`, `POST .../reject` (admin), and the public role detail already returns `evidence`.
-- [ ] **A7 Admin UI**: an "Evidence" panel beside "Refresh trend data": run, progress, per-role review with checkboxes for citations and added skills, approve / reject.
-- [ ] **A8 User UI**: role page skill list shows confirmed / single source / no evidence with an expandable list of quotes and links; skill tree node panel shows "Seen in N Malaysian job ads" with links; added skills are marked "added from job ads".
-- [ ] **A9 Docs**: README (how evidence works), DECISIONS (#35), Sources page line, REVIEW_LOG note that approvals are the review record.
+- [x] **A1 Storage.** `store.py`: migration 10 creates `evidence (id, role_id, state, created, body, decided_by, decided_at, reason)`; add to `APP_TABLES` (RLS on Postgres). Functions `save_evidence`, `get_evidence`, `list_evidence(state)`, `decide_evidence`. Test in `test_store.py`.
+- [x] **A2 Collector** `app/evidence/search.py`: `search_role(role, catalogue, grounded=...)` runs the job-ad prompt (catalogue ids listed in the prompt, Gemini tags each quote with an id or `other`), widens to "any page" when fewer than 2 job ads come back, classifies each URL (job board list → `job_ad`), marks `grounded` from the grounding metadata, and returns sources. `aggregate(role, sources, catalogue)` → `{skills: {id: status + citations}, added: [...], not_in_catalogue: [...]}`.
+- [x] **A3 Refresh** `app/evidence/refresh.py`: background run over all catalogue roles (3 in parallel), progress steps like the trend refresh, one pending record per role; a failed role is reported and skipped.
+- [x] **A4 Review** `app/evidence/review.py`: list pending, detail, approve with `drop_sources` and `drop_added`, reject with reason; approval recomputes the aggregate, stamps reviewer and date, reloads reference data.
+- [x] **A5 Apply** `reference.py`: latest approved evidence per role adds `{"skill_id", "weight": 1, "source": "evidence"}` entries and an `evidence` summary to each role.
+- [x] **A6 API**: `POST/GET /api/evidence/refresh`, `GET /api/evidence/pending`, `GET /api/evidence/pending/{id}`, `POST .../approve`, `POST .../reject` (admin), and the public role detail already returns `evidence`.
+- [x] **A7 Admin UI**: an "Evidence" panel beside "Refresh trend data": run, progress, per-role review with checkboxes for citations and added skills, approve / reject.
+- [x] **A8 User UI**: role page skill list shows confirmed / single source / no evidence with an expandable list of quotes and links; skill tree node panel shows "Seen in N Malaysian job ads" with links; added skills are marked "added from job ads".
+- [x] **A9 Docs**: README (how evidence works), DECISIONS (#35), Sources page line, REVIEW_LOG note that approvals are the review record.
 
 ## B. Emerging roles
 

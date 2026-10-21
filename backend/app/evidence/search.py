@@ -4,7 +4,8 @@ One grounded call per role asks for current Malaysian job ads and the exact sent
 each skill, tagged with our catalogue ids. When fewer than MIN_JOB_ADS usable ads come back, a
 second call widens to any page (career guides, industry and government reports), labelled "web".
 
-`aggregate` turns the pages into what a reviewer and the app need:
+`aggregate` turns the pages into what a reviewer and the app need (`drop_sources` holds page URLs,
+or "URL#skill_id" for one quote, that the reviewer unticked):
   status per skill   confirmed (2+ distinct pages), single (1), none (0)
   added              catalogue skills not in the role that 2+ distinct *job ads* ask for (weight 1);
                      web pages never add skills
@@ -20,6 +21,8 @@ import re
 from collections.abc import Callable
 from urllib.parse import urlparse
 
+import httpx
+
 from app.llm import generate_grounded_json
 from app.services.skills import _alias_index, normalize
 
@@ -28,9 +31,16 @@ MAX_PAGES = 8
 MAX_QUOTES = 12       # per page
 MAX_CITATIONS = 5     # per skill, as shown
 
-# Job boards used in Malaysia. LinkedIn counts only for its job pages, not articles.
+# Job boards used in Malaysia, and the hiring systems employers post ads on. LinkedIn counts only
+# for its job pages, not articles. Employer career sites (careers.x, jobs.x) count as job ads too.
 JOB_BOARDS = ("jobstreet.com", "jobstreet.com.my", "hiredly.com", "myfuturejobs.gov.my", "indeed.com",
-              "maukerja.my", "ricebowl.my", "glints.com", "jora.com", "jobsdb.com", "wobb.co", "kalibrr.com")
+              "maukerja.my", "ricebowl.my", "glints.com", "jora.com", "jobsdb.com", "wobb.co", "kalibrr.com",
+              "prosple.com", "jobleads.com", "workable.com", "greenhouse.io", "lever.co", "myworkdayjobs.com",
+              "smartrecruiters.com", "successfactors.com", "recruitee.com")
+CAREER_SUBDOMAINS = ("careers", "career", "jobs", "job", "apply", "recruit", "recruitment", "talent")
+# Gemini sometimes copies Google's grounding redirect instead of the page address. Those links
+# expire, so they are resolved to the real address (only the redirect header is read).
+REDIRECT_HOSTS = ("vertexaisearch.cloud.google.com",)
 
 ADS_PROMPT = """Search the web for current job ads in Malaysia (posted in the last 12 months) for the
 role "{title}": {summary}
@@ -72,7 +82,19 @@ def page_kind(url: str) -> str:
     host = _host(url)
     if _on(host, "linkedin.com"):
         return "job_ad" if urlparse(url).path.startswith("/jobs") else "web"
-    return "job_ad" if any(_on(host, board) for board in JOB_BOARDS) else "web"
+    if any(_on(host, board) for board in JOB_BOARDS) or host.split(".")[0] in CAREER_SUBDOMAINS:
+        return "job_ad"
+    return "web"
+
+
+def resolve_redirect(url: str) -> str | None:
+    """The address a Google grounding redirect points to, or None if it has expired."""
+    try:
+        response = httpx.get(url, follow_redirects=False, timeout=10)
+    except httpx.HTTPError:
+        return None
+    location = response.headers.get("location", "")
+    return location if response.is_redirect and location.startswith(("http://", "https://")) else None
 
 
 def _grounded(url: str, sources: list[dict]) -> bool:
@@ -81,7 +103,10 @@ def _grounded(url: str, sources: list[dict]) -> bool:
     return any(d and _on(host, d) for d in domains)
 
 
-def _clean_pages(raw: dict, sources: list[dict], skills: dict) -> list[dict]:
+Resolve = Callable[[str], str | None]
+
+
+def _clean_pages(raw: dict, sources: list[dict], skills: dict, resolve: Resolve) -> list[dict]:
     """Keep well-formed pages with an http(s) URL; tag ids are validated against the catalogue."""
     aliases = _alias_index()
     pages = []
@@ -89,6 +114,9 @@ def _clean_pages(raw: dict, sources: list[dict], skills: dict) -> list[dict]:
         if not isinstance(page, dict):
             continue
         url = str(page.get("url") or "").strip()
+        via_google = any(_on(_host(url), h) for h in REDIRECT_HOSTS)
+        if via_google:
+            url = resolve(url) or ""
         if not url.startswith(("http://", "https://")):
             continue
         quotes = []
@@ -103,8 +131,19 @@ def _clean_pages(raw: dict, sources: list[dict], skills: dict) -> list[dict]:
         if quotes:
             pages.append({"url": url[:500], "title": str(page.get("title") or "")[:200],
                           "employer": str(page.get("employer") or "")[:120], "kind": page_kind(url),
-                          "grounded": _grounded(url, sources), "quotes": quotes})
+                          "grounded": via_google or _grounded(url, sources), "quotes": quotes})
     return pages
+
+
+def _dedupe(pages: list[dict]) -> list[dict]:
+    """One entry per address: two redirects can lead to the same ad."""
+    out: dict[str, dict] = {}
+    for page in pages:
+        if page["url"] in out:
+            out[page["url"]]["quotes"] += page["quotes"]
+        else:
+            out[page["url"]] = page
+    return list(out.values())
 
 
 def aggregate(role: dict, pages: list[dict], skills: dict, drop_sources: set[str] = frozenset(),
@@ -115,6 +154,8 @@ def aggregate(role: dict, pages: list[dict], skills: dict, drop_sources: set[str
         if page["url"] in drop_sources:
             continue
         for q in page["quotes"]:
+            if f"{page['url']}#{q['skill_id']}" in drop_sources:  # one quote unticked by the reviewer
+                continue
             if q["skill_id"] is None:
                 if q["skill_name"]:
                     other.setdefault(q["skill_name"], set()).add(page["url"])
@@ -137,17 +178,17 @@ def aggregate(role: dict, pages: list[dict], skills: dict, drop_sources: set[str
 
 
 def search_role(role: dict, skills: dict, *, grounded: Grounded = generate_grounded_json,
-                today: dt.date | None = None) -> dict:
+                resolve: Resolve = resolve_redirect, today: dt.date | None = None) -> dict:
     """Search, widen if needed, aggregate. Raises if the search itself fails."""
     catalogue = "\n".join(f"- {sid}: {s['name']}" for sid, s in skills.items())
     fill = {"title": role["title"], "summary": role.get("summary", ""), "catalogue": catalogue, "max_pages": MAX_PAGES}
     raw, sources = grounded(ADS_PROMPT.format(**fill))
-    pages = _clean_pages(raw, sources, skills)
+    pages = _dedupe(_clean_pages(raw, sources, skills, resolve))
     widened = sum(p["kind"] == "job_ad" for p in pages) < MIN_JOB_ADS
     if widened:
         raw, more = grounded(WEB_PROMPT.format(**fill))
         sources = sources + more
         seen = {p["url"] for p in pages}
-        pages += [p for p in _clean_pages(raw, sources, skills) if p["url"] not in seen]
+        pages += [p for p in _dedupe(_clean_pages(raw, sources, skills, resolve)) if p["url"] not in seen]
     return {"role_id": role["id"], "title": role["title"], "searched": str(today or dt.date.today()),
             "widened": widened, "sources": pages, "summary": aggregate(role, pages, skills)}

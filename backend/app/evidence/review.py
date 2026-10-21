@@ -29,13 +29,15 @@ def _pending(evidence_id: str) -> dict:
 
 
 def list_pending() -> list[dict]:
+    skills = get_reference().skills
     out = []
     for item in store.list_evidence("pending", "role"):
         body = item["body"]
         out.append({"id": item["id"], "role_id": item["subject"], "title": body["title"],
                     "searched": body["searched"], "widened": body["widened"],
                     "job_ads": sum(p["kind"] == "job_ad" for p in body["sources"]),
-                    "pages": len(body["sources"]), "added": [a["skill_id"] for a in body["summary"]["added"]]})
+                    "pages": len(body["sources"]), "added": [a["skill_id"] for a in body["summary"]["added"]],
+                    "added_names": [skills[a["skill_id"]]["name"] for a in body["summary"]["added"]]})
     return out
 
 
@@ -63,7 +65,9 @@ def approve(evidence_id: str, reviewer: str, drop_sources: list[str], drop_added
     ref = get_reference()
     body["summary"] = aggregate(_base_role(ref.roles[item["subject"]]), body["sources"], ref.skills,
                                 set(drop_sources), set(drop_added))
-    body["sources"] = [p for p in body["sources"] if p["url"] not in set(drop_sources)]
+    dropped = set(drop_sources)
+    body["sources"] = [{**p, "quotes": [q for q in p["quotes"] if f"{p['url']}#{q['skill_id']}" not in dropped]}
+                       for p in body["sources"] if p["url"] not in dropped]
     body.update(reviewed_by=reviewer, reviewed_at=_stamp(), dropped_sources=drop_sources, dropped_added=drop_added)
     store.decide_evidence(evidence_id, "approved", reviewer, body)
     reload_reference()

@@ -157,7 +157,10 @@ def test_approved_evidence_adds_skill_to_matching(client, searched):
     assert role["evidence"]["reviewed_by"] == "Team Reviewer"
     assert fit() > before
     tree = client.get(f"/api/profiles/{pid}/tree", params={"role": "data_analyst"}).json()
-    assert any(n["skill_id"] == "cloud_computing" for n in tree["nodes"])
+    cloud = next(n for n in tree["nodes"] if n["skill_id"] == "cloud_computing")
+    assert cloud["added_from_ads"] is True and cloud["evidence"]["job_ads"] == 2
+    analyst = next(r for r in client.get(f"/api/profiles/{pid}/matches").json()["roles"] if r["role_id"] == "data_analyst")
+    assert analyst["evidence"]["skills"]["sql"]["status"] == "confirmed"
     assert client.post(f"/api/evidence/pending/{evidence_id}/approve", json=decision, headers=ADMIN).status_code == 404
 
 
@@ -192,3 +195,32 @@ def test_rejected_evidence_changes_nothing(client, searched):
 def test_odd_evidence_ids_are_not_found(client):
     for bad in ["..%2Fx", "a/b", "%2E%2E"]:
         assert client.get(f"/api/evidence/pending/{bad}", headers=ADMIN).status_code == 404
+
+
+def test_google_redirect_links_are_resolved_to_the_real_page():
+    redirect = "https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc"
+    ads = [_page(redirect, ("sql", "SQL")), _page("https://vertexaisearch.cloud.google.com/grounding-api-redirect/dead", ("sql", "SQL")),
+           ADS[1]]
+    real = {redirect: "https://my.hiredly.com/jobs/acme-data-analyst"}
+    ref = get_reference()
+    result = search.search_role(ref.roles["data_analyst"], ref.skills, grounded=FakeSearch(ads, grounded=()),
+                                resolve=real.get)
+    urls = [p["url"] for p in result["sources"]]
+    assert urls == ["https://my.hiredly.com/jobs/acme-data-analyst", "https://www.jobstreet.com.my/job/111"]
+    assert result["sources"][0]["kind"] == "job_ad" and result["sources"][0]["grounded"] is True  # it came from Google
+    assert result["widened"] is False
+
+
+@pytest.mark.parametrize("url", ["https://careers.shopee.com.my/job-detail/1", "https://jobs.bytedance.com/en/position/2",
+                                 "https://apply.workable.com/acme/j/3", "https://boards.greenhouse.io/acme/jobs/4"])
+def test_employer_career_sites_are_job_ads(url):
+    assert search.page_kind(url) == "job_ad"
+
+
+def test_one_wrongly_tagged_quote_can_be_unticked_without_dropping_its_page():
+    result = _run(FakeSearch(ADS))
+    role, skills = get_reference().roles["data_analyst"], get_reference().skills
+    drop = {"https://www.jobstreet.com.my/job/111#cloud_computing"}
+    summary = search.aggregate(role, result["sources"], skills, drop_sources=drop)
+    assert summary["skills"]["cloud_computing"]["status"] == "single" and summary["added"] == []
+    assert summary["skills"]["sql"]["status"] == "confirmed"  # the page's other quote still counts

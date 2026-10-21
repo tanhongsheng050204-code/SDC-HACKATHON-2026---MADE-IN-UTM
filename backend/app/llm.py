@@ -52,7 +52,10 @@ def generate_grounded_json(prompt: str) -> tuple[dict, list[dict]]:
     settings = get_settings()
     if not settings.gemini_api_key:
         raise RuntimeError("GEMINI_API_KEY is not configured")
-    response = _client(settings.gemini_api_key, GROUNDED_TIMEOUT_SECONDS * 1_000).models.generate_content(
+    # Keep the client in a variable for the whole call: a client that is only a temporary closes its
+    # connection when garbage-collected, mid-request, which broke parallel searches.
+    client = _client(settings.gemini_api_key, GROUNDED_TIMEOUT_SECONDS * 1_000)
+    response = client.models.generate_content(
         model=settings.gemini_model,
         contents=prompt,
         config=types.GenerateContentConfig(tools=[types.Tool(google_search=types.GoogleSearch())],
