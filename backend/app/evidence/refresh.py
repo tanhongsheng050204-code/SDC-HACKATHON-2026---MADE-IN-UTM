@@ -1,4 +1,5 @@
-"""Run a skill-evidence search for every catalogue role, in the background, for review.
+"""Run a skill-evidence search for every catalogue role, or an emerging-roles search for the AI
+capabilities we track (app/evidence/emerging.py), in the background, for review.
 
 Like the trend refresh: the admin button starts it, the UI polls progress, and each role's result
 is saved as "pending". Nothing changes for users until a person approves a role. A role whose
@@ -10,7 +11,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from app import store
-from app.evidence import search
+from app.evidence import emerging, search
 from app.reference import get_reference
 from app.trends.refresh import _safe_error
 
@@ -58,7 +59,34 @@ def run(role_ids: list[str] | None = None, now: dt.datetime | None = None) -> di
     return status()
 
 
-def start() -> bool:
+def run_emerging(now: dt.datetime | None = None) -> dict:
+    now = now or dt.datetime.now().replace(microsecond=0)
+    ref = get_reference()
+    picked = emerging.candidates(ref)
+    measured = picked and picked[0][1] is not None
+    _log(f"Searching for emerging roles from {len(picked)} AI capabilities"
+         + ("" if measured else " (no approved trend refresh yet, so research momentum is not measured)"))
+    with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
+        jobs = {pool.submit(emerging.search_capability, cap, m, ref): cap for cap, m in picked}
+        for job in as_completed(jobs):
+            cap = jobs[job]
+            try:
+                body = job.result()
+            except Exception as error:  # one failed capability does not stop the run
+                with _lock:
+                    _status["failed"].append(cap["id"])
+                _log(f"{cap['name']}: nothing usable ({_safe_error(error)})")
+                continue
+            evidence_id = f"{now:%Y-%m-%d-%H%M%S}-emerging-{cap['id']}"
+            store.save_evidence(evidence_id, "emerging", cap["id"], body)
+            with _lock:
+                _status["saved"].append(evidence_id)
+            _log(f"{cap['name']}: {body['title']['en']} ({len(body['sources'])} sources)")
+    _log("Saved for review. Nothing is shown until an admin approves a card.")
+    return status()
+
+
+def start(mode: str = "roles") -> bool:
     with _lock:
         if _status["state"] == "running":
             return False
@@ -66,7 +94,7 @@ def start() -> bool:
 
     def work():
         try:
-            run()
+            run_emerging() if mode == "emerging" else run()
             with _lock:
                 _status["state"] = "done"
         except Exception as error:

@@ -177,3 +177,7 @@ class ProfileIn(BaseModel):
             raise ValueError(f"Unknown skills: {', '.join(unknown)}")
         return list(dict.fromkeys(value))
 
+
+
+class LiveSearchRequest(BaseModel):
+    profile_id: str = Field(min_length=1, max_length=64)

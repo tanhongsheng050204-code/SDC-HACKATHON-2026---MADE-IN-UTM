@@ -1,4 +1,4 @@
-"""A person approves or rejects each role's evidence before it changes anything.
+"""A person approves or rejects each role's evidence, and each emerging role, before anyone sees it.
 
 Before approving, the reviewer can untick citations (a quote that is not on the page, an ad that
 is not Malaysian) and proposed added skills; statuses are recomputed without them. The reviewer's
@@ -23,12 +23,17 @@ def _pending(evidence_id: str) -> dict:
     if not _ID.match(evidence_id):
         raise NotFound(evidence_id)
     item = store.get_evidence(evidence_id)
-    if item is None or item["state"] != "pending" or item["kind"] != "role":
+    if item is None or item["state"] != "pending":
         raise NotFound(evidence_id)
     return item
 
 
-def list_pending() -> list[dict]:
+def list_pending(kind: str = "role") -> list[dict]:
+    if kind == "emerging":
+        return [{"id": i["id"], "kind": "emerging", "subject": i["subject"], "title": i["body"]["title"]["en"],
+                 "capability_name": i["body"]["capability_name"], "momentum": i["body"]["momentum"],
+                 "searched": i["body"]["searched"], "sources": len(i["body"]["sources"])}
+                for i in store.list_evidence("pending", "emerging")]
     skills = get_reference().skills
     out = []
     for item in store.list_evidence("pending", "role"):
@@ -45,6 +50,9 @@ def detail(evidence_id: str) -> dict:
     item = _pending(evidence_id)
     ref = get_reference()
     names = {sid: s["name"] for sid, s in ref.skills.items()}
+    if item["kind"] == "emerging":
+        return {"id": item["id"], "kind": "emerging", "subject": item["subject"], **item["body"], "skill_names": names,
+                "stepping_stone_title": ref.roles[item["body"]["stepping_stone"]]["title"]}
     return {"id": item["id"], "role_id": item["subject"], **item["body"], "skill_names": names,
             "role_skills": [rs["skill_id"] for rs in ref.roles[item["subject"]]["skills"]
                             if rs.get("source") != "evidence"]}
@@ -62,6 +70,10 @@ def _base_role(role: dict) -> dict:
 def approve(evidence_id: str, reviewer: str, drop_sources: list[str], drop_added: list[str]) -> dict:
     item = _pending(evidence_id)
     body = item["body"]
+    if item["kind"] == "emerging":  # read live from the database; no ranking or reference data changes
+        body.update(reviewed_by=reviewer, reviewed_at=_stamp())
+        store.decide_evidence(evidence_id, "approved", reviewer, body)
+        return {"id": evidence_id, "capability_id": item["subject"]}
     ref = get_reference()
     body["summary"] = aggregate(_base_role(ref.roles[item["subject"]]), body["sources"], ref.skills,
                                 set(drop_sources), set(drop_added))
