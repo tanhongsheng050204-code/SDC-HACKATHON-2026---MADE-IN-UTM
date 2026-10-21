@@ -1,7 +1,9 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useId, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { EtaBar } from "../components/EtaBar";
 import { Icon } from "../components/Icon";
-import { api, Journey, JourneyStep, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
+import { RouteMap } from "../components/RouteMap";
+import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
@@ -26,19 +28,11 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
 }) {
   const [data, setData] = useState<Matches | null>(null);
   const [error, setError] = useState(false);
-  const [question, setQuestion] = useState("");
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     api.matches(profile.id, scenario).then((d) => { setData(d); setError(false); }).catch(() => setError(true));
   }, [profile.id, profile.completed_courses.length, scenario, attempt]);
-
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    if (!question.trim()) return;
-    onAsk(question.trim());
-    setQuestion("");
-  }
 
   const name = profile.display_name?.replace(/\s*\(demo\)$/, "");
   const top = data?.roles[0];
@@ -61,9 +55,12 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
 
-      {journey && data && <NextStep journey={journey} top={top ?? null} target={target} onOpenRole={onOpenRole} onStep={openStep} />}
+      <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
+
+      {journey && data && <NextStep journey={journey} top={top ?? null} target={target} profile={profile}
+        from={current ? tr(current.title) : t("route.yourSkills")} onOpenRole={onOpenRole} onStep={openStep} />}
       {journey && (
-        <ol className="journey" aria-label={t("step.title")}>
+        <ol className="journey route-legs" aria-label={t("step.title")}>
           {journey.steps.map((s, i) => {
             const now = journey.next === s.id;
             return (
@@ -77,12 +74,6 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
           })}
         </ol>
       )}
-
-      <form className="home-ask" onSubmit={submit}>
-        <label className="sr-only" htmlFor="home-q">{t("shell.coach")}</label>
-        <input id="home-q" type="text" maxLength={500} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t("home.askPlaceholder")} />
-        <button className="primary" type="submit" disabled={!question.trim()}>{t("a.ask")}</button>
-      </form>
 
       {error && (
         <p className="error" role="alert">{t("home.loadFailed")} <button className="link" onClick={() => setAttempt((n) => n + 1)}>{t("shell.retry")}</button></p>
@@ -119,14 +110,14 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
 
       {data && (
         <div className="card home-roles">
-          <h2>{t("home.bestRoles")}</h2>
+          <h2>{t("home.topDest")}</h2>
           <ol className="home-list">
             {data.roles.slice(0, 3).map((r) => (
               <li key={r.role_id}>
                 <button className="home-role" onClick={() => onOpenRole(r)}>
                   <span className="rank">#{r.rank}</span>
                   <span className="home-role-title">{tr(r.title)}
-                    {r.role_id === profile.target_role_id && <span className="badge good"><Icon name="target" />{t("target.yours")}</span>}
+                    {r.role_id === profile.target_role_id && <span className="badge good"><Icon name="flag" />{t("target.yours")}</span>}
                     {r.robust_pick && <span className="badge gold">{t("k.robustPick")}</span>}
                   </span>
                   <span className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(r.fit) })}><span style={{ width: `${r.fit * 100}%` }} /></span>
@@ -145,10 +136,20 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
 }
 
 // The one thing to do next: the first journey step not done, in plain words.
-function NextStep({ journey, top, target, onOpenRole, onStep }: {
-  journey: Journey; top: RoleMatch | null; target: RoleMatch | null;
+function NextStep({ journey, top, target, profile, from, onOpenRole, onStep }: {
+  journey: Journey; top: RoleMatch | null; target: RoleMatch | null; profile: Profile; from: string;
   onOpenRole: (r: RoleMatch) => void; onStep: (s: JourneyStep) => void;
 }) {
+  const [plan, setPlan] = useState<Pathway | null>(null);
+  const [planFailed, setPlanFailed] = useState(false);
+  const targetId = target?.role_id;
+  useEffect(() => {
+    if (!targetId) { setPlan(null); return; }
+    let live = true;
+    setPlanFailed(false);
+    api.pathway(profile.id, targetId).then((p) => live && setPlan(p)).catch(() => live && setPlanFailed(true));
+    return () => { live = false; };
+  }, [profile.id, targetId, profile.completed_courses.length]);
   const step = journey.next;
   let title: string, body: string, action: string, go: () => void;
   if (step === "stand") {
@@ -163,6 +164,19 @@ function NextStep({ journey, top, target, onOpenRole, onStep }: {
   } else {
     [title, body, action, go] = [t("next.doneTitle"), t("next.doneBody"), t("next.doneAction"), () => onStep(target ? "build" : "explore")];
   }
+  if (target) {
+    return (
+      <div className="card next-step resume-route">
+        <span className="eyebrow">{t("home.resume")}</span>
+        <h2>{tf("route.from", { from, to: tr(target.title) })}</h2>
+        {plan && plan.steps.length > 0 && <RouteMap plan={plan} from={from} to={target.title} compact />}
+        {plan && <EtaBar plan={plan} role={target} inline />}
+        {!plan && !planFailed && <p className="muted">{t("home.routeLoading")}</p>}
+        <p><strong>{title}</strong> <span className="muted">{body}</span></p>
+        <button className="btn ink" onClick={go}>{action} →</button>
+      </div>
+    );
+  }
   return (
     <div className="card next-step">
       <span className="eyebrow">{t("home.next")}</span>
@@ -170,5 +184,57 @@ function NextStep({ journey, top, target, onOpenRole, onStep }: {
       <p className="muted">{body}</p>
       <button className="btn ink" onClick={go}>{action} →</button>
     </div>
+  );
+}
+
+// "Where to?": typing filters the roles to jump to (arrow keys move, Enter opens); Enter with no
+// matching role sends the text to the coach, as the old ask box did.
+function WhereTo({ roles, onOpenRole, onAsk }: { roles: RoleMatch[]; onOpenRole: (r: RoleMatch) => void; onAsk: (q: string) => void }) {
+  const [q, setQ] = useState("");
+  const [active, setActive] = useState(0);
+  const id = useId();
+  const needle = q.trim().toLowerCase();
+  const matches = needle.length < 2 ? [] : roles.filter((r) =>
+    tr(r.title).toLowerCase().includes(needle) || r.title.toLowerCase().includes(needle)).slice(0, 5);
+
+  function ask() {
+    if (!q.trim()) return;
+    onAsk(q.trim());
+    setQ("");
+  }
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (matches.length) onOpenRole(matches[Math.min(active, matches.length - 1)]);
+    else ask();
+  }
+  function keys(e: KeyboardEvent<HTMLInputElement>) {
+    if (!matches.length) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive((a) => (a + 1) % matches.length); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive((a) => (a - 1 + matches.length) % matches.length); }
+    else if (e.key === "Escape") setQ("");
+  }
+  return (
+    <form className="where-to" onSubmit={submit} role="search">
+      <label htmlFor={`${id}-q`}><span className="where-to-title">{t("home.whereTo")}</span><small className="muted">{t("home.whereToHint")}</small></label>
+      <div className="where-to-row">
+        <input id={`${id}-q`} type="text" maxLength={500} value={q} autoComplete="off"
+          role="combobox" aria-expanded={matches.length > 0} aria-controls={`${id}-list`} aria-autocomplete="list"
+          aria-activedescendant={matches.length ? `${id}-o${Math.min(active, matches.length - 1)}` : undefined}
+          onChange={(e) => { setQ(e.target.value); setActive(0); }} onKeyDown={keys} placeholder={t("home.whereToPlaceholder")} />
+        <button className="primary" type="button" onClick={ask} disabled={!q.trim()}>{t("home.askCoach")}</button>
+      </div>
+      {matches.length > 0 && (
+        <ul id={`${id}-list`} role="listbox" className="where-to-list" aria-label={t("home.whereTo")}>
+          {matches.map((r, i) => (
+            <li key={r.role_id} id={`${id}-o${i}`} role="option" aria-selected={i === Math.min(active, matches.length - 1)}
+              onMouseDown={(e) => e.preventDefault()} onClick={() => onOpenRole(r)}>
+              <Icon name="route" /><span>{tr(r.title)}</span><small className="muted">#{r.rank} · {percent(r.fit)}%</small>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="sr-only" aria-live="polite">{needle.length >= 2 ? (matches.length ? tf("home.matchCount", { n: matches.length }) : t("home.noMatch")) : ""}</p>
+      {needle.length >= 2 && !matches.length && <small className="muted">{t("home.noMatch")}</small>}
+    </form>
   );
 }

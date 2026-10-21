@@ -54,7 +54,7 @@ export function RouteMap({ plan, from, to, compact = false }: { plan: Pathway; f
         <g className="route-pin" transform={`translate(${pts[pts.length - 1][0]} ${pts[pts.length - 1][1]})`}>
           <path d="M0 0 C -9 -12, -12 -18, -12 -24 A 12 12 0 1 1 12 -24 C 12 -18, 9 -12, 0 0 Z" />
           <circle cx={0} cy={-24} r={4.5} className="route-pin-dot" />
-          <text className="route-end-label" x={10} y={22} textAnchor="end">{tr(to)}</text>
+          <text className="route-end-label" x={14} y={-42} textAnchor="end">{tr(to)}</text>
         </g>
         <g className="route-here" transform={`translate(${pts[here][0]} ${pts[here][1]})`}>
           <circle r={here === 0 ? 0 : 15} className="route-here-ring" />

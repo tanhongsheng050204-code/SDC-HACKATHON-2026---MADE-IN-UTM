@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { EtaBar } from "../components/EtaBar";
 import { RouteMap } from "../components/RouteMap";
 import { StudyCalendar } from "../components/StudyCalendar";
 import { Citations } from "../components/SkillEvidence";
@@ -160,29 +161,5 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
           onDone={proven} onClose={() => { setProving(null); setOpen(null); }} />
       )}
     </section>
-  );
-}
-
-// The ETA: what is left on this route, refreshed after every tick. Readiness after the plan is
-// 100% only when every missing skill has a course; otherwise it is the share of the role's skill
-// weight the plan reaches, and the skills with no course are named. Hidden when printing.
-function EtaBar({ plan, role }: { plan: Pathway; role: RoleMatch }) {
-  const left = plan.steps.filter((s) => !s.done);
-  const paid = left.filter((s) => s.course.cost === "paid");
-  const known = paid.reduce((sum, s) => sum + (s.course.price_rm ?? 0), 0);
-  const unknown = paid.filter((s) => s.course.price_rm == null).length;
-  const total = [...role.covered, ...role.missing].reduce((w, s) => w + s.weight, 0) || 1;
-  const reachable = total - role.missing.filter((m) => plan.uncovered_skills.includes(m.skill_id)).reduce((w, s) => w + s.weight, 0);
-  const after = plan.uncovered_skills.length === 0 ? 1 : reachable / total;
-  const rm = unknown ? tf("route.rmPlus", { n: known.toLocaleString("en-MY"), k: unknown }) : tf("route.rm", { n: known.toLocaleString("en-MY") });
-  return (
-    <div className="eta-bar" role="status">
-      <span className="eta-title">{t("route.eta")}</span>
-      <strong>{tf("route.hoursLeft", { h: plan.hours_left })}</strong>
-      <span>{rm}</span>
-      <span>{tf("route.stops", { n: left.length })}</span>
-      <span>{tf("route.readiness", { now: percent(plan.readiness), after: percent(after) })}</span>
-      {left.length === 0 && plan.steps.length > 0 && <span className="badge good">{t("route.arrived")}</span>}
-    </div>
   );
 }

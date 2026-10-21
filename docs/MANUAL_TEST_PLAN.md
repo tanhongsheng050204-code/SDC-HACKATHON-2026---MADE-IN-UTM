@@ -64,13 +64,13 @@ Notes: ______
 
 - [ ] 4.1 Greeting matches the time of day (“Good morning / afternoon / evening, Aisyah.”) and shows today's date.
 - [ ] 4.2 **Your next step** (clerk demo): “Pick a target role. Your best fit now: AI operations specialist” with **Open the role**.
-- [ ] 4.3 The four-step strip shows ✓ Where I stand, **Next** Explore roles, and Later for steps 3 and 4; each step opens its screen.
-- [ ] 4.4 On the role, **Make this my target** turns into **Your target** with **Clear target**; back on Today the next step is “Build your skills for …”, step 2 shows ✓, and the role is marked **Your target** in the list.
+- [ ] 4.3 The four-step strip (joined like legs of a route; solid between finished steps) shows ✓ Where I stand, **Next** Explore roles, and Later for steps 3 and 4; each step opens its screen.
+- [ ] 4.4 On the role, **Set as destination** turns into **Your destination** with **Clear destination**; back on Today the card becomes **Resume route**: “From {current job} to {role}”, a small route map, the Time-to-ready line and the next step's button (“Build your skills for …”); step 2 shows ✓ and the role is marked **Your destination** in the list. Without a destination the card is the old “Pick a target role”.
 - [ ] 4.5 **Open my pathway** opens the target's Pathway; after proving a skill or finishing a course, the next step becomes “Get ready to apply for …”.
 - [ ] 4.6 After finishing interview practice or making a Future Card for the target, every step shows ✓ and the card says “You're on track”.
-- [ ] 4.7 Typing a question and pressing **Ask** opens the coach already answering it.
+- [ ] 4.7 **Where to?**: typing “data” lists matching roles (rank and fit); arrow keys move, Enter opens the highlighted role. Typing a question with no matching role and pressing Enter (or **Ask the coach** at any time) opens the coach already answering it.
 - [ ] 4.8 The worker card shows the current job's outlook and opens My job, task by task; the student demo shows roles open to graduates instead.
-- [ ] 4.9 **Your best next roles** shows three roles; **See all roles (13)** opens Future roles. Scenario switch, KPIs and tipping points are on Future roles, not here.
+- [ ] 4.9 **Top destinations for you** shows three roles; **See all roles (13)** opens Future roles. Scenario switch, KPIs and tipping points are on Future roles, not here.
 - [ ] 4.10 With the API stopped, Today shows “Couldn't load your results.” with **Try again**.
 
 Notes: ______
@@ -169,7 +169,7 @@ Notes: ______
 
 ## 9. Role detail and pathway
 
-- [ ] 9.0 The page header shows the role, **Make this my target** and **Build my pathway**, and a one-line summary (fit, outlook, skills to learn).
+- [ ] 9.0 The page header shows the role, **Set as destination** and **Build my pathway**, and a one-line summary (fit, outlook, skills to learn).
 - [ ] 9.0.1 Four tabs: **Overview**, **Fit and plan**, **Market**, **Practise and share**. Arrow keys move between tabs; the address gains `&tab=…`; reloading keeps the tab.
 - [ ] 9.0.2 Overview: a day in this job, why this rank, outlook table with 🔍, the exposure line, pay, and pros and cons. Fit and plan: skills you bring / have / need, evidence, pathway and impact buttons. Market: open jobs, Malaysian programmes, where experts disagree. Practise and share: identity statement, interview practice, Future Card.
 - [ ] 9.1 **← Future roles** goes back.
