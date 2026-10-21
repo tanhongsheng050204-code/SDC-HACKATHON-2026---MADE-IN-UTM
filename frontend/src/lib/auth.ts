@@ -61,6 +61,7 @@ export async function signIn(): Promise<void> {
   await client.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: window.location.origin + window.location.pathname + window.location.search },
+  listener(userId);
   });
 }
 
