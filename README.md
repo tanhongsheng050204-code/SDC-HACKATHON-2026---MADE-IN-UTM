@@ -21,7 +21,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Role pages in four tabs** | **Overview** (a day in the job, why this rank, outlook by scenario with the x-ray, pay, pros and cons), **Fit and plan** (skills you bring, have and need, evidence, pathway), **Market** (open jobs in Malaysia, MyCOL and programmes, where experts disagree) and **Practise and share** (identity statement, interview practice, Future Card). The tab is kept in the address. |
 | **My profile** | Edit your skills, current job, years of experience and situation in place; add more skills from a CV or the questionnaire; your target role and progress stay. |
 | **Target role** | **Make this my target** on any role page. Pathway, SDG impact, practice and sharing follow it, and it is saved with your profile. |
-| **Future Skills Radar** | Skills rising, steady or declining, from research papers and job postings, each with its source and date. Your own skills are highlighted. |
+| **Future Skills Radar** | A **forecast to 2030** for every skill with enough data: the change in the share of job ads that mention it, projected from three years of quarterly history and AI research momentum, with an 80% range under each AI-adoption scenario, a history-and-forecast chart, **Likely** or **Uncertain**, and **Emerging** when growth is speeding up. Jobs rising and declining under the same scenario, with Malaysia's own employment trend per occupation group (OpenDOSM). A **backtest** says how well the method did on the last year of data, good or bad. Every number names its source and date; your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
 | **Your own AI future** | On **Future roles**, drag AI adoption from 0.5× to 2× (not just the three scenarios). Laluan names your **tipping points**: the speed at which your current job turns Declining, or another role overtakes your top match. |
@@ -54,9 +54,9 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 
 | Criterion (weight) | Where to look |
 | --- | --- |
-| **Innovation & Creativity (30%)** | *How trend signals become forecasts:* the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
+| **Innovation & Creativity (30%)** | *How trend signals become skill forecasts:* damped, shrunk trends over three years of job ads and research, projected to 2030 per scenario with an 80% range and a published backtest ([forecast.py](backend/app/trends/forecast.py), **Radar**); the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
 | **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
-| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**). Hardest risks and fallbacks: unreliable trend data → dated snapshots, arXiv→OpenAlex fallback, human approval; AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 297 automated tests. Public and synthetic data only. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**, then approve: rankings change). **Hardest risk: reliable, updatable trend data.** Public job-ad and research counts are noisy proxies, and free APIs limit or refuse requests. Fallbacks: noisy trends are shrunk towards no change and shown with 80% ranges; the backtest is published even where it is weak; every source is dated and every refresh waits for a person's approval; arXiv → OpenAlex (optional API key) → the two-period comparison → the last approved snapshot. Other risks: AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 337 automated tests. Public and synthetic data only. |
 | **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
 
 ## Suggested demo (about 3 minutes)
@@ -138,6 +138,7 @@ The **frontend is on Vercel** ([laluan-psi.vercel.app](https://laluan-psi.vercel
 | `RUNPOD_API_KEY`, `RUNPOD_LLM_ENDPOINT`, `RUNPOD_WHISPER_ENDPOINT` | Optional | RunPod → Settings → API Keys (one key calls both endpoints) and each endpoint's ID, for CV reading (Qwen) and voice (Whisper) |
 | `RUNPOD_LLM_MODEL` | Only if changed | Default `Qwen/Qwen2.5-7B-Instruct`; must match the model the worker loaded |
 | `CONTACT_EMAIL` | Optional | Sent to OpenAlex with research-trend requests |
+| `OPENALEX_API_KEY` | Optional | Free key from [openalex.org](https://openalex.org). Without one, OpenAlex searches share a small daily budget per IP address (Render's addresses are shared); it is only used when arXiv refuses |
 
 Not needed: `SUPABASE_JWT_SECRET` (legacy projects only), `DATABASE_PATH`, `DATA_DIR`, `FRONTEND_DIST`.
 
@@ -173,6 +174,7 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `CORS_ORIGINS` | Comma-separated frontend addresses, default `http://localhost:5173`. |
 | `CORS_ORIGIN_REGEX` | Optional pattern for hosts that serve one site under many addresses, e.g. Vercel's per-deploy URLs. |
 | `CONTACT_EMAIL` | Optional contact address sent with OpenAlex requests. |
+| `OPENALEX_API_KEY` | Optional OpenAlex key, used when arXiv is unavailable; without it OpenAlex allows only a few dozen searches a day per IP address. |
 | `DATABASE_URL` | Postgres connection string (Supabase). Empty means the local SQLite file below. |
 | `DATABASE_PATH` | SQLite file, default `backend/laluan.db`. |
 | `SUPABASE_URL` | Supabase project URL; login tokens are verified against its public keys. |
@@ -185,13 +187,25 @@ For a separately hosted frontend, set `VITE_API_URL` (see [frontend/.env.example
 
 ## How the ranking works
 
-Each role scores **0.6 × weighted skill fit + 0.4 × scaled outlook**, plus **0.05** if it serves an SDG the person picked. Roles that are declining under the chosen scenario rank below the rest. Every card shows this breakdown and the snapshot it came from.
+Each role scores **0.6 × weighted skill fit + 0.4 × scaled outlook**, plus up to **0.05** when it fits what the person said they enjoy (**What I enjoy**) and, for graduates, **0.05** when it is open to new graduates. Roles that are declining under the chosen scenario rank below the rest. Every card shows this breakdown and the snapshot it came from. SDG links explain each role and skill; they no longer change the rank.
 
 The scenario engine adjusts each role's baseline growth for AI-adoption speed, how exposed its tasks are to automation and how much AI complements it. Years before the horizon are interpolated. These are modelling assumptions, not predictions about any one person. See [matching.py](backend/app/services/matching.py) and [scenario.py](backend/app/services/scenario.py), and [CODE_TO_EXPLAIN.md](docs/CODE_TO_EXPLAIN.md) for a walkthrough.
 
 ## Trend signals
 
-The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**) skill mentions from Hacker News **“Who is hiring?”** threads and from live **Malaysian job postings on freehire.me** (a share today; a trend once a second count at least four weeks later exists), and Malaysian employment by occupation group from the **OpenDOSM** public API (`wages_occupation`). Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot to `backend/data/signals/` and keeps the old ones, so rankings can be compared before and after.
+The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**), skill mentions from Hacker News **“Who is hiring?”** threads and from live **Malaysian job postings on freehire.me** (a share today; a trend once a second count at least four weeks later exists), and Malaysian employment by occupation group from the **OpenDOSM** public API (`wages_occupation`). Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot and keeps the old ones, so rankings can be compared before and after.
+
+### Forecasts: which skills and jobs will rise or decline
+
+Each refresh also collects **history**: about three years of quarterly skill mentions in the hiring threads, twelve quarters of papers per AI capability, and eight years of Malaysian employment per occupation group. [`forecast.py`](backend/app/trends/forecast.py) then applies one method to every series:
+
+1. A straight line through the log of the share (share of job ads mentioning a skill; a capability's papers against the median capability; an occupation group's share of all employees).
+2. Noisy trends are **shrunk towards no change** in proportion to how unclear they are, and the projection starts from the last year's average, not one noisy quarter.
+3. The trend is **damped** (each year adds 80% of the previous year's change), so nothing grows for ever, and projected to 2030 with an **80% range**.
+4. For a skill, AI research momentum is added, scaled by each scenario's adoption speed (slow 0.5×, baseline 1×, accelerated 1.6×): skills that accelerating AI capabilities automate fall faster under faster adoption; skills they boost rise faster.
+5. **Rising** above +15% by 2030, **declining** below −15%, otherwise steady; **Likely** only when the whole range agrees; **Emerging** when a rising skill grew faster in the last 18 months than before.
+
+The forecast feeds matching: each skill's trend is its forecast's yearly rate, which moves the role outlooks, and each role's Malaysian employment points are its occupation group's projected change. **Backtest:** every refresh hides the last year of job-ad data and forecasts it. With the data collected on 21 Oct 2026, where the history showed a clear trend (19 skills), the next year moved that way for 14; guessing "everything rises" gets 12. On size, a plain "no change" guess did better (average error about 18% against 25%), so the app tells people to read the direction more than the number. Without history (an API down), the refresh falls back to comparing the last six months with a year earlier.
 
 **A person approves every update.** A refresh only saves the new snapshot for review. On the **Admin** page (linked from Sources), an admin sees which roles would move and by how much, then approves it (their name is stored with the snapshot and shown on the Sources page) or rejects it with a reason (kept in `backend/data/signals/rejected/`). Users see nothing new until it is approved.
 
@@ -232,7 +246,7 @@ Each role page opens with a short **"A day in this job"** in EN / BM / 中文: w
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 297 tests: API, services, trends, review, guardrails, openings, interview, exposure, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # 337 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
 cd frontend; npm run build                           # type check + production build
 ```
 
@@ -251,7 +265,8 @@ Human scoring of the synthetic CVs and an outside review of the pathways are sti
 - **Courses:** RM prices and HRD Corp status come from each provider's own page and are dated (`price_checked`). Three paid courses (NIOSH, electrical, caregiver) have no published fee, so the app says to ask the provider; only the GRI training is confirmed HRD Corp-claimable.
 - **CVs:** read in memory and scrubbed before any model call; only confirmed skills, goals and course progress are saved. The scrubber is rule-based: it catches the usual Malaysian shapes (IC, phone, `Jalan …` / postcode addresses, labelled birth dates, `Sdn Bhd` / university names) but not every possible detail, which is why the person sees and can edit the text first.
 - **Voice:** the browser fallback (Web Speech API) is run by the browser's maker; Chrome sends the audio to Google. The app says so whenever it uses it.
-- **Accounts:** there are none. A profile is reached by its ID, which the browser remembers; Future Cards use a separate read-only link. Treat both links as private.
+- **Forecasts:** job-ad mentions come from Hacker News hiring threads, which lean towards tech jobs in the US and Europe; nine skills (care, safety, soft skills) have too few mentions and show "no data" instead of a guess. The 80% range covers uncertainty in the trend, not sudden shocks.
+- **Accounts:** optional. Without logging in, a profile is reached by its ID, which the browser remembers, and is deleted after 30 days; Google login keeps it until you delete it. Future Cards use a separate read-only link. Treat both links as private.
 - **Workforce view:** files with name, email, IC or staff-ID columns are refused, but the data should still be anonymous before upload.
 
 ## Project structure

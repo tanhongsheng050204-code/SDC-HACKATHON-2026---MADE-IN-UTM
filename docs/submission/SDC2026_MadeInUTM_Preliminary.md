@@ -31,18 +31,19 @@ This matters socially and economically. A worker who reskills too late loses inc
 
 ### 2.2 The proposed AI solution *(300 words max)*
 
-Laluan takes a person from “who I am today” to “where I can be in the AI era” in minutes.
+Aisyah, a data-entry clerk, learns her team has adopted an AI invoice reader. Laluan takes her from “who I am today” to “where I can be in the AI era” in minutes.
 
-1. **Skills in.** The user uploads or pastes a CV, answers a questionnaire, or picks skills. Names, emails, phone and IC numbers are removed *before* any AI reads the text; the file is never stored. Dictionary matching, a generative model (Google Gemini) and embeddings find the skills; the user confirms them.
-2. **Dated trend signals.** Each role starts from the WEF Future of Jobs 2025 growth figure. A re-runnable pipeline then adjusts it with AI-research momentum (arXiv/OpenAlex) and skill demand in job postings. Every update is saved as a new dated snapshot and **only goes live after a person approves it**.
-3. **Explainable matching under three futures.** Roles are ranked under slow, baseline and accelerated AI adoption: 0.6 × skill fit + 0.4 × outlook, plus a small boost for the SDGs the user cares about. Every card shows “Why this rank?”, an estimate range and its source.
-4. **A plan you can start this week.** Ordered courses for the missing skills, with hours, RM price and HRD Corp status, all from a curated catalogue. AI-written summaries are checked sentence by sentence against the catalogue so nothing is invented.
-5. **An AI coach** answers questions about the user's own results with citations; it may suggest a change, but nothing happens until the user presses Apply.
-6. **SDG impact, a shareable Future Card and an HR workforce view** (aggregate only, never a ranking of people).
+1. **Skills in.** CV upload, questionnaire or skill list. Names, IC and phone numbers are removed *before* any AI reads the text; the file is never stored. She confirms the skills.
+2. **Forecasts, not lists.** A re-runnable pipeline collects three years of job-ad mentions, AI-research papers (arXiv) and Malaysian employment (OpenDOSM). Each series becomes a damped trend to 2030 with an 80% range, flagged *emerging* when growth speeds up. A backtest on the last year is shown in the app. Every refresh is dated and **only goes live after a person approves it**.
+3. **Three futures.** Slow, baseline and accelerated AI adoption change the forecasts and her ranked roles: 0.6 × skill fit + 0.4 × outlook. “Why this rank?”, a step-by-step forecast x-ray and **tipping points** (the adoption speed at which her job turns declining) explain every number.
+4. **A plan she can start this week.** Ordered courses for missing skills, with hours, RM price and HRD Corp status from a curated catalogue; AI summaries are checked against it, so nothing is invented.
+5. **SDG links with reasons** for every role and skill, an **AI coach** that only suggests (she presses Apply), and an aggregate **HR workforce view**.
 
-From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and embeddings, with an offline fallback), **database architecture** (Supabase Postgres for profiles, progress and shared cards; versioned JSON reference data) and **cloud deployment** (Docker container on Render, frontend on Vercel, CI on GitHub Actions).
+Hardest risk: reliable, updatable trend data. Fallbacks: noisy trends shrink towards no change, ranges stay visible, arXiv falls back to OpenAlex, and the last approved snapshot stays live.
 
-*Word count: 296*
+Workshops used: **GenAI APIs** (Gemini; Qwen2.5 and Whisper on RunPod; offline fallback), **database architecture** (Supabase Postgres) and **cloud deployment** (Vercel, Docker on Render, GitHub Actions).
+
+*Word count: 281*
 
 ## 3. Technical architecture and implementation plan
 
@@ -52,9 +53,9 @@ From the SDC Phase 1 workshops we use: **GenAI APIs** (Gemini generation and emb
 | --- | --- |
 | Frontend | React 18 + TypeScript + Vite; responsive; EN / BM / 中文; lite mode for slow connections |
 | Backend API | Python 3.12, FastAPI, Pydantic |
-| AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); rule-based offline mode when no key is set |
+| AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); optional open models on RunPod Serverless: Qwen2.5-7B-Instruct (CV reading, so raw CV text stays away from Google) and faster-whisper `small` (voice input); rule-based offline mode when no key is set |
 | Data | Supabase Postgres (profiles, progress, Future Cards, review decisions); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
-| Trend pipeline | arXiv API with OpenAlex fallback; Hacker News “Who is hiring?” threads via the Algolia HN API; Malaysian job postings via the freehire.me API |
+| Trend pipeline | arXiv API with OpenAlex fallback (research papers per AI capability); Hacker News “Who is hiring?” threads via the Algolia HN API (skill mentions); Malaysian job postings via the freehire.me API; OpenDOSM `wages_occupation` (Malaysian employment by occupation group). Three years of quarterly history per series → damped-trend forecasts to 2030 with 80% ranges and a backtest (Python, no extra libraries) |
 | Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
 
 ```mermaid
@@ -64,7 +65,7 @@ flowchart LR
     API --> DEID["De-identify CV text"] --> LLM["Gemini API<br/>skills · coach · summaries"]
     API --> DB[("Supabase Postgres<br/>profiles · progress · cards")]
     API --> REF[("Reference data<br/>WEF · O*NET · courses · SDGs")]
-    PIPE["Trend refresh<br/>arXiv / OpenAlex · job posts"] --> PEND["Snapshot waiting for review"]
+    PIPE["Trend refresh<br/>arXiv / OpenAlex · job posts · OpenDOSM"] --> FC["Forecast to 2030<br/>ranges · scenarios · backtest"] --> PEND["Snapshot waiting for review"]
     PEND -->|admin approves| REF
     LLM --> GROUND["Grounding check<br/>against the catalogue"] --> API
 ```
@@ -73,17 +74,17 @@ flowchart LR
 
 ### 3.2 Design-thinking and deployment strategy *(200 words max)*
 
-**Empathise.** We started from the brief's three users and wrote personas: Aisyah, a data-entry clerk whose team just adopted an AI invoice reader; Wei Jie, a final-year student; and an HR team planning reskilling. Their fears shaped the tone: calm, honest, never alarmist.
+**Empathise.** Personas from the brief's users: Aisyah, a clerk facing an AI invoice reader; Wei Jie, a final-year student; an HR team planning reskilling. Their fears set the tone: calm, honest, never alarmist.
 
-**Define.** Success means a ranked, explainable plan in under five minutes, with every number traceable to a source.
+**Define.** A ranked, explainable plan in under five minutes, every number traceable to a dated source.
 
-**Ideate.** We rejected a pure chatbot: answers could not be checked. Instead, AI is used where it helps (reading CVs, explaining results) and every recommendation comes from cited data.
+**Ideate.** We rejected a pure chatbot because its answers cannot be checked. AI reads CVs and explains; forecasts come from public data with a published method.
 
-**Prototype and test.** The app has been live since Phase 1, and each round of browser testing fed back into the design: a phone layout fix, a “server waking up” notice, and a person-approval step for trend data. Every change is logged in REVIEW_LOG.md.
+**Prototype and test.** Live since Phase 1. Browser testing fed back into the design: a phone layout, a “server waking up” notice, human approval of trend data. A backtest exposed that plain trend lines overstate change, so we added shrinkage and damping. Every fix is in REVIEW_LOG.md.
 
-**Deploy.** Already deployed: Vercel for the frontend, a Docker container on Render for the API, with tests running on every push. It works without an API key, so the demo never depends on one provider. For Phase 2 we will finish the human evaluation, using the in-app review kit with a counsellor and native speakers.
+**Deploy.** Vercel (frontend), Docker on Render (API), Supabase (data), tests on every push. It works without an API key. Phase 2: human evaluation with a counsellor and native speakers via the in-app review kit.
 
-*Word count: 189*
+*Word count: 156*
 
 ## 4. Preliminary environmental and SDG impact framework
 
@@ -91,8 +92,8 @@ flowchart LR
 | --- | --- |
 | **Target SDG sub-target(s)** | **8.5** “By 2030, achieve full and productive employment and decent work for all women and men, including for young people…”; **4.4** “By 2030, substantially increase the number of youth and adults who have relevant skills, including technical and vocational skills, for employment, decent jobs and entrepreneurship.” Supporting: 4.3 (affordable technical and vocational education), 8.2 (productivity through innovation). |
 | **Current problem baseline** | Only **26%** of Malaysian professionals using AI at work have had formal AI training (Hays Asia Salary Guide 2025, as cited in the Domain 1 brief); **600,000+** Malaysian workers need reskilling within 3–5 years (MOSTI, same source); data-entry clerk jobs are projected to fall **≈26%** by 2030 (WEF Future of Jobs Report 2025, Fig. 2.3). For an individual today: no source-cited, personalised pathway exists in one place, so the share of recommendations a user can trace to a source is effectively **0%** in generic chatbot advice. |
-| **Core measurable KPIs** | (1) Time from CV to a ranked, costed pathway (minutes). (2) Skill-extraction recall on 5 synthetic CVs marked by a person (%). (3) Share of role, skill, task and course recommendations that show a dated source (%). (4) Share of plan steps that are free or free to audit (%). (5) Reviewer agreement with the top-3 roles for the two personas (%). |
-| **Phase 2 impact target** | (1) ≤ **5 minutes** in a timed run. (2) ≥ **80%** average recall. (3) **100%** of recommendations cited (already enforced by automated tests). (4) ≥ **70%** of steps free or free to audit in both demo pathways (currently 2 of 2 for Aisyah and 1 of 1 for Wei Jie). (5) ≥ **70%** reviewer agreement from a lecturer or career counsellor. |
+| **Core measurable KPIs** | (1) Time from CV to a ranked, costed pathway (minutes). (2) Skill-extraction recall on 5 synthetic CVs marked by a person (%). (3) Share of role, skill, task and course recommendations that show a dated source (%). (4) Share of plan steps that are free or free to audit (%). (5) Reviewer agreement with the top-3 roles for the two personas (%). (6) Forecast backtest: share of clear skill trends whose direction held in the held-out year (%). |
+| **Phase 2 impact target** | (1) ≤ **5 minutes** in a timed run. (2) ≥ **80%** average recall. (3) **100%** of recommendations cited (already enforced by automated tests). (4) ≥ **70%** of steps free or free to audit in both demo pathways (currently 2 of 2 for Aisyah and 1 of 1 for Wei Jie). (5) ≥ **70%** reviewer agreement from a lecturer or career counsellor. (6) Above the “everything rises” guess, re-measured at every refresh (21 Oct 2026: 14 of 19 clear trends held, against 12 for “everything rises”; sizes still rougher than a “no change” guess). |
 
 **Sources:** World Economic Forum, *Future of Jobs Report 2025*, January 2025, Figures 2.1 and 2.3, <https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf>. SDC Hackathon, *Domain 1 Problem Statement & Marking Rubric* (citing Hays Asia Salary Guide 2025 and MOSTI). United Nations, *SDG targets 4.3, 4.4, 8.2, 8.5*, <https://sdgs.un.org/goals>.
 
@@ -128,6 +129,7 @@ flowchart LR
 | Dataset | WEF Future of Jobs Report 2025, Figure 2.3 (figures cited, not redistributed as a dataset) | WEF terms of use, with citation |
 | Dataset | UN Sustainable Development Goals names, targets and colours | UN SDG guidelines |
 | Dataset | arXiv API metadata counts; OpenAlex | arXiv API terms; CC0 |
+| Dataset | OpenDOSM `wages_occupation` (Department of Statistics Malaysia, via data.gov.my) | CC BY 4.0 |
 | Dataset | Hacker News “Who is hiring?” posts, counted via the Algolia HN API | HN API terms (counts only, no posts stored) |
 | Dataset | Malaysian job postings via the freehire.me API (counts stored; openings shown live with links) | freehire terms; project MIT |
 | Dataset | Anthropic Economic Index (exposure, task-level AI use, Malaysia usage) | CC BY |
@@ -135,6 +137,8 @@ flowchart LR
 | Dataset | ILO Working Paper 140, Annex Table A1 | CC BY 4.0 |
 | Images | Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Unsplash License |
 | Model | Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
+| Model | Qwen2.5-7B-Instruct (Alibaba Qwen team), served with vLLM on RunPod Serverless (optional) | Apache-2.0 |
+| Model | OpenAI Whisper `small` via faster-whisper, on RunPod Serverless (optional) | MIT |
 
 ### 6.3 Employment-related IP conflicts
 

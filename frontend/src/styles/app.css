@@ -214,6 +214,24 @@ legend { font-weight: 600; padding: 0 6px; }
 .radar-col li:first-child { border-top: none; }
 .radar-col li.mine { background: var(--accent-soft); border-radius: 8px; font-weight: 600; }
 .radar-col .badge { margin-left: 8px; background: var(--ink); color: var(--page); }
+.radar-controls { display: grid; gap: 8px; margin-bottom: 12px; }
+.radar-controls p { margin: 0; font-size: .86rem; }
+.radar-col .badge.emerging { background: var(--gold-bg); color: var(--gold); }
+.fc-num { display: inline-flex; gap: 8px; align-items: baseline; white-space: nowrap; }
+.fc-sure { font-size: .74rem; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: 6px; padding: 0 5px; }
+.fc-sure.sure { border-style: solid; }
+.fc-detail { flex-basis: 100%; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spark { display: block; overflow: visible; }
+.spark-line { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; }
+.spark-ahead { fill: none; stroke-width: 1.5; stroke-dasharray: 3 3; stroke: var(--gold); }
+.spark-cone { fill: var(--gold-bg); stroke: none; }
+.spark.rising .spark-ahead { stroke: var(--good); } .spark.rising .spark-cone { fill: var(--good-bg); }
+.spark.declining .spark-ahead { stroke: var(--risk); } .spark.declining .spark-cone { fill: var(--risk-bg); }
+.radar-roles { list-style: none; margin: 0; padding: 0; display: grid; }
+.radar-roles li { display: grid; grid-template-columns: minmax(140px, 1.4fr) auto auto 1fr; gap: 4px 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); font-size: .88rem; }
+.radar-roles li:first-child { border-top: none; }
+.radar-roles .radar-my { grid-column: 1 / -1; }
+@media (max-width: 640px) { .radar-roles li { grid-template-columns: 1fr auto; } }
 .momentum { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .momentum li { display: grid; grid-template-columns: minmax(150px, 1fr) 2fr 52px; gap: 10px; align-items: center; font-size: .86rem; }
 .momentum .bar { position: relative; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
