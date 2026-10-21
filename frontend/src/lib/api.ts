@@ -101,6 +101,7 @@ export interface PendingPreview {
   skills: Record<"rising" | "steady" | "declining" | "no_data", number>;
 }
 export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; snapshot_id: string | null; error: string | null }
+export interface InPlace { role_id: string; title: string; people: number; avg_hours: number; fees_each_rm: number; staff_time_rm: number; ai_skills: string[] }
 export interface Workforce {
   scenario: { id: Scenario; label: string; description: string };
   employees: number; at_risk: number; total_hours: number;
@@ -109,6 +110,7 @@ export interface Workforce {
   roles: { role_id: string; title: string; headcount: number; at_risk: boolean; avg_fit: number;
     outlook: Record<Scenario, { index: number; label: string }> }[];
   moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
+  in_place: InPlace[]; get_ahead: InPlace[];
   sdg_contribution: (Sdg & { people: number })[];
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };

@@ -85,7 +85,8 @@ const rm = (n: number) => `RM ${n.toLocaleString("en-MY", { maximumFractionDigit
 
 // What the reskilling moves cost: course fees from the catalogue's dated prices, split by HRD Corp
 // status, and staff time at DOSM group-median pay. Estimates for planning, not quotes.
-function Budget({ budget, hours }: { budget: WorkforceData["budget"]; hours: number }) {
+function Budget({ budget, hours, inPlace }: { budget: WorkforceData["budget"]; hours: number; inPlace: WorkforceData["in_place"] }) {
+  const stay = inPlace.reduce((sum, r) => ({ time: sum.time + r.staff_time_rm, hours: sum.hours + r.avg_hours * r.people, people: sum.people + r.people }), { time: 0, hours: 0, people: 0 });
   if (hours === 0) return null;
   return (
     <div className="card budget">
@@ -102,8 +103,30 @@ function Budget({ budget, hours }: { budget: WorkforceData["budget"]; hours: num
         <div className="kpi"><span className="kpi-label">{t("bud.time")} <InfoTip term="gl.masco" label={t("bud.time")} /></span><strong>{rm(budget.staff_time_rm)}</strong>
           <span className="badge">{tf("bud.timeNote", { h: hours.toLocaleString() })}</span></div>
       </div>
+      {stay.people > 0 && <p><strong>{tf("bud.compare", { stay: rm(stay.time), h: stay.hours.toLocaleString(), move: rm(budget.staff_time_rm) })}</strong></p>}
       {budget.unpriced_courses.length > 0 && <p className="banner">{tf("bud.unpriced", { list: budget.unpriced_courses.join(", ") })}</p>}
       <p className="source">{tf("bud.source", { year: budget.pay_year })}</p>
+    </div>
+  );
+}
+
+// The same role, AI-assisted: the AI skills it adds, hours and costs per group (totals only).
+function InPlaceTable({ title, sub, rows }: { title: string; sub: string; rows: WorkforceData["in_place"] }) {
+  return (
+    <div className="card">
+      <h2>{title}</h2>
+      <p className="muted">{sub}</p>
+      <div className="table-wrap">
+        <table className="heatmap">
+          <thead><tr><th>{t("wf.role")}</th><th>{t("wf.peopleCol")}</th><th>{t("aa.skills")}</th><th>{t("wf.hoursEach")}</th><th>{t("bud.feesEach")}</th><th>{t("bud.time")}</th></tr></thead>
+          <tbody>{rows.map((r) => (
+            <tr key={r.role_id}>
+              <th scope="row">{tf("aa.title", { role: tr(r.title) })}</th><td>{r.people}</td>
+              <td>{r.ai_skills.map((s) => tr(s)).join(", ")}</td><td>{r.avg_hours}</td><td>{rm(r.fees_each_rm)}</td><td>{rm(r.staff_time_rm)}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -146,6 +169,8 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         <p className="source">{tf("wf.heatSource", { id: src.snapshot_id })}</p>
       </div>
 
+      {result.in_place.length > 0 && <InPlaceTable title={t("wf.inPlace")} sub={t("wf.inPlaceSub")} rows={result.in_place} />}
+
       <div className="card">
         <h2>{t("wf.moves")}</h2>
         {result.moves.length === 0 ? <p className="muted">{t("wf.noMoves")}</p> : (
@@ -165,7 +190,8 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         )}
       </div>
 
-      <Budget budget={result.budget} hours={result.total_hours} />
+      <Budget budget={result.budget} hours={result.total_hours} inPlace={result.in_place} />
+      {result.get_ahead.length > 0 && <InPlaceTable title={t("wf.getAhead")} sub={t("wf.getAheadSub")} rows={result.get_ahead} />}
 
       {result.sdg_contribution.length > 0 && (
         <div className="card">

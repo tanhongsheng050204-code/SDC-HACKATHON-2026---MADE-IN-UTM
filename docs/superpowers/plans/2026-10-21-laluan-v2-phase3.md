@@ -64,6 +64,6 @@
 Decisions: working adults see **A "Your job, with AI"** (their own role, "AI-assisted", never an invented title) before **B "Move to a growing role"** (the ranked list). Option A is a separate, unranked card: what changes in each task, 2–4 AI skills to add (drafted from our capability and task data, team-reviewed, each with a course), a short pathway and readiness; approved emerging roles that start from this job appear as "where this can lead". Long shots (fit under 20%) keep their rank with a "Long-term goal" label and a stepping stone. Switchers also see Option A and a "shortest route" pick. HR gets, per at-risk group, upskill in place and the nearest non-declining move with fees and staff time compared, plus a lower-priority "get ahead" list for stable roles with 40%+ automatable tasks. Graduates start from their degree (a programme pre-ticks skills they confirm). The class view splits results per programme. The role page gets "Find current openings": live Malaysian ads, unreviewed, cached daily, rate-limited.
 
 - [x] **E1** `data/ai_upgrade.json` drafted by `scripts/build_ai_upgrade.py`; Option A card for workers and switchers; long-shot labels; shortest-route pick.
-- [ ] **E2** HR: upskill in place + nearest move per at-risk group, costs compared; "get ahead" list.
+- [x] **E2** HR: upskill in place + nearest move per at-risk group, costs compared; "get ahead" list.
 - [ ] **E3** `data/programmes.json` (about 15 Malaysian programmes); degree step for graduates; class view per programme.
 - [ ] **E4** "Find current openings" on the role page.
