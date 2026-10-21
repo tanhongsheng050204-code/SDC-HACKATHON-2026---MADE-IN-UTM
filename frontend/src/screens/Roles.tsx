@@ -6,6 +6,7 @@ import { Change, compareMatches, RefreshPanel, WhatChanged } from "../components
 import { EvidencePanel } from "../components/EvidencePanel";
 import { EmergingRoles } from "../components/EmergingRoles";
 import { RoleCard } from "../components/RoleCard";
+import { RoleGraph } from "../components/RoleGraph";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
 import { t } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
@@ -26,6 +27,8 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
   const [error, setError] = useState<string | null>(null);
   const [changes, setChanges] = useState<Change[] | null>(null);
   const [tipSeen, setTipSeen] = useState(() => load(KEYS.sliderTip) === "1");
+  const [view, setView] = useState<"list" | "graph">(() => (load(KEYS.rolesView) === "graph" ? "graph" : "list"));
+  function changeView(v: "list" | "graph") { setView(v); save(KEYS.rolesView, v); }
 
   useEffect(() => {
     let live = true;
@@ -111,9 +114,21 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         <p className="muted"><button className="link" onClick={onSurvey}>{t("survey.prompt")}</button></p>
       )}
       {data && <WhatIf data={data} extra={extra} onChange={setExtra} />}
-      <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
-        {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
-      </div>
+      {data && (
+        <div className="segmented view-switch" role="radiogroup" aria-label={t("graph.title")}>
+          <button role="radio" aria-checked={view === "list"} onClick={() => changeView("list")}>{t("graph.list")}</button>
+          <button role="radio" aria-checked={view === "graph"} onClick={() => changeView("graph")}>{t("graph.graph")}</button>
+        </div>
+      )}
+      {data && view === "graph" ? (
+        <div className={loading ? "is-updating" : undefined} aria-busy={loading}>
+          <RoleGraph data={data} profile={profile} scenario={scenario} onOpen={onOpen} />
+        </div>
+      ) : (
+        <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
+          {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
+        </div>
+      )}
       {data && (
         <EmergingRoles profile={profile} refreshKey={emergingKey} onStart={(roleId) => {
           const match = data.roles.find((r) => r.role_id === roleId);
