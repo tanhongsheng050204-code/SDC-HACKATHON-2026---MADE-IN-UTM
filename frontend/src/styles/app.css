@@ -608,13 +608,14 @@ main:focus { outline: none; }
 /* Future roles as a map (RoleGraph) */
 .role-graph { margin: 0; padding: 8px; }
 .role-graph svg { display: block; width: 100%; height: auto; font-family: var(--font); }
-.graph-edge line { stroke: var(--line-strong, var(--line)); stroke-width: 1.5; }
+.graph-scroll { overflow-x: auto; }
+.graph-edge { stroke: var(--line-strong, var(--line)); stroke-width: 1.5; }
+.graph-edge.link { stroke: var(--gold-bright); stroke-dasharray: 5 4; }
 .graph-pill rect { fill: var(--surface); stroke: var(--line-strong, var(--line)); }
 .graph-pill text { font-size: 11px; fill: var(--ink-2, var(--ink)); }
 .graph-pill.link rect { fill: var(--gold-bg); stroke: var(--gold-bright); }
 .graph-pill.link text { fill: var(--gold); font-weight: 600; }
 .graph-arrowhead.link { fill: var(--gold-bright); }
-.graph-link path { fill: none; stroke: var(--gold-bright); stroke-width: 1.5; stroke-dasharray: 5 4; }
 .graph-arrowhead { fill: var(--ink-faint, var(--ink-soft)); }
 .graph-you circle { fill: var(--accent); }
 .graph-you text { fill: #fff; font-size: 12px; }
@@ -623,7 +624,13 @@ main:focus { outline: none; }
 .graph-node rect { fill: var(--surface); stroke: var(--line-strong, var(--line)); stroke-width: 1.5; transition: stroke .15s; }
 .graph-node.tone-good rect { fill: var(--good-bg); stroke: var(--good); }
 .graph-node.tone-risk rect { fill: var(--risk-bg); stroke: var(--risk); }
-.graph-node:hover rect, .graph-node:focus-visible rect { stroke: var(--accent); stroke-width: 3; }
+.graph-node:hover rect, .graph-node:focus-visible rect, .graph-node.open rect { stroke: var(--accent); stroke-width: 3; }
+.graph-toggle { font-size: 16px; font-weight: 700; fill: var(--accent); }
+.graph-you { cursor: pointer; }
+.graph-hint { margin: 4px 8px 0; font-size: 13px; }
+.graph-detail { border-top: 1px solid var(--line); margin: 4px 8px 0; padding-top: 10px; display: grid; gap: 6px; }
+.graph-detail p, .graph-steps { margin: 0; }
+.graph-steps { padding-left: 20px; display: grid; gap: 2px; }
 .graph-title { font-size: 13px; font-weight: 650; fill: var(--ink); }
 .graph-rank { font-size: 11px; font-weight: 700; fill: var(--ink-soft); }
 .graph-small { font-size: 10.5px; fill: var(--ink-soft); }
