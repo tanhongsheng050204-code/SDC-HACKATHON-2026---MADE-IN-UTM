@@ -9,7 +9,7 @@ import pytest
 from app import store
 from app.reference import get_reference
 from app.services import matching
-from app.trends import builder, jobs, research
+from app.trends import builder, dosm, jobs, research
 
 TODAY = dt.date(2026, 10, 19)
 CLERK = {"skills": ["data_entry", "excel", "office_admin", "scheduling", "communication", "genai_tools"],
@@ -30,6 +30,15 @@ def fake_jobs(mentions: dict | None = None) -> dict:
     return {"source": "test postings", "source_url": "y", "retrieved": str(TODAY),
             "threads": {"recent": [{"title": "a"}], "prior": [{"title": "b"}]},
             "postings": {"recent": 100, "prior": 100}, "mentions": base}
+
+
+def fake_dosm(clerical: float = 1000.0, craft: float = 1000.0) -> dict:
+    """Every group grows 10% like all employees, except the two given (recent counts, prior 1000)."""
+    groups = {g: {"recent": 1100.0, "prior": 1000.0} for g in dosm.MASCO.values()}
+    groups["4"] = {"recent": clerical, "prior": 1000.0}
+    groups["7"] = {"recent": craft, "prior": 1000.0}
+    return {"source": "test DOSM", "source_url": "z", "retrieved": str(TODAY), "dataset": "wages_occupation",
+            "years": [2022, 2025], "overall": {"recent": 1100.0, "prior": 1000.0}, "groups": groups}
 
 
 def test_momentum_is_relative_to_the_median_and_clipped():
@@ -159,6 +168,7 @@ ADMIN = {"X-Admin-Token": "test-admin-token"}
 def test_refresh_waits_for_approval_then_reranks(data_copy, client, monkeypatch):
     monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research("document_understanding"))
     monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs({"sql": {"recent": 50, "prior": 10}}))
+    monkeypatch.setattr(dosm, "collect", lambda *a, **k: fake_dosm())
     pid = client.post("/api/profiles", json={"skills": CLERK["skills"]}).json()["id"]
     before = client.get(f"/api/profiles/{pid}/matches").json()
 
@@ -192,6 +202,7 @@ def test_refresh_waits_for_approval_then_reranks(data_copy, client, monkeypatch)
 def test_rejected_snapshot_is_kept_but_never_used(data_copy, client, monkeypatch):
     monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research("document_understanding"))
     monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs({}))
+    monkeypatch.setattr(dosm, "collect", lambda *a, **k: fake_dosm())
     live = client.get("/api/signals").json()[0]["snapshot_id"]
     sid = _refresh(client)["snapshot_id"]
     decision = {"reviewer": "Team Reviewer", "reason": "Job-posting counts look too small this week"}
@@ -231,3 +242,59 @@ def test_refresh_status_needs_admin_and_hides_urls(client):
     assert client.get("/api/signals/refresh").status_code == 401
     error = RuntimeError("500 for url 'https://export.arxiv.org/api/query?search_query=secret'")
     assert "arxiv.org" not in refresh._safe_error(error) and "[url]" in refresh._safe_error(error)
+
+
+def _opendosm(request: httpx.Request) -> httpx.Response:
+    assert request.url.params["id"] == "wages_occupation"
+    rows = []
+    for year, scale in ((2021, 0.9), (2022, 1.0), (2025, 1.1)):
+        for name in ["overall", *dosm.MASCO]:
+            grow = 1.3 if (name == "professionals" and year == 2025) else 1.0
+            rows.append({"sex": "both", "date": f"{year}-01-01", "occupation": name,
+                         "recipients": round(1000 * scale * grow, 1), "wages_mean": 1, "wages_median": 1})
+            rows.append({"sex": "male", "date": f"{year}-01-01", "occupation": name,
+                         "recipients": 1.0, "wages_mean": 1, "wages_median": 1})
+    return httpx.Response(200, json=rows)
+
+
+def test_dosm_compares_latest_year_with_three_years_earlier():
+    raw = dosm.collect(TODAY, client=httpx.Client(transport=httpx.MockTransport(_opendosm)))
+    assert raw["years"] == [2022, 2025] and raw["dataset"] == "wages_occupation"
+    assert raw["overall"] == {"recent": 1100.0, "prior": 1000.0}  # "both" sexes only
+    assert raw["groups"]["2"] == {"recent": 1430.0, "prior": 1000.0}
+    assert set(raw["groups"]) == {str(i) for i in range(1, 10)}
+
+
+def test_malaysian_employment_moves_roles_by_their_occupation_group():
+    ref = get_reference()
+    # Clerical jobs shrink 10% while all employees grow 10%: 20 points below, capped at 10.
+    snap = builder.build(ref, ref.snapshots[0], fake_research(), fake_jobs(),
+                         dt.datetime(2026, 10, 19, 22, 0), fake_dosm(clerical=900.0))
+    signals = {s["role_id"]: s for s in snap["signals"]}
+    clerk, analyst = signals["data_entry_clerk"], signals["data_analyst"]
+    assert clerk["local_points"] == -builder.LOCAL_CAP
+    assert analyst["local_points"] == 0.0  # professionals grew like everyone else
+    assert clerk["net_growth_pct"] == round(clerk["baseline_growth_pct"] + clerk["demand_points"]
+                                            - builder.LOCAL_CAP + clerk["ai_points"], 1)
+    assert "Malaysian employment -10" in clerk["note"]
+    assert snap["inputs"][-1]["years"] == [2022, 2025] and "test DOSM" in snap["source"]
+    assert builder.local_points(fake_dosm(), None) == 0.0  # a role with no MASCO group is left alone
+
+
+def test_snapshot_without_dosm_has_no_local_points():
+    ref = get_reference()
+    snap = builder.build(ref, ref.snapshots[0], fake_research(), fake_jobs(), dt.datetime(2026, 10, 19, 22, 0))
+    assert all("local_points" not in s for s in snap["signals"])
+    assert len(snap["inputs"]) == 2
+
+
+def test_refresh_still_runs_when_opendosm_is_down(data_copy, client, monkeypatch):
+    def down(*a, **k):
+        raise httpx.ConnectError("no route to https://api.data.gov.my/data-catalogue/?id=x")
+    monkeypatch.setattr(research, "collect", lambda *a, **k: fake_research())
+    monkeypatch.setattr(jobs, "collect", lambda *a, **k: fake_jobs())
+    monkeypatch.setattr(dosm, "collect", down)
+    state = _refresh(client)
+    assert any("OpenDOSM unavailable" in step and "data.gov.my" not in step for step in state["steps"])
+    pending = store.get_snapshot(state["snapshot_id"])["body"]
+    assert all("local_points" not in s for s in pending["signals"])

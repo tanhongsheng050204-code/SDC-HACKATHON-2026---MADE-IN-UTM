@@ -144,7 +144,7 @@ The scenario engine adjusts each role's baseline growth for AI-adoption speed, h
 
 ## Trend signals
 
-The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**) and skill mentions from Hacker News **“Who is hiring?”** threads. Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot to `backend/data/signals/` and keeps the old ones, so rankings can be compared before and after.
+The refresh collects AI research counts from **arXiv** (falling back to **OpenAlex**) skill mentions from Hacker News **“Who is hiring?”** threads, and Malaysian employment by occupation group from the **OpenDOSM** public API (`wages_occupation`). Raw counts go to `backend/data/raw/`; each refresh writes a new dated snapshot to `backend/data/signals/` and keeps the old ones, so rankings can be compared before and after.
 
 **A person approves every update.** A refresh only saves the new snapshot for review. Under **Admin: refresh trend data** on the Future roles screen, an admin sees which roles would move and by how much, then approves it (their name is stored with the snapshot and shown on the Sources page) or rejects it with a reason (kept in `backend/data/signals/rejected/`). Users see nothing new until it is approved.
 
