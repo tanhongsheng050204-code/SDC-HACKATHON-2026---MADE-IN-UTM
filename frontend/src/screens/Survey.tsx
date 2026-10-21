@@ -69,12 +69,15 @@ export function Survey({ profile, userId, onDone, onSkip }: {
           {other === null ? (
             <>
               <p className="muted likert-prompt" id="likert-prompt">{t("survey.scale")}</p>
-              <div className="likert" role="group" aria-labelledby="likert-prompt">
-                {SCALE.map((value) => (
-                  <button key={value} className={`btn likert-${value}`} onClick={() => answer({ card_id: card.id, answer: value })}>
-                    {t(`survey.${value}`)}
-                  </button>
-                ))}
+              <div className="likert">
+                <span className="likert-end disagree" aria-hidden="true">{t("survey.strongly_disagree")}</span>
+                <div className="likert-dots" role="group" aria-labelledby="likert-prompt">
+                  {SCALE.map((value) => (
+                    <button key={value} className={`likert-dot ${value}`} aria-label={t(`survey.${value}`)} title={t(`survey.${value}`)}
+                      onClick={() => answer({ card_id: card.id, answer: value })} />
+                  ))}
+                </div>
+                <span className="likert-end agree" aria-hidden="true">{t("survey.strongly_agree")}</span>
               </div>
               <button className="link" onClick={() => setOther("")}>✎ {t("survey.other")}</button>
             </>

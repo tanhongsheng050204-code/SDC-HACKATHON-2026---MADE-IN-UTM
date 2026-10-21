@@ -447,13 +447,32 @@ main:focus { outline: none; }
 .survey-card { max-width: 640px; gap: 14px; }
 .survey-text { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
 .survey-other { display: grid; gap: 10px; }
-.likert { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-.likert .btn { min-height: 52px; padding: 8px 6px; white-space: normal; line-height: 1.2; text-align: center; justify-content: center; }
-.likert .likert-strongly_disagree, .likert .likert-disagree { border-color: var(--risk-bg); }
-.likert .likert-strongly_disagree { background: var(--risk-bg); color: var(--risk); }
-.likert .likert-strongly_agree, .likert .likert-agree { border-color: var(--good-bg); }
-.likert .likert-strongly_agree { background: var(--good-bg); color: var(--good); }
-@media (max-width: 560px) { .likert { grid-template-columns: 1fr; } }
+/* Five circles in a line: strongest answers largest, neutral smallest (decision #36). */
+.likert { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; padding: 6px 0; }
+.likert-end { font-size: .85rem; font-weight: 600; line-height: 1.25; }
+.likert-end.disagree { color: var(--risk); text-align: right; }
+.likert-end.agree { color: var(--good); }
+.likert-dots { display: flex; align-items: center; gap: clamp(10px, 2.6vw, 20px); }
+.likert-dot { padding: 0; min-height: 0; border-radius: 50%; border: 3px solid var(--line-strong); background: transparent; box-shadow: none;
+  cursor: pointer; transition: transform .12s ease, background-color .12s ease; }
+.likert-dot:hover:not(:disabled), .likert-dot:focus-visible { transform: scale(1.08); }
+.likert-dot.strongly_disagree, .likert-dot.strongly_agree { width: 60px; height: 60px; }
+.likert-dot.disagree, .likert-dot.agree { width: 46px; height: 46px; }
+.likert-dot.neutral { width: 32px; height: 32px; border-color: var(--ink-soft); }
+.likert-dot.strongly_disagree, .likert-dot.disagree { border-color: var(--risk); }
+.likert-dot.strongly_agree, .likert-dot.agree { border-color: var(--good); }
+.likert-dot.strongly_disagree:hover, .likert-dot.disagree:hover { background: var(--risk-bg); border-color: var(--risk); }
+.likert-dot.strongly_agree:hover, .likert-dot.agree:hover { background: var(--good-bg); border-color: var(--good); }
+.likert-dot.neutral:hover { background: var(--surface-2); border-color: var(--ink-soft); }
+@media (max-width: 560px) {
+  .likert { grid-template-columns: 1fr 1fr; grid-template-areas: "dots dots" "left right"; row-gap: 8px; }
+  .likert-dots { grid-area: dots; justify-content: center; }
+  .likert-end.disagree { grid-area: left; text-align: left; }
+  .likert-end.agree { grid-area: right; text-align: right; }
+  .likert-dot.strongly_disagree, .likert-dot.strongly_agree { width: 52px; height: 52px; }
+  .likert-dot.disagree, .likert-dot.agree { width: 40px; height: 40px; }
+  .likert-dot.neutral { width: 28px; height: 28px; }
+}
 .survey-other textarea { width: 100%; }
 .also-like { margin: 14px 0; }
 
