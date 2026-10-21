@@ -1,5 +1,6 @@
-"""Delete anonymous and demo profiles not updated for 30 days (retention rule in docs/05-BACKEND_SCHEMA.md).
-Profiles saved to an account stay until their owner deletes them."""
+"""Delete demo copies left alone for a day and anonymous profiles left alone for 30 days (retention
+rule in docs/05-BACKEND_SCHEMA.md). The API also does this at every start. Profiles saved to an
+account stay until their owner deletes them."""
 
 import sys
 from pathlib import Path
@@ -10,4 +11,4 @@ from app import store  # noqa: E402
 
 if __name__ == "__main__":
     store.init_db()
-    print(f"Deleted {store.purge_older_than(30)} profiles")
+    print(f"Deleted {store.purge_stale()}")
