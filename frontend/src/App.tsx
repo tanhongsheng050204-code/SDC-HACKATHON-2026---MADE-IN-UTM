@@ -376,7 +376,7 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "tree" && profile && role && (
               <SkillTree profile={profile} role={role} userId={userId} onProfile={setProfile}
-                onImpact={() => go("impact")} onBack={() => go("role")} />
+                onImpact={() => go("impact")} onBack={() => go("role")} onChangeDestination={() => go("roles")} />
             )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
             {screen === "review-kit" && <ReviewKit />}

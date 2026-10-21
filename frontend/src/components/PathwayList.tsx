@@ -1,4 +1,6 @@
 import type { Pathway, RoleMatch } from "../lib/api";
+import { confetti } from "../lib/confetti";
+import { Icon, IconName } from "./Icon";
 import { percent } from "../lib/format";
 import { COST, HRD, priceText } from "../lib/labels";
 import { getLang, t, tf, tr, tv, type StringKey } from "../lib/i18n";
@@ -21,14 +23,16 @@ export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: Rol
           {plan.grounding.all_supported ? t("pl.grounded") : tf("pl.ungrounded", { list: plan.grounding.unsupported.join(", ") })}
         </p>
       )}
-      {uncovered.length > 0 && (
-        <p className="muted">{tf("pl.uncovered", { list: uncovered.map((n) => tr(n)).join(", ") })}</p>
-      )}
-      <ol className="steps">
-        {plan.steps.map((s) => {
+      {uncovered.length > 0 && (plan.free_only
+        ? <p className="banner warning">{tf("route.noFree", { list: uncovered.map((n) => tr(n)).join(", ") })}</p>
+        : <p className="muted">{tf("pl.uncovered", { list: uncovered.map((n) => tr(n)).join(", ") })}</p>)}
+      <ol className="steps turn-by-turn">
+        {plan.steps.map((s, i) => {
           const c = s.course;
+          const move: IconName = i === 0 ? "go-straight" : i === plan.steps.length - 1 ? "flag" : i % 2 ? "turn-right" : "turn-left";
           return (
             <li key={s.step} className={s.done ? "card is-done" : "card"}>
+              <span className="manoeuvre" aria-hidden="true"><Icon name={s.done ? "check" : move} /><b>{s.step}</b></span>
               <div className="card-row"><strong>{s.skills.map((k) => tr(k.name)).join(", ")}</strong>
                 <span className="step-badges">
                   <span className={`badge ${COST[c.cost]?.tone ?? ""}`}>{c.cost === "paid" ? priceText(c.price_rm, c.cost) : COST[c.cost]?.label ?? c.cost}</span>
@@ -39,7 +43,7 @@ export function PathwayList({ plan, role, onToggle }: { plan: Pathway; role: Rol
               <span className="source">{t("pl.catalogue")} · {c.url ? (c.checked ? tf("pl.checked", { date: c.checked }) : t("pl.notChecked")) : t("pl.noPage")}</span>
               {c.price_note && <span className="source">{c.price_note}{c.hrd_note ? ` ${c.hrd_note}` : ""}{c.price_checked ? ` ${tf("pl.priceChecked", { date: c.price_checked })}` : ""}</span>}
               {c.cost === "paid" && <span className="source">{t("pl.priceWarn")}</span>}
-              <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => onToggle(c.id, e.target.checked)} /> {t("pl.finished")}</label>
+              <label className="check"><input type="checkbox" checked={s.done} onChange={(e) => { if (e.target.checked) confetti(e.currentTarget); onToggle(c.id, e.target.checked); }} /> {t("pl.finished")}</label>
             </li>
           );
         })}

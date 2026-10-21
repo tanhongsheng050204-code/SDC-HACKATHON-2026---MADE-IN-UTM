@@ -215,6 +215,14 @@ Notes: ______
 - [ ] 9.19.5 **Your career identity statement** names your current job and skills you already have; **Copy** copies it; the Future Card shows the rules version.
 - [ ] 9.19.6 **Future roles → Map**: every role but AI operations specialist is plotted, your top five highlighted; switching scenario moves points; tapping a point opens the role. On a phone the map scrolls sideways.
 
+### 9.20 Pathway as a route
+- [ ] 9.20.1 The Pathway header reads **From {your current job} to {role}** (or **From your current skills to …** with no current job); **Change destination** opens Future roles. On a role page the target button says **Set as destination** / **Your destination**.
+- [ ] 9.20.2 The route map shows a start dot, one numbered stop per course, a gold destination pin and **You are here** at the last finished stop. Finished stretches are solid and draw in on load; the rest is dashed. With reduce-motion or Lite mode the line is drawn at once.
+- [ ] 9.20.3 The **Time to ready** bar shows hours left, the RM total of known prices (with “+ n price to confirm” when a price is unknown), stops left and readiness now → after. It stays on screen when scrolling (top on a computer, bottom edge on a phone) and is hidden when printing.
+- [ ] 9.20.4 Ticking **I finished this** in the List tab bursts confetti (not with reduce-motion or Lite mode) and moves the stop, the hours and the stops left at once.
+- [ ] 9.20.5 **Free courses only** (e.g. Sustainability and ESG analyst) drops the paid GRI course, shows RM 0, readiness after below 100%, and a yellow “No free route for this skill: ESG and sustainability reporting.”
+- [ ] 9.20.6 List steps show turn arrows (straight, left, right, flag at the destination, tick when done). On a phone the route keeps its size and scrolls sideways; the page itself does not.
+
 ## 10. SDG impact
 
 - [ ] 10.1 Heading reads “Your impact as a / an …” with the right article.
@@ -337,7 +345,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (297, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (319, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

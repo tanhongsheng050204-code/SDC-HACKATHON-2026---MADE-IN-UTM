@@ -12,15 +12,19 @@ from app.services import grounding
 from app.services.matching import effective_skills, fit_and_gap
 
 LEVEL_ORDER = {"intro": 0, "intermediate": 1, "advanced": 2}
+FREE_COSTS = ("free", "free_audit")
 
 
-def _choose_courses(ref: Reference, missing: list[dict], prefer_claimable: bool = False) -> list[tuple[dict, list[str]]]:
+def _choose_courses(ref: Reference, missing: list[dict], prefer_claimable: bool = False,
+                    free_only: bool = False) -> list[tuple[dict, list[str]]]:
+    """`free_only` keeps courses that are free or free to audit; a skill no such course teaches
+    is left out of the plan and reported as uncovered."""
     remaining = [rs["skill_id"] for rs in missing]
     chosen: list[tuple[dict, list[str]]] = []
     for skill_id in list(remaining):
         if skill_id not in remaining:
             continue  # already covered by an earlier course
-        candidates = [c for c in ref.courses if skill_id in c["skills"]]
+        candidates = [c for c in ref.courses if skill_id in c["skills"] and (not free_only or c["cost"] in FREE_COSTS)]
         if not candidates:
             continue
         best = min(
@@ -53,7 +57,8 @@ Steps: {steps}
 Total hours: {hours}"""
 
 
-def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None) -> dict:
+def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None,
+          free_only: bool = False) -> dict:
     """The plan is built from the skills the person reported, so finished steps stay visible
     (marked done) and readiness shows the progress since the plan was made. `role_override` is the
     role with extra skills (the AI-assisted version of a job, app/services/upgrade.py)."""
@@ -63,7 +68,8 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
     done = set(profile.get("completed_courses") or [])
     steps = []
     for n, (course, taught) in enumerate(
-        sorted(_choose_courses(ref, missing, prefer_claimable=(profile.get("audience") or "worker") == "worker"), key=lambda ct: LEVEL_ORDER[ct[0]["level"]]), start=1
+        sorted(_choose_courses(ref, missing, prefer_claimable=(profile.get("audience") or "worker") == "worker",
+                               free_only=free_only), key=lambda ct: LEVEL_ORDER[ct[0]["level"]]), start=1
     ):
         weight = max(rs["weight"] for rs in missing if rs["skill_id"] in taught)
         steps.append({
@@ -80,9 +86,10 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
     total_hours = sum(s["course"]["hours"] for s in steps)
 
     if not steps:
-        return {"role_id": role_id, "fit": fit, "readiness": readiness, "steps": [], "total_hours": 0,
+        return {"role_id": role_id, "fit": fit, "readiness": readiness, "steps": [], "total_hours": 0, "hours_left": 0,
+                "free_only": free_only,
                 "summary": f"You already have every skill we track for {role['title']}.",
-                "summary_mode": "template", "grounding": None, "uncovered_skills": []}
+                "summary_mode": "template", "grounding": None, "uncovered_skills": uncovered}
 
     summary, mode = _template_summary(role, steps, total_hours), "template"
     try:
@@ -118,4 +125,5 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
                                                       "h": total_hours}},
         "grounding": report.as_dict() if report else None,
         "uncovered_skills": uncovered,
+        "free_only": free_only,
     }

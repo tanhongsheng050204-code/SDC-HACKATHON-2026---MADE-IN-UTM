@@ -1,7 +1,8 @@
 // Line icons drawn on a 24 px grid, one path each, so we don't ship an icon library.
 export type IconName =
   | "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash"
-  | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target";
+  | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target"
+  | "go-straight" | "turn-left" | "turn-right" | "flag" | "check";
 
 const ICONS: Record<IconName, string> = {
   chat: "M4 5h16v11H9l-5 4z",
@@ -19,6 +20,11 @@ const ICONS: Record<IconName, string> = {
   home: "M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-5h4v5",
   mic: "M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6",
   book: "M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h9",
+  "go-straight": "M12 20V5M7 10l5-5 5 5",
+  "turn-left": "M17 20v-7a4 4 0 0 0-4-4H6M10 5 6 9l4 4",
+  "turn-right": "M7 20v-7a4 4 0 0 1 4-4h7M14 5l4 4-4 4",
+  check: "M5 12.5l4.5 4.5L19 7.5",
+  flag: "M6 21V4M6 4h11l-2 4 2 4H6",
   target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 12.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z",
 };
 

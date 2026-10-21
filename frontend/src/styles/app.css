@@ -772,3 +772,58 @@ main:focus { outline: none; }
 .audience-pick legend { font-weight: 600; padding: 0; margin-bottom: 6px; }
 .review-more { display: grid; gap: 6px; align-content: end; }
 .review-more .btn { justify-self: start; }
+
+/* ---- Pathway as a route: map, ETA bar, turn-by-turn steps, confetti ---- */
+.route-head { grid-template-columns: 1fr auto; align-items: end; }
+.route-panel { display: grid; gap: 10px; padding: 14px 16px; }
+.route-map { margin: 0; }
+.route-map svg { width: 100%; max-width: 720px; margin: 0 auto; height: auto; display: block; overflow: visible; }
+.route-line { fill: none; stroke-linecap: round; }
+.route-line.upcoming { stroke: var(--line-strong); stroke-width: 4; stroke-dasharray: 2 10; }
+.route-line.travelled { stroke: var(--accent); stroke-width: 5; stroke-dasharray: 1; stroke-dashoffset: 1; animation: route-draw .85s ease-out .1s forwards; }
+@keyframes route-draw { to { stroke-dashoffset: 0; } }
+.route-stop { animation: route-pop .35s ease-out both; transform-box: fill-box; transform-origin: center; }
+@keyframes route-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+.route-stop circle { fill: var(--surface); stroke: var(--line-strong); stroke-width: 2.5; }
+.route-stop text { font-size: 11px; font-weight: 700; fill: var(--ink); }
+.route-stop.is-done circle { fill: var(--accent); stroke: var(--accent); }
+.route-stop.is-done text { fill: var(--page); }
+.route-stop .route-stop-label { font-size: 11px; font-weight: 500; fill: var(--ink-soft); }
+.route-start circle { fill: var(--ink); }
+.route-end-label { font-size: 12px; font-weight: 600; fill: var(--ink); }
+.route-pin path { fill: var(--gold-bright); stroke: var(--gold); stroke-width: 1.5; }
+.route-pin-dot { fill: var(--surface); }
+.route-here-ring { fill: none; stroke: var(--accent); stroke-width: 2; opacity: .5; }
+.route-here text { font-size: 11px; font-weight: 700; fill: var(--accent); }
+.route-free { font-size: .9rem; }
+.route-map.compact .route-end-label { font-size: 14px; }
+
+.eta-bar { position: sticky; top: 8px; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
+  padding: 10px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 16px rgba(0, 0, 0, .06); font-size: .9rem; }
+.eta-bar .eta-title { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
+@media (max-width: 560px) {
+  .route-head { grid-template-columns: 1fr; }
+  /* On a phone the ETA rides along the bottom edge, like a sat-nav's arrival strip. */
+  .eta-bar { position: fixed; top: auto; left: 12px; right: 12px; bottom: 12px; gap: 4px 12px; font-size: .85rem; }
+  main:has(.eta-bar) { padding-bottom: 120px; }
+  /* Too small to read when squeezed to 343px, so the route keeps its size and scrolls sideways. */
+  .route-map { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .route-map svg { min-width: 560px; }
+}
+@media print { .eta-bar, .route-free { display: none; } }
+
+.turn-by-turn > li::before { display: none; }
+.turn-by-turn .manoeuvre { position: absolute; left: 14px; top: 16px; width: 34px; display: grid; justify-items: center; gap: 2px; color: var(--accent); }
+.turn-by-turn .manoeuvre svg { width: 22px; height: 22px; }
+.turn-by-turn .manoeuvre b { font-size: .72rem; color: var(--ink-soft); }
+
+.confetti { position: fixed; width: 0; height: 0; pointer-events: none; z-index: 1000; }
+.confetti span { position: absolute; width: 7px; height: 7px; border-radius: 2px; animation: confetti-burst .75s ease-out forwards; }
+@keyframes confetti-burst { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(.6) rotate(200deg); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .route-line.travelled { animation: none; stroke-dashoffset: 0; }
+  .route-stop { animation: none; }
+  .confetti { display: none; }
+}
+:root[data-lite="1"] .route-line.travelled { stroke-dashoffset: 0; }

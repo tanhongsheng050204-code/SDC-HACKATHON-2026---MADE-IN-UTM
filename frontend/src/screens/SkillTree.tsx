@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { RouteMap } from "../components/RouteMap";
 import { StudyCalendar } from "../components/StudyCalendar";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
 import { api, Pathway, Profile, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
 import { percent } from "../lib/format";
-import { levelName, t, tr } from "../lib/i18n";
+import { levelName, t, tf, tr } from "../lib/i18n";
 
 
 // My pathway: the skill tree is the map (skills you have at the bottom, the role on top), each
 // node carries the course that teaches it, and the ring fills as levels are proven. The List tab
 // is the same plan as ordered courses, for hours, cost and printing.
-export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }: {
+export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, onChangeDestination }: {
   profile: Profile; role: RoleMatch; userId: string | null;
-  onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void;
+  onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void; onChangeDestination: () => void;
 }) {
   const [tab, setTab] = useState<"tree" | "list">("tree");
   const [tree, setTree] = useState<Tree | null>(null);
@@ -23,23 +24,34 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
   const [open, setOpen] = useState<TreeNode | null>(null);
   const [proving, setProving] = useState<TreeNode | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [fromTitle, setFromTitle] = useState<string | null>(null);
 
   function load() {
     api.tree(profile.id, role.role_id).then(setTree).catch(() => setError(t("tree.loadFailed")));
   }
   useEffect(load, [profile.id, role.role_id, profile.completed_courses.length]);
+  // The plan drives the route map and the ETA bar, so it loads with the page, not only on the List tab.
   useEffect(() => {
-    if (tab === "list" && !plan) api.pathway(profile.id, role.role_id).then(setPlan).catch(() => setError(t("tree.loadFailed")));
-  }, [tab, plan, profile.id, role.role_id]);
+    let live = true;  // a slower answer for the previous toggle must not overwrite this one
+    api.pathway(profile.id, role.role_id, freeOnly).then((p) => live && setPlan(p)).catch(() => live && setError(t("tree.loadFailed")));
+    return () => { live = false; };
+  }, [profile.id, role.role_id, freeOnly]);
+  useEffect(() => {
+    if (!profile.current_role_id) { setFromTitle(null); return; }
+    api.roles().then((rs) => setFromTitle(rs.find((r) => r.id === profile.current_role_id)?.title ?? null)).catch(() => setFromTitle(null));
+  }, [profile.current_role_id]);
 
   async function refreshProfile() {
     try { onProfile(await api.getProfile(profile.id)); } catch { /* the tree already shows the change */ }
   }
   async function setCourse(courseId: string, done: boolean) {
+    // Optimistic: the route and ETA move at once; the saved plan replaces it a moment later.
+    setPlan((p) => p && { ...p, steps: p.steps.map((s) => (s.course.id === courseId ? { ...s, done } : s)),
+      hours_left: p.steps.reduce((h, s) => h + ((s.course.id === courseId ? done : s.done) ? 0 : s.course.hours), 0) });
     try {
       onProfile(await api.complete(profile.id, courseId, done));
-      setPlan(null);
-      if (tab === "list") setPlan(await api.pathway(profile.id, role.role_id));
+      setPlan(await api.pathway(profile.id, role.role_id, freeOnly));
     } catch { setError(t("tree.loadFailed")); }
   }
   async function proven(passed: boolean) {
@@ -55,18 +67,29 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
   return (
     <section>
       <button className="link back-link" onClick={onBack}>← {tr(tree.role.title)}</button>
-      <div className="page-head"><h1>{t("path.title")}: {tr(tree.role.title)}</h1><p className="muted">{t("path.sub")}</p></div>
+      <div className="page-head route-head">
+        <div>
+          <p className="eyebrow">{t("path.title")}</p>
+          <h1>{fromTitle ? tf("route.from", { from: tr(fromTitle), to: tr(tree.role.title) }) : tf("route.fromSkills", { to: tr(tree.role.title) })}</h1>
+          <p className="muted">{t("path.sub")}</p>
+        </div>
+        <button className="btn quiet" onClick={onChangeDestination}>{t("route.change")}</button>
+      </div>
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
 
-      <div className="card path-head">
-        <div className="card-row"><strong>{t("path.readiness")}</strong><strong className="readiness-num">{percent(tree.readiness)}%</strong></div>
-        <div className="fit" role="img" aria-label={`${t("path.readiness")} ${percent(tree.readiness)}%`}><div style={{ width: `${tree.readiness * 100}%` }} /></div>
-        <span className="muted">{tree.total_steps} {t("path.steps")} · {tree.hours_left} {t("path.hoursLeft")}</span>
-      </div>
+      {plan && (
+        <div className="route-panel card">
+          <RouteMap plan={plan} from={fromTitle ? tr(fromTitle) : t("route.yourSkills")} to={tree.role.title} />
+          <label className="check route-free"><input type="checkbox" checked={freeOnly} onChange={(e) => setFreeOnly(e.target.checked)} /> {t("route.freeOnly")}</label>
+        </div>
+      )}
+      {plan && <EtaBar plan={plan} role={role} />}
 
-      <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={tab === "tree"} onClick={() => setTab("tree")}>{t("path.tabTree")}</button>
-        <button role="tab" aria-selected={tab === "list"} onClick={() => setTab("list")}>{t("path.tabList")}</button>
+      <div className="tabs" role="tablist" aria-label={t("path.title")}>
+        <button role="tab" aria-selected={tab === "tree"} tabIndex={tab === "tree" ? 0 : -1} onClick={() => setTab("tree")}
+          onKeyDown={(e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { setTab("list"); (e.currentTarget.nextElementSibling as HTMLElement | null)?.focus(); } }}>{t("path.tabTree")}</button>
+        <button role="tab" aria-selected={tab === "list"} tabIndex={tab === "list" ? 0 : -1} onClick={() => setTab("list")}
+          onKeyDown={(e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { setTab("tree"); (e.currentTarget.previousElementSibling as HTMLElement | null)?.focus(); } }}>{t("path.tabList")}</button>
       </div>
 
       {tab === "tree" && (
@@ -137,5 +160,29 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
           onDone={proven} onClose={() => { setProving(null); setOpen(null); }} />
       )}
     </section>
+  );
+}
+
+// The ETA: what is left on this route, refreshed after every tick. Readiness after the plan is
+// 100% only when every missing skill has a course; otherwise it is the share of the role's skill
+// weight the plan reaches, and the skills with no course are named. Hidden when printing.
+function EtaBar({ plan, role }: { plan: Pathway; role: RoleMatch }) {
+  const left = plan.steps.filter((s) => !s.done);
+  const paid = left.filter((s) => s.course.cost === "paid");
+  const known = paid.reduce((sum, s) => sum + (s.course.price_rm ?? 0), 0);
+  const unknown = paid.filter((s) => s.course.price_rm == null).length;
+  const total = [...role.covered, ...role.missing].reduce((w, s) => w + s.weight, 0) || 1;
+  const reachable = total - role.missing.filter((m) => plan.uncovered_skills.includes(m.skill_id)).reduce((w, s) => w + s.weight, 0);
+  const after = plan.uncovered_skills.length === 0 ? 1 : reachable / total;
+  const rm = unknown ? tf("route.rmPlus", { n: known.toLocaleString("en-MY"), k: unknown }) : tf("route.rm", { n: known.toLocaleString("en-MY") });
+  return (
+    <div className="eta-bar" role="status">
+      <span className="eta-title">{t("route.eta")}</span>
+      <strong>{tf("route.hoursLeft", { h: plan.hours_left })}</strong>
+      <span>{rm}</span>
+      <span>{tf("route.stops", { n: left.length })}</span>
+      <span>{tf("route.readiness", { now: percent(plan.readiness), after: percent(after) })}</span>
+      {left.length === 0 && plan.steps.length > 0 && <span className="badge good">{t("route.arrived")}</span>}
+    </div>
   );
 }

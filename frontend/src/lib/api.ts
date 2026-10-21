@@ -273,7 +273,7 @@ export interface Pathway {
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean }[];
   summary_template?: { key: string; vars: Record<string, unknown> };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
-  uncovered_skills: string[];
+  uncovered_skills: string[]; free_only?: boolean;
 }
 
 // The hosted API can sleep when idle (Render's free plan) and take up to a minute to wake. While it does,
@@ -523,5 +523,6 @@ export const api = {
     request<SurveyResult>(`/profiles/${id}/survey`, { method: "POST", body: JSON.stringify({ answers, language }) }),
   xray: (roleId: string, scenario: Scenario, year?: number, adoption?: number) =>
     request<Xray>(`/roles/${encodeURIComponent(roleId)}/xray?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption ? `&adoption=${adoption}` : ""}`),
-  pathway: (id: string, role: string) => request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}`),
+  pathway: (id: string, role: string, freeOnly = false) =>
+    request<Pathway>(`/profiles/${id}/pathway?role=${encodeURIComponent(role)}${freeOnly ? "&free_only=true" : ""}`),
 };
