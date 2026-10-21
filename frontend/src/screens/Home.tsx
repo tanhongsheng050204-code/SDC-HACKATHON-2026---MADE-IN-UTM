@@ -115,13 +115,14 @@ export function Home({ profile, scenario, onScenario, onAsk, onOpenRole, onGo }:
       {data && (
         <div className="home-grid">
           <div className="card home-roles">
-            <div className="card-row">
-              <div><h2>Your best next roles</h2><p className="muted">{data.scenario.description}</p></div>
+            <div className="home-roles-head">
+              <h2>Your best next roles</h2>
               <div className="segmented" role="radiogroup" aria-label="AI adoption scenario">
                 {SCENARIOS.map((s) => (
                   <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
                 ))}
               </div>
+              <p className="muted scenario-note">{data.scenario.description}</p>
             </div>
             <ol className="home-list">
               {data.roles.slice(0, 5).map((r) => (
