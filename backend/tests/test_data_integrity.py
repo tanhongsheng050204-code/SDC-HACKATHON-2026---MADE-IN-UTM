@@ -151,3 +151,16 @@ def test_every_role_maps_to_a_dosm_group():
     ref = get_reference()
     groups = {g["id"] for g in ref.salaries["groups"]}
     assert all(role["masco_major"] in groups - {"all"} for role in ref.roles.values())
+
+
+def test_every_sdg_reason_has_bm_and_chinese():
+    ref = get_reference()
+    for tags in [*ref.sdg_map["roles"].values(), *ref.sdg_map["skills"].values()]:
+        for tag in tags:
+            assert tag.get("reason_ms", "").strip() and tag.get("reason_zh", "").strip(), tag["reason"]
+
+
+def test_role_page_sends_sdg_reasons_in_three_languages(client):
+    body = client.get("/api/roles/care_worker").json()
+    assert body["sdgs"] and all(set(g["reasons"]) == {"en", "ms", "zh"} for g in body["sdgs"])
+    assert all(set(g["reasons"]) == {"en", "ms", "zh"} for goals in body["skill_sdgs"].values() for g in goals)

@@ -46,6 +46,13 @@ class Reference:
     def skill_sdgs(self, skill_id: str) -> list[dict]:
         return self.sdg_map["skills"].get(skill_id, [])
 
+    def sdg_view(self, tags: list[dict]) -> list[dict]:
+        """SDG tags as sent to the app: the goal, its target, and the reason in each language (BM
+        and 中文 are AI-drafted; English is shown where a translation is missing)."""
+        return [{**self.sdgs[t["sdg"]], "target": t.get("target"), "reason": t["reason"],
+                 "reasons": {"en": t["reason"], "ms": t.get("reason_ms") or t["reason"],
+                             "zh": t.get("reason_zh") or t["reason"]}} for t in tags]
+
 
 def _read(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))

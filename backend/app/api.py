@@ -69,10 +69,9 @@ def role_detail(role_id: str):
     role = ref.roles[role_id]
     return {
         **role,
-        "sdgs": [{**ref.sdgs[t["sdg"]], "reason": t["reason"]} for t in ref.role_sdgs(role_id)],
+        "sdgs": ref.sdg_view(ref.role_sdgs(role_id)),
         "skill_sdgs": {
-            rs["skill_id"]: [{**ref.sdgs[t["sdg"]], "reason": t["reason"]}
-                             for t in ref.skill_sdgs(rs["skill_id"])]
+            rs["skill_id"]: ref.sdg_view(ref.skill_sdgs(rs["skill_id"]))
             for rs in role["skills"] if ref.skill_sdgs(rs["skill_id"])
         },
     }
@@ -623,7 +622,9 @@ def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
             "level_name": ref.skill_levels[check["level"] - 1]["name"],
             "answers": [q["answer"] for q in check["questions"]],
             "explanations": [q["explanation"] for q in check["questions"]],
-            "course": None if passed else skilltree.course_for(ref, check["skill_id"])}
+            "course": None if passed else skilltree.course_for(ref, check["skill_id"]),
+            # A pass shows how the proven skill serves the Sustainable Development Goals.
+            "sdgs": ref.sdg_view(ref.skill_sdgs(check["skill_id"])) if passed else []}
 
 
 @router.get("/profiles/{profile_id}/survey")

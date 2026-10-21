@@ -10,7 +10,7 @@ export type Audience = "worker" | "graduate" | "switcher";
 export interface Skill { id: string; name: string; category: string }
 /** The scrubbed CV text that would go to a language model, and how many details were removed. */
 export interface SendPreview { text: string; removed: Partial<Record<"NAME" | "EMAIL" | "PHONE" | "IC" | "DOB" | "AGE" | "ADDRESS" | "ORG", number>>; characters: number }
-export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string }
+export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string; reasons?: Texts }
 export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[]; added_from_ads?: boolean }
 export interface RoleOption { id: string; title: string }
 export interface Profile {
@@ -158,6 +158,7 @@ export interface CheckStart {
 export interface CheckResult {
   passed: boolean; correct: number; level: number; level_name: string; answers: number[];
   explanations: string[]; course: { id: string; title: string; url: string } | null;
+  sdgs?: Sdg[];  // on a pass: how the proven skill serves the goals
 }
 
 export interface SurveyCard { id: string; text: Record<string, string>; role_ids: string[] }

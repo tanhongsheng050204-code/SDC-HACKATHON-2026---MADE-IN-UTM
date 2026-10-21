@@ -99,7 +99,7 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "from_role": ref.roles[a]["title"], "to_role": ref.roles[b]["title"], "to_role_id": b,
         "people": m["people"], "avg_hours": round(m["hours"] / m["people"]),
         "avg_fit_now": round(m["fit"] / m["people"], 3),
-        "sdgs": [{**ref.sdgs[t["sdg"]], "reason": t["reason"]} for t in ref.role_sdgs(b)],
+        "sdgs": ref.sdg_view(ref.role_sdgs(b)),
     } for (a, b), m in moves.items()), key=lambda m: (-m["people"], m["avg_hours"]))
     at_risk = sum(r["headcount"] for r in rows if r["at_risk"])
     return {
