@@ -315,7 +315,7 @@ Notes: ______
 
 ## 20. For developers (local)
 
-- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (269, one skipped).
+- [ ] 20.1 `cd backend` → `python -m pytest` → all tests pass (270, one skipped).
 - [ ] 20.2 `cd frontend` → `npm run build` → builds with no errors.
 - [ ] 20.3 `docker compose up --build` (repo outside OneDrive) → app on <http://localhost:8080>.
 - [ ] 20.4 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

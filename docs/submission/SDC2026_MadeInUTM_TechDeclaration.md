@@ -117,7 +117,7 @@ Did the team use any generative-AI tool to help create code, design, text or oth
 
 **How the team reviewed, tested and took responsibility for AI-generated output** *(100 words max)*
 
-The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 269 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
+The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: 270 automated backend tests, a type-checked frontend build, and CI on every push. Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
 
 *Word count: 93*
 
