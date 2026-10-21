@@ -215,6 +215,10 @@ Results and decisions are stored in the database (`evidence` table), so a redepl
 
 A person approves each card. Up to 6 approved cards appear under the ranked roles on the Future roles screen, labelled **"A prediction"** and **never ranked**: there is no published growth figure for jobs this new. Each card shows the person's carry-over skills, what is left to learn and a link to the stepping-stone role. **Search current job ads** on a card runs a live search, labelled "not yet reviewed", cached per title per day, limited to 5 per profile per hour, and never scored. Search grounding is billed by Google per search on paid plans; one full run is 13–26 searches, an emerging-roles run 8.
 
+## A day in this job
+
+Each role page opens with a short **"A day in this job"** in EN / BM / 中文: what you spend the day doing, the setting and who you work with, and how the work helps people. Gemini drafted it once per role from our own data only (the role's O\*NET tasks, work context, main skills, DOSM pay group and SDG reason) with [`build_day_in_job.py`](backend/scripts/build_day_in_job.py); the text is committed in `backend/data/day_in_job.json` and listed in REVIEW_LOG for the team. When an admin approves a role's job-ad evidence, a richer version that may also use the approved ad quotes is drafted in the background and waits in the same admin panel; once approved, it replaces that role's text. It never feeds any score.
+
 ## Tests and checks
 
 ```powershell
@@ -224,7 +228,7 @@ cd frontend; npm run build                           # type check + production b
 
 GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
 
-Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py` and `build_tasks.py` (rebuild reference data), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
+Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py`, `build_tasks.py` and `build_day_in_job.py` (rebuild reference data; the last needs `GEMINI_API_KEY`), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
 
 A full manual checklist of every feature is in [MANUAL_TEST_PLAN.md](docs/MANUAL_TEST_PLAN.md).
 
