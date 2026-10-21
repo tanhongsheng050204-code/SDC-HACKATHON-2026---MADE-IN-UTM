@@ -667,3 +667,8 @@ main:focus { outline: none; }
 .sdg-reasons h2 { margin: 0; font-size: 1.05rem; }
 .sdg-reasons ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .proof-result .sdg-reasons h2 { font-size: .95rem; }
+.study-calendar { display: grid; gap: 10px; margin-top: 12px; }
+.study-calendar h3, .study-calendar p { margin: 0; }
+.cal-days { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.cal-days legend { font-weight: 600; margin-bottom: 4px; }
+@media print { .study-calendar { display: none; } }

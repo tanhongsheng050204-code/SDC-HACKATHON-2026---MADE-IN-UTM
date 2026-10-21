@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
+import { StudyCalendar } from "../components/StudyCalendar";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
@@ -96,6 +97,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack }
       {tab === "list" && (plan
         ? <>
             <PathwayList plan={plan} role={role} onToggle={setCourse} />
+            <StudyCalendar plan={plan} roleTitle={role.title} />
             <div className="actions">
               <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
               <button onClick={() => window.print()}>{t("a.print")}</button>
