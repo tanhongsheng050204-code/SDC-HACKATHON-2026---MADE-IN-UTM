@@ -178,9 +178,12 @@ export interface AlsoLike {
 export interface SurveyResult { preferences: Record<string, number>; summary: string[]; also_like: AlsoLike[] }
 
 type Count = number | "fewer than 3";
+export interface Programme { id: string; name: Texts; skills: string[] }
 export interface ClassResult {
   scenario: { id: Scenario; label: string; description: string };
   students: Count; programmes: { name: string; students: Count }[];
+  by_programme: { name: string; students: number; best_fit: { role_id: string; title: string; students: Count }[];
+    top_gaps: { skill_id: string; name: string; students: Count; course: { title: string; url: string } | null }[] }[];
   best_fit: { role_id: string; title: string; students: Count; outlook: Record<Scenario, { index: number; label: string }> }[];
   top_gaps: { skill_id: string; name: string; students: Count; course: { id: string; title: string; url: string } | null }[];
   courses: { course: { id: string; title: string; provider: string; url: string; hours: number; cost: string }; students_helped: Count; hours: number }[];
@@ -425,6 +428,7 @@ export const api = {
   aiAssisted: (profileId: string) => request<AiAssisted>(`/profiles/${encodeURIComponent(profileId)}/ai-assisted`),
   history: (roleId: string, scenario: Scenario) =>
     request<RoleHistory>(`/roles/${encodeURIComponent(roleId)}/history?scenario=${scenario}`),
+  programmes: () => request<Programme[]>("/programmes"),
   translations: () => request<Record<string, { ms: string; zh: string }>>("/translations"),
   tasks: (roleId: string, done: string[] = []) =>
     request<RoleTasks>(`/roles/${encodeURIComponent(roleId)}/tasks${done.length ? `?done=${encodeURIComponent(done.join(","))}` : ""}`),

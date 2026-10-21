@@ -65,5 +65,5 @@ Decisions: working adults see **A "Your job, with AI"** (their own role, "AI-ass
 
 - [x] **E1** `data/ai_upgrade.json` drafted by `scripts/build_ai_upgrade.py`; Option A card for workers and switchers; long-shot labels; shortest-route pick.
 - [x] **E2** HR: upskill in place + nearest move per at-risk group, costs compared; "get ahead" list.
-- [ ] **E3** `data/programmes.json` (about 15 Malaysian programmes); degree step for graduates; class view per programme.
+- [x] **E3** `data/programmes.json` (about 15 Malaysian programmes); degree step for graduates; class view per programme.
 - [ ] **E4** "Find current openings" on the role page.

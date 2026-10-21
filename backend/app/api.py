@@ -56,6 +56,13 @@ def list_skills():
     return sorted(get_reference().skills.values(), key=lambda s: (s["category"], s["name"]))
 
 
+@router.get("/programmes")
+def programmes():
+    """Common Malaysian programmes and the skills they usually teach: a graduate's starting point,
+    which they confirm (team-reviewed data)."""
+    return [{k: p[k] for k in ("id", "name", "skills")} for p in get_reference().programmes]
+
+
 @router.get("/translations")
 def translations():
     """BM / 中文 for the text in our reference data, keyed by its English wording (AI-drafted)."""

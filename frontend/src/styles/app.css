@@ -697,3 +697,5 @@ main:focus { outline: none; }
 .ai-assisted .study-calendar { margin-top: 4px; }
 .option-head { margin: 18px 0 6px; font-size: 1.1rem; }
 .shortest-route { display: grid; gap: 4px; text-align: left; margin-bottom: 10px; border-left: 4px solid var(--good); }
+.degree-start { display: grid; gap: 8px; margin-bottom: 12px; }
+.degree-start h2, .degree-start p { margin: 0; }

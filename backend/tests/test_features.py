@@ -271,3 +271,20 @@ def test_hr_moves_go_to_the_nearest_role_and_offer_upskilling_in_place():
     assert in_place["data_entry_clerk"]["ai_skills"]
     risky = {r["role_id"] for r in result["roles"] if r["at_risk"]}
     assert all(r["role_id"] not in risky for r in result["get_ahead"])  # stable roles only
+
+
+def test_class_view_splits_results_by_programme_without_small_groups():
+    from app.services import classview
+
+    ref = get_reference()
+    result = classview.analyse(ref, open("data/sample_class.csv", encoding="utf-8").read(), "baseline")
+    names = {p["name"] for p in result["by_programme"]}
+    assert {"Business administration", "Computer science", "Electrical and electronic engineering"} <= names
+    assert all(p["students"] >= classview.SMALL and p["best_fit"] and p["top_gaps"] for p in result["by_programme"])
+    small = "programme,skills\n" + "Psychology,communication; empathy\n" * 2 + "Accounting,excel; statistics\n" * 4
+    assert [p["name"] for p in classview.analyse(ref, small, "baseline")["by_programme"]] == ["Accounting"]
+
+
+def test_programmes_are_served(client):
+    body = client.get("/api/programmes").json()
+    assert any(p["id"] == "accounting" and "excel" in p["skills"] for p in body)
