@@ -78,6 +78,18 @@ def role_detail(role_id: str):
     }
 
 
+@router.get("/roles/{role_id}/day")
+def role_day(role_id: str):
+    """A day in this job: the reviewed or committed description, in EN / BM / 中文."""
+    ref = get_reference()
+    if role_id not in ref.roles:
+        raise HTTPException(404, "Role not found")
+    entry = ref.day_in_job.get(role_id)
+    if entry is None:
+        raise HTTPException(404, "No description for this role yet")
+    return {k: entry.get(k) for k in ("role_id", "text", "basis", "drafted", "reviewed_by")}
+
+
 @router.get("/roles/{role_id}/xray")
 def role_xray(role_id: str, scenario: Scenario = "baseline", year: int | None = None,
               adoption: float | None = Query(default=None, ge=0.5, le=2.0)):
@@ -239,7 +251,7 @@ def evidence_refresh_status(x_admin_token: str = Header(default="")):
 
 
 @router.get("/evidence/pending")
-def pending_evidence(kind: str = Query("role", pattern="^(role|emerging)$"), x_admin_token: str = Header(default="")):
+def pending_evidence(kind: str = Query("role", pattern="^(role|emerging|day)$"), x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     return evidence_review.list_pending(kind)
 

@@ -1,6 +1,7 @@
 """Reference data: skills, roles, courses, SDGs, scenarios and dated signal snapshots.
 
-Roles also carry their latest approved skill evidence (app/evidence), stored in the database.
+Roles also carry their latest approved skill evidence (app/evidence), stored in the database, and
+"a day in this job" is the committed file version unless a richer one has been approved.
 
 All of it is versioned JSON under backend/data/, read once and kept in memory. Snapshots are
 immutable: committed ones are files; ones imported or approved at runtime are rows in the database.
@@ -33,6 +34,7 @@ class Reference:
     work_dimensions: list[dict]
     survey_cards: dict[str, dict]
     salaries: dict
+    day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
 
     @property
     def latest_snapshot(self) -> dict:
@@ -89,6 +91,7 @@ def get_reference() -> Reference:
         work_dimensions=_read(data_dir / "work_dimensions.json"),
         survey_cards={c["id"]: c for c in _read(data_dir / "survey_cards.json")},
         salaries=_read(data_dir / "salaries.json"),
+        day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
     )
 
 

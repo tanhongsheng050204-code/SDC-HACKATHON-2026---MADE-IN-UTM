@@ -372,7 +372,8 @@ def decide_snapshot(snapshot_id: str, state: str, decided_by: str, body: dict, r
 
 # --- cited evidence (Phase 3) -------------------------------------------------------------------
 # Web-search results waiting for, or decided by, a person. `kind` is "role" (skill evidence for a
-# catalogue role) or "emerging" (a predicted new role); `subject` is the role or capability id.
+# catalogue role), "emerging" (a predicted new role) or "day" (a "day in this job" draft that uses
+# approved job ads); `subject` is the role or capability id.
 
 def save_evidence(evidence_id: str, kind: str, subject: str, body: dict) -> None:
     with _connect() as conn:

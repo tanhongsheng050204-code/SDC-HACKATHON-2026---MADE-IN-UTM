@@ -9,6 +9,7 @@ import datetime as dt
 import re
 
 from app import store
+from app.evidence import day
 from app.evidence.search import aggregate
 from app.reference import get_reference, reload_reference
 
@@ -29,6 +30,11 @@ def _pending(evidence_id: str) -> dict:
 
 
 def list_pending(kind: str = "role") -> list[dict]:
+    if kind == "day":
+        roles = get_reference().roles
+        return [{"id": i["id"], "kind": "day", "role_id": i["subject"], "title": roles[i["subject"]]["title"],
+                 "drafted": i["body"]["drafted"], "basis": i["body"]["basis"]}
+                for i in store.list_evidence("pending", "day") if i["subject"] in roles]
     if kind == "emerging":
         return [{"id": i["id"], "kind": "emerging", "subject": i["subject"], "title": i["body"]["title"]["en"],
                  "capability_name": i["body"]["capability_name"], "momentum": i["body"]["momentum"],
@@ -50,6 +56,10 @@ def detail(evidence_id: str) -> dict:
     item = _pending(evidence_id)
     ref = get_reference()
     names = {sid: s["name"] for sid, s in ref.skills.items()}
+    if item["kind"] == "day":
+        return {"id": item["id"], "kind": "day", "role_id": item["subject"],
+                "title": ref.roles[item["subject"]]["title"], **item["body"],
+                "current": (ref.day_in_job.get(item["subject"]) or {}).get("text")}
     if item["kind"] == "emerging":
         return {"id": item["id"], "kind": "emerging", "subject": item["subject"], **item["body"], "skill_names": names,
                 "stepping_stone_title": ref.roles[item["body"]["stepping_stone"]]["title"]}
@@ -74,6 +84,11 @@ def approve(evidence_id: str, reviewer: str, drop_sources: list[str], drop_added
         body.update(reviewed_by=reviewer, reviewed_at=_stamp())
         store.decide_evidence(evidence_id, "approved", reviewer, body)
         return {"id": evidence_id, "capability_id": item["subject"]}
+    if item["kind"] == "day":  # replaces the file version for this role
+        body.update(reviewed_by=reviewer, reviewed_at=_stamp())
+        store.decide_evidence(evidence_id, "approved", reviewer, body)
+        reload_reference()
+        return {"id": evidence_id, "role_id": item["subject"]}
     ref = get_reference()
     body["summary"] = aggregate(_base_role(ref.roles[item["subject"]]), body["sources"], ref.skills,
                                 set(drop_sources), set(drop_added))
@@ -83,6 +98,7 @@ def approve(evidence_id: str, reviewer: str, drop_sources: list[str], drop_added
     body.update(reviewed_by=reviewer, reviewed_at=_stamp(), dropped_sources=drop_sources, dropped_added=drop_added)
     store.decide_evidence(evidence_id, "approved", reviewer, body)
     reload_reference()
+    day.queue_in_background(item["subject"], body)  # a richer "day in this job" draft, for review
     return {"id": evidence_id, "role_id": item["subject"], "added": [a["skill_id"] for a in body["summary"]["added"]]}
 
 

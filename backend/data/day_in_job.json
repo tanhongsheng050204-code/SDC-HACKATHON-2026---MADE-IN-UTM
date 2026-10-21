@@ -1,0 +1,534 @@
+{
+  "note": "AI-drafted (Gemini) from our own data only: O*NET tasks, work context, main skills, DOSM pay group and SDG reason. Team: read each text, have a native speaker check BM and 中文, and fill reviewed_by (REVIEW_LOG.md). An approved job-ad version in the database replaces a role's text here.",
+  "model": "gemini-3.8-flash",
+  "roles": {
+    "data_entry_clerk": {
+      "role_id": "data_entry_clerk",
+      "text": {
+        "en": "You spend structured, predictable days working at a desk during fixed office hours, selecting needed materials and keying records into business systems. Working with data and systems, you compile, sort, and verify data accuracy, store completed documents, and locate errors or report them to supervisors. Your role is vital because reskilling clerical workers before their tasks are automated keeps them in full and productive employment. The DOSM 2025 median monthly pay for clerical support workers is RM2,693, which is the median for the whole occupation group and not a job offer.",
+        "ms": "Anda menghabiskan hari yang teratur dan mudah dijangka dengan bekerja di meja pada waktu pejabat yang tetap, memilih bahan yang diperlukan dan memasukkan rekod ke dalam sistem perniagaan. Semasa bekerja dengan data dan sistem, anda menyusun dan mengesahkan ketepatan data, menyimpan dokumen yang lengkap, serta mengesan ralat atau melaporkannya kepada penyelia. Usaha ini penting kerana melatih semula pekerja perkeranian sebelum tugas mereka diautomasikan mengekalkan mereka dalam pekerjaan yang penuh dan produktif. Gaji bulanan penengah DOSM 2025 untuk pekerja sokongan perkeranian ialah RM2,693, yang merupakan penengah bagi keseluruhan kumpulan pekerjaan dan bukannya tawaran kerja.",
+        "zh": "你在固定的办公时间内伏案工作，度过结构化且规律的日常，挑选所需材料并将记录录入业务系统。在与数据和系统打交道时，你负责整理并核对数据的准确性、归档已完成的文件，以及找出错误或向主管汇报。在文职人员的任务实现自动化之前对其进行再培训，能让他们保持充分和生产性就业，从而带来积极影响。2025年马来西亚统计局（DOSM）文职支持人员的月薪中位数为RM2,693，此数据代表整个职业组别的中位数，并非具体的职位薪水。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Data entry clerk",
+        "summary": "Keys records into business systems and checks them for errors.",
+        "tasks": [
+          "Compile, sort, and verify the accuracy of data before it is entered.",
+          "Compare data with source documents, or re-enter data in verification format to detect errors.",
+          "Store completed documents in appropriate locations.",
+          "Locate and correct data entry errors, or report them to supervisors.",
+          "Select materials needed to complete work assignments."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "structured, predictable days",
+          "working at a desk",
+          "fixed office hours"
+        ],
+        "main_skills": [
+          "Data entry",
+          "Spreadsheets (Excel / Google Sheets)",
+          "Office administration",
+          "Resilience, flexibility and agility"
+        ],
+        "sdg_reasons": [
+          "Reskilling clerical workers before their tasks are automated keeps them in full and productive employment."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "admin_assistant": {
+      "role_id": "admin_assistant",
+      "text": {
+        "en": "You spend structured, predictable days working at a desk during fixed office hours, collaborating in a team to greet visitors, answer calls, and enter information into databases. You also review work done by others for spelling and grammar, compose reports and meeting notes, and train staff with computer usage. Your role helps keep administrative workers in decent work as offices automate. The DOSM 2025 median monthly pay for clerical support workers is RM2,693 for the whole occupation group, not a job offer.",
+        "ms": "Anda menghabiskan hari yang berstruktur dan teratur di meja kerja sepanjang waktu pejabat tetap, bekerja dalam pasukan untuk menyambut pelawat, menjawab panggilan, dan memasukkan maklumat ke dalam pangkalan data. Anda juga menyemak kerja orang lain dari segi ejaan dan tatabahasa, menyediakan laporan dan nota mesyuarat, serta melatih staf menggunakan komputer. Peranan ini membantu mengekalkan pekerja pentadbiran dalam pekerjaan yang baik apabila pejabat diautomasikan. Gaji bulanan penengah DOSM 2025 untuk pekerja sokongan perkeranian ialah RM2,693 bagi keseluruhan kumpulan pekerjaan, bukan satu tawaran kerja.",
+        "zh": "您在固定的办公时间内在办公桌前度过规律而稳定的一天，与团队一起接待访客、接听电话，并将信息录入数据库。您还会审核他人完成的工作以检查拼写和语法，撰写报告与会议记录，并培训和协助员工使用计算机。随着办公室自动化的发展，这份工作有助于让行政人员保持体面工作。2025年马来西亚统计局（DOSM）文职支持人员整个职业群体的月收入中位数为RM2,693，并非工作聘约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Administrative assistant",
+        "summary": "Runs schedules, documents and office routines for a team.",
+        "tasks": [
+          "Create, maintain, and enter information into databases.",
+          "Review work done by others to check for correct spelling and grammar, ensure that company format policies are followed, and recommend revisions.",
+          "Compose, type, and distribute meeting notes, routine correspondence, or reports, such as presentations or expense, statistical, or monthly reports.",
+          "Answer telephones and give information to callers, take messages, or transfer calls to appropriate individuals.",
+          "Greet visitors or callers and handle their inquiries or direct them to the appropriate persons according to their needs.",
+          "Train and assist staff with computer usage."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Office administration",
+          "Scheduling and coordination",
+          "Spreadsheets (Excel / Google Sheets)",
+          "Communication",
+          "Using generative AI tools"
+        ],
+        "sdg_reasons": [
+          "Keeps administrative workers in decent work as offices automate."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "customer_service_rep": {
+      "role_id": "customer_service_rep",
+      "text": {
+        "en": "You spend structured, predictable days working at a desk with people, under shift or flexible hours, to answer customer questions and solve problems by phone, chat, and email. Using computers, you confer with customers, record their interactions and complaints, process payments, and refer unresolved grievances to designated departments. This work is often a first job for workers without degrees and a key entry-level role that AI is reshaping, where reskilling keeps workers included. The DOSM 2025 median monthly pay for clerical support workers is RM2,693, which is the median for the whole occupation group and not a job offer.",
+        "ms": "Anda menghabiskan hari yang berstruktur dan teratur dengan bekerja di meja bersama orang ramai melalui syif atau waktu fleksibel untuk menjawab soalan pelanggan serta menyelesaikan masalah melalui telefon, sembang maya, dan e-mel. Menggunakan komputer, anda berhubung dengan pelanggan, merekodkan interaksi serta aduan, mengutip bayaran, dan merujuk aduan yang belum selesai kepada jabatan yang ditetapkan. Kerja ini sering menjadi pekerjaan pertama bagi pekerja tanpa ijazah dan sumber pekerjaan peringkat permulaan yang sedang diubah oleh AI, di mana latihan semula kemahiran memastikan mereka kekal terangkum. Gaji bulanan penengah DOSM 2025 untuk pekerja sokongan perkeranian adalah RM2,693, yang merupakan penengah bagi keseluruhan kumpulan pekerjaan dan bukan tawaran kerja.",
+        "zh": "你在桌前度过规律且日程明确的工作日，与他人共事并采用轮班或弹性工时，通过电话、在线聊天和电子邮件解答客户疑问并解决问题。你使用计算机与客户沟通，记录互动细节与投诉，收取款项，并将未解决的诉求转介给指定部门进一步调查。这是常作为无学位劳动者第一份工作的关键入门级岗位，在人工智能重塑该岗位的过程中，技能重塑能让他们保持包容不落伍。2025年马来西亚统计局（DOSM）公布的文职支持人员月薪中位数为RM2,693，该数值是整个职业群体的中位数，并非工作聘约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Customer service representative",
+        "summary": "Answers customer questions and solves problems by phone, chat and email.",
+        "tasks": [
+          "Keep records of customer interactions or transactions, recording details of inquiries, complaints, or comments, as well as actions taken.",
+          "Determine charges for services requested, collect deposits or payments, or arrange for billing.",
+          "Complete contract forms, prepare change of address records, or issue service discontinuance orders, using computers.",
+          "Confer with customers by telephone or in person to provide information about products or services, take or enter orders, cancel accounts, or obtain details of complaints.",
+          "Contact customers to respond to inquiries or to notify them of claim investigation results or any planned adjustments.",
+          "Refer unresolved customer grievances to designated departments for further investigation."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working at a desk",
+          "shift or flexible hours"
+        ],
+        "main_skills": [
+          "Customer service",
+          "Communication",
+          "Empathy and active listening",
+          "Analytical thinking and problem solving",
+          "Using generative AI tools"
+        ],
+        "sdg_reasons": [
+          "A large source of entry-level jobs that AI is reshaping.",
+          "Often a first job for workers without degrees; reskilling keeps them included."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "data_analyst": {
+      "role_id": "data_analyst",
+      "text": {
+        "en": "You spend your day collecting business intelligence data, analyzing industry trends, and generating reports that turn business data into recommendations for action. Working at a desk with data and systems during fixed office hours, you share your findings for review by executives, managers, clients, and other stakeholders. Your work guides data-driven decisions that raise productivity through innovation and build analytical capability in industry. The DOSM 2025 median monthly pay for Professionals is RM6,124, which reflects the whole occupation group and is not a job offer.",
+        "ms": "Anda menghabiskan hari dengan mengumpul data kecerdasan perniagaan, menganalisis trend industri, dan menjana laporan untuk menyokong cadangan tindakan. Bekerja di meja dengan data dan sistem pada waktu pejabat yang tetap, anda menyediakan maklumat ini untuk semakan eksekutif, pengurus, pelanggan dan pihak berkepentingan lain. Usaha anda membolehkan keputusan berasaskan data yang meningkatkan produktiviti melalui inovasi serta membina keupayaan analitikal dalam industri. Gaji bulanan median DOSM 2025 untuk Profesional ialah RM6,124, iaitu median bagi seluruh kumpulan pekerjaan ini dan bukan tawaran kerja.",
+        "zh": "你的一天用于收集商业智能数据、分析行业趋势，并生成总结业务数据的报告以支持行动建议。你在固定的办公时间内伏案处理数据和系统，将成果供高管、经理、客户及其他利益相关者审阅。你的工作促成了以数据为驱动的决策，通过创新提高生产力并在行业中建立分析能力。2025年马来西亚统计局（DOSM）专业人员的月薪中位数为RM6,124，这是整个职业组别的中位数，并非工作录用待遇。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Data analyst",
+        "summary": "Turns business data into reports and answers that guide decisions.",
+        "tasks": [
+          "Generate standard or custom reports summarizing business, financial, or economic data for review by executives, managers, clients, and other stakeholders.",
+          "Collect business intelligence data from available industry reports, public information, field reports, or purchased sources.",
+          "Maintain or update business intelligence tools, databases, dashboards, systems, or methods.",
+          "Create business intelligence tools or systems, including design of related databases, spreadsheets, or outputs.",
+          "Identify and analyze industry or geographic trends with business strategy implications.",
+          "Synthesize current business intelligence or trend data to support recommendations for action."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "working at a desk",
+          "fixed office hours"
+        ],
+        "main_skills": [
+          "SQL",
+          "Data visualisation",
+          "Spreadsheets (Excel / Google Sheets)",
+          "Statistics",
+          "Python",
+          "Communication"
+        ],
+        "sdg_reasons": [
+          "Data-driven decisions raise productivity through innovation.",
+          "Builds research and analytical capability in industry."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "ai_ml_engineer": {
+      "role_id": "ai_ml_engineer",
+      "text": {
+        "en": "You spend your fixed office hours at a desk working with data and systems, analyzing large sets of data and comparing machine-learning models using statistical software. You identify business problems and deliver presentations of your mathematical modeling results to management or other end users. Your work builds the AI systems behind new products and services, raising productivity through technological upgrading. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, not a job offer.",
+        "ms": "Anda menghabiskan waktu pejabat yang tetap di meja bekerja dengan data dan sistem, menganalisis set data yang besar serta membandingkan model pembelajaran mesin menggunakan perisian statistik. Anda mengenal pasti masalah perniagaan dan membentangkan hasil pemodelan matematik kepada pihak pengurusan atau pengguna akhir yang lain. Kerja anda membina sistem AI di sebalik produk dan perkhidmatan baharu, sekali gus meningkatkan produktiviti melalui peningkatan teknologi. Gaji bulanan median DOSM 2025 untuk Profesional bagi keseluruhan kumpulan pekerjaan ialah RM6,124, bukan satu tawaran pekerjaan.",
+        "zh": "你在固定的办公时间内坐在办公桌前与数据和系统打交道，使用统计软件分析大型数据集并比较机器学习模型。你负责找出业务问题，并向管理层或其他最终用户汇报数学建模的结果。你的工作为新产品和服务构建人工智能系统，通过技术升级提高生产力。2025年马来西亚统计局（DOSM）公布的专业人员整个职业组别的月薪中位数为RM6,124，并非工作聘约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "AI and machine learning specialist",
+        "summary": "Builds, trains and deploys machine-learning models into products.",
+        "tasks": [
+          "Clean and manipulate raw data using statistical software.",
+          "Analyze, manipulate, or process large sets of data using statistical software.",
+          "Apply feature selection algorithms to models predicting outcomes of interest, such as sales, attrition, and healthcare use.",
+          "Compare models using statistical performance metrics, such as loss functions or proportion of explained variance.",
+          "Identify business problems or management objectives that can be addressed through data analysis.",
+          "Deliver oral or written presentations of the results of mathematical modeling and data analysis to management or other end users."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "open-ended, varied work",
+          "working at a desk",
+          "fixed office hours"
+        ],
+        "main_skills": [
+          "Python",
+          "Machine learning",
+          "Deep learning",
+          "Statistics",
+          "MLOps and model deployment",
+          "Cloud computing"
+        ],
+        "sdg_reasons": [
+          "Builds the AI systems behind new products and services.",
+          "AI raises productivity through technological upgrading."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "ai_operations_specialist": {
+      "role_id": "ai_operations_specialist",
+      "text": {
+        "en": "You spend your day working at a desk during fixed office hours, collaborating in a team to design and run AI-assisted workflows. You carefully check the output and quality of these automated processes to ensure they run smoothly. Your efforts help existing workers use AI productively instead of being replaced. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda bekerja di meja semasa waktu pejabat yang tetap, bekerjasama dalam pasukan untuk mereka bentuk dan menjalankan aliran kerja berbantukan AI. Sepanjang hari, anda memeriksa hasil dan kualiti aliran kerja tersebut bagi memastikan kelancarannya. Usaha anda ini membantu pekerja sedia ada menggunakan AI secara produktif dan bukannya digantikan. Gaji bulanan penengah DOSM 2025 bagi Profesional untuk keseluruhan kumpulan pekerjaan ialah RM6,124, dan ini bukan satu tawaran pekerjaan.",
+        "zh": "你在固定的办公时间内伏案工作，与团队紧密合作以设计并运行人工智能辅助的工作流程。你会认真检查这些流程的产出与质量，以确保一切顺利进行。你的工作帮助现有员工高效利用人工智能，而不是被其取代。2025年马来西亚统计局（DOSM）专业人员整个职业群体的月收入中位数为RM6,124，但这并非工作薪酬要约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "AI operations specialist",
+        "summary": "Designs and runs AI-assisted workflows in a business, checking their output and quality.",
+        "tasks": [],
+        "work_setting": [
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Using generative AI tools",
+          "Prompt engineering and AI workflow design",
+          "Critical thinking",
+          "Communication",
+          "Spreadsheets (Excel / Google Sheets)",
+          "API design and integration"
+        ],
+        "sdg_reasons": [
+          "Helps existing workers use AI productively instead of being replaced.",
+          "A role that existing workers can reach by adding AI skills to their current ones."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "software_developer": {
+      "role_id": "software_developer",
+      "text": {
+        "en": "You spend your day working at a desk during fixed office hours, writing, testing, and maintaining software applications while working with data and systems. Working in a team, you confer with systems analysts, engineers, and programmers to analyze user needs and modify software to correct errors and improve performance. Through this work, you help build digital infrastructure and access in a high-growth, high-productivity occupation. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda menghabiskan hari dengan bekerja di meja pada waktu pejabat yang tetap, menulis, menguji, dan menyelenggara aplikasi perisian sambil mengendalikan data dan sistem. Bekerja dalam pasukan, anda berbincang dengan penganalisis sistem, jurutera, dan pengatur cara untuk menganalisis keperluan pengguna serta mengubah suai perisian bagi membetulkan ralat dan meningkatkan prestasi. Melalui kerja ini, anda membantu membina infrastruktur dan akses digital dalam pekerjaan yang berpertumbuhan serta berproduktiviti tinggi. Gaji bulanan median DOSM 2025 bagi Profesional untuk keseluruhan kumpulan pekerjaan ini ialah RM6,124, dan ia bukan satu tawaran pekerjaan.",
+        "zh": "你在固定的办公时间内坐在办公桌前，处理数据与系统，编写、测试并维护软件应用程序。在团队工作中，你与系统分析员、工程师和程序员商讨，分析用户需求并修改现有软件以纠正错误和提升性能。通过这项工作，你在这项高增长、高生产力的职业中协助构建数字基础设施与接入渠道。2025年马来西亚统计局（DOSM）公布的专业人员整个职业组别月入中位数为RM6,124，这并不是一份工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Software and applications developer",
+        "summary": "Writes, tests and maintains software applications.",
+        "tasks": [
+          "Modify existing software to correct errors, adapt it to new hardware, or upgrade interfaces and improve performance.",
+          "Develop or direct software system testing or validation procedures, programming, or documentation.",
+          "Design, develop and modify software systems, using scientific analysis and mathematical models to predict and measure outcomes and consequences of design.",
+          "Determine system performance standards.",
+          "Analyze user needs and software requirements to determine feasibility of design within time and cost constraints.",
+          "Confer with systems analysts, engineers, programmers and others to design systems and to obtain information on project limitations and capabilities, performance requirements and interfaces."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "JavaScript / TypeScript",
+          "Python",
+          "Version control (Git)",
+          "Software testing",
+          "API design and integration",
+          "Analytical thinking and problem solving"
+        ],
+        "sdg_reasons": [
+          "Builds digital infrastructure and access.",
+          "High-growth, high-productivity occupation."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "cybersecurity_analyst": {
+      "role_id": "cybersecurity_analyst",
+      "text": {
+        "en": "You start the day at a desk working with data and systems alongside your team, monitoring computer virus reports and modifying security files. Working shift or flexible hours, you perform risk assessments, execute data system tests, and train users to promote security awareness. Your efforts protect people and institutions from online crime and keep digital infrastructure reliable. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda memulakan hari di meja bekerja dengan data dan sistem bersama pasukan anda, memantau laporan virus komputer dan mengubah suai fail keselamatan. Bekerja secara syif atau waktu fleksibel, anda menjalankan penilaian risiko, melaksanakan ujian sistem, serta melatih pengguna untuk memupuk kesedaran keselamatan. Usaha anda melindungi orang ramai dan institusi daripada jenayah dalam talian serta memastikan infrastruktur digital sentiasa boleh dipercayai. Gaji bulanan median DOSM 2025 untuk Profesional bagi keseluruhan kumpulan pekerjaan ialah RM6,124, dan ini bukan satu tawaran pekerjaan.",
+        "zh": "你开启一天的日常是在办公桌前与团队一起处理数据和系统，监测计算机病毒报告并修改安全文件。在轮班或弹性工时下，你进行风险评估、执行系统测试，并培训用户以提升安全意识。你的工作保护人们和机构免受网络犯罪侵害，并确保数字基础设施可靠。2025年马来西亚统计局（DOSM）针对专业人员整个职业组别的月薪中位数为RM6,124，这并不是工作录用通知。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Cybersecurity analyst",
+        "summary": "Monitors systems, investigates threats and keeps data safe.",
+        "tasks": [
+          "Monitor current reports of computer viruses to determine when to update virus protection systems.",
+          "Modify computer security files to incorporate new software, correct errors, or change individual access status.",
+          "Perform risk assessments and execute tests of data processing system to ensure functioning of data processing activities and security measures.",
+          "Document computer security and emergency measures policies, procedures, and tests.",
+          "Develop plans to safeguard computer files against accidental or unauthorized modification, destruction, or disclosure and to meet emergency data processing needs.",
+          "Train users and promote security awareness to ensure system security and to improve server and network efficiency."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "working at a desk",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Cybersecurity fundamentals",
+          "Network security",
+          "Incident response",
+          "Risk assessment",
+          "Critical thinking",
+          "Cloud computing"
+        ],
+        "sdg_reasons": [
+          "Protects people and institutions from online crime.",
+          "Keeps digital infrastructure reliable."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "digital_marketing_specialist": {
+      "role_id": "digital_marketing_specialist",
+      "text": {
+        "en": "You start the day working at a desk on open-ended, varied work, conducting market research analysis to plan and measure online campaigns across search and social media. Working in a team, you propose campaigns to marketing executives and collaborate with merchandising staff, merchants, and bloggers. Your work helps small businesses grow and reach customers online, while informing people about sustainable products and lifestyles. The DOSM 2025 median monthly pay for Professionals is RM6,124, which is the median for the whole occupation group and not a job offer.",
+        "ms": "Anda memulakan hari dengan bekerja di meja mengendalikan tugasan yang terbuka dan pelbagai, menjalankan analisis penyelidikan pasaran bagi merancang serta mengukur kempen dalam talian di carian dan media sosial. Bekerja dalam pasukan, anda mencadangkan kempen kepada eksekutif pemasaran dan bekerjasama dengan kakitangan pembarangan, peniaga, serta penulis blog. Usaha anda membantu perniagaan kecil berkembang dan mencapai pelanggan dalam talian, di samping memaklumkan orang ramai tentang produk dan gaya hidup mampan. Gaji bulanan penengah DOSM 2025 bagi Profesional ialah RM6,124, iaitu median bagi keseluruhan kumpulan pekerjaan dan bukannya tawaran pekerjaan.",
+        "zh": "你开始一天在办公桌前的开放且多样化的工作，通过开展市场研究分析来规划并衡量搜索与社交媒体上的在线活动。在团队工作中，你向营销主管提议推广活动，并与商品推销人员、商家及博主进行协作。你的工作有助于小型企业在网络上发展并接触客户，同时向大众宣传可持续产品与生活方式。DOSM 2025年专业人士的月薪中位数为RM6,124，这是整个职业群体的中位数，而非具体的工作聘约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Digital marketing specialist",
+        "summary": "Plans and measures online campaigns across search and social media.",
+        "tasks": [
+          "Conduct market research analysis to identify search query trends, real-time search and news media activity, popular social media topics, electronic commerce trends, market opportunities, or competitor performance.",
+          "Coordinate sales or other promotional strategies with merchandising, operations, or inventory control staff to ensure product catalogs are current, accurate, and organized for best findability against user intent.",
+          "Conduct financial modeling for online marketing programs or Web site revenue forecasting.",
+          "Propose online or multiple-sales-channel campaigns to marketing executives.",
+          "Participate in the development or implementation of online marketing strategy.",
+          "Communicate and collaborate with merchants, Webmasters, bloggers, or online editors to strategically place hyperlinks."
+        ],
+        "work_setting": [
+          "open-ended, varied work",
+          "working at a desk",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Social media marketing",
+          "Marketing analytics",
+          "Search engine optimisation",
+          "Content writing",
+          "Using generative AI tools",
+          "Spreadsheets (Excel / Google Sheets)"
+        ],
+        "sdg_reasons": [
+          "Helps small businesses grow and reach customers online.",
+          "Can inform people about sustainable products and lifestyles."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "ux_designer": {
+      "role_id": "ux_designer",
+      "text": {
+        "en": "You start the day conducting user research to determine design requirements, analyzing user feedback, and creating Web prototypes. Working at a desk during fixed office hours, you engage in open-ended, varied work in a team and confer with management or development teams to prioritize needs and choose solutions. Your designs help people by ensuring accessible design includes those with disabilities and low digital literacy, making digital services usable for everyone. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda memulakan hari dengan menjalankan penyelidikan pengguna untuk menentukan keperluan reka bentuk, menganalisis maklum balas pengguna, dan mencipta prototaip Web. Sambil bekerja di meja dalam waktu pejabat yang tetap, anda melakukan kerja yang terbuka dan pelbagai dalam satu pasukan serta berbincang dengan pihak pengurusan atau pasukan pembangunan untuk memilih penyelesaian. Reka bentuk anda membantu masyarakat kerana reka bentuk mudah diakses merangkumi orang kurang upaya dan mereka yang mempunyai literasi digital rendah, menjadikan perkhidmatan digital boleh digunakan oleh semua orang. Gaji bulanan penengah DOSM 2025 bagi Profesional untuk keseluruhan kumpulan pekerjaan ialah RM6,124, dan ini bukan tawaran pekerjaan.",
+        "zh": "你从开展用户研究以确定设计需求、分析用户反馈以及创建网页原型开始一天的工作。在固定的办公时间内，你坐在办公桌前从事开放且多样的团队工作，并与管理层或开发团队沟通以确定需求优先级并选择解决方案。你的工作通过无障碍设计包容残障人士和数字素养较低的人群，使所有人都能使用数字服务。马来西亚统计局（DOSM）2025年专业人员整个职业组别的月薪中位数为RM6,124，这并不是工作聘约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "UX / UI designer",
+        "summary": "Researches what users need and designs screens that are easy to use.",
+        "tasks": [
+          "Create searchable indices for Web page content.",
+          "Create Web models or prototypes that include physical, interface, logical, or data models.",
+          "Design, build, or maintain Web sites, using authoring or scripting languages, content creation tools, management tools, and digital media.",
+          "Develop and document style guidelines for Web site content.",
+          "Conduct user research to determine design requirements and analyze user feedback to improve design quality.",
+          "Confer with management or development teams to prioritize needs, resolve conflicts, develop content criteria, or choose solutions."
+        ],
+        "work_setting": [
+          "working with people",
+          "open-ended, varied work",
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "User research",
+          "UI design",
+          "Empathy and active listening",
+          "Communication",
+          "Using generative AI tools",
+          "JavaScript / TypeScript"
+        ],
+        "sdg_reasons": [
+          "Accessible design includes people with disabilities and low digital literacy.",
+          "Makes digital services usable for everyone."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "renewable_energy_technician": {
+      "role_id": "renewable_energy_technician",
+      "text": {
+        "en": "You start your structured, predictable day working in a team on site or out and about to assemble and install photovoltaic systems using drawings, schematics, and standards. During the day, you determine system designs, apply weather sealing, and activate systems to verify their functionality and performance. Your work helps people by installing renewable energy capacity and cutting emissions from electricity. The DOSM 2025 median monthly pay for technicians and associate professionals across the whole occupation group is RM3,852, which is not a job offer.",
+        "ms": "Anda memulakan hari yang berstruktur dan mudah dijangka dengan bekerja dalam pasukan di tapak atau bergerak ke pelbagai lokasi untuk memasang modul dan sistem fotovolta mengikut lukisan, skematik serta piawaian. Sepanjang hari, anda menentukan reka bentuk sistem, menyapu kedap cuaca, dan mengaktifkan sistem bagi mengesahkan kefungsian serta prestasinya. Kerja anda membantu orang ramai dengan memasang kapasiti tenaga boleh baharu dan mengurangkan pelepasan daripada elektrik. Gaji bulanan penengah DOSM 2025 bagi Juruteknik dan profesional bersekutu untuk keseluruhan kumpulan pekerjaan ialah RM3,852, dan ini bukan tawaran kerja.",
+        "zh": "你在结构化且可预测的日常中开启一天，与团队一起在现场或奔走于不同地点，根据图纸、原理图和标准组装并安装光伏系统。在日常工作中，你负责确定系统设计、应用耐候密封层，并激活系统以验证其功能与性能表现。你的工作通过安装可再生能源装机容量以及减少电力排放来造福社会。2025年马来西亚统计局（DOSM）公布的技术员及准专业人员整个职业组别的月收入中位数为RM3,852，这并非工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Renewable energy technician",
+        "summary": "Installs and maintains solar and other renewable energy systems.",
+        "tasks": [
+          "Determine photovoltaic (PV) system designs or configurations based on factors such as customer needs, expectations, and site conditions.",
+          "Diagram layouts and locations for photovoltaic (PV) arrays and equipment, including existing building or site features.",
+          "Activate photovoltaic (PV) systems to verify system functionality and conformity to performance expectations.",
+          "Assemble solar modules, panels, or support structures, as specified.",
+          "Install photovoltaic (PV) systems in accordance with codes and standards, using drawings, schematics, and instructions.",
+          "Apply weather sealing to array, building, or support mechanisms."
+        ],
+        "work_setting": [
+          "structured, predictable days",
+          "working on site or out and about",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Solar PV installation and maintenance",
+          "Electrical systems",
+          "Workplace safety and compliance",
+          "Analytical thinking and problem solving",
+          "Resilience, flexibility and agility"
+        ],
+        "sdg_reasons": [
+          "Installs renewable energy capacity.",
+          "Cuts emissions from electricity."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Technicians and associate professionals (the whole occupation group): RM3,852"
+      },
+      "reviewed_by": null
+    },
+    "sustainability_analyst": {
+      "role_id": "sustainability_analyst",
+      "text": {
+        "en": "You start the day working at a desk during fixed office hours, researching sustainability issues and reviewing policies or proposals. You spend your time developing reports and presentations, creating sustainability indicators, and writing grant applications to secure funding for sustainability projects. Your work supports companies in sustainability reporting and helps measure and reduce company emissions. The DOSM 2025 median monthly pay for Professionals (the whole occupation group) is RM6,124, which is not a job offer.",
+        "ms": "Anda memulakan hari dengan bekerja di meja pada waktu pejabat yang tetap, menyelidik isu kelestarian serta menyemak dasar atau cadangan. Anda meluangkan masa menghasilkan laporan dan pembentangan, menetapkan penunjuk kelestarian, serta menulis permohonan geran bagi mendapatkan pembiayaan projek kelestarian. Tugas anda menyokong syarikat dalam pelaporan kelestarian serta membantu mengukur dan mengurangkan pelepasan syarikat. Gaji bulanan penengah DOSM 2025 bagi Profesional (keseluruhan kumpulan pekerjaan) ialah RM6,124, dan ini bukan satu tawaran pekerjaan.",
+        "zh": "你在固定的办公时间内坐在办公桌前开始一天的工作，研究可持续发展问题并审查相关政策或提案。你花时间制作报告与演示文稿、制定可持续发展指标，并撰写拨款申请以争取项目的资金支持。你的工作支持公司进行可持续发展报告，并协助衡量和减少公司排放。2025年马来西亚统计局（DOSM）公布的专业人士（整个职业组别）月薪中位数为RM6,124，这并非工作录用薪酬。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Sustainability and ESG analyst",
+        "summary": "Measures a company's environmental and social impact and reports it.",
+        "tasks": [
+          "Research or review regulatory, technical, or market issues related to sustainability.",
+          "Develop reports or presentations to communicate the effectiveness of sustainability initiatives.",
+          "Write grant applications, rebate applications, or project proposals to secure funding for sustainability projects.",
+          "Review and revise sustainability proposals or policies.",
+          "Identify or create new sustainability indicators.",
+          "Identify or investigate violations of natural resources, waste management, recycling, or other environmental policies."
+        ],
+        "work_setting": [
+          "working at a desk",
+          "fixed office hours"
+        ],
+        "main_skills": [
+          "ESG and sustainability reporting",
+          "Carbon accounting",
+          "Spreadsheets (Excel / Google Sheets)",
+          "Data visualisation",
+          "Risk assessment",
+          "Communication"
+        ],
+        "sdg_reasons": [
+          "Measures and reduces company emissions.",
+          "Supports companies in sustainability reporting."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "care_worker": {
+      "role_id": "care_worker",
+      "text": {
+        "en": "You spend your structured days administering bedside or personal hygiene care, handling housekeeping duties, and monitoring vital signs under the direction of registered nurses or physiotherapists. Working on site or out and about, you work in a team with managers, healthcare professionals, and clients during flexible or shift hours. Your work supports the health and well-being of elderly and dependent people, while helping recognise care work as skilled, paid work. The DOSM 2025 median monthly pay for service and sales workers is RM2,035, which is the median for the whole occupation group and not a job offer.",
+        "ms": "Anda menghabiskan hari yang berstruktur dengan memberikan penjagaan diri atau di sisi katil, melaksanakan tugasan rumah, dan memantau tanda vital di bawah arahan jururawat berdaftar atau ahli fisioterapi. Bekerja di tapak atau di luar mengikut waktu syif atau anjal, anda bekerja dalam pasukan bersama penyelia dan orang ramai untuk menyokong individu warga emas serta mereka yang bergantung. Usaha anda menyokong kesihatan dan kesejahteraan warga emas dan orang tanggungan, sekali gus mengiktiraf kerja penjagaan sebagai kerja mahir dan bergaji. Gaji bulanan penengah DOSM 2025 bagi pekerja perkhidmatan dan jualan ialah RM2,035, iaitu penengah bagi keseluruhan kumpulan pekerjaan dan bukannya tawaran pekerjaan.",
+        "zh": "你在结构化且规律的日子里提供床边或个人卫生照护，处理家务，并在注册护士或物理治疗师的指导下监测生命体征。你在现场或外出地点以轮班或弹性工时工作，在团队中与主管、医护人员及照护对象紧密配合。你的日常工作支持了老年人和依赖照护者的健康与福祉，并让照护工作被认可为有薪酬的技能型工作。2025年马来西亚统计局（DOSM）服务和销售人员的月入中位数为RM2,035，这是整个职业群体的中位数，并非具体的工作要约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-21",
+      "facts": {
+        "role": "Care worker (elderly and personal care)",
+        "summary": "Supports elderly and dependent people with daily living and health needs.",
+        "tasks": [
+          "Prepare and maintain records of client progress and services performed, reporting changes in client condition to manager or supervisor.",
+          "Perform healthcare-related tasks, such as monitoring vital signs and medication, under the direction of registered nurses or physiotherapists.",
+          "Administer bedside or personal care, such as ambulation or personal hygiene assistance.",
+          "Perform housekeeping duties, such as cooking, cleaning, washing clothes or dishes, or running errands.",
+          "Care for individuals or families during periods of incapacitation, family disruption, or convalescence, providing companionship, personal care, or help in adjusting to new lifestyles.",
+          "Participate in case reviews, consulting with the team caring for the client, to evaluate the client's needs and plan for continuing services."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working on site or out and about",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Patient and elderly care",
+          "Empathy and active listening",
+          "Communication",
+          "Workplace safety and compliance",
+          "Scheduling and coordination",
+          "Resilience, flexibility and agility"
+        ],
+        "sdg_reasons": [
+          "Supports health and well-being of elderly and dependent people.",
+          "Recognises care work, largely done by women, as skilled and paid work."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Service and sales workers (the whole occupation group): RM2,035"
+      },
+      "reviewed_by": null
+    }
+  }
+}
