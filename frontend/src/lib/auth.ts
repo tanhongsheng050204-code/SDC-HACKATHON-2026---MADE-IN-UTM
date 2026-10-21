@@ -12,6 +12,7 @@ const client: SupabaseClient | null = authEnabled ? createClient(URL!, KEY!) : n
 let token: string | null = null;
 let userId: string | null = null;
 let googleName: string | null = null;  // offered as the default display name; stored only if the person saves it
+let accountName: string | null = null;  // the name the person chose, kept on the Supabase account (user_metadata.display_name)
 type Listener = (userId: string | null) => void;
 const listeners = new Set<Listener>();
 
@@ -22,6 +23,7 @@ function set(session: Session | null) {
   token = session?.access_token ?? null;
   const meta = session?.user.user_metadata ?? {};
   googleName = String(meta.full_name ?? meta.name ?? "").trim().slice(0, 60) || null;
+  accountName = String(meta.display_name ?? "").trim().slice(0, 60) || null;
   if (next !== userId) {
     userId = next;
     listeners.forEach((l) => l(userId));
@@ -55,6 +57,16 @@ export async function refreshToken(): Promise<string | null> {
 }
 export const getUserId = () => userId;
 export const getGoogleName = () => googleName;
+export const getAccountName = () => accountName;
+
+/** Keep the chosen name on the account itself, so it survives logging out, a replaced profile
+ * and other devices. Profiles copy it (App.tsx). */
+export async function setAccountName(name: string): Promise<void> {
+  if (!client) return;
+  const { data, error } = await client.auth.updateUser({ data: { display_name: name } });
+  if (error) throw error;
+  accountName = String(data.user?.user_metadata?.display_name ?? name).trim() || null;
+}
 
 // Tells the listener the current user straight away, then on every change: the stored session can
 // finish loading before a screen subscribes, and that screen must not miss it (it showed "Log in"

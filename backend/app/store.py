@@ -298,10 +298,13 @@ def attach_user(profile_id: str, user_id: str) -> None:
 
 
 def replace_owned_profile(old_id: str, new_id: str, user_id: str) -> None:
-    """Delete the account's saved profile and attach this one, in one transaction."""
+    """Delete the account's saved profile and attach this one, in one transaction. The new profile
+    keeps the old one's display name if it has none of its own."""
     with _connect() as conn:
+        old = conn.execute("SELECT display_name FROM profiles WHERE id=? AND user_id=?", (old_id, user_id)).fetchone()
         conn.execute("DELETE FROM profiles WHERE id=? AND user_id=?", (old_id, user_id))
-        conn.execute("UPDATE profiles SET user_id=?, updated_at=? WHERE id=?", (user_id, _now(), new_id))
+        conn.execute("UPDATE profiles SET user_id=?, updated_at=?, display_name=COALESCE(display_name, ?) WHERE id=?",
+                     (user_id, _now(), old["display_name"] if old else None, new_id))
 
 
 def purge_older_than(days: int = 30) -> int:
