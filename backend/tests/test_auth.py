@@ -118,3 +118,16 @@ def test_replacing_a_saved_profile_is_one_step(client):
     store.replace_owned_profile(first, second, "user-z")
     assert store.get_profile(first) is None
     assert store.profile_for_user("user-z")["id"] == second
+
+
+def test_token_from_a_server_clock_slightly_ahead_is_accepted(client):
+    # Supabase's clock ran 2 s ahead of this PC: a fresh token looked "issued in the future" and
+    # every login was refused as expired. A small leeway absorbs normal clock drift.
+    now = dt.datetime.now(dt.UTC)
+    fresh = jwt.encode({"sub": "user-skew", "aud": "authenticated", "iat": now + dt.timedelta(seconds=5),
+                        "nbf": now + dt.timedelta(seconds=5), "exp": now + dt.timedelta(hours=1)}, SECRET, algorithm="HS256")
+    assert client.get("/api/me", headers={"Authorization": f"Bearer {fresh}"}).status_code == 200
+
+
+def test_long_expired_token_is_still_refused(client):
+    assert client.get("/api/me", headers=token("user-old", minutes=-5)).status_code == 401

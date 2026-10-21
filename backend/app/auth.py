@@ -6,6 +6,7 @@ allowed for anonymous and demo profiles; a bad or expired header is refused, nev
 stale session can't quietly act as anonymous on an owned profile.
 """
 
+import logging
 from functools import lru_cache
 
 import jwt
@@ -14,6 +15,11 @@ from fastapi import Header, HTTPException
 from app.config import get_settings
 
 AUDIENCE = "authenticated"
+# Seconds of clock drift allowed between Supabase and this server. With none, a server only 2 s
+# behind Supabase saw every fresh token as "issued in the future" and refused all logins.
+LEEWAY_SECONDS = 60
+
+log = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=2)
@@ -25,10 +31,12 @@ def user_from_token(token: str) -> str:
     """The Supabase user id in a valid token. Raises jwt.InvalidTokenError otherwise."""
     settings = get_settings()
     if settings.supabase_jwt_secret:
-        claims = jwt.decode(token, settings.supabase_jwt_secret, algorithms=["HS256"], audience=AUDIENCE)
+        claims = jwt.decode(token, settings.supabase_jwt_secret, algorithms=["HS256"], audience=AUDIENCE,
+                            leeway=LEEWAY_SECONDS)
     elif settings.supabase_url:
         key = _jwks(f"{settings.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json").get_signing_key_from_jwt(token)
-        claims = jwt.decode(token, key.key, algorithms=["RS256", "ES256"], audience=AUDIENCE)
+        claims = jwt.decode(token, key.key, algorithms=["RS256", "ES256"], audience=AUDIENCE,
+                            leeway=LEEWAY_SECONDS)
     else:
         raise jwt.InvalidTokenError("Login is not configured on this server")
     if not claims.get("sub"):
@@ -48,5 +56,6 @@ def current_user(authorization: str = Header(default="")) -> str | None:
     except jwt.PyJWKClientError:
         # The key server is unreachable: not the person's fault, so don't sign them out.
         raise HTTPException(503, "Login check is unavailable right now. Try again shortly.") from None
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as error:
+        log.warning("Login token refused: %s", type(error).__name__)  # the reason only, never the token
         raise HTTPException(401, "Please log in again") from None
