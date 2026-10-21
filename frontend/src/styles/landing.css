@@ -187,3 +187,6 @@
 @media (max-width: 560px) { .lp-route.route-map { overflow: visible; } .lp-route.route-map svg { min-width: 0; } .lp-route .route-stop-label { display: none; } .lp-legs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .lp-roles li { grid-template-columns: minmax(0, 1fr) auto; } .lp-roles .lp-bar { display: none; } }
 @media (max-width: 560px) { .lp-route .route-here-label, .lp-route .route-end-label { font-size: 22px; } .lp-route .route-stop text { font-size: 16px; } .lp-route .route-stop circle { r: 15; } }
+
+.lp-welcome { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font: inherit; }
+.lp-welcome b { color: var(--accent); }

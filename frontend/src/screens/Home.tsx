@@ -56,9 +56,7 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
         <p className="muted">{t("home.sub")} {today}.</p>
       </div>
 
-      <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
-
-      {data && target && <StoryBanner profile={profile} target={target} year={data.signal_source.horizon_year} />}
+      {!target && <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />}
 
       {journey && data && <NextStep journey={journey} top={top ?? null} target={target} profile={profile}
         from={current ? tr(current.title) : t("route.yourSkills")} onOpenRole={onOpenRole} onStep={openStep} />}
@@ -70,13 +68,16 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
               <li key={s.id} className={`journey-step ${s.done ? "is-done" : ""} ${now ? "is-now" : ""}`}>
                 <button onClick={() => openStep(s.id)} aria-current={now ? "step" : undefined}>
                   <span className="journey-num" aria-hidden="true">{s.done ? "✓" : i + 1}</span>
-                  <span>{t(STEP_LABEL[s.id])}<small>{s.done ? t("step.done") : now ? t("step.now") : t("step.later")}</small></span>
+                  <span>{t(STEP_LABEL[s.id])}<small>{s.done ? t("step.done") : now ? t("step.now") : t("step.later")} · {t(`step.${s.id}Hint` as StringKey)}</small></span>
                 </button>
               </li>
             );
           })}
         </ol>
       )}
+
+      {target && <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />}
+      {data && target && <StoryBanner profile={profile} target={target} year={data.signal_source.horizon_year} />}
 
       {error && (
         <p className="error" role="alert">{t("home.loadFailed")} <button className="link" onClick={() => setAttempt((n) => n + 1)}>{t("shell.retry")}</button></p>
@@ -250,7 +251,7 @@ function WhereTo({ roles, onOpenRole, onAsk }: { roles: RoleMatch[]; onOpenRole:
           role="combobox" aria-expanded={matches.length > 0} aria-controls={`${id}-list`} aria-autocomplete="list"
           aria-activedescendant={matches.length ? `${id}-o${Math.min(active, matches.length - 1)}` : undefined}
           onChange={(e) => { setQ(e.target.value); setActive(0); }} onKeyDown={keys} placeholder={t("home.whereToPlaceholder")} />
-        <button className="primary" type="button" onClick={ask} disabled={!q.trim()}>{t("home.askCoach")}</button>
+        <button className="btn ask-inline" type="button" onClick={ask} disabled={!q.trim()}><span className="as-orb sm" aria-hidden="true" />{t("home.askCoach")}</button>
       </div>
       {matches.length > 0 && (
         <ul id={`${id}-list`} role="listbox" className="where-to-list" aria-label={t("home.whereTo")}>

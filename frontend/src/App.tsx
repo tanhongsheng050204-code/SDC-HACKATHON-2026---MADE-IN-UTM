@@ -1,13 +1,14 @@
 // Screens follow docs/03-APP_FLOW.md. Entry points: /?card=ID opens a read-only Future Card;
 // /?demo=clerk|student|hr opens a demo; ?view=... restores a screen (see lib/route.ts).
 import { useEffect, useRef, useState } from "react";
-import { AccountButton } from "./components/AccountButton";
+import { AccountButton, LoginHost } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
 import { Command, CommandMenu } from "./components/CommandMenu";
 import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
+import { JourneyNext } from "./components/JourneyNext";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onServerWaking, Audience, CoachAction, CoachProposal, Journey, Profile, RoleMatch, RoleOption, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
@@ -357,8 +358,11 @@ function MainApp({ demo }: { demo: string | null }) {
       </nav>
     );
     return (
-      <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
-        onStart={() => go("intake")} onDemo={(k) => (k === "class" ? (setWorkforceTab("class"), go("workforce")) : openDemo(k))} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
+      <>
+        <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
+          onStart={() => go("intake")} onResume={storedId ? () => resume() : undefined} onDemo={(k) => (k === "class" ? (setWorkforceTab("class"), go("workforce")) : openDemo(k))} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
+        <LoginHost />
+      </>
     );
   }
 
@@ -452,6 +456,10 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce initialTab={workforceTab} />}
           </ScreenBoundary>
+          {profile && journey && (
+            <JourneyNext journey={journey} screen={screen} targetTitle={journey.target_title}
+              onStep={(s) => (s === "stand" ? goProfile() : s === "explore" || s === "done" ? go("roles") : openTarget(s === "build" ? "tree" : "role"))} />
+          )}
         </main>
       </div>
       {coachOpen && profile && (
@@ -463,6 +471,7 @@ function MainApp({ demo }: { demo: string | null }) {
         <CommandMenu commands={commands} onAsk={(q) => (profile ? askLaluan(q) : go("intake"))} onClose={() => setMenuOpen(false)} />
       )}
       {toast && <div className="toast" role="status">{toast}</div>}
+      <LoginHost />
       {conflict && <ConflictDialog onKeep={() => resolveConflict(false)} onReplace={() => resolveConflict(true)} />}
       {!conflict && userId && !accountName && !nameSkipped && !(profile?.user_id === userId && profile.display_name) && (
         <NameDialog suggestion={getGoogleName() ?? ""} onDone={(name) => {

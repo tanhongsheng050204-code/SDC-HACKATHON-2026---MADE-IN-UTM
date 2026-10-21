@@ -21,9 +21,9 @@ const chain = () => [1, 2, 3, 4].map((i) => ({ title: t(`lp.c${i}` as StringKey)
 
 const faq = () => [1, 2, 3, 4, 5, 6].map((i) => ({ q: t(`lp.q${i}` as StringKey), a: t(`lp.a${i}` as StringKey) }));
 
-export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onSources, onReviewKit }: {
+export function Landing({ nav, banners, model, prefs, onStart, onResume, onDemo, onHr, onSources, onReviewKit }: {
   nav: ReactNode; banners: ReactNode; model: string | null; prefs: ReactNode;
-  onStart: () => void; onDemo: (k: string) => void; onHr: () => void; onSources: () => void; onReviewKit: () => void;
+  onStart: () => void; onResume?: () => void; onDemo: (k: string) => void; onHr: () => void; onSources: () => void; onReviewKit: () => void;
 }) {
   const openPerson = (key: string) => (key === "hr" ? onHr() : onDemo(key));
   return (
@@ -34,7 +34,9 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
       <main className="lp">
         <header className="lp-hero">
           <Rosette className="hero-rosette" />
-          <p className="pill-tag">{t("landing.tag")}</p>
+          {onResume ? (
+            <button className="pill-tag lp-welcome" onClick={onResume}><span className="lp-facts-dot" aria-hidden="true" />{t("lp.welcomeBack")} <b>{t("lp.resume")} →</b></button>
+          ) : <p className="pill-tag">{t("landing.tag")}</p>}
           <h1>{t("landing.title")}</h1>
           <p className="lp-lede">{t("landing.lede")}</p>
           <HeroRoute />

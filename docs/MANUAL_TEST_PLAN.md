@@ -81,6 +81,13 @@ Notes: ______
 
 Notes: ______
 
+### 4c. Today layout, the journey thread and log-in
+- [ ] 4c.1 With a destination, Today opens with **Resume route**, then the four steps (each with a short hint: skills and job · pick a destination · courses and proof · practise, jobs, share), then **Where to?** and the story banner. Without one, **Where to?** comes first.
+- [ ] 4c.2 At the foot of My profile, What I enjoy, My job, the Radar, Future roles, a role page, Pathway and SDG impact, a bar shows “Step N of 4 · …”, what to do next, and a button to the right screen (no button when you are already there). It follows the same journey as Today and the sidebar.
+- [ ] 4c.3 Every **Log in** (landing, sidebar, “Log in to keep your progress” banners) first opens “Keep your route on any device” with three points, **Continue with Google**, **Not now…** and a privacy line; Esc or a click outside closes it.
+- [ ] 4c.4 With a saved profile, the landing hero shows “Welcome back. Resume my route →”, which opens Today.
+- [ ] 4c.5 The landing's “One afternoon with Laluan” labels each moment with its app step (1 Where I stand … 4 Apply and share).
+
 ## 4b. My profile (edit)
 - [ ] 4b.1 With a profile, **My profile** opens the edit page (not the intake): situation, skills, current job and years are filled in.
 - [ ] 4b.2 Changing years and pressing **Save changes** shows “Profile saved”, returns to Today, and the change is still there when you reopen it; the target role is unchanged.

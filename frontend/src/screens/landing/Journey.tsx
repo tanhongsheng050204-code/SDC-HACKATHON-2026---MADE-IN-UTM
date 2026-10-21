@@ -1,15 +1,18 @@
 import { ReactNode, useState } from "react";
-import { t, tr } from "../../lib/i18n";
+import { StringKey, t, tr } from "../../lib/i18n";
 import { TASK_LABEL, TREND_TEXT } from "../../lib/labels";
 
 // "One afternoon with Laluan": the main journey as a timeline. Pick a step on the left to see a
 // small picture of that screen on the right.
-interface Step { time: string; title: string; text: string; panel: ReactNode }
+interface Step { time: string; leg: number; title: string; text: string; panel: ReactNode }
+
+// The app's four journey steps, so the afternoon reads in the same order as the sidebar.
+const LEGS: StringKey[] = ["step.stand", "step.explore", "step.build", "step.apply"];
 
 // Built at render time, so the steps follow the chosen language.
 const steps = (): Step[] => [
   {
-    time: "14:00", title: t("jy.t1"),
+    time: "14:00", leg: 1, title: t("jy.t1"),
     text: t("jy.x1"),
     panel: (
       <div className="jp-card">
@@ -24,7 +27,7 @@ const steps = (): Step[] => [
     ),
   },
   {
-    time: "14:05", title: t("jy.t2"),
+    time: "14:05", leg: 1, title: t("jy.t2"),
     text: t("jy.x2"),
     panel: (
       <div className="jp-card jp-radar" title={t("jy.example")}>
@@ -36,7 +39,7 @@ const steps = (): Step[] => [
     ),
   },
   {
-    time: "14:10", title: t("jy.t3"),
+    time: "14:10", leg: 1, title: t("jy.t3"),
     text: t("jy.x3"),
     panel: (
       <div className="jp-card">
@@ -47,7 +50,7 @@ const steps = (): Step[] => [
     ),
   },
   {
-    time: "14:20", title: t("jy.t4"),
+    time: "14:20", leg: 2, title: t("jy.t4"),
     text: t("jy.x4"),
     panel: (
       <div className="jp-card">
@@ -58,7 +61,7 @@ const steps = (): Step[] => [
     ),
   },
   {
-    time: "14:30", title: t("jy.t5"),
+    time: "14:30", leg: 3, title: t("jy.t5"),
     text: t("jy.x5"),
     panel: (
       <div className="jp-card">
@@ -72,7 +75,7 @@ const steps = (): Step[] => [
     ),
   },
   {
-    time: "14:40", title: t("jy.t6"),
+    time: "14:40", leg: 4, title: t("jy.t6"),
     text: t("jy.x6"),
     panel: (
       <div className="jp-card jp-share">
@@ -93,7 +96,7 @@ export function Journey() {
         {all.map((s, i) => (
           <li key={s.title}>
             <button role="tab" aria-selected={i === active} aria-controls="journey-panel" onClick={() => setActive(i)}>
-              <small>{s.time}</small>{s.title}
+              <small>{s.time} · {s.leg} {t(LEGS[s.leg - 1])}</small>{s.title}
             </button>
           </li>
         ))}
