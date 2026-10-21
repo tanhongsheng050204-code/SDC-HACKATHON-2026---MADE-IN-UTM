@@ -20,11 +20,18 @@ figures) is never edited; each refresh writes a new snapshot that adjusts it wit
   Malaysian employment    = employee growth in the role's MASCO group - growth of all employees
                             (OpenDOSM, percentage points over 3 years), capped at +/-10 points
   net_growth_pct          = baseline + demand adjustment + Malaysian employment + AI adjustment
+
+With history (quarterly job postings and research, yearly OpenDOSM; see forecast.py), each skill's
+trend becomes its forecast instead: the yearly rate of its baseline-scenario projection to the
+horizon, and the Malaysian employment points become the projected change in the group's share of
+employees by the horizon (same caps). The two-period comparison is the fallback without history.
 """
 
 import datetime as dt
 import math
 import statistics
+
+from app.trends import forecast
 
 MOMENTUM_RANGE = (-1.0, 1.0)
 MIN_MENTIONS = 20  # postings mentioning a skill, both periods together, before its trend counts
@@ -59,7 +66,30 @@ def _mean(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
-def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict) -> dict[str, dict]:
+def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict,
+                  history: dict | None = None, scenarios: list[dict] | None = None,
+                  horizon_year: int = 2030) -> dict[str, dict]:
+    out = _two_period_signals(skills, capabilities, research, jobs)
+    if not history:
+        return out
+    cap_trends = forecast.capability_trends(history["research"]) if history.get("research") else {}
+    jobs_series = history.get("jobs")
+    for skill_id, signal in out.items():
+        f = forecast.skill_forecast(skill_id, capabilities, jobs_series, cap_trends, scenarios or [], horizon_year)
+        if f is None:
+            continue
+        base = f["scenarios"]["baseline"]
+        quarters = len(f["history"])
+        what = (f"{quarters} quarters of {jobs_series['source']}" if quarters
+                else "research momentum only (too few job-posting mentions)")
+        signal.update(trend=round(_clip(f["annual_rate"], -1.0, 1.0), 3), label=base["label"], forecast=f,
+                      sources=[f"Forecast to {horizon_year}: damped trend over {what}; "
+                               f"{base['change_pct']:+g}% (80% range {base['low_pct']:+g}% to {base['high_pct']:+g}%)",
+                               *signal["sources"]])
+    return out
+
+
+def _two_period_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict) -> dict[str, dict]:
     m = _pressure(momentum(research))
     totals = jobs["postings"]
     out: dict[str, dict] = {}
@@ -108,6 +138,7 @@ def local_points(dosm: dict, masco: str | None) -> float:
 
 def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research: dict,
                  skills_out: dict[str, dict], dosm: dict | None = None) -> list[dict]:
+    series = (dosm or {}).get("series")
     m = _pressure(momentum(research))
     by_role = {s["role_id"]: s for s in baseline["signals"]}
     out = []
@@ -122,8 +153,13 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
         ai_points = round(_clip(CAP_POINTS * (_mean(complementing) - _mean(exposing)),
                                 -CAP_POINTS, CAP_POINTS), 1)
         local = local_points(dosm, role.get("masco_major")) if dosm else 0.0
+        group = forecast.group_forecast(series, role.get("masco_major") or "", baseline["horizon_year"]) if series else None
+        if group:
+            local = round(_clip(group["change_pct"], -LOCAL_CAP, LOCAL_CAP), 1)
         growth = round(base["net_growth_pct"] + demand_points + local + ai_points, 1)
         extra = {"local_points": local} if dosm else {}
+        if group:
+            extra["malaysia_forecast"] = group
         out.append({
             "role_id": role_id,
             "net_growth_pct": growth,
@@ -142,9 +178,11 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
 
 
 def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
-          dosm: dict | None = None) -> dict:
+          dosm: dict | None = None, history: dict | None = None) -> dict:
     caps = ref.capabilities
-    skills_out = skill_signals(ref.skills, caps, research, jobs)
+    scenarios = [{"id": k, **v} for k, v in ref.scenarios.items()]
+    horizon = int(baseline["horizon_year"])
+    skills_out = skill_signals(ref.skills, caps, research, jobs, history, scenarios, horizon)
     stamp = now.strftime("%Y-%m-%d")
     return {
         "snapshot_id": f"{stamp}-trend-{now:%H%M%S}",
@@ -168,4 +206,30 @@ def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
         "capability_momentum": momentum(research),
         "signals": role_signals(ref.roles, caps, baseline, research, skills_out, dosm),
         "skill_signals": list(skills_out.values()),
+        **({"forecast": _forecast_meta(history, dosm, list(ref.skills), horizon)} if history else {}),
+    }
+
+
+def _forecast_meta(history: dict, dosm: dict | None, skill_ids: list[str], horizon: int) -> dict:
+    """How the forecasts were made, what history they used and how the method did on held-out data."""
+    jobs_series, research_series = history.get("jobs"), history.get("research")
+    caps = forecast.capability_trends(research_series) if research_series else {}
+    return {
+        "method": "Damped log-linear trend per series, 80% range, under each adoption scenario",
+        "horizon_year": horizon,
+        "damping": forecast.DAMPING,
+        "history": {
+            **({"jobs": {"source": jobs_series["source"], "retrieved": jobs_series["retrieved"],
+                         "periods": [forecast.complete_periods(jobs_series)[0],
+                                     forecast.complete_periods(jobs_series)[-1]],
+                         "threads": jobs_series["threads"]}} if jobs_series else {}),
+            **({"research": {"source": research_series["source"], "retrieved": research_series["retrieved"],
+                             "periods": [research_series["periods"][0], research_series["periods"][-1]]}}
+               if research_series else {}),
+            **({"dosm": {"source": dosm["source"], "retrieved": dosm["retrieved"],
+                         "periods": [min(dosm["series"]["overall"]), max(dosm["series"]["overall"])]}}
+               if dosm and dosm.get("series") else {}),
+        },
+        "capabilities": {k: {"growth_per_year": v["slope"], "history": v["history"]} for k, v in caps.items()},
+        "backtest": forecast.backtest(jobs_series, skill_ids) if jobs_series else None,
     }

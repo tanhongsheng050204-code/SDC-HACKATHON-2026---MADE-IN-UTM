@@ -346,8 +346,13 @@ def radar(profile_id: str | None = None, user: str | None = User):
     mine = matching.effective_skills(ref, _profile_for(profile_id, user)) if profile_id else set()
     baseline = ref.scenarios["baseline"]
     signals = signals_from_snapshot(snapshot)
+    rows = {s["role_id"]: s for s in snapshot["signals"]}
     roles = sorted(({"role_id": rid, "title": ref.roles[rid]["title"],
-                    **vars(outlook(sig, "baseline", float(baseline["adoption"])))}
+                    **vars(outlook(sig, "baseline", float(baseline["adoption"]))),
+                    "scenarios": {sid: {"index": o.index, "label": o.label}
+                                  for sid, s in ref.scenarios.items()
+                                  for o in [outlook(sig, sid, float(s["adoption"]))]},
+                    "malaysia": rows[rid].get("malaysia_forecast")}
                    for rid, sig in signals.items()), key=lambda r: -r["index"])
     skills_out = sorted(({**s, "name": ref.skills[s["skill_id"]]["name"], "mine": s["skill_id"] in mine}
                          for s in snapshot.get("skill_signals", [])),
@@ -361,6 +366,8 @@ def radar(profile_id: str | None = None, user: str | None = User):
                                 for c in ref.capabilities],
         "skills": skills_out,
         "roles": roles,
+        "forecast": snapshot.get("forecast"),
+        "scenarios": [{"id": s["id"], "label": s["label"]} for s in ref.scenarios.values()],
     }
 
 

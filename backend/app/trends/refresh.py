@@ -61,8 +61,9 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
     now = now or dt.datetime.now().replace(microsecond=0)
     ref = get_reference()
     contact = get_settings().contact_email or None
+    openalex_key = get_settings().openalex_api_key or None
     research_raw = _raw("research", now.date(), lambda: research.collect(
-        ref.capabilities, now.date(), mailto=contact, progress=_log), force)
+        ref.capabilities, now.date(), mailto=contact, api_key=openalex_key, progress=_log), force)
     jobs_raw = _raw("jobs", now.date(), lambda: jobs.collect(
         ref.job_terms, now.date(), progress=_log), force)
     try:
@@ -70,8 +71,17 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
     except (httpx.HTTPError, KeyError, ValueError) as error:  # optional source: build without it
         _log(f"OpenDOSM unavailable, building without Malaysian employment ({_safe_error(error)})")
         dosm_raw = None
+    history = {}
+    try:  # optional: the forecasts. Without history the snapshot uses the two-period comparison
+        history["jobs"] = _raw("jobs_history", now.date(), lambda: jobs.collect_series(
+            ref.job_terms, now.date(), progress=_log), force)
+        history["research"] = _raw("research_history", now.date(), lambda: research.collect_series(
+            ref.capabilities, now.date(), mailto=contact, api_key=openalex_key, progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"History incomplete, forecasting from what was collected ({_safe_error(error)})")
     _log("Building new snapshot")
-    snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now, dosm_raw)
+    snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now, dosm_raw,
+                             history or None)
     review.save_pending(snapshot)
     _log(f"Saved {snapshot['snapshot_id']} for review. Users keep the current forecast until an admin approves it.")
     return snapshot
