@@ -1,4 +1,4 @@
-"""Run a skill-evidence search for every catalogue role, or an emerging-roles search for the AI
+"""Read the real job ads of every catalogue role (skill evidence), or run an emerging-roles search for the AI
 capabilities we track (app/evidence/emerging.py), in the background, for review.
 
 Like the trend refresh: the admin button starts it, the UI polls progress, and each role's result
@@ -6,7 +6,7 @@ is saved as "pending". Nothing changes for users until a person approves a role.
 search fails is reported and skipped; the rest still go to review.
 
 The admin can stop a run: searches not started yet are cancelled, the ones already running (at
-most PARALLEL) finish, since they are already paid for, and everything found is kept for review.
+most PARALLEL) finish, and everything found is kept for review.
 """
 
 import datetime as dt
@@ -18,7 +18,7 @@ from app.evidence import emerging, search
 from app.reference import get_reference
 from app.trends.refresh import _safe_error
 
-PARALLEL = 3  # grounded searches at once: about 25 s each, so 13 roles take about 2 minutes
+PARALLEL = 3  # roles at once: reading one role's ads takes a few seconds; emerging searches about 25 s each
 
 _lock = threading.Lock()
 _status: dict = {"state": "idle", "steps": [], "saved": [], "failed": [], "error": None, "stopping": False}

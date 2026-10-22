@@ -4,8 +4,8 @@ and certifications, read from real job ads (DECISIONS #44).
     python scripts/build_qualifications.py           # every role -> data/raw/qualifications_draft.json
     python scripts/build_qualifications.py --apply   # draft -> data/entry_requirements.json "roles"
 
-Ads come from freehire.me (the same source and search terms as a role page's openings,
-data/role_openings.json): the newest MAX_ADS Malaysian postings whose title names the role, each with
+Ads come from freehire.me through app/evidence/ads.py (the same source and search terms as a role
+page's openings and the skill evidence): the newest MAX_ADS Malaysian postings whose title names the role, each with
 its original link (mostly JobStreet). No language model is used: the education sentence and known
 certificate names are found in each ad's own text by fixed rules (extract() below), so every quote
 and link is real. A first attempt asked Gemini with Google Search for ads; none of its 8 links opened
@@ -21,11 +21,9 @@ licence route as the qualification (entry_requirements.json "licences"); its ads
 
 import argparse
 import datetime as dt
-import html
 import json
 import re
 import sys
-from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
 from pathlib import Path
 
@@ -33,24 +31,16 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.trends.mypostings import API_URL, COUNTRY  # noqa: E402
+from app.evidence import ads  # noqa: E402
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 DRAFT = DATA / "raw" / "qualifications_draft.json"
 REQS = DATA / "entry_requirements.json"
 MAX_ADS = 60
-PAGES = 3
 MIN_ADS = 5        # ads stating a level before a role gets its own qualification line
 MIN_MENTIONS = 2   # ads that must name a field or certificate before it is shown
 MIN_CERT_SHARE = 0.1  # ...and a certificate at least this share of the ads read
 MAJORITY = 0.5     # the top level must be asked for by at least half the ads that state one
-# Title words a posting must contain to count for qualifications, where the openings search is broad
-# (e.g. "solar" also finds solar sales and finance jobs).
-QUAL_TITLES = {"renewable_energy_technician": ["technician", "installer", "wireman", "juruteknik"],
-               "engineering_technician": ["drafter", "draughtsman", "draftsman", "bim", "cad"],
-               "accounts_clerk": ["clerk", "assistant", "payroll", "kerani"],
-               "bank_teller": ["teller", "cashier", "counter"]}
-
 # Lowest first: an ad asking for "Diploma/Degree" asks for at least a diploma.
 LEVELS = [("SPM", r"\b(spm|stpm|svm|o[- ]?levels?|form (5|five))\b"),
           ("SKM", r"\b(skm|sijil kemahiran malaysia|malaysian skills? certificate)\b"),
@@ -87,17 +77,9 @@ CERTS = {
 }
 
 
-def text_of(description: str) -> list[str]:
-    """The ad as sentences and list items, without HTML."""
-    raw = re.sub(r"<(br|/p|/li|li|/h\d|/div)[^>]*>", "\n", description or "", flags=re.I)
-    raw = html.unescape(re.sub(r"<[^>]+>", " ", raw))
-    parts = re.split(r"\n|(?<=[.!?])\s+(?=[A-Z])|•", raw)
-    return [re.sub(r"\s+", " ", p).strip(" -*·") for p in parts if p and p.strip()]
-
-
 def extract(description: str) -> dict:
     """The education sentence, its minimum level and fields, and the certificates the ad names."""
-    sentences = text_of(description)
+    sentences = ads.sentences(description)
     level, quote, fields = None, None, []
     for s in sentences:
         low = s.lower()
@@ -119,42 +101,17 @@ def extract(description: str) -> dict:
     return {"level": level, "quote": quote, "fields": sorted(set(fields)), "certifications": certs}
 
 
-def postings(client: httpx.Client, lookup: dict, must: list[str] | None = None) -> list[dict]:
-    words = [w.lower() for w in must or lookup["titles"]]
-    out = []
-    for page in range(PAGES):
-        data = client.get(f"{API_URL}/jobs/search", params={"q": lookup["query"], "countries": COUNTRY, "limit": 100,
-                                                            "offset": page * 100, "sort": "posted_at", "order": "desc"}).json()["data"]
-        out += [j for j in data if any(re.search(rf"\b{re.escape(w)}\b", j["title"].lower()) for w in words)]
-        if len(data) < 100 or len(out) >= MAX_ADS:
-            break
-    out = [j for j in out if str(j.get("url", "")).startswith("https://")][:MAX_ADS]
-
-    # Search results cut each description at about 1,000 characters, usually before the requirements.
-    def full(job: dict) -> dict:
-        try:
-            detail = client.get(f"{API_URL}/jobs/{job['public_slug']}").json()["data"]
-            return {**job, "description": detail.get("description") or job.get("description")}
-        except (httpx.HTTPError, KeyError, ValueError):
-            return job
-
-    with ThreadPoolExecutor(max_workers=6) as pool:
-        return list(pool.map(full, out))
-
-
 def search() -> None:
-    lookups = json.loads((DATA / "role_openings.json").read_text(encoding="utf-8"))["roles"]
     out = {"source": "freehire.me (Malaysian job postings, mostly JobStreet), read on " + dt.date.today().isoformat(),
            "roles": {}}
     with httpx.Client(timeout=30) as client:
-        for role_id, lookup in lookups.items():
-            ads = []
-            for job in postings(client, lookup, QUAL_TITLES.get(role_id)):
-                found = extract(job.get("description") or "")
-                ads.append({"title": job["title"].strip(), "company": job.get("company"), "url": job["url"],
-                            "posted": (job.get("posted_at") or "")[:10], **found})
-            out["roles"][role_id] = {"searched": dt.date.today().isoformat(), "ads": ads}
-            print(f"{role_id}: {len(ads)} ads, {sum(1 for a in ads if a['level'])} state a level")
+        for role_id in ads.lookups():
+            read = []
+            for job in ads.for_role(role_id, MAX_ADS, client=client):
+                read.append({"title": job["title"], "company": job["company"], "url": job["url"],
+                             "posted": job["posted"], **extract(job["description"])})
+            out["roles"][role_id] = {"searched": dt.date.today().isoformat(), "ads": read}
+            print(f"{role_id}: {len(read)} ads, {sum(1 for a in read if a['level'])} state a level")
     DRAFT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 

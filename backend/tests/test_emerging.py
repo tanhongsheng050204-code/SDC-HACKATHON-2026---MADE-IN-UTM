@@ -31,6 +31,38 @@ def fake_grounded(answer: dict):
     return call
 
 
+GOOGLE_PAGE = "https://www.jobstreet.com.my/job/95378380"  # where Google's redirect really leads
+
+
+@pytest.fixture(autouse=True)
+def offline_links(monkeypatch):
+    """Google's redirect resolves to a real ad, and that ad holds the quote; no network in tests."""
+    monkeypatch.setattr(search, "resolve_redirect", lambda url: GOOGLE_PAGE if "vertexaisearch" in url else None)
+    monkeypatch.setattr(emerging, "_page_text",
+                        lambda url: "<li>We are hiring an AI prompt specialist to design prompts.</li>" if url == GOOGLE_PAGE else None)
+
+
+def test_links_are_googles_own_and_sites_google_did_not_read_are_dropped():
+    ref = get_reference()
+    cap = ref.capabilities[0]
+    answer = _answer(cap["id"], sources=[
+        {"url": "https://www.jobstreet.com.my/job/ai-prompt-specialist-made-up", "title": "AI Prompt Specialist",
+         "quote": "We are hiring an AI prompt specialist to design prompts."},
+        {"url": "https://www.not-read-by-google.com/page", "title": "Elsewhere", "quote": "Something else."}])
+    body = emerging.search_capability(cap, None, ref, grounded=fake_grounded(answer))
+    assert [s["url"] for s in body["sources"]] == [GOOGLE_PAGE]  # the model's slug is replaced, the other site dropped
+    assert body["sources"][0]["quote_on_page"] is True
+
+
+def test_a_quote_not_on_the_linked_page_is_marked():
+    ref = get_reference()
+    cap = ref.capabilities[0]
+    answer = _answer(cap["id"], sources=[{"url": "https://www.jobstreet.com.my/job/9", "title": "x",
+                                          "quote": "A sentence the page does not contain."}])
+    assert emerging.search_capability(cap, None, ref, grounded=fake_grounded(answer))["sources"][0]["quote_on_page"] is False
+    assert emerging.quote_on_page("https://blocked.example/x", "Any quote.") is None  # page could not be read
+
+
 def test_without_a_trend_refresh_every_capability_is_a_candidate():
     ref = get_reference()
     picked = emerging.candidates(ref)

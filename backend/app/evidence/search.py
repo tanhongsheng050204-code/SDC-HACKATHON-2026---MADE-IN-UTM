@@ -1,35 +1,40 @@
-"""Find where a role's skills are asked for: Malaysian job ads, through Gemini's Google Search.
+"""Find where a role's skills are asked for in real Malaysian job ads.
 
-One grounded call per role asks for current Malaysian job ads and the exact sentences that ask for
-each skill, tagged with our catalogue ids. When fewer than MIN_JOB_ADS usable ads come back, a
-second call widens to any page (career guides, industry and government reports), labelled "web".
+The ads come from freehire.me (app/evidence/ads.py: the same postings as a role page's openings,
+each with its original link, mostly JobStreet). Every sentence of every ad is matched against our
+skill names and aliases (skills_in: the CV dictionary minus GENERIC_IN_ADS); a sentence that names a skill
+becomes that skill's quote, word for word, with the ad's own link. No language model is involved,
+so no link, ad or quote can be invented. (Until 22 Oct 2026 a Gemini search found the ads; most of
+the links it wrote did not open, because the model rebuilt ad addresses from memory: REVIEW_LOG.)
 
 `aggregate` turns the pages into what a reviewer and the app need (`drop_sources` holds page URLs,
 or "URL#skill_id" for one quote, that the reviewer unticked):
-  status per skill   confirmed (2+ distinct pages), single (1), none (0)
-  added              catalogue skills not in the role that 2+ distinct *job ads* ask for (weight 1);
-                     web pages never add skills
-  not_in_catalogue   skill names we have no entry for, with how many pages named them, for the team
+  status per skill   confirmed (2+ ads), single (1), none (0)
+  added              catalogue skills not in the role that ADD_MIN_ADS+ ads and ADD_SHARE of the ads
+                     read ask for, added at weight 1 once approved
+  not_in_catalogue   freehire's own skill tags on the ads that we have no entry for, with how many
+                     ads carry them, for the team
 
-Nothing here is personal: the prompt holds a role title and our skill names only. Every citation
-keeps its quote and URL, and `grounded` says whether its site was among the sources Google
-reported, so a reviewer can spot quotes the model may have invented.
+The page-kind and redirect helpers below are also used by the emerging-roles search (emerging.py).
 """
 
 import datetime as dt
+import math
 import re
 from collections.abc import Callable
+from functools import lru_cache
 from urllib.parse import urlparse
 
 import httpx
 
-from app.llm import generate_grounded_json
+from app.evidence import ads
 from app.services.skills import _alias_index, normalize
 
-MIN_JOB_ADS = 2       # usable ads before the search is widened, and ads needed to add a skill
-MAX_PAGES = 8
-MAX_QUOTES = 12       # per page
+MAX_ADS = 40          # newest ads read per role
+MAX_SENTENCE = 300    # longer "sentences" are usually whole paragraphs that lost their breaks
 MAX_CITATIONS = 5     # per skill, as shown
+ADD_MIN_ADS = 3       # a catalogue skill joins the role only if at least this many ads ask for it...
+ADD_SHARE = 0.2       # ...and at least this share of the ads read (generic skills appear in a few ads)
 
 # Job boards used in Malaysia, and the hiring systems employers post ads on. LinkedIn counts only
 # for its job pages, not articles. Employer career sites (careers.x, jobs.x) count as job ads too.
@@ -46,32 +51,7 @@ CAREER_SUBDOMAINS = ("careers", "career", "jobs", "job", "apply", "recruit", "re
 # expire, so they are resolved to the real address (only the redirect header is read).
 REDIRECT_HOSTS = ("vertexaisearch.cloud.google.com",)
 
-ADS_PROMPT = """Search the web for current job ads in Malaysia (posted in the last 12 months) for the
-role "{title}": {summary}
-Prefer Malaysian job boards such as JobStreet, Hiredly, MyFutureJobs, LinkedIn Jobs, Indeed Malaysia
-and Maukerja. Find up to {max_pages} different ads.
-
-For each ad, copy the exact sentences that ask for skills, and tag each sentence with the closest
-skill id from this list, or "other" with a short skill name when none fits:
-{catalogue}
-
-Use only sentences that appear in the ad. Do not invent ads, URLs or quotes.
-Return JSON only:
-{{"pages": [{{"url": "...", "title": "...", "employer": "...", "quotes": [{{"skill_id": "...", "skill_name": "...", "quote": "..."}}]}}]}}"""
-
-WEB_PROMPT = """Search the web for pages that describe which skills the role "{title}" needs in
-Malaysia ({summary}): career guides, industry or government reports, professional bodies, job ads.
-Find up to {max_pages} different pages.
-
-For each page, copy the exact sentences that name skills for this role, and tag each sentence with
-the closest skill id from this list, or "other" with a short skill name when none fits:
-{catalogue}
-
-Use only sentences that appear on the page. Do not invent pages, URLs or quotes.
-Return JSON only:
-{{"pages": [{{"url": "...", "title": "...", "employer": "", "quotes": [{{"skill_id": "...", "skill_name": "...", "quote": "..."}}]}}]}}"""
-
-Grounded = Callable[[str], tuple[dict, list[dict]]]
+Fetch = Callable[[str, int], list[dict]]
 
 
 def _host(url: str) -> str:
@@ -112,32 +92,57 @@ def _grounded(url: str, sources: list[dict]) -> bool:
 Resolve = Callable[[str], str | None]
 
 
-def _clean_pages(raw: dict, sources: list[dict], skills: dict, resolve: Resolve) -> list[dict]:
-    """Keep well-formed pages with an http(s) URL; tag ids are validated against the catalogue."""
+# One-word aliases that help read a CV but are too common in job ads to show an ad asks for the skill:
+# "ensure compliance with cash-handling procedures" is not risk assessment, "proficient in writing
+# English" is not content writing, and "5 ml" in a nursing ad is not machine learning.
+GENERIC_IN_ADS = {"compliance", "audit", "writing", "coordination", "ml", "flexibility"}
+
+
+@lru_cache(maxsize=1)
+def _ad_terms() -> list[tuple[re.Pattern, str]]:
+    terms = [(t, s) for t, s in _alias_index().items() if len(t) >= 2 and t not in GENERIC_IN_ADS]
+    return [(re.compile(rf"(?<![\w]){re.escape(t)}(?![\w])"), s) for t, s in sorted(terms, key=lambda ts: -len(ts[0]))]
+
+
+def skills_in(sentence: str) -> list[str]:
+    """Catalogue skills a job-ad sentence names, by name or alias (as dictionary_extract, minus GENERIC_IN_ADS)."""
+    haystack = f" {normalize(sentence)} "
+    found: list[str] = []
+    for pattern, skill_id in _ad_terms():
+        if skill_id not in found and pattern.search(haystack):
+            found.append(skill_id)
+    return found
+
+
+def pages_from_ads(jobs: list[dict], skills: dict) -> list[dict]:
+    """One page per ad: the first sentence that names each catalogue skill, word for word, and the
+    ad's own skill tags that are not in our catalogue (no quote: they only list names for the team).
+    An ad posted again (same title and employer, a new link) counts once."""
     aliases = _alias_index()
-    pages = []
-    for page in (raw.get("pages") or [])[:MAX_PAGES]:
-        if not isinstance(page, dict):
+    pages, posted = [], set()
+    for job in jobs:
+        key = (job["title"].casefold().strip(), (job.get("company") or "").casefold().strip())
+        if key in posted:
             continue
-        url = str(page.get("url") or "").strip()
-        via_google = any(_on(_host(url), h) for h in REDIRECT_HOSTS)
-        if via_google:
-            url = resolve(url) or ""
-        if not url.startswith(("http://", "https://")):
-            continue
-        quotes = []
-        for q in (page.get("quotes") or [])[:MAX_QUOTES]:
-            if not isinstance(q, dict) or not str(q.get("quote") or "").strip():
+        posted.add(key)
+        quotes, seen = [], set()
+        for sentence in ads.sentences(job["description"]):
+            if len(sentence) > MAX_SENTENCE:
                 continue
-            name = str(q.get("skill_name") or "").strip()[:60]
-            skill_id = str(q.get("skill_id") or "")
-            if skill_id not in skills:  # "other", or an id the model made up: try our own names
-                skill_id = aliases.get(normalize(name))
-            quotes.append({"skill_id": skill_id, "skill_name": name, "quote": str(q["quote"]).strip()[:400]})
+            for skill_id in skills_in(sentence):
+                if skill_id in skills and skill_id not in seen:
+                    seen.add(skill_id)
+                    quotes.append({"skill_id": skill_id, "skill_name": skills[skill_id]["name"], "quote": sentence})
+        for tag in job.get("tags", []):
+            known = aliases.get(normalize(tag))
+            if known is None:
+                quotes.append({"skill_id": None, "skill_name": tag.strip().lower()[:60], "quote": ""})
+            elif known in skills and known not in seen:  # tagged by the site but not written in a sentence
+                seen.add(known)
+                quotes.append({"skill_id": known, "skill_name": skills[known]["name"], "quote": f"Skill listed on the ad: {tag}"})
         if quotes:
-            pages.append({"url": url[:500], "title": str(page.get("title") or "")[:200],
-                          "employer": str(page.get("employer") or "")[:120], "kind": page_kind(url),
-                          "grounded": via_google or _grounded(url, sources), "quotes": quotes})
+            pages.append({"url": job["url"][:500], "title": job["title"][:200], "employer": (job.get("company") or "")[:120],
+                          "kind": "job_ad", "grounded": True, "posted": job.get("posted"), "quotes": quotes})
     return pages
 
 
@@ -153,7 +158,7 @@ def _dedupe(pages: list[dict]) -> list[dict]:
 
 
 def aggregate(role: dict, pages: list[dict], skills: dict, drop_sources: set[str] = frozenset(),
-              drop_added: set[str] = frozenset()) -> dict:
+              drop_added: set[str] = frozenset(), ads_read: int | None = None) -> dict:
     cited: dict[str, dict[str, dict]] = {}  # skill id -> url -> citation (one per page)
     other: dict[str, set[str]] = {}
     for page in pages:
@@ -177,24 +182,19 @@ def aggregate(role: dict, pages: list[dict], skills: dict, drop_sources: set[str
         status = "confirmed" if len(cites) >= 2 else "single" if cites else "none"
         out[skill_id] = {"status": status, "sources": len(cites),
                          "job_ads": sum(c["kind"] == "job_ad" for c in cites), "citations": cites[:MAX_CITATIONS]}
+    read = ads_read if ads_read is not None else len({p["url"] for p in pages})
+    needed = max(ADD_MIN_ADS, math.ceil(ADD_SHARE * read))
     added = [{"skill_id": s, "job_ads": out[s]["job_ads"]} for s in out
-             if s not in own and s not in drop_added and out[s]["job_ads"] >= MIN_JOB_ADS]
+             if s not in own and s not in drop_added and out[s]["job_ads"] >= needed]
     names = sorted(({"name": n, "count": len(urls)} for n, urls in other.items()), key=lambda x: (-x["count"], x["name"]))
     return {"skills": out, "added": added, "not_in_catalogue": names}
 
 
-def search_role(role: dict, skills: dict, *, grounded: Grounded = generate_grounded_json,
-                resolve: Resolve = resolve_redirect, today: dt.date | None = None) -> dict:
-    """Search, widen if needed, aggregate. Raises if the search itself fails."""
-    catalogue = "\n".join(f"- {sid}: {s['name']}" for sid, s in skills.items())
-    fill = {"title": role["title"], "summary": role.get("summary", ""), "catalogue": catalogue, "max_pages": MAX_PAGES}
-    raw, sources = grounded(ADS_PROMPT.format(**fill))
-    pages = _dedupe(_clean_pages(raw, sources, skills, resolve))
-    widened = sum(p["kind"] == "job_ad" for p in pages) < MIN_JOB_ADS
-    if widened:
-        raw, more = grounded(WEB_PROMPT.format(**fill))
-        sources = sources + more
-        seen = {p["url"] for p in pages}
-        pages += [p for p in _dedupe(_clean_pages(raw, sources, skills, resolve)) if p["url"] not in seen]
+def search_role(role: dict, skills: dict, *, fetch: Fetch = ads.for_role, today: dt.date | None = None) -> dict:
+    """Read the role's newest real ads and aggregate. Raises if the ads cannot be fetched."""
+    jobs = fetch(role["id"], MAX_ADS)
+    pages = _dedupe(pages_from_ads(jobs, skills))
+    read = len({(j["title"].casefold().strip(), (j.get("company") or "").casefold().strip()) for j in jobs})  # reposts once
     return {"role_id": role["id"], "title": role["title"], "searched": str(today or dt.date.today()),
-            "widened": widened, "sources": pages, "summary": aggregate(role, pages, skills)}
+            "widened": False, "ads_read": read, "sources": pages,
+            "summary": aggregate(role, pages, skills, ads_read=read)}

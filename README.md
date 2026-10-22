@@ -242,21 +242,23 @@ Research activity and Hacker News posts are rough proxies for demand. A refresh 
 
 ## Skill evidence from job ads
 
-Each role's skill list can be checked against **current Malaysian job ads**. **Refresh skill evidence** (Admin, Future roles screen) runs a Gemini search with Google Search grounding for every role (about 2 minutes) and asks for the exact sentence in each ad that asks for each skill. If fewer than 2 ads come back, it widens to any page (career guides, reports), labelled as weaker evidence. Google's redirect links are resolved to the real address; only the redirect header is read.
+Each role's skill list is checked against **current Malaysian job ads, read directly**. **Refresh skill evidence** (Admin, Future roles screen) reads up to 40 of each role's newest ads from freehire.me (mostly JobStreet; the same ads as the role page's openings), about a minute for all roles. Every sentence of every ad is matched against our skill names and aliases, so each quote is the ad's own sentence with the ad's own link, and **no language model is involved: a link or a quote cannot be invented**. A few one-word aliases that help read a CV are too common in ads to count as evidence ("compliance", "audit", "writing", "coordination", "ml", "flexibility"), and an ad posted again under a new link counts once.
 
-**A person approves each role.** The reviewer sees every page and quote, flagged when the site was not among Google's own sources, and can untick a whole page or one quote (wrong page, wrong skill) before approving. Then:
+(Until 22 Oct 2026 a Gemini search found the ads. Of 33 links checked on the live site, 5 opened: the model read real ads but rebuilt their addresses from memory. See REVIEW_LOG.)
 
-- every skill of the role shows **Confirmed** (2+ pages), **One source** or **Not seen in ads**, with the quotes and links, on the role page and in the skill tree;
-- a skill from our catalogue that **2+ job ads** ask for is **added to the role at weight 1**, so fit, rankings and the pathway change; web pages never add skills;
-- skill names that are not in our catalogue are listed for the team and change nothing.
+**A person approves each role.** The reviewer sees every ad and quote and can untick a whole ad or one quote (a sentence that does not really ask for the skill) before approving. Then:
+
+- every skill of the role shows **Confirmed** (2+ ads), **One source** or **Not seen in ads**, with the quotes and links, on the role page and in the skill tree;
+- a catalogue skill that **3+ ads and a fifth of the ads read** ask for is **added to the role at weight 1**, so fit, rankings and the pathway change;
+- skill tags the site put on the ads that are not in our catalogue are listed for the team and change nothing.
 
 Results and decisions are stored in the database (`evidence` table), so a redeploy keeps them.
 
 ## Emerging roles (a prediction)
 
-**Find emerging roles** (same admin panel) runs one grounded Gemini search per AI capability we track (about 5 minutes). Each proposes one new job title in Malaysia with EN / BM / 中文 text, the catalogue skills it needs, a **stepping-stone role from our catalogue**, an SDG and quoted sources. Answers without a source, a catalogue skill or a valid stepping stone are refused. Once a trend refresh is approved, only capabilities whose research is accelerating are searched, fastest first; before that, every card says momentum is not measured yet.
+**Find emerging roles** (same admin panel) runs one Google-grounded Gemini search per AI capability we track (about 5 minutes). Each proposes one new job title in Malaysia with EN / BM / 中文 text, the catalogue skills it needs, a **stepping-stone role from our catalogue**, an SDG and quoted sources. **Source links come from Google's own search results, never from an address the model wrote**: a Google redirect link is followed to the page it leads to, a site Google did not read is dropped, and each source records whether its quote was found on the page (many job boards refuse automated visits, so that is sometimes unknown). Answers without such a source, a catalogue skill or a valid stepping stone are refused. Once a trend refresh is approved, only capabilities whose research is accelerating are searched, fastest first; before that, every card says momentum is not measured yet.
 
-A person approves each card. Up to 6 approved cards appear under the ranked roles on the Future roles screen, labelled **"A prediction"** and **never ranked**: there is no published growth figure for jobs this new. Each card shows the person's carry-over skills, what is left to learn and a link to the stepping-stone role. **Search current job ads** on a card runs a live search, labelled "not yet reviewed", cached per title per day, limited to 5 per profile per hour, and never scored. Search grounding is billed by Google per search on paid plans; one full run is 13–26 searches, an emerging-roles run 8.
+A person approves each card. Up to 6 approved cards appear under the ranked roles on the Future roles screen, labelled **"A prediction"** and **never ranked**: there is no published growth figure for jobs this new. Each card shows the person's carry-over skills, what is left to learn and a link to the stepping-stone role. **Search current job ads** on a card reads real Malaysian ads whose title has all the card title's main words (freehire.me), labelled "not yet reviewed", cached per title per day, limited to 5 per profile per hour, and never scored. Search grounding is billed by Google per search on paid plans; an emerging-roles run is 8 searches.
 
 ## A day in this job
 

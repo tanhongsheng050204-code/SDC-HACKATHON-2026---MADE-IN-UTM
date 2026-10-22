@@ -12,7 +12,8 @@ function Sources({ items }: { items: EmergingSource[] }) {
         <li key={s.url}><q>{s.quote}</q>
           <span className="source"> · <span className="badge">{s.kind === "job_ad" ? t("ev.jobAd") : t("ev.web")}</span>{" "}
             <a href={s.url} target="_blank" rel="noreferrer">{s.employer || s.title || new URL(s.url).hostname} ↗</a>
-            {!s.grounded && <em> ({t("ev.notGrounded")})</em>}</span>
+            {!s.grounded && <em> ({t("ev.notGrounded")})</em>}
+            {s.quote_on_page === false && <em> ({t("ev.quoteMissing")})</em>}</span>
         </li>
       ))}
     </ul>

@@ -117,14 +117,14 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   return (
     <details className="card admin" open={panelOpen} onToggle={(e) => setPanelOpen(e.currentTarget.open)}>
       <summary>Admin: skill evidence and emerging roles{waiting > 0 && <span className="badge gold">{waiting} waiting for review</span>}</summary>
-      <p className="muted">Searches the web for current Malaysian job ads for every role and the exact sentences that ask for each skill (about 2 minutes). Skills that 2+ ads ask for are proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Approving a role also drafts a richer "A day in this job" from its ads, which waits here for review too. Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
+      <p className="muted">Reads up to 40 current Malaysian job ads for every role (freehire.me, mostly JobStreet, with their real links) and quotes the sentences that name each skill, word for word: no AI writes them (about a minute). A catalogue skill that 3+ ads and a fifth of the ads ask for is proposed for the role. <strong>Nothing changes for users until you approve a role.</strong> Approving a role also drafts a richer "A day in this job" from its ads, which waits here for review too. Open each link you doubt; untick a whole page, or one quote that is not on the page or is tagged with the wrong skill.</p>
       <div className="two-col">
         <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
         <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
       </div>
       <div className="actions">
-        <button className="primary" disabled={running || !token} onClick={() => start("roles")}>{running ? "Searching…" : "Refresh skill evidence"}</button>
-        <button disabled={running || !token} onClick={() => start("emerging")} title="One web search per AI capability, about 5 minutes">Find emerging roles</button>
+        <button className="primary" disabled={running || !token} onClick={() => start("roles")}>{running ? "Reading job ads…" : "Refresh skill evidence"}</button>
+        <button disabled={running || !token} onClick={() => start("emerging")} title="One Google-grounded search per AI capability, about 5 minutes; links come from Google's own sources">Find emerging roles</button>
         {running && (
           <button className="danger" disabled={status?.stopping} onClick={stop}
             title="Cancels the searches not started yet; the ones already running finish and are kept for review">
@@ -169,6 +169,8 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
             <div key={s.url} className="evidence-page">
               <strong>{s.title || s.url}</strong> <span className="badge">{s.kind === "job_ad" ? "Job ad" : "Web page"}</span>
               {!s.grounded && <span className="badge risk">not among the search's sources: check it</span>}
+              {s.quote_on_page === false && <span className="badge risk">quote not found on this page: check it</span>}
+              {s.quote_on_page == null && <span className="badge">page could not be checked automatically</span>}
               <p><q>{s.quote}</q></p>
               <a className="source" href={s.url} target="_blank" rel="noreferrer">{s.url} ↗</a>
             </div>
@@ -200,7 +202,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
 
       {detail && (
         <div className="review">
-          <p className="eyebrow">Waiting for review · {detail.title} · searched {detail.searched}{detail.widened && " · widened to any page"}</p>
+          <p className="eyebrow">Waiting for review · {detail.title} · job ads read {detail.searched}{detail.widened && " · widened to any page"}</p>
           {detail.summary.added.length > 0 && (
             <>
               <h3>Skills to add to this role (weight 1)</h3>
@@ -217,7 +219,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
             const e = detail.summary.skills[id];
             return <li key={id}>{name(id)} {e && <EvidenceBadge e={e} />}</li>;
           })}</ul>
-          <h3>Pages found ({detail.sources.length})</h3>
+          <h3>Job ads read ({detail.sources.length}): each sentence is the ad's own; untick any that does not really ask for the skill</h3>
           {detail.sources.map((page) => (
             <div key={page.url} className={`evidence-page ${dropSources.has(page.url) ? "dropped" : ""}`}>
               <label className="check">
