@@ -22,6 +22,7 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements-dev.txt
       - run: pip install -r requirements-dev.txt
+      - run: python scripts/fetch_ocr_models.py  # so the scanned-CV tests run, not skip
       - run: python -m pytest
 
   postgres:

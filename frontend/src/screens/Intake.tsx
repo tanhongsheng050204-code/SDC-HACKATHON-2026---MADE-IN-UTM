@@ -206,6 +206,7 @@ function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: 
     <div className="send-check">
       <h2>{t("send.title")}</h2>
       <p className="muted">{t("send.sub")}</p>
+      {preview.from_scan && <p className="banner warning">{t("send.fromScan")}</p>}
       {removed.length ? (
         <p className="chips" aria-label={t("send.removed")}>
           <span>{t("send.removed")}:</span>
@@ -241,7 +242,7 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
       <p><strong>{t("in.uploadTitle")}</strong></p>
       <p className="muted">{t("in.uploadSub")}</p>
       <label className="btn ink file-btn">{busy ? t("in.reading") : t("in.chooseFile")}
-        <input type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+        <input type="file" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png"
           disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
       </label>
       {error && <p className="error" role="alert">{error}</p>}
