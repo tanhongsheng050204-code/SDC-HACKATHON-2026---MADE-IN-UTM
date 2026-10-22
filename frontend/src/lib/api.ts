@@ -18,6 +18,16 @@ export interface Profile {
   skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;
   audience?: Audience | null; user_id?: string | null; is_demo?: boolean; preferences?: Record<string, number>; skill_levels?: Record<string, number>;
   target_role_id?: string | null; practised_at?: string | null;
+  target_date?: string | null; weekly_hours?: number | null;
+}
+export type ProgressStatus = "on_track" | "ahead" | "behind" | "done";
+export interface Progress {
+  role_id: string | null; target_date: string | null; weekly_hours: number | null; today: string;
+  readiness: number | null; hours_left: number | null; total_hours: number | null;
+  start: { date: string; readiness: number } | null; expected: number | null; status: ProgressStatus | null;
+  finish_estimate: string | null;
+  week: { starts: string; hours_done: number; target: number | null };
+  points: { date: string; readiness: number; kind: string; subject: string | null }[];
 }
 export type JourneyStep = "stand" | "explore" | "build" | "apply";
 export interface Journey {
@@ -427,6 +437,9 @@ export const api = {
   setTarget: (id: string, roleId: string | null) =>
     request<Profile>(`/profiles/${id}/target`, { method: "PUT", body: JSON.stringify({ role_id: roleId }) }),
   journey: (id: string) => request<Journey>(`/profiles/${id}/journey`),
+  progress: (id: string) => request<Progress>(`/profiles/${id}/progress`),
+  setPlan: (id: string, targetDate: string | null, weeklyHours: number | null) =>
+    requestDetail<Profile>(`/profiles/${id}/plan`, { method: "PUT", body: JSON.stringify({ target_date: targetDate, weekly_hours: weeklyHours }) }),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),

@@ -1,8 +1,9 @@
 import { FormEvent, KeyboardEvent, useEffect, useId, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { Icon } from "../components/Icon";
-import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleHistory, RoleMatch, Scenario } from "../lib/api";
-import { percent, signed } from "../lib/format";
+import { api, Journey, JourneyStep, Matches, Pathway, Profile, Progress, RoleHistory, RoleMatch, Scenario } from "../lib/api";
+import { STATUS_KEY, STATUS_TONE } from "../components/ProgressPanel";
+import { percent, shortDate, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE, priceText } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
@@ -286,10 +287,12 @@ function NextStep({ profile, journey, top, target, onOpenRole, onStep }: {
   onOpenRole: (r: RoleMatch) => void; onStep: (s: JourneyStep) => void;
 }) {
   const [plan, setPlan] = useState<Pathway | null>(null);
+  const [track, setTrack] = useState<Progress | null>(null);
   useEffect(() => {
-    if (!target) { setPlan(null); return; }
+    if (!target) { setPlan(null); setTrack(null); return; }
     api.pathway(profile.id, target.role_id).then(setPlan).catch(() => setPlan(null));
-  }, [profile.id, target?.role_id, profile.completed_courses.length]);
+    api.progress(profile.id).then(setTrack).catch(() => setTrack(null));
+  }, [profile.id, target?.role_id, profile.completed_courses.length, profile.target_date]);
 
   const step = journey.next;
   const next = plan?.steps.find((s) => !s.done) ?? null;
@@ -321,6 +324,14 @@ function NextStep({ profile, journey, top, target, onOpenRole, onStep }: {
           <div className="next-progress-row"><span>{tf("v3.ready", { n: ready })}</span><span className="muted">{tf("v3.toGo", { h: plan.hours_left, rm: `RM ${rm.toLocaleString("en-MY")}` })}</span></div>
           <div className="next-progress-bar" role="img" aria-label={tf("v3.ready", { n: ready })}><span style={{ width: `${ready}%` }} /></div>
         </div>
+      )}
+      {track && track.readiness !== null && (
+        <p className="progress-line">
+          {track.status && track.target_date
+            ? <><span className={`badge ${STATUS_TONE[track.status]}`}>{t(STATUS_KEY[track.status])}</span>{" "}
+                {tf("home.progress", { n: percent(track.readiness), date: shortDate(track.target_date) })}</>
+            : tf("home.progressNoDate", { n: percent(track.readiness) })}
+        </p>
       )}
       <div className="actions">
         <button className="btn ink" onClick={go}>{action} →</button>

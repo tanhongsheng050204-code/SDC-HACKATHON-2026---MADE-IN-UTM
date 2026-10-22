@@ -5,6 +5,7 @@ import { LoginToKeep } from "../components/AccountButton";
 import { PathwayList } from "../components/PathwayList";
 import { RouteMap } from "../components/RouteMap";
 import { StudyCalendar } from "../components/StudyCalendar";
+import { ProgressPanel } from "../components/ProgressPanel";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
 import { SkillRing } from "../components/SkillRing";
@@ -76,6 +77,8 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [suggestedHours, setSuggestedHours] = useState<number | null>(null);
+  const isDestination = profile.target_role_id === role.role_id;
   const dragStart = useRef<number | null>(null);
   const completions = profile.completed_courses.join(",");
 
@@ -215,6 +218,9 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
         {plan.uncovered_skills.length > 0 && <p className="banner">{tf("pl.uncovered", { list: plan.uncovered_skills.map(id => tr([...role.covered, ...role.missing].find(s => s.skill_id === id)?.name ?? id)).join(", ") })}</p>}
       </div>}
 
+      {/* Progress toward the destination: target date, weekly hours, on track or behind */}
+      {isDestination && <ProgressPanel profile={profile} roleTitle={role.title} onProfile={onProfile} suggestedHours={suggestedHours} />}
+
       {/* A licensed job: its qualification route comes before any course */}
       {plan?.requirements?.needs_licence && <EntryRequirements req={plan.requirements} />}
 
@@ -271,7 +277,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
       {tab === "list" && (plan
         ? <>
             <PathwayList plan={plan} role={role} freeOnly={freeOnly} saving={saving} onToggle={setCourse} />
-            <StudyCalendar plan={plan} roleTitle={role.title} />
+            <StudyCalendar plan={plan} roleTitle={role.title} onUseAsTarget={isDestination ? setSuggestedHours : undefined} />
             <div className="actions">
               <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
               <button onClick={() => window.print()}>{t("a.print")}</button>

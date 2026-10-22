@@ -15,9 +15,9 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
-              "evidence")
+              "evidence", "progress_events")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -108,6 +108,23 @@ _MIGRATIONS = {
     11: """
     ALTER TABLE profiles ADD COLUMN target_role_id TEXT;
     ALTER TABLE profiles ADD COLUMN practised_at TEXT;
+    """,
+    # Progress over time: a target date and weekly study hours, and dated events (course finished,
+    # skill proven, destination set) with the readiness toward the destination after each one.
+    12: """
+    ALTER TABLE profiles ADD COLUMN target_date TEXT;
+    ALTER TABLE profiles ADD COLUMN weekly_hours INTEGER;
+    CREATE TABLE IF NOT EXISTS progress_events (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        subject TEXT,
+        detail INTEGER,
+        role_id TEXT,
+        readiness REAL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS progress_events_profile ON progress_events(profile_id, created_at);
     """,
 }
 
@@ -202,6 +219,8 @@ def _row(row) -> dict | None:
         "audience": row["audience"],
         "target_role_id": row["target_role_id"],
         "practised_at": row["practised_at"],
+        "target_date": row["target_date"],
+        "weekly_hours": row["weekly_hours"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
@@ -285,6 +304,33 @@ def set_target(profile_id: str, role_id: str | None) -> dict | None:
         if cursor.rowcount == 0:
             return None
     return get_profile(profile_id)
+
+
+def set_plan(profile_id: str, target_date: str | None, weekly_hours: int | None) -> dict | None:
+    with _connect() as conn:
+        cursor = conn.execute("UPDATE profiles SET target_date=?, weekly_hours=?, updated_at=? WHERE id=?",
+                              (target_date, weekly_hours, _now(), profile_id))
+        if cursor.rowcount == 0:
+            return None
+    return get_profile(profile_id)
+
+
+def add_event(profile_id: str, kind: str, subject: str | None = None, detail: int | None = None,
+              role_id: str | None = None, readiness: float | None = None, at: str | None = None) -> None:
+    """One dated progress event. `readiness` is toward `role_id` (the destination) after the change."""
+    with _connect() as conn:
+        conn.execute("INSERT INTO progress_events (id, profile_id, kind, subject, detail, role_id, readiness, created_at) "
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                     (secrets.token_urlsafe(9), profile_id, kind, subject, detail, role_id, readiness,
+                      at or dt.datetime.now(dt.UTC).isoformat(timespec="microseconds")))  # keeps same-second order
+
+
+def list_events(profile_id: str) -> list[dict]:
+    """Oldest first."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT kind, subject, detail, role_id, readiness, created_at FROM progress_events "
+                            "WHERE profile_id=? ORDER BY created_at, id", (profile_id,)).fetchall()
+    return [dict(r) for r in rows]
 
 
 def mark_practised(profile_id: str) -> None:

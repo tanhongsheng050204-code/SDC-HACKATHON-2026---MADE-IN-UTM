@@ -1,5 +1,6 @@
 """Request bodies, with the validation rules from docs/05-BACKEND_SCHEMA.md."""
 
+import datetime as dt
 import re
 from typing import Literal
 
@@ -61,6 +62,13 @@ class InterviewRequest(BaseModel):
     role_id: str = Field(min_length=1, max_length=80)
     turns: list[InterviewTurn] = Field(default_factory=list, max_length=5)
     language: Literal["en", "ms", "zh"] = "en"
+
+
+class PlanRequest(BaseModel):
+    """A target date to reach the destination by, and study hours a week. Either may be cleared."""
+    model_config = ConfigDict(extra="forbid")
+    target_date: dt.date | None = None
+    weekly_hours: int | None = Field(default=None, ge=1, le=40)
 
 
 class TargetRequest(BaseModel):

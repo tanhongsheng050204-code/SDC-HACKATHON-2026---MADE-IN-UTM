@@ -86,6 +86,7 @@ Notes: ______
 - [ ] 5.9 Source line: forecast id and import date, "Estimates, not predictions. You decide."
 - [ ] 5.10 With the API stopped: "Couldn't load your results" with **Try again**.
 - [ ] 5.11 **What changed since your last visit** (blue card): with a destination and/or current job whose Baseline outlook moved in a newer forecast, it reads e.g. "Forecast updated on 20 Oct 2026: AI operations specialist moved from +60 to +35 under Baseline (estimate). Your route is unchanged." with the source and snapshot id. **Got it** hides it, and it stays hidden after a reload until a later forecast moves a number again. No card when nothing moved or there is only one forecast.
+- [ ] 5.12 With a destination: the next-step card shows a progress line, e.g. **On track** "35% ready · target date 30 Jun 2027", or "35% ready. Set a target date…" when there is none.
 
 Notes: ______
 
@@ -190,6 +191,9 @@ Notes: ______
 - [ ] 13.9 **Plan it in my calendar**: pick days, session length and start time; the finish date updates; **Download calendar file (.ics)** opens in Google / Outlook / Apple Calendar.
 - [ ] 13.10 **See my impact** opens SDG impact; **Print summary** prints without the sidebar or time bar.
 - [ ] 13.11 Phone: route on top, steps in a sheet you can drag, tap or move with Enter / arrow keys.
+- [ ] 13.12 **Your progress** (mint card, only on your destination's route): "N% ready", a **Target date** and **Study hours a week**; **Save plan** saves both and shows **On track / Ahead / Behind / Ready** with the straight-line sentence, a finish estimate ("At 6 hours a week, the 270 course hours left take until about …"), and a bold warning when that is after the target date. A date of today or earlier is refused.
+- [ ] 13.13 The readiness chart shows a dot for each change (destination chosen, course ticked or unticked, skill proven) and a dashed on-track line to 100% on the target date; screen readers hear the dates and percentages.
+- [ ] 13.14 "Course hours finished this week: N of 6" bar fills as courses are ticked this week (Monday to Sunday). In the study calendar, **Use N hours a week as my target** fills the hours box (then **Save plan**).
 
 Notes: ______
 

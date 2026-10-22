@@ -410,3 +410,28 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 /* ---------- Rate-limit notice (429 from an AI endpoint) ---------- */
 .banner.slow-down { display: flex; gap: 12px; align-items: center; justify-content: space-between; border-radius: 22px; background: var(--sun); color: var(--ink); }
 .banner.slow-down .icon-btn { min-width: 44px; min-height: 44px; flex: none; }
+
+/* ---------- Progress timeline (Pathway) and the progress line on Today ---------- */
+.progress-panel { border: 0; border-radius: 26px; background: var(--mint); box-shadow: none; gap: 10px; }
+.progress-head { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.progress-head h2 { font-size: 1.35rem; font-weight: 900; letter-spacing: -.02em; margin: 0; }
+.progress-status { font-size: .9rem; padding: 6px 14px; }
+.badge.sun { background: var(--sun); color: var(--ink); }
+.progress-big { font-size: 2rem; font-weight: 900; letter-spacing: -.03em; margin: 0; }
+.progress-chart { margin: 0; display: grid; gap: 6px; }
+.progress-chart svg { width: 100%; height: auto; max-height: 220px; background: var(--surface); border-radius: 18px; }
+.progress-chart text { font-size: 9px; fill: var(--ink-soft); }
+.progress-chart .grid { stroke: var(--line); stroke-width: 1; }
+.progress-chart .actual { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.progress-chart .dot { fill: var(--accent); }
+.progress-chart .expected { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.progress-chart .today { stroke: var(--sun-edge); stroke-width: 1.5; }
+.progress-chart figcaption { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: .82rem; }
+.progress-chart .key { display: inline-block; width: 18px; height: 0; border-top: 3px solid var(--accent); margin-left: 6px; }
+.progress-chart .key.expected { border-top: 2px dashed var(--ink-soft); }
+.week-bar { display: grid; gap: 6px; }
+.progress-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.progress-form label { display: grid; gap: 4px; font-weight: 700; font-size: .9rem; }
+.progress-form input, .progress-form select { min-height: 44px; border-radius: 14px; }
+.progress-form .btn { min-height: 44px; }
+.progress-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 0; font-weight: 700; }

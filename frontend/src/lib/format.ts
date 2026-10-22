@@ -38,3 +38,9 @@ export function jobLinks(title: string) {
 export function onetUrl(code: string) {
   return `https://www.onetonline.org/link/summary/${code}`;
 }
+
+// "22 Oct 2026" in the page's language, from an ISO date (read as a local calendar day).
+export function shortDate(iso: string) {
+  return new Date(`${iso.slice(0, 10)}T00:00:00`).toLocaleDateString(document.documentElement.lang || undefined,
+    { day: "numeric", month: "short", year: "numeric" });
+}

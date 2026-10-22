@@ -7,7 +7,9 @@ const DAY_KEYS = ["cal.sun", "cal.mon", "cal.tue", "cal.wed", "cal.thu", "cal.fr
 
 // "Plan it in my calendar": weekly study sessions for the courses not finished yet, downloaded as
 // an .ics file. Nothing is sent to the server.
-export function StudyCalendar({ plan, roleTitle }: { plan: Pathway; roleTitle: string }) {
+export function StudyCalendar({ plan, roleTitle, onUseAsTarget }: {
+  plan: Pathway; roleTitle: string; onUseAsTarget?: (hoursPerWeek: number) => void;
+}) {
   const [days, setDays] = useState<number[]>([6]);  // Saturday
   const [sessionHours, setSessionHours] = useState(2);
   const [startTime, setStartTime] = useState("10:00");
@@ -54,7 +56,15 @@ export function StudyCalendar({ plan, roleTitle }: { plan: Pathway; roleTitle: s
         <p>{tf("cal.summary", { n: planned.length, courses: courses.length,
           date: last.end.toLocaleDateString(getLang() === "zh" ? "zh-CN" : getLang() === "ms" ? "ms-MY" : "en-MY", { day: "numeric", month: "long", year: "numeric" }) })}</p>
       ) : <p className="muted" role="note">{t("cal.pickDay")}</p>}
-      <button className="primary" disabled={!last} onClick={download}>{t("cal.download")}</button>
+      <div className="actions">
+        <button className="primary" disabled={!last} onClick={download}>{t("cal.download")}</button>
+        {onUseAsTarget && days.length > 0 && (
+          // The weekly hours of these sessions become the progress target (saved with "Save plan").
+          <button className="btn quiet" onClick={() => onUseAsTarget(days.length * sessionHours)}>
+            {tf("cal.useTarget", { n: days.length * sessionHours })}
+          </button>
+        )}
+      </div>
       <p className="source">{t("cal.note")}</p>
     </div>
   );

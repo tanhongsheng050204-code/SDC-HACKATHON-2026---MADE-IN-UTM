@@ -12,12 +12,12 @@ from app import ratelimit, runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, PlanRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
-                          openings, pathway, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
+                          openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
 from app.trends import refresh, review
 from app.evidence import emerging, refresh as evidence_refresh, review as evidence_review
@@ -601,7 +601,28 @@ def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
     _profile_for(profile_id, user)
     if body.role_id is not None and body.role_id not in get_reference().roles:
         raise HTTPException(422, "Unknown role")
-    return store.set_target(profile_id, body.role_id)
+    profile = store.set_target(profile_id, body.role_id)
+    if body.role_id is not None:
+        progress.record(get_reference(), profile_id, "destination_set", body.role_id)
+    return profile
+
+
+@router.put("/profiles/{profile_id}/plan")
+def set_plan(profile_id: str, body: PlanRequest, user: str | None = User):
+    """A target date and weekly study hours for the destination. Starts the on-track line from today."""
+    _profile_for(profile_id, user)
+    if body.target_date is not None and body.target_date <= progress.today():
+        raise HTTPException(422, "Choose a date after today")
+    profile = store.set_plan(profile_id, body.target_date.isoformat() if body.target_date else None, body.weekly_hours)
+    if body.target_date is not None:
+        progress.record(get_reference(), profile_id, "plan_set", body.target_date.isoformat())
+    return profile
+
+
+@router.get("/profiles/{profile_id}/progress")
+def profile_progress(profile_id: str, user: str | None = User):
+    """Readiness over time toward the destination, and on track / ahead / behind a target date."""
+    return progress.summary(get_reference(), _profile_for(profile_id, user))
 
 
 @router.get("/profiles/{profile_id}/journey")
@@ -657,7 +678,10 @@ def complete_course(profile_id: str, body: CompleteRequest, user: str | None = U
     done = [c for c in profile["completed_courses"] if c != body.course_id]
     if body.done:
         done.append(body.course_id)
-    return store.set_completed(profile_id, done)
+    updated = store.set_completed(profile_id, done)
+    if body.done != (body.course_id in profile["completed_courses"]):  # only real changes are events
+        progress.record(get_reference(), profile_id, "course_finished" if body.done else "course_unfinished", body.course_id)
+    return updated
 
 
 @router.post("/profiles/{profile_id}/cards", status_code=201)
@@ -776,6 +800,7 @@ def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
         raise HTTPException(409, "This check was already marked")
     if passed:
         store.set_skill_level(profile["id"], check["skill_id"], check["level"])
+        progress.record(ref, profile["id"], "skill_proven", check["skill_id"], check["level"])
     return {"passed": passed, "correct": correct, "level": check["level"],
             "level_name": ref.skill_levels[check["level"] - 1]["name"],
             "answers": [q["answer"] for q in check["questions"]],
