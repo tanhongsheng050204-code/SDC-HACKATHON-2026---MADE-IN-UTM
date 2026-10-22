@@ -13,6 +13,8 @@ import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as
 import { setDataText, t } from "./lib/i18n";
 import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
+import { clearOfflineData } from "./lib/pwa";
+import { InstallPrompt } from "./components/InstallPrompt";
 import { CardPage } from "./screens/CardPage";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
@@ -54,6 +56,13 @@ function MainApp({ demo }: { demo: string | null }) {
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
+  // No network at all (not just a sleeping server): the service worker shows the last saved copy.
+  const [noNetwork, setNoNetwork] = useState(() => typeof navigator !== "undefined" && navigator.onLine === false);
+  useEffect(() => {
+    const update = () => setNoNetwork(!navigator.onLine);
+    window.addEventListener("online", update); window.addEventListener("offline", update);
+    return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
+  }, []);
   const [waking, setWaking] = useState(false);
   useEffect(() => onServerWaking(setWaking), []);
   // A 429 from an AI endpoint: one calm notice that hides itself, whatever screen asked.
@@ -307,6 +316,7 @@ function MainApp({ demo }: { demo: string | null }) {
   async function deleteProfile() {
     if (!profile || !window.confirm(t("shell.deleteConfirm"))) return;
     await api.deleteProfile(profile.id).catch(() => undefined);
+    clearOfflineData();
     save(KEYS.profile, null); setProfile(null); setRole(null);
     go("landing", { role: undefined });
   }
@@ -322,14 +332,15 @@ function MainApp({ demo }: { demo: string | null }) {
   const themeButton = <ThemeButton theme={theme} onToggle={toggleTheme} />;
   const banners = (
     <>
-      {waking && <div className="banner info" role="status">{t("shell.waking")}</div>}
+      {noNetwork && <div className="banner info" role="status">{t("pwa.offline")}</div>}
+      {waking && !noNetwork && <div className="banner info" role="status">{t("shell.waking")}</div>}
       {slowDown && (
         <div className="banner info slow-down" role="status">
           <span>{t("shell.slowDown")}</span>
           <button className="icon-btn" onClick={() => setSlowDown(false)} aria-label={t("shell.dismiss")}>×</button>
         </div>
       )}
-      {offline && !waking && <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>}
+      {offline && !waking && !noNetwork && <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>}
       {error && <div className="banner error" role="alert">{error} <button className="link" onClick={() => setError(null)}>{t("a.dismiss")}</button></div>}
     </>
   );
@@ -381,6 +392,7 @@ function MainApp({ demo }: { demo: string | null }) {
         {banners}
         <main id="main" tabIndex={-1}>
           <ScreenBoundary key={screen}>
+            {screen === "home" && profile && <InstallPrompt />}
             {screen === "home" && profile && (
               <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => (s === "intake" ? goProfile() : go(s))}
                 onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />

@@ -152,6 +152,8 @@ Not needed: `SUPABASE_JWT_SECRET` (legacy projects only), `DATABASE_PATH`, `DATA
 | `VITE_SUPABASE_ANON_KEY` | Supabase → Project Settings → API Keys → Legacy API keys → `anon` (public by design; row-level security keeps the tables closed to it) |
 | `VITE_SENTRY_DSN` | Optional: the same Sentry DSN, for errors in the browser. Empty = the Sentry code is never loaded |
 
+The site is an installable app (manifest, icons in `frontend/public/icons/`, service worker `frontend/public/sw.js`); after one visit, Today and the route can be read offline.
+
 Security headers (a Content Security Policy that allows only this site, the Render API, Supabase and Sentry; HSTS; no framing) are in [`frontend/vercel.json`](frontend/vercel.json). If the API moves to another address, update its `connect-src` too.
 
 **3. Supabase and Google login.** Enable the **Google** provider (Authentication → Sign In / Providers) with a Google Cloud OAuth client whose only authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback` (no JavaScript origins needed). Under Authentication → URL Configuration, set the Vercel address as the **Site URL** and add `https://laluan-psi.vercel.app/**` and `http://localhost:5173/**` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in. Tables are created on the API's first start.

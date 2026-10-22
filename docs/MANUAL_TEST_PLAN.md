@@ -296,6 +296,10 @@ Notes: ______
 - [ ] 22.3 App: the sidebar becomes a scrolling strip at the top; Today's cards stack; the four step buttons fit.
 - [ ] 22.4 Future roles, Pathway (sheet), workforce tables and the map fit or scroll inside their box.
 - [ ] 22.5 Coach and the Future Card story are full screen and swipeable.
+- [ ] 22.6 Android Chrome (deployed site): Today shows **Install Laluan** with the girl icon; **Install** adds Laluan to the home screen and it opens full screen; **Not now** hides the card for good on that phone.
+- [ ] 22.7 iPhone Safari: the card says to tap Share → "Add to Home Screen"; the home-screen icon is the girl mascot.
+- [ ] 22.8 Offline: open Today and your route once, turn on airplane mode, reopen Laluan → "You're offline. You're seeing the last copy saved on this device…", and Today and the route still show. Ticking a course offline fails politely.
+- [ ] 22.9 **Delete my profile** or **Log out** clears the offline copy (DevTools → Application → Cache Storage: `laluan-data-v1` is gone).
 
 Notes: ______
 

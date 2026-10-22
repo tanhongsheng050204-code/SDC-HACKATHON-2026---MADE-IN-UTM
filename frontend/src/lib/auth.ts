@@ -2,6 +2,7 @@
 // token we send with each request (backend/app/auth.py). Without VITE_SUPABASE_* the app runs as
 // before, anonymous only, and the login button is hidden.
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { clearOfflineData } from "./pwa";
 import { KEYS, save } from "./storage";
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -93,4 +94,5 @@ export async function signOut(): Promise<void> {
   // This device only: an expired token here must not end the person's sessions elsewhere.
   await client.auth.signOut({ scope: "local" });
   set(null);
+  clearOfflineData();  // the offline copy of an account's data stays with the account
 }

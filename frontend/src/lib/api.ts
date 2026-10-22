@@ -390,7 +390,8 @@ async function fetchAwake(url: string, original?: RequestInit): Promise<Response
         return response;
       }
     } catch (e) {
-      if (Date.now() - started > WAKE_LIMIT_MS) { setWaking(false); throw e; }
+      // Offline: nothing to wait for (the service worker already answered from its copy if it had one).
+      if (navigator.onLine === false || Date.now() - started > WAKE_LIMIT_MS) { setWaking(false); throw e; }
     }
     setWaking(true);
     await new Promise((r) => setTimeout(r, Math.min(2000 + attempt * 1000, 6000)));

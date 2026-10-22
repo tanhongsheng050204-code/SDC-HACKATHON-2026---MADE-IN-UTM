@@ -453,3 +453,10 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .usage-table th[scope="row"], .usage-table thead th:first-child { text-align: left; }
 .feedback-list { list-style: none; padding: 0; display: grid; gap: 8px; }
 .feedback-list p { margin: 4px 0 0; }
+
+/* ---------- Install Laluan card (Today) ---------- */
+.install-prompt { display: grid; grid-template-columns: auto 1fr; gap: 12px 14px; align-items: center; border: 0; border-radius: 24px; background: var(--sky); box-shadow: none; }
+.install-prompt img { border-radius: 14px; }
+.install-prompt p { margin: 2px 0 0; }
+.install-prompt .actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
+.install-prompt .btn { min-height: 44px; }

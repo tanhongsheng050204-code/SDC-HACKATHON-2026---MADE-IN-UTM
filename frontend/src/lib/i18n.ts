@@ -1281,7 +1281,7 @@ const STRINGS = {
   "priv.who": { en: "Who can see it", ms: "Siapa yang boleh melihatnya", zh: "谁能看到" },
   "priv.whoText": { en: "Only you, or your Google account if you log in. A Future Card shows the role, readiness and plan, never your skill list or current job. HR files with names or staff IDs are refused, and class results hide groups smaller than 3.", ms: "Hanya anda, atau akaun Google anda jika anda log masuk. Kad Masa Depan menunjukkan peranan, kesediaan dan pelan, tidak pernah senarai kemahiran atau pekerjaan semasa anda. Fail HR yang mengandungi nama atau ID kakitangan ditolak, dan keputusan kelas menyembunyikan kumpulan kurang daripada 3.", zh: "只有您本人，或登录后您的 Google 账户。未来卡片只显示职位、准备度和计划，从不显示您的技能清单或目前工作。含姓名或员工编号的 HR 文件会被拒绝，班级结果会隐藏少于 3 人的组别。" },
   "priv.delete": { en: "How to remove it", ms: "Cara membuangnya", zh: "如何删除" },
-  "priv.deleteText": { en: "Delete my profile (at the bottom of the sidebar) removes your profile, Future Cards, proven skills, survey answers, progress history and consent records at once. Shared card links stop working.", ms: "Padam profil saya (di bahagian bawah bar sisi) membuang profil, Kad Masa Depan, kemahiran yang dibuktikan, jawapan tinjauan, sejarah kemajuan dan rekod persetujuan anda serta-merta. Pautan kad yang dikongsi berhenti berfungsi.", zh: "侧边栏底部的“删除我的资料”会立即删除您的资料、未来卡片、已证明的技能、问卷回答、进度记录和同意记录。已分享的卡片链接将失效。" },
+  "priv.deleteText": { en: "Delete my profile (at the bottom of the sidebar) removes your profile, Future Cards, proven skills, survey answers, progress history and consent records at once. Shared card links stop working, and the offline copy on this device is cleared.", ms: "Padam profil saya (di bahagian bawah bar sisi) membuang profil, Kad Masa Depan, kemahiran yang dibuktikan, jawapan tinjauan, sejarah kemajuan dan rekod persetujuan anda serta-merta. Pautan kad yang dikongsi berhenti berfungsi, dan salinan luar talian pada peranti ini dikosongkan.", zh: "侧边栏底部的“删除我的资料”会立即删除您的资料、未来卡片、已证明的技能、问卷回答、进度记录和同意记录。已分享的卡片链接将失效，此设备上的离线副本也会被清除。" },
   "priv.link": { en: "Your data", ms: "Data anda", zh: "您的数据" },
   "pii1.NAME": { en: "name", ms: "nama", zh: "姓名" },
   "pii1.EMAIL": { en: "email", ms: "e-mel", zh: "电邮" },
@@ -1354,6 +1354,12 @@ const STRINGS = {
   "fb.reportWhat": { en: "What went wrong? What did you expect?", ms: "Apa yang tidak kena? Apa yang anda jangkakan?", zh: "出了什么问题？你原本期待什么？" },
   "fb.reportPrivate": { en: "We send the screen you're on, not your profile. Please leave out personal details; contact details are removed anyway.", ms: "Kami menghantar skrin yang anda lihat, bukan profil anda. Sila jangan sertakan butiran peribadi; butiran hubungan akan dibuang.", zh: "我们只发送你所在的页面，不发送你的资料。请勿填写个人信息；联系方式也会被删除。" },
   "fb.reportThanks": { en: "Thank you. The team reads every report.", ms: "Terima kasih. Pasukan membaca setiap laporan.", zh: "谢谢。团队会阅读每一份报告。" },
+  "pwa.title": { en: "Install Laluan", ms: "Pasang Laluan", zh: "安装 Laluan" },
+  "pwa.body": { en: "Add Laluan to your home screen. It opens like an app, and your last Today and route can be read without a connection.", ms: "Tambah Laluan ke skrin utama anda. Ia dibuka seperti aplikasi, dan Hari Ini serta laluan terakhir anda boleh dibaca tanpa sambungan.", zh: "把 Laluan 添加到主屏幕。它会像应用一样打开，没有网络时也能查看你上次的“今天”和路线。" },
+  "pwa.ios": { en: "On iPhone or iPad: tap Share, then “Add to Home Screen”.", ms: "Pada iPhone atau iPad: ketik Kongsi, kemudian “Tambah ke Skrin Utama”.", zh: "在 iPhone 或 iPad 上：点按“分享”，然后选择“添加到主屏幕”。" },
+  "pwa.install": { en: "Install", ms: "Pasang", zh: "安装" },
+  "pwa.notNow": { en: "Not now", ms: "Bukan sekarang", zh: "以后再说" },
+  "pwa.offline": { en: "You're offline. You're seeing the last copy saved on this device; changes need a connection.", ms: "Anda di luar talian. Anda melihat salinan terakhir yang disimpan pada peranti ini; perubahan memerlukan sambungan.", zh: "你目前离线，看到的是此设备上次保存的副本；更改需要联网。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;
