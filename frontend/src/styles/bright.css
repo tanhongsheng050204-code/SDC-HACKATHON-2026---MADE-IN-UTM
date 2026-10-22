@@ -173,12 +173,12 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .lp-hero .btn.quiet { background: var(--surface); }
 
 .lp-ribbon { position: relative; width: 100%; height: 400px; margin-top: 12px; }
-.lp-ribbon svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lp-ribbon > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .lp-ribbon .rb-wide { stroke: var(--mint); stroke-width: 150; }
 .lp-ribbon .rb-mid { stroke: var(--mint-2); stroke-width: 80; opacity: .8; }
 .lp-ribbon .rb-sun { stroke: var(--sun); stroke-width: 44; opacity: .9; }
 .lp-ribbon .rb-line { stroke: var(--accent); stroke-width: 5; stroke-dasharray: 1; stroke-dashoffset: 1; animation: route-draw 1s cubic-bezier(.2, .7, .2, 1) .2s forwards; }
-.lp-ribbon path { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.lp-ribbon > svg path { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .rb-dot { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 99px; background: var(--surface); border: 5px solid var(--accent); }
 .rb-dot.start { width: 26px; height: 26px; margin: -13px 0 0 -13px; background: var(--ink); border-color: var(--surface); box-shadow: 0 4px 12px rgba(16, 36, 31, .25); }
 .rb-card { position: absolute; display: grid; gap: 2px; max-width: 250px; text-align: left; padding: 10px 14px; border-radius: 16px; background: var(--surface); box-shadow: 0 12px 30px -14px rgba(16, 36, 31, .35); animation: rise-in .4s ease-out both; }
@@ -317,3 +317,16 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .story-tap, .story-tap:hover:not(:disabled), .story-tap:active:not(:disabled) { background: transparent; transform: none; }
 .story-dash:active:not(:disabled), .intake-back:active:not(:disabled) { transform: none; box-shadow: none; }
 .intake-back, .intake-back:hover:not(:disabled) { background: none; min-height: 44px; }
+
+/* The mascot walking the landing route. */
+.rb-walker { position: absolute; z-index: 2; left: 7%; top: 358px; transform: translate(-50%, -100%); transform-origin: 50% 100%; pointer-events: none; margin-top: 7px; }
+.lp-ribbon .rb-walker svg { position: static; width: 48px; height: 79px; display: block; filter: drop-shadow(0 6px 8px rgba(16, 36, 31, .18)); }
+.walker-leg, .walker-arm { transform-box: fill-box; transform-origin: 50% 0; }
+.rb-walker.is-walking .walker-leg.front, .rb-walker.is-walking .walker-arm.back { animation: walk-swing .5s ease-in-out infinite alternate; }
+.rb-walker.is-walking .walker-leg.back, .rb-walker.is-walking .walker-arm.front { animation: walk-swing .5s ease-in-out infinite alternate-reverse; }
+.rb-walker.is-walking .walker-body { animation: walk-bob .25s ease-in-out infinite alternate; }
+@keyframes walk-swing { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+@keyframes walk-bob { from { transform: translateY(0); } to { transform: translateY(-1.5px); } }
+@media (max-width: 760px) { .lp-ribbon .rb-walker svg { width: 30px; height: 50px; } }
+@media (prefers-reduced-motion: reduce) { .rb-walker * { animation: none !important; } }
+:root[data-lite="1"] .rb-walker * { animation: none !important; }

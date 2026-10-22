@@ -36,7 +36,7 @@ export function HeroPreview() {
           </div>
           <div className="lp-rolecards">
             {ROLES.map((r) => (
-              <div key={r.title}><small>{tr(r.title)}</small><b>{r.fit}%</b><em>▲ {OUTLOOK_TEXT.growing}</em></div>
+              <div key={r.title}><small>{tr(r.title)}</small><b>{r.fit}%</b><em>{OUTLOOK_TEXT.growing}</em></div>
             ))}
           </div>
         </div>
@@ -50,7 +50,7 @@ export function HeroPreview() {
           </div>
           <div className="lp-step">
             <span className="lp-tag">{t("hp.cardH")}</span>
-            <span className="lp-meta">{tr("Data entry clerk")} · ▼ {OUTLOOK_TEXT.declining}</span>
+            <span className="lp-meta">{tr("Data entry clerk")} · {OUTLOOK_TEXT.declining}</span>
           </div>
         </div>
       </div>

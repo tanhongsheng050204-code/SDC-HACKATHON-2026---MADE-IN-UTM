@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useState } from "react";
-import { LogoMark, Rosette } from "../../components/Brand";
+import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import { LogoMark, Rosette, WalkingGirl } from "../../components/Brand";
 import { t, tf, tr, type StringKey } from "../../lib/i18n";
 import { OUTLOOK_TEXT } from "../../lib/labels";
 import { api } from "../../lib/api";
@@ -34,18 +34,20 @@ function RibbonRoute() {
   const [who, setWho] = useState<Persona>("clerk");
   const r = ROUTES[who];
   const at = STOP_AT[r.stops.length];
+  const track = useRef<SVGPathElement>(null);
   const cost = (s: { audit: boolean }) => (s.audit ? t("v3.freeAudit") : t("v3.free"));
-  const toLine = tf("v3.byYear", { word: `▲ ${OUTLOOK_TEXT[r.toWord]}`, n: r.toIndex });
+  const toLine = tf("v3.byYear", { word: OUTLOOK_TEXT[r.toWord], n: r.toIndex });
   return (
     <>
       <div className="lp-ribbon" aria-hidden="true">
         <svg viewBox="0 0 1280 400" preserveAspectRatio="none">
-          <path className="rb-wide" d={RIBBON} />
+          <path ref={track} className="rb-wide" d={RIBBON} />
           <path className="rb-mid" d="M-20,380 C 220,380 320,250 470,255 S 720,300 870,205 S 1130,95 1300,75" />
           <path className="rb-sun" d="M-20,365 C 190,365 300,270 450,268 S 690,320 850,218 S 1110,100 1300,90" />
           <path key={who} className="rb-line" d={RIBBON} pathLength={1} />
         </svg>
         <span className="rb-dot start" style={{ left: "7%", top: 358 }} />
+        <RouteWalker key={who} track={track} stopsX={r.stops.map((_, i) => at[i][0])} />
         <div className="rb-card here" style={{ left: "calc(7% - 10px)", top: 380 }}>
           <small>{t("v3.youAreHere")}</small>
           <b>{r.from ? tr(r.from) : t("v3.yourSkills")} {r.from && <span className={r.fromTone}>{OUTLOOK_TEXT[r.fromWord]}</span>}</b>
@@ -79,6 +81,57 @@ function RibbonRoute() {
       </div>
     </>
   );
+}
+
+// The mascot walks the route: from "You are here", pausing at each course stop, to the destination,
+// then starts again. Positions come from the ribbon path in its 1280 × 400 box; the ribbon stretches
+// sideways, so x is a percentage and y is scaled by the ribbon's real height. Reduce motion and Lite
+// mode keep her standing at "You are here".
+const WALK_FROM = 90, WALK_TO = 1150, WALK_MS = 7000, STOP_MS = 700, END_MS = 1600;
+
+function RouteWalker({ track, stopsX }: { track: RefObject<SVGPathElement>; stopsX: number[] }) {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const path = track.current, el = box.current;
+    if (!path || !el) return;
+    const total = path.getTotalLength();
+    const lengthAt = (x: number) => { let lo = 0, hi = total; for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (path.getPointAtLength(m).x < x) lo = m; else hi = m; } return lo; };
+    const from = lengthAt(WALK_FROM), to = lengthAt(WALK_TO);
+    const stops = stopsX.map(lengthAt);
+    const place = (len: number) => {
+      const pt = path.getPointAtLength(len), ahead = path.getPointAtLength(Math.min(total, len + 4));
+      const h = el.parentElement?.clientHeight ?? 400, w = el.parentElement?.clientWidth ?? 1280;
+      const angle = Math.atan2((ahead.y - pt.y) * h / 400, (ahead.x - pt.x) * w / 1280) * 180 / Math.PI;
+      el.style.left = `${(pt.x / 1280) * 100}%`;
+      el.style.top = `${pt.y * h / 400}px`;
+      el.style.transform = `translate(-50%, -100%) rotate(${angle * 0.35}deg)`;
+    };
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.dataset.lite === "1";
+    if (still) { place(from); el.classList.add("is-still"); return; }
+    // A timeline of walking legs and pauses: walk to each stop, pause, walk on, rest at the end.
+    const legs: { a: number; b: number; ms: number }[] = [];
+    let prev = from;
+    for (const s of [...stops, to]) { legs.push({ a: prev, b: s, ms: WALK_MS * (s - prev) / (to - from) }); prev = s; }
+    let frame = 0, start = performance.now() + 900;  // wait for the route to draw first
+    const tick = (now: number) => {
+      let t = now - start, len = from, walking = false;
+      if (t >= 0) {
+        len = to;
+        for (const [i, leg] of legs.entries()) {
+          if (t < leg.ms) { len = leg.a + (leg.b - leg.a) * (t / leg.ms); walking = true; break; }
+          t -= leg.ms;
+          if (i < legs.length - 1) { if (t < STOP_MS) { len = leg.b; break; } t -= STOP_MS; }
+          else if (t >= END_MS) { start = now; len = from; }
+        }
+      }
+      place(len);
+      el.classList.toggle("is-walking", walking);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [track, stopsX.join(",")]);
+  return <div ref={box} className="rb-walker"><WalkingGirl /></div>;
 }
 
 // Live numbers from the API; if the server is asleep the tiles keep fixed text instead of waiting.
