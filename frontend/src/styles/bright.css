@@ -497,3 +497,4 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .kpis > .kpi:nth-child(4n+2) .kpi-label { color: var(--ink-2); }
 /* The difficulty shades (diff-1..3) darken the box, so the small text on them uses the stronger ink. */
 .tree-node[class*="diff-"] > small, .tree-node[class*="diff-"] .tree-course, .tree-node.locked .tree-step { color: var(--ink-2); }
+.error-detail { margin-top: 12px; } .error-detail code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px 10px; border-radius: 10px; }

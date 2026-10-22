@@ -10,13 +10,17 @@ const BANDS = ["rising", "steady", "declining"] as const;
 const SHOWN_MAX = 300;  // beyond this a percentage stops meaning much; the range still shows the spread
 
 const pct = (n: number) => (n > SHOWN_MAX ? `>+${SHOWN_MAX}%` : `${signed(Math.round(n))}%`);
-const periodTime = (p: string) => (p.includes("Q") ? +p.slice(0, 4) + (+p.slice(5) - 1) / 4 + 0.125 : +p + 0.5);
+// "2024Q3" → mid-quarter, "2024" (or the number 2024) → mid-year.
+const periodTime = (p: string | number) => {
+  const s = String(p);
+  return s.includes("Q") ? +s.slice(0, 4) + (+s.slice(-1) - 1) / 4 + 0.125 : +s.slice(0, 4) + 0.5;
+};
 
 /** History as a solid line, the forecast as a dashed line to the horizon with its 80% range shaded. */
 function Spark({ name, f, scenario }: { name: string; f: SkillForecast; scenario: Scenario }) {
-  const band = f.scenarios[scenario];
-  const h = f.history;
-  if (h.length < 2) return null;
+  const band = f.scenarios?.[scenario];
+  const h = (f.history ?? []).filter((p) => typeof p?.share_pct === "number" && p.period != null);
+  if (!band || h.length < 2) return null;
   const recent = h.slice(-4);
   const level = recent.reduce((s, p) => s + p.share_pct, 0) / recent.length;
   const start = recent.reduce((s, p) => s + periodTime(p.period), 0) / recent.length;
@@ -41,9 +45,10 @@ function Spark({ name, f, scenario }: { name: string; f: SkillForecast; scenario
 }
 
 function SkillRow({ s, scenario }: { s: SkillTrend; scenario: Scenario }) {
-  const band = s.forecast?.scenarios[scenario];
+  const band = s.forecast?.scenarios?.[scenario];
+  const sources = s.sources ?? [];
   return (
-    <li className={s.mine ? "mine" : ""} title={s.sources.join("\n")}>
+    <li className={s.mine ? "mine" : ""} title={sources.join("\n")}>
       <span>
         {tr(s.name)}
         {s.mine && <span className="badge">{t("radar.yours")}</span>}
@@ -55,7 +60,7 @@ function SkillRow({ s, scenario }: { s: SkillTrend; scenario: Scenario }) {
           <span className={`fc-sure ${band.sure ? "sure" : ""}`} title={t("fc.sureHelp")}>{band.sure ? t("fc.sure") : t("fc.unsure")}</span>
         </span>
       ) : (
-        <span className="muted">{s.trend !== null ? `${signed(Math.round(s.trend * 100))}%` : ""}</span>
+        <span className="muted">{typeof s.trend === "number" ? `${signed(Math.round(s.trend * 100))}%` : ""}</span>
       )}
       {band && s.forecast && (
         <span className="fc-detail">
@@ -64,17 +69,17 @@ function SkillRow({ s, scenario }: { s: SkillTrend; scenario: Scenario }) {
             : tf("fc.range80", { lo: pct(band.low_pct), hi: pct(band.high_pct) })}</small>
         </span>
       )}
-      {s.sources.length > 0 && (band ? (
-        <details className="radar-src"><summary className="source">{tf("fc.sources", { n: s.sources.length })}</summary>
-          <small className="source">{s.sources.join(" · ")}</small></details>
-      ) : <small className="source radar-src">{s.sources.join(" · ")}</small>)}
+      {sources.length > 0 && (band ? (
+        <details className="radar-src"><summary className="source">{tf("fc.sources", { n: sources.length })}</summary>
+          <small className="source">{sources.join(" · ")}</small></details>
+      ) : <small className="source radar-src">{sources.join(" · ")}</small>)}
     </li>
   );
 }
 
 function Backtest({ meta }: { meta: ForecastMeta }) {
   const b = meta.backtest;
-  if (!b) return null;
+  if (!b || typeof b.model_error !== "number") return null;
   const asPct = (logErr: number) => Math.round((Math.exp(logErr) - 1) * 100);
   return (
     <div className="card">
@@ -97,16 +102,20 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
   if (error) return <section><p className="error" role="alert">{error}</p></section>;
   if (!data) return <section><p className="muted">{t("radar.loading")}</p></section>;
 
-  const labelOf = (s: SkillTrend) => s.forecast?.scenarios[scenario].label ?? s.label;
-  const visible = onlyMine ? data.skills.filter((s) => s.mine) : data.skills;
-  const noData = data.skills.filter((s) => s.label === "no_data");
-  const momentum = data.capability_momentum.some((c) => c.momentum !== null);
-  const meta = data.forecast;
-  const jobs = meta?.history.jobs;
+  // Every field is read defensively: snapshots approved at different times carry different extras.
+  const allSkills = data.skills ?? [];
+  const labelOf = (s: SkillTrend) => s.forecast?.scenarios?.[scenario]?.label ?? s.label;
+  const visible = onlyMine ? allSkills.filter((s) => s.mine) : allSkills;
+  const noData = allSkills.filter((s) => s.label === "no_data");
+  const capabilities = data.capability_momentum ?? [];
+  const momentum = capabilities.some((c) => c.momentum !== null);
+  const meta = data.forecast ?? null;
+  const jobs = meta?.history?.jobs;
   const horizon = meta?.horizon_year ?? 2030;
-  const byChange = (a: SkillTrend, b: SkillTrend) =>
-    (b.forecast?.scenarios[scenario].change_pct ?? (b.trend ?? 0) * 100) - (a.forecast?.scenarios[scenario].change_pct ?? (a.trend ?? 0) * 100);
-  const roles = [...data.roles].sort((a, b) => b.scenarios[scenario].index - a.scenarios[scenario].index);
+  const changeOf = (s: SkillTrend) => s.forecast?.scenarios?.[scenario]?.change_pct ?? (s.trend ?? 0) * 100;
+  const byChange = (a: SkillTrend, b: SkillTrend) => changeOf(b) - changeOf(a);
+  const roles = (data.roles ?? []).filter((r) => r.scenarios?.[scenario])
+    .sort((a, b) => b.scenarios[scenario].index - a.scenarios[scenario].index);
   return (
     <section>
       <div className="page-head"><h1>{t("h.radar")}</h1>
@@ -119,10 +128,10 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
               <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => setScenario(s.id)}>{s.label}</button>
             ))}
           </div>
-          {jobs && <p className="muted">{tf("fc.what", { year: horizon, from: jobs.periods[0], to: jobs.periods[1] })} {t("fc.scenarioNote")}</p>}
+          {jobs?.periods && <p className="muted">{tf("fc.what", { year: horizon, from: jobs.periods[0], to: jobs.periods[1] })} {t("fc.scenarioNote")}</p>}
         </div>
       )}
-      {data.skills.length === 0 ? (
+      {allSkills.length === 0 ? (
         <div className="banner warning">{t("radar.noTrends")}</div>
       ) : (
         <>
@@ -147,7 +156,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         <details><summary className="muted">{tf("radar.noDataCount", { n: noData.length })}</summary>
           <p className="muted">{t("radar.twoCounts")}</p>
           <ul className="plain-list">
-            {noData.map((s) => <li key={s.skill_id}><strong>{tr(s.name)}</strong>{s.sources.length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
+            {noData.map((s) => <li key={s.skill_id}><strong>{tr(s.name)}</strong>{(s.sources ?? []).length > 0 && <small className="source radar-src">{s.sources.join(" · ")}</small>}</li>)}
           </ul>
         </details>
       )}
@@ -157,7 +166,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         <ul className="radar-roles">
           {roles.map((r) => {
             const now = r.scenarios[scenario];
-            const all = Object.values(r.scenarios).map((o) => o.index);
+            const all = Object.values(r.scenarios).map((o) => o.index).filter((n) => typeof n === "number");
             const my = r.malaysia;
             return (
               <li key={r.role_id}>
@@ -165,7 +174,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
                 <span className={`outlook ${now.label}`}>{OUTLOOK_TEXT[now.label]}</span>
                 <strong>{tf("fc.byYear", { pct: pct(now.index), year: horizon })}</strong>
                 <small className="muted">{tf("fc.acrossScenarios", { lo: pct(Math.min(...all)), hi: pct(Math.max(...all)) })}</small>
-                {my && my.history.length > 0 && (
+                {my && (my.history ?? []).length > 0 && typeof my.change_pct === "number" && (
                   <small className="muted radar-my">{tf("fc.malaysia", { pct: pct(my.change_pct), year: my.horizon_year,
                     from: my.history[0].period, to: my.history[my.history.length - 1].period })}</small>
                 )}
@@ -181,7 +190,7 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
           <h3>{t("radar.momentum")}</h3>
           <p className="muted">{t("radar.momentumSub")}</p>
           <ul className="momentum">
-            {data.capability_momentum.map((c) => {
+            {capabilities.map((c) => {
               const m = c.momentum ?? 0;
               return (
                 <li key={c.id}>
@@ -195,8 +204,8 @@ export function Radar({ profile, onNext }: { profile: Profile; onNext: () => voi
         </div>
       )}
       <p className="source">Snapshot {data.snapshot_id} · imported {data.imported}
-        {data.inputs.map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}
-        {meta && Object.values(meta.history).map((h) => h && (
+        {(data.inputs ?? []).map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}
+        {meta?.history && Object.values(meta.history).map((h) => h?.periods && (
           <span key={h.source}> · {h.source} {h.periods[0]}–{h.periods[1]} (retrieved {h.retrieved})</span>
         ))}</p>
       <button className="primary" onClick={onNext}>{t("a.seeRoles")}</button>

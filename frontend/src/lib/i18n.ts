@@ -1428,6 +1428,7 @@ const STRINGS = {
   "cls.none": { en: "No classes yet.", ms: "Belum ada kelas.", zh: "还没有班级。" },
   "cls.members": { en: "{n} students", ms: "{n} pelajar", zh: "{n} 名学生" },
   "cls.code": { en: "Join code", ms: "Kod sertai", zh: "加入代码" },
+  "err.details": { en: "Technical details (send these to the team)", ms: "Butiran teknikal (hantar kepada pasukan)", zh: "技术细节（请发给团队）" },
   "cls.copied": { en: "Copied", ms: "Disalin", zh: "已复制" },
   "cls.open": { en: "Open", ms: "Buka", zh: "打开" },
   "cls.copy": { en: "Copy join link", ms: "Salin pautan sertai", zh: "复制加入链接" },
