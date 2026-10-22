@@ -18,13 +18,15 @@ Target: average recall ≥ 80%. Write down which skills were missed and whether 
 
 ## 2. Pathway review
 
+Top 3 roles are the live app's Baseline ranking on 22 Oct 2026 (forecast snapshot 2026-10-22-trend-092120); the reviewer fills the other columns.
+
 Reviewer: ______ (role: lecturer / career counsellor) · Date: ______
 
 | Persona | Top 3 roles shown | Reviewer agrees? | Pathway sensible? | Reviewer comments | What we changed |
 |---|---|---|---|---|---|
-| Aisyah (working adult) | | | | | |
-| Wei Jie (graduate) | | | | | |
-| Farid (career switcher) | | | | | |
+| Aisyah (working adult) | AI operations specialist (47% fit); Engineering drafting and BIM technician (40%); Supply chain and logistics specialist (38%) | | | | |
+| Wei Jie (graduate) | Digital marketing specialist (64% fit); Engineering drafting and BIM technician (40%); AI operations specialist (40%) | | | | |
+| Farid (career switcher) | AI operations specialist (33% fit); Digital marketing specialist (36%); UX / UI designer (46%) | | | | |
 | HR sample company | | | | | |
 | Career-centre sample class | | | | | |
 
@@ -33,3 +35,24 @@ One row per group in the brief: working adults, graduates and career switchers, 
 ## 3. Task labels
 
 Number of O\*NET tasks reviewed: ______ · labels changed by the team: ______ (examples in REVIEW_LOG.md)
+
+## 4. Timed runs with first-time users
+
+The brief's first success measure is "profile to ranked roles and a pathway in minutes". Ask five people who have not seen Laluan to start from the landing page with **Start with my skills** (no help from the team), and time them until the Pathway shows courses. Use synthetic or their own non-sensitive skills only; never a real CV.
+
+| Tester (first name or initials) | Who they are (worker / student / switcher) | Minutes to a pathway | Got stuck at | One thing they said |
+|---|---|---|---|---|
+| 1 | | | | |
+| 2 | | | | |
+| 3 | | | | |
+| 4 | | | | |
+| 5 | | | | |
+
+Median: ______ minutes (target ≤ 5). Changes made after the runs: ______
+
+## 5. Bahasa Malaysia and 中文 check
+
+Reviewer (BM): ______ · Date: ______ · strings checked in the Review kit, tab 1: ______ · fixed: ______
+Reviewer (中文): ______ · Date: ______ · strings checked: ______ · fixed: ______
+
+Start with the main journey: landing, onboarding, Today, Future roles, a role page, Pathway.
