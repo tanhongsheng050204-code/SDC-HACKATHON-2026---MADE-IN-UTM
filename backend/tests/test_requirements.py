@@ -66,5 +66,55 @@ def test_requirement_texts_have_bm_and_chinese():
     ref = get_reference()
     data = ref.entry_requirements
     texts = [g["text"] for g in data["usual_by_group"].values()]
-    texts += [x for lic in data["licences"].values() for x in (lic["name"], lic["route"])]
+    texts += [x for lic in data["licences"].values() for x in (lic["name"], lic["route"], lic["qualification"])]
+    texts += [f for entry in data.get("roles", {}).values() for f in entry.get("fields", [])]
     assert all(ref.translations.get(x, {}).get("ms") and ref.translations.get(x, {}).get("zh") for x in texts)
+
+
+def _script():
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / "scripts" / "build_qualifications.py"
+    spec = importlib.util.spec_from_file_location("build_qualifications", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_licensed_roles_take_their_qualification_from_the_licence_route():
+    """No more "employers usually ask for a degree" next to a diploma route."""
+    roles = _roles(CARE_WORKER)
+    nurse, tvet = roles["registered_nurse"]["requirements"], roles["tvet_instructor"]["requirements"]
+    assert nurse["qualification"]["basis"] == "licence" and "Diploma in Nursing" in nurse["qualification"]["text"]
+    assert tvet["qualification"]["basis"] == "licence" and "SKM" in tvet["qualification"]["text"]
+
+
+def test_role_qualifications_come_from_real_ads_with_quotes_and_links():
+    ref = get_reference()
+    from_ads = {r: e for r, e in ref.entry_requirements["roles"].items() if e.get("level")}
+    assert len(from_ads) >= 10
+    for role_id, entry in from_ads.items():
+        assert entry["level_ads"] >= 0.5 * entry["ads_with_level"] and entry["ads_with_level"] >= 5, role_id
+        assert entry["sources"] and all(s["url"].startswith("https://") and s["quote"] for s in entry["sources"]), role_id
+        for cert in entry["certifications"]:
+            assert cert["ads"] >= 2 and cert["sources"] and all(s["quote"] for s in cert["sources"]), (role_id, cert["name"])
+    cyber = _roles(SERVICE_REP)["cybersecurity_analyst"]["requirements"]
+    assert cyber["qualification"]["basis"] == "ads" and cyber["qualification"]["level"] == "degree"
+    assert any(c["name"] == "CompTIA Security+" for c in cyber["certifications"])
+
+
+def test_a_role_with_too_few_ads_keeps_the_masco_default():
+    farm = _roles(CARE_WORKER)["farm_worker"]["requirements"]
+    assert farm["qualification"] == {"basis": "masco", "text": farm["usual"]}
+
+
+def test_extraction_reads_the_minimum_level_fields_and_known_certificates():
+    q = _script()
+    ad = ("<p><strong>Requirements</strong></p><ul><li>Minimum Diploma / Degree in Accounting or Finance.</li>"
+          "<li>Possess LCCI Level 3 or ACCA.</li><li>Good communication skills.</li></ul>"
+          "<p>We pay CPA campaigns on Google.</p>")
+    found = q.extract(ad)
+    assert found["level"] == "diploma" and found["quote"].startswith("Minimum Diploma")
+    assert {"accounting", "finance"} <= set(found["fields"])
+    assert set(found["certifications"]) == {"LCCI", "ACCA"}  # "CPA campaigns" is not the accounting body
+    assert q.extract("<p>No education stated here.</p>")["level"] is None

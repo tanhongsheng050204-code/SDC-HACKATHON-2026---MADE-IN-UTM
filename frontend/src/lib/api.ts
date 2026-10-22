@@ -56,9 +56,16 @@ export interface EmergingDetail {
   sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
 }
 export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
+export interface AdQuote { title: string; company: string | null; url: string; quote: string }
 export interface Requirements {
   usual: string; skill_level: number | null; usual_source: { title: string; url: string };
-  licence: { name: string; law: string; route: string; route_months: number; sources: { title: string; url: string }[] } | null;
+  qualification: { basis: "licence" | "masco"; text: string }
+    | { basis: "ads"; level: string; fields: string[]; level_ads: number; ads_with_level: number };
+  certifications: { name: string; ads: number; sources: AdQuote[] }[];
+  ads: { ads_read: number; ads_with_level: number; level: string | null; level_ads: number; sources: AdQuote[];
+    searched: string; source: { title: string; url: string } | null } | null;
+  licence: { name: string; law: string; route: string; route_months: number; qualification: string;
+    sources: { title: string; url: string }[] } | null;
   needs_licence: boolean;
 }
 export interface RoleMatch {

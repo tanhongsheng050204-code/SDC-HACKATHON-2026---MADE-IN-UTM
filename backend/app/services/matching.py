@@ -35,8 +35,23 @@ def requirements(ref: Reference, role_id: str, current_id: str | None = None) ->
     data = ref.entry_requirements
     usual = data["usual_by_group"][ref.roles[role_id]["masco_major"]]
     licence = data["licences"].get(role_id)
+    ads = data.get("roles", {}).get(role_id)
+    # One qualification line, from the most specific source: the licence route, then what most
+    # Malaysian job ads ask for (scripts/build_qualifications.py), then the MASCO group default.
+    if licence:
+        qualification = {"basis": "licence", "text": licence["qualification"]}
+    elif ads and ads.get("level"):
+        qualification = {"basis": "ads", "level": ads["level"], "fields": ads["fields"],
+                         "level_ads": ads["level_ads"], "ads_with_level": ads["ads_with_level"]}
+    else:
+        qualification = {"basis": "masco", "text": usual["text"]}
+    evidence = None
+    if ads and ads.get("ads_read"):
+        evidence = {k: ads[k] for k in ("ads_read", "ads_with_level", "level", "level_ads", "sources", "searched")}
+        evidence["source"] = data.get("ads_source")
     return {"usual": usual["text"], "skill_level": usual["skill_level"], "usual_source": data["masco_source"],
-            "licence": licence, "needs_licence": bool(licence) and role_id != current_id}
+            "qualification": qualification, "certifications": (ads or {}).get("certifications", []),
+            "ads": evidence, "licence": licence, "needs_licence": bool(licence) and role_id != current_id}
 
 
 def being_checked(role: dict) -> bool:

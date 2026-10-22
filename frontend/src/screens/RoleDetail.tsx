@@ -65,6 +65,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
                   : t("day.data")}</p>
               </section>
             )}
+            {role.requirements && !role.requirements.needs_licence && <EntryRequirements req={role.requirements} />}
             <details className="card why" open>
               <summary>{tf("rd.why", { n: role.why.score.toFixed(2) })}</summary>
               <ul>
@@ -90,7 +91,6 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
             <ForecastHistory roleId={role.role_id} scenario={scenario} />
             <ExposureLine roleId={role.role_id} onOpen={() => onTab("market")} />
             <PayLine pay={role.pay} change={role.pay_change_rm} />
-            {role.requirements && !role.requirements.needs_licence && <EntryRequirements req={role.requirements} />}
             {roleCase && <RoleCase data={roleCase} />}
           </>
         )}
