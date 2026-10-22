@@ -2,6 +2,7 @@
 // token we send with each request (backend/app/auth.py). Without VITE_SUPABASE_* the app runs as
 // before, anonymous only, and the login button is hidden.
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { KEYS, save } from "./storage";
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
@@ -79,6 +80,7 @@ export function onAuth(listener: Listener): () => void {
 
 export async function signIn(): Promise<void> {
   if (!client) return;
+  save(KEYS.loginPending, "1", "session");  // App opens Today (or the intake) when Google sends us back
   // Come back to the same screen (the app keeps its state in the query string).
   await client.auth.signInWithOAuth({
     provider: "google",

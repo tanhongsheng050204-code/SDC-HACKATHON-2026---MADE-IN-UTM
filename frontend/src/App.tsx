@@ -81,12 +81,15 @@ function MainApp({ demo }: { demo: string | null }) {
   profileRef.current = profile;
   const roleRef = useRef(role);
   roleRef.current = role;
+  const routeRef = useRef(route);
+  routeRef.current = route;
 
   const screen = route.screen;
   const scenario = route.scenario;
 
   function go(next: Screen, extra: Partial<Route> = {}) {
-    const r = { ...route, ...extra, screen: next };
+    const r = { ...routeRef.current, ...extra, screen: next };
+    routeRef.current = r;
     setRoute(r);
     writeRoute(r, "push");
     window.scrollTo(0, 0);
@@ -171,6 +174,13 @@ function MainApp({ demo }: { demo: string | null }) {
       if (profileRef.current?.user_id) { setProfile(null); setRole(null); go("landing", { role: undefined }); }
       return;
     }
+    // Just back from Google: land on Today (or the intake if there is no profile yet), not the
+    // landing page the login started from. A plain reload while logged in stays where it is.
+    const justLoggedIn = load(KEYS.loginPending, "session") === "1";
+    save(KEYS.loginPending, null, "session");
+    const landHome = () => {
+      if (justLoggedIn && routeRef.current.screen === "landing") go(profileRef.current ? "home" : "intake", { role: undefined });
+    };
     (async () => {
       try {
         const me = await api.me();
@@ -183,14 +193,17 @@ function MainApp({ demo }: { demo: string | null }) {
         }
         if (claimable && local && !me.profile_id) {
           await api.claim(local.id);
-          setProfile(await api.getProfile(local.id));
+          const claimed = await api.getProfile(local.id);
+          setProfile(claimed); profileRef.current = claimed;
+          landHome();
           return;
         }
         if (me.profile_id && (!local || local.is_demo || local.id !== me.profile_id)) {
           await openSaved(me.profile_id);
         } else if (local) {
-          setProfile(local);
+          setProfile(local); profileRef.current = local;
         }
+        landHome();
         setError(null);  // any "log in to open your profile" notice is answered now
       } catch { setError(t("auth.expired")); }
     })();
@@ -199,8 +212,8 @@ function MainApp({ demo }: { demo: string | null }) {
 
   async function openSaved(id: string) {
     const p = await api.getProfile(id);
-    save(KEYS.profile, p.id); setProfile(p); setRole(null);
-    if (route.screen === "landing") go("home", { role: undefined });
+    save(KEYS.profile, p.id); setProfile(p); setRole(null); profileRef.current = p;
+    if (routeRef.current.screen === "landing") go("home", { role: undefined });
   }
 
   // A profile made while logged in belongs to the account straight away.
