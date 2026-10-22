@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { LegalLinks } from "../screens/Legal";
 import { type Journey, type JourneyStep, type Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
@@ -72,6 +73,7 @@ export function Sidebar({ current, roleId, profile, journey, model, settings, on
       <div className="side-foot">
         {model && <p className="side-note">{t("shell.model")}: {model}</p>}
         <p className="side-note">{t("shell.estimates")}</p>
+        <p className="side-note"><LegalLinks /></p>
         {settings}
       </div>
     </aside>

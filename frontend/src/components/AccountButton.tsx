@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { LegalLinks } from "../screens/Legal";
 import { createPortal } from "react-dom";
 import { authEnabled, signIn, signOut } from "../lib/auth";
 import { t } from "../lib/i18n";
@@ -45,7 +46,7 @@ export function LoginDialog({ onClose }: { onClose: () => void }) {
           <span className="login-g" aria-hidden="true">G</span>{t("login.google")}
         </button>
         <button className="link login-skip" onClick={onClose}>{t("login.notNow")}</button>
-        <p className="login-note">{t("login.note")}</p>
+        <p className="login-note">{t("login.note")} <LegalLinks /></p>
       </div>
     </div>,
     document.body,

@@ -45,6 +45,7 @@ export function ProofCheck({ profileId, node, isDemo, onDone, onClose }: {
     <div className="dialog-backdrop">
       <div className="dialog proof" role="dialog" aria-modal="true" aria-labelledby="proof-title">
         <h2 id="proof-title">{tr(node.name)}{check && ` · ${t("tree.prove")} ${levelName(check.level)}`}</h2>
+        <p className="proof-practice">{t("proof.practice")}</p>
         {busy && !check && <p className="muted">{t("tree.writing")}</p>}
         {error && <p className="error" role="alert">{error}</p>}
         {question && check && (

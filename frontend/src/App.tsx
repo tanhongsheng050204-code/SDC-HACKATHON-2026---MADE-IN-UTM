@@ -18,6 +18,7 @@ import { clearOfflineData } from "./lib/pwa";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CardPage } from "./screens/CardPage";
 import { Unsubscribe } from "./screens/Unsubscribe";
+import { Legal, type LegalDoc } from "./screens/Legal";
 import { EmailSettings } from "./components/EmailSettings";
 import { JoinClass } from "./components/JoinClass";
 import { Impact } from "./screens/Impact";
@@ -48,6 +49,8 @@ export default function App() {
     window.history.replaceState(null, "", `${window.location.pathname}?view=profile`);
   }
   if (unsubscribe) return <Unsubscribe token={unsubscribe} />;
+  const legal = params.get("legal");
+  if (legal === "privacy" || legal === "terms") return <Legal doc={legal as LegalDoc} />;
   return cardId ? <CardPage cardId={cardId} /> : <MainApp demo={params.get("demo")} />;
 }
 

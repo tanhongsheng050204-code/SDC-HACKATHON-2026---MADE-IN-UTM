@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import { LegalLinks } from "../screens/Legal";
 import { api, ClassPreview, Membership, Profile } from "../lib/api";
 import { shortDate } from "../lib/format";
 import { t, tf } from "../lib/i18n";
@@ -69,6 +70,7 @@ export function JoinClass({ profile, userId }: { profile: Profile; userId: strin
               <p>{t("cls.shareTitle")}</p>
               <ul>{preview.shared.map((f) => <li key={f}>{SHARED_LABELS[f] ? t(SHARED_LABELS[f]) : f}</li>)}</ul>
               <p className="muted">{t("cls.notShared")}</p>
+              <p className="muted"><LegalLinks /></p>
               <div className="actions">
                 <button className="btn ink" onClick={join} disabled={busy} aria-busy={busy}>{t("cls.join")}</button>
                 <button className="btn quiet" onClick={() => setPreview(null)}>{t("a.dismiss")}</button>

@@ -509,7 +509,7 @@ export const api = {
     if (!response.ok) throw new Error(`${response.status}`);
     return { profile_id: body.profile_id as string };
   },
-  health: () => request<{ status: string; llm_model: string; snapshot: string; snapshot_imported: string; voice?: boolean }>("/health"),
+  health: () => request<{ status: string; llm_model: string; snapshot: string; snapshot_imported: string; voice?: boolean; contact?: string | null }>("/health"),
   skills: () => request<Skill[]>("/skills"),
   sdgs: () => request<Sdg[]>("/sdgs"),
   roles: () => request<RoleOption[]>("/roles"),

@@ -7,6 +7,7 @@ import { useDemoLoop } from "../../lib/demoLoop";
 import "../../styles/landing.css";
 import { HeroScenes } from "./HeroPreview";
 import { Journey } from "./Journey";
+import { legalHref } from "../Legal";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
 
@@ -366,6 +367,8 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
               <li><a href={REPO} target="_blank" rel="noreferrer">{t("lp.github")}</a></li>
               <li><a href={`${REPO}/blob/main/docs/AI_DECLARATION.md`} target="_blank" rel="noreferrer">{t("lp.aiDecl")}</a></li>
               <li><a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer">{t("lp.licence")}</a></li>
+              <li><a href={legalHref("privacy")}>{t("legal.privacyTitle")}</a></li>
+              <li><a href={legalHref("terms")}>{t("legal.termsTitle")}</a></li>
             </ul>
           </div>
         </div>

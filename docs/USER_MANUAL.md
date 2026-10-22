@@ -292,6 +292,9 @@ Open **HR teams and career centres** in the sidebar.
 - **Other data** used: O\*NET, courses, SDGs, prices, job ads, MASCO.
 - **Fairness check:** the same sample profiles and CVs are run under names from Malaysia's communities, female and male. Rankings, scores, pathways and skills must be identical, and the panel says **Passed** or **Failed**. It also lists what Laluan never asks for or stores (age, gender, ethnicity and so on).
 
+### Privacy notice and terms of use
+Links in the footer of the landing page, the sidebar, the login card and the class join screen open the **Privacy notice** (what Laluan keeps and why, which services process it, how long it is kept, your rights, who to contact) and the **Terms of use** (what Laluan is and is not, fair use, other websites). Both are drafts for the team to review.
+
 ### Your data
 **What it's for:** plain words on what Laluan keeps, what it never keeps, what the AI sees, and who can see your profile.
 

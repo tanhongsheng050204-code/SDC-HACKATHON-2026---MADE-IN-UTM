@@ -95,6 +95,16 @@ def test_health_names_the_model(client):
     assert "offline" in client.get("/api/health").json()["llm_model"].lower()
 
 
+def test_health_gives_the_contact_for_data_requests(client, monkeypatch):
+    from app.config import get_settings
+    monkeypatch.setenv("CONTACT_EMAIL", "")
+    get_settings.cache_clear()
+    assert client.get("/api/health").json()["contact"] is None  # the privacy notice then points to Report a problem
+    monkeypatch.setenv("CONTACT_EMAIL", "team@example.org")
+    get_settings.cache_clear()
+    assert client.get("/api/health").json()["contact"] == "team@example.org"
+
+
 def _snapshot(**overrides):
     base = {"snapshot_id": "2099-01-01-test", "source": "Test source", "source_url": "https://example.org",
             "published": "2025-01-07", "imported": "2099-01-01", "horizon_year": 2030, "illustrative": True,

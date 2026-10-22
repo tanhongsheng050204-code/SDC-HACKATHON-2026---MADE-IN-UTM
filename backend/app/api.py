@@ -49,6 +49,7 @@ def health():
         "snapshot": ref.latest_snapshot["snapshot_id"],
         "snapshot_imported": ref.latest_snapshot["imported"],
         "voice": runpod.voice_available(),
+        "contact": get_settings().contact_email or None,  # shown in the privacy notice for data requests
     }
 
 

@@ -351,6 +351,8 @@ Notes: ______
 - [ ] 24.3 After a CV upload, `GET /api/profiles/{id}` contains no CV text, name, email or phone.
 - [ ] 24.4 Admin endpoints (e.g. `GET /api/signals/pending`) without `X-Admin-Token` return 401.
 - [ ] 24.5 A profile owned by an account cannot be read or changed by another account or anonymously.
+- [ ] 24.13 **Privacy notice** and **Terms of use** (landing footer, sidebar footer, login card, class join screen) open `/?legal=privacy` and `/?legal=terms` without a profile: a sand "Draft … not legal advice" line, PDPA principles named, the same "What we keep / never keep" text as Your data, retention (30 days anonymous, a day for demos), the services that process data, and the contact email (or "use Report a problem" when CONTACT_EMAIL is empty). **← Back to Laluan** returns to the landing page.
+- [ ] 24.14 The proof-check dialog says it is practice, not a certificate.
 - [ ] 24.12 Sources → **Fairness check**: "Passed · 59 checks: 3 sample profiles under 8 names, and 5 sample CVs, give identical results", the names used and the fields never collected (age, gender, ethnicity…). `GET /api/fairness` returns the same.
 - [ ] 24.9 **Download my data** (sidebar, above Delete my profile) saves `laluan-my-data-xxxxxxxx.json` with the profile, Future Cards, proven skills, proof-check results, survey answers, progress events and consent records (one `profile_storage` row dated when the profile was made).
 - [ ] 24.10 After **Delete my profile**, `GET /api/profiles/{id}/export` returns 404 and nothing of the profile is left in any table.
