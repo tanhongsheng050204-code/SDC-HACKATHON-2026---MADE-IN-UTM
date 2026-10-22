@@ -15,11 +15,11 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 17
+SCHEMA_VERSION = 18
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence", "progress_events", "consents", "feedback", "usage_counts",
               "email_settings", "sent_jobs", "counsellors", "classes", "class_members", "decisions",
-              "checkin_actions")
+              "checkin_actions", "applications")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -242,6 +242,24 @@ _MIGRATIONS = {
         decided_at TEXT
     );
     CREATE INDEX IF NOT EXISTS checkin_actions_profile ON checkin_actions(profile_id, created_at);
+    """,
+    # Jobs a person saved or applied for: title, employer, link, status, interview date and a short
+    # note with contact details removed. No CV or documents.
+    18: """
+    CREATE TABLE IF NOT EXISTS applications (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        role_id TEXT,
+        title TEXT NOT NULL,
+        employer TEXT,
+        url TEXT,
+        status TEXT NOT NULL,
+        interview_date TEXT,
+        note TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS applications_profile ON applications(profile_id, created_at);
     """,
 }
 
@@ -488,6 +506,8 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
             "SELECT job_key, sent_at FROM sent_jobs WHERE profile_id=? ORDER BY sent_at", (profile_id,)).fetchall()]
     out["destination_decisions"] = [{k: d[k] for k in ("role_id", "reasons", "facts", "created_at")}
                                     for d in list_decisions(profile_id)]
+    out["job_applications"] = [{k: a[k] for k in ("role_id", "title", "employer", "url", "status", "interview_date",
+                                                   "note", "created_at", "updated_at")} for a in list_applications(profile_id)]
     out["checkin_actions"] = [{k: a[k] for k in ("class_name", "kind", "value", "status", "created_at", "decided_at")}
                               for a in actions_for_profile(profile_id)]
     return out
@@ -1000,4 +1020,41 @@ def actions_for_profile(profile_id: str) -> list[dict]:
                             "JOIN classes c ON c.id = a.class_id LEFT JOIN counsellors k ON k.user_id = c.counsellor_user_id "
                             "WHERE a.profile_id=? ORDER BY a.created_at, a.id", (profile_id,)).fetchall()
     return [dict(r) for r in rows]
+
+
+# --- job applications -------------------------------------------------------------------------
+
+APPLICATION_FIELDS = ("role_id", "title", "employer", "url", "status", "interview_date", "note")
+
+
+def list_applications(profile_id: str) -> list[dict]:
+    """Newest first."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT * FROM applications WHERE profile_id=? ORDER BY created_at DESC, id",
+                            (profile_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def add_application(profile_id: str, fields: dict) -> dict:
+    app_id, now = secrets.token_urlsafe(9), _now()
+    with _connect() as conn:
+        conn.execute("INSERT INTO applications (id, profile_id, role_id, title, employer, url, status, interview_date, note, "
+                     "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                     (app_id, profile_id, *(fields.get(k) for k in APPLICATION_FIELDS), now, now))
+    return next(a for a in list_applications(profile_id) if a["id"] == app_id)
+
+
+def update_application(profile_id: str, app_id: str, fields: dict) -> dict | None:
+    changes = {k: v for k, v in fields.items() if k in APPLICATION_FIELDS}
+    with _connect() as conn:
+        if changes:
+            sets = ", ".join(f"{k}=?" for k in changes)
+            conn.execute(f"UPDATE applications SET {sets}, updated_at=? WHERE id=? AND profile_id=?",
+                         (*changes.values(), _now(), app_id, profile_id))
+    return next((a for a in list_applications(profile_id) if a["id"] == app_id), None)
+
+
+def delete_application(profile_id: str, app_id: str) -> bool:
+    with _connect() as conn:
+        return conn.execute("DELETE FROM applications WHERE id=? AND profile_id=?", (app_id, profile_id)).rowcount > 0
 

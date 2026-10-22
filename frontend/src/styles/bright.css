@@ -678,3 +678,19 @@ html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[dat
   .table-wrap, .table-scroll { overflow: visible !important; }
   .card { break-inside: avoid; }
 }
+
+/* Application tracker and switching cost */
+.badge.sky { background: var(--sky); color: var(--sky-ink); }
+.app-form { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; margin: 10px 0; }
+.app-form label, .app-edit label { display: grid; gap: 4px; font-weight: 700; font-size: .9rem; }
+.app-form .actions { grid-column: 1 / -1; }
+.app-list { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 10px; }
+.app-list li { background: var(--surface-2); border-radius: 18px; padding: 12px 14px; display: grid; gap: 8px; }
+.app-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.app-edit { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+.app-edit select, .app-edit input { min-height: 44px; }
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 12px 0; }
+.sw-grid > div { background: var(--sand); border-radius: 18px; padding: 12px 14px; display: grid; gap: 4px; }
+.sw-grid dt { font-weight: 700; font-size: .9rem; color: var(--ink-2); }
+.sw-grid dd { margin: 0; font-size: 1.05rem; }
+.sw-grid small { color: var(--ink-soft); }

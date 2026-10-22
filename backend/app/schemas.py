@@ -294,3 +294,41 @@ class ActionIn(BaseModel):
 class ActionAnswer(BaseModel):
     model_config = ConfigDict(extra="forbid")
     answer: Literal["accept", "decline", "done"]
+
+
+APPLICATION_STATUSES = ("saved", "applied", "interview", "offer", "not_this_time")
+
+
+class ApplicationIn(BaseModel):
+    """A job the person saved or applied for. No CV or documents; the note is scrubbed of contact details."""
+    model_config = ConfigDict(extra="forbid")
+    role_id: str | None = Field(default=None, max_length=80)
+    title: str = Field(min_length=1, max_length=160)
+    employer: str | None = Field(default=None, max_length=160)
+    url: str | None = Field(default=None, max_length=500)
+    status: Literal["saved", "applied", "interview", "offer", "not_this_time"] = "saved"
+    interview_date: dt.date | None = None
+    note: str | None = Field(default=None, max_length=300)
+
+    @field_validator("url")
+    @classmethod
+    def _https_link(cls, v: str | None) -> str | None:
+        if v and not re.match(r"^https?://", v.strip()):
+            raise ValueError("The link must start with http:// or https://")
+        return v.strip() if v else None
+
+
+class ApplicationPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str | None = Field(default=None, min_length=1, max_length=160)
+    employer: str | None = Field(default=None, max_length=160)
+    url: str | None = Field(default=None, max_length=500)
+    status: Literal["saved", "applied", "interview", "offer", "not_this_time"] | None = None
+    interview_date: dt.date | None = None
+    note: str | None = Field(default=None, max_length=300)
+
+    @field_validator("url")
+    @classmethod
+    def _https_link(cls, v: str | None) -> str | None:
+        return ApplicationIn._https_link(v)
+

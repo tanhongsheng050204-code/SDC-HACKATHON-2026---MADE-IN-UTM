@@ -1,4 +1,6 @@
 import { EntryRequirements } from "../components/EntryRequirements";
+import { ApplicationTracker } from "../components/ApplicationTracker";
+import { SwitchCost } from "../components/SwitchCost";
 import { Helpful } from "../components/Helpful";
 import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
@@ -113,6 +115,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
                 names={Object.fromEntries([...role.covered, ...role.missing].map((s) => [s.skill_id, s.name]))}
                 added={new Set([...role.covered, ...role.missing].filter((s) => s.added_from_ads).map((s) => s.skill_id))} />
             )}
+            <SwitchCost profile={profile} role={role} />
             <SdgReasons sdgs={role.sdgs} title={t("sdg.roleTitle")} />
             {role.missing.length === 0 ? (
               <div className="empty-state">
@@ -133,6 +136,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
 
         {tab === "market" && (
           <>
+            <ApplicationTracker profileId={profile.id} roleId={role.role_id} />
             <JobPostings roleId={role.role_id} title={tr(role.title)} />
             <Openings roleId={role.role_id} roleTitle={tr(role.title)} profileId={profile.id} />
             <Programmes roleId={role.role_id} />

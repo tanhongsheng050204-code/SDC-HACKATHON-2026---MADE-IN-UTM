@@ -13,7 +13,7 @@ from app import ratelimit, runpod, store
 from app.auth import current_claims, current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (ActionAnswer, ActionIn, CardRequest, DecisionReasonsIn, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (ActionAnswer, ActionIn, ApplicationIn, ApplicationPatch, CardRequest, DecisionReasonsIn, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
@@ -647,6 +647,53 @@ def set_decision_reasons(profile_id: str, body: DecisionReasonsIn, user: str | N
         raise HTTPException(404, "No destination chosen yet")
     store.set_decision_reasons(latest["id"], list(dict.fromkeys(body.reasons)))
     return decisions.compare(get_reference(), profile)
+
+
+# --- job applications ----------------------------------------------------------------------
+
+MAX_APPLICATIONS = 200
+
+
+def _application_fields(body, profile: dict) -> dict:
+    fields = body.model_dump(exclude_unset=isinstance(body, ApplicationPatch))  # a new job gets the defaults
+    if fields.get("interview_date"):
+        fields["interview_date"] = fields["interview_date"].isoformat()
+    if fields.get("note"):  # a short note, never contact details
+        fields["note"] = scrub(fields["note"], [profile.get("display_name") or ""]).strip() or None
+    if fields.get("role_id") and fields["role_id"] not in get_reference().roles:
+        raise HTTPException(422, "Unknown role")
+    return fields
+
+
+@router.get("/profiles/{profile_id}/applications")
+def list_applications(profile_id: str, user: str | None = User):
+    """Jobs the person saved or applied for, newest first."""
+    _profile_for(profile_id, user)
+    return store.list_applications(profile_id)
+
+
+@router.post("/profiles/{profile_id}/applications", status_code=201)
+def add_application(profile_id: str, body: ApplicationIn, user: str | None = User):
+    profile = _profile_for(profile_id, user)
+    if len(store.list_applications(profile_id)) >= MAX_APPLICATIONS:
+        raise HTTPException(422, f"At most {MAX_APPLICATIONS} jobs can be tracked")
+    return store.add_application(profile_id, _application_fields(body, profile))
+
+
+@router.patch("/profiles/{profile_id}/applications/{app_id}")
+def update_application(profile_id: str, app_id: str, body: ApplicationPatch, user: str | None = User):
+    profile = _profile_for(profile_id, user)
+    updated = store.update_application(profile_id, app_id, _application_fields(body, profile))
+    if updated is None:
+        raise HTTPException(404, "Not found")
+    return updated
+
+
+@router.delete("/profiles/{profile_id}/applications/{app_id}", status_code=204)
+def delete_application(profile_id: str, app_id: str, user: str | None = User):
+    _profile_for(profile_id, user)
+    if not store.delete_application(profile_id, app_id):
+        raise HTTPException(404, "Not found")
 
 
 @router.get("/profiles/{profile_id}/plan-check")

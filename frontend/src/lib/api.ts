@@ -85,6 +85,11 @@ export interface EmergingDetail {
 }
 export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
 export interface AdQuote { title: string; company: string | null; url: string; quote: string }
+export type ApplicationStatus = "saved" | "applied" | "interview" | "offer" | "not_this_time";
+export interface Application {
+  id: string; role_id: string | null; title: string; employer: string | null; url: string | null;
+  status: ApplicationStatus; interview_date: string | null; note: string | null; created_at: string; updated_at: string;
+}
 export interface Requirements {
   usual: string; skill_level: number | null; usual_source: { title: string; url: string };
   qualification: { basis: "licence" | "masco"; text: string }
@@ -576,6 +581,14 @@ export const api = {
   setDecisionReasons: (id: string, reasons: DecisionReason[]) =>
     request<Decision>(`/profiles/${id}/decision/reasons`, { method: "PUT", body: JSON.stringify({ reasons }) }),
   planCheck: (id: string) => request<PlanCheck[]>(`/profiles/${id}/plan-check`),
+  applications: (id: string) => request<Application[]>(`/profiles/${id}/applications`),
+  addApplication: (id: string, body: Partial<Application> & { title: string }) =>
+    requestDetail<Application>(`/profiles/${id}/applications`, { method: "POST", body: JSON.stringify(body) }),
+  updateApplication: (id: string, appId: string, body: Partial<Application>) =>
+    requestDetail<Application>(`/profiles/${id}/applications/${encodeURIComponent(appId)}`, { method: "PATCH", body: JSON.stringify(
+      Object.fromEntries(Object.entries(body).filter(([k]) => ["title", "employer", "url", "status", "interview_date", "note"].includes(k)))) }),
+  deleteApplication: (id: string, appId: string) =>
+    requestDetail<void>(`/profiles/${id}/applications/${encodeURIComponent(appId)}`, { method: "DELETE" }),
   adminCounsellors: (token: string) => request<Counsellor[]>("/admin/counsellors", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   decideCounsellor: (token: string, userId: string, approve: boolean, decidedBy: string) =>
     request<Counsellor>(`/admin/counsellors/${encodeURIComponent(userId)}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },

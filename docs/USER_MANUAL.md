@@ -149,11 +149,13 @@ Use synthetic or non-sensitive information when testing. Never upload someone el
 - **What it takes to get hired:** the usual qualifications, or the licence and the law for licensed jobs.
 
 **Fit and plan:**
+- **What this move costs you:** the pay difference (DOSM group medians), learning hours (and weeks at your weekly study hours), course fees in RM and the certificates employers ask for. Time between jobs is not counted, because there is no Malaysian figure for it.
 - Skills you bring, have and still need (core skills marked).
 - **Where these skills come from:** evidence from real job ads.
 - The SDG reasons and the pathway buttons.
 
 **Market:**
+- **Jobs I'm applying for:** **Add a job** you found (title, employer, link), then move it from Saved to Applied, Interview (add the date), Offer or Not this time. It stays with your profile; no CV or documents are kept.
 - **Open now in Malaysia:** live postings with links to the employer or job board, plus **Find current openings**.
 - **Malaysian programmes:** MyCOL, MyMahir, Jelajah AI MyMahir.
 - **Where experts disagree: AI exposure:** three studies side by side.
