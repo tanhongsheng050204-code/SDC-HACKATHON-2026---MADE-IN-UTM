@@ -1,0 +1,4 @@
+# Builds from the repository root (the RunPod OCR worker, runpod/ocr/Dockerfile) only need its folder.
+# backend/ and frontend/ are built from their own folders, with their own .dockerignore files.
+**
+!runpod/ocr/**
