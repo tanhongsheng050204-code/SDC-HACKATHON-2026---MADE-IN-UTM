@@ -174,7 +174,7 @@ function ForecastChanges({ profile }: { profile: Profile }) {
   });
   const latest = changes.map((c) => c.latest).sort((a, b) => a.imported.localeCompare(b.imported)).at(-1);
   if (!latest || seen === latest.snapshot_id) return null;
-  const date = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString(document.documentElement.lang || undefined, { day: "numeric", month: "short", year: "numeric" });
+  const date = (iso: string) => new Date(`${iso.slice(0, 10)}T00:00:00`).toLocaleDateString(document.documentElement.lang || undefined, { day: "numeric", month: "short", year: "numeric" });
 
   function gotIt() {
     save(KEYS.forecastSeen + profile.id, latest!.snapshot_id);
