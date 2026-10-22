@@ -87,3 +87,26 @@ def _png_blank() -> bytes:
 def test_text_pdfs_and_word_files_never_go_through_ocr(monkeypatch):
     monkeypatch.setattr(ocr, "read_images", lambda *_: pytest.fail("OCR used for a file with text"))
     assert documents.read("cv.txt", b"Data entry clerk using Microsoft Excel and SQL every day at work.")[1] is False
+
+
+def _two_columns():
+    """A sidebar (contact, skills) beside the main text, like most designed CVs."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    image = Image.new("RGB", (1240, 900), "white")
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default(size=28)
+    for i, line in enumerate(["SKILLS", "AutoCAD", "MATLAB", "Power BI", "Python"]):
+        draw.text((40, 80 + 70 * i), line, fill="black", font=font)
+    for i, line in enumerate(["EXPERIENCE", "Engineering Intern", "Built an Excel dashboard", "Cut report time by 75%", "Taught SPM Mathematics"]):
+        draw.text((520, 80 + 70 * i), line, fill="black", font=font)
+    buffer = io.BytesIO()
+    image.save(buffer, "PNG")
+    return buffer.getvalue()
+
+
+@needs_ocr
+def test_two_column_pages_are_read_one_column_at_a_time():
+    lines = documents.read("cv.png", _two_columns())[0].splitlines()
+    assert lines[:5] == ["SKILLS", "AutoCAD", "MATLAB", "Power BI", "Python"]
+    assert lines[5] == "EXPERIENCE" and lines[-1] == "Taught SPM Mathematics"

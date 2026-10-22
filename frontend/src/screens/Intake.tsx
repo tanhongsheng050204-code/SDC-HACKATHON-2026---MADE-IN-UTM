@@ -1,3 +1,4 @@
+import { setSent } from "../lib/sent";
 import { useEffect, useState } from "react";
 import { Icon } from "../components/Icon";
 import { MicButton } from "../components/MicButton";
@@ -224,18 +225,23 @@ function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: 
   );
 }
 
+// An upload goes straight to "Check your skills": the file is scrubbed on the server, the scrubbed text
+// is what the AI reads, and that text waits on the next screen in a collapsed note (lib/sent.ts).
 function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<SendPreview | null>(null);
   async function upload(file: File | undefined) {
     if (!file) return;
     setBusy(true); setError(null);
-    try { setPreview(await api.previewUpload(file)); }
+    try {
+      const preview = await api.previewUpload(file);
+      const { skills } = await api.extract(preview.text);
+      setSent(preview);
+      onDone(skills);
+    }
     catch (e) { setError(e instanceof Error ? e.message : t("in.uploadFailed")); }
     finally { setBusy(false); }
   }
-  if (preview) return <SendCheck preview={preview} onBack={() => setPreview(null)} onDone={onDone} />;
   return (
     <div className="dropzone">
       <Icon name="upload" />

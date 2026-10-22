@@ -25,6 +25,7 @@ MAX_PAGES = 3      # a CV's first pages hold the skills; more would only slow th
 # read 10-point text without a miss. It keeps a scan inside a 512 MB server.
 MAX_SIDE = 1200
 MAX_PIXELS = 40_000_000  # refuse images bigger than this (decompression bombs)
+MIN_COLUMN_LINES = 4  # lines on each side of a gap before a page counts as two columns
 _lock = threading.Lock()  # one scan at a time: caps memory on a small server
 
 
@@ -55,8 +56,58 @@ def available() -> bool:
 
 
 def _tidy(line: str) -> str:
-    """The recogniser sometimes drops the space after a comma or colon."""
+    """The recogniser sometimes drops the space after a comma or colon, and reads a bullet as a dot."""
+    line = re.sub(r"^\s*[.•·*●▪]\s*(?=[A-Za-z])", "", line)
     return re.sub(r"(?<=[,:;])(?=[A-Za-z])", " ", line).strip()
+
+
+def _column_gap(spans: list[tuple[float, float]], width: float) -> float | None:
+    """The x of an empty vertical band between two columns, or None for a one-column page.
+
+    A two-column CV (a sidebar with contact details and skills beside the main text) has a band no
+    text crosses; reading straight across would interleave the two. The band must sit in the middle
+    60% of the page and have at least MIN_COLUMN_LINES lines on each side."""
+    covered = [False] * (int(width) + 1)
+    for x0, x1 in spans:
+        for x in range(max(0, int(x0)), min(int(width), int(x1)) + 1):
+            covered[x] = True
+    best = None
+    x = int(width * 0.2)
+    while x < width * 0.8:
+        if covered[x]:
+            x += 1
+            continue
+        start = x
+        while x < width * 0.8 and not covered[x]:
+            x += 1
+        gap = (start + x) / 2
+        left = sum(1 for x0, x1 in spans if x1 <= start)
+        right = sum(1 for x0, x1 in spans if x0 >= x)
+        if left >= MIN_COLUMN_LINES and right >= MIN_COLUMN_LINES and (best is None or x - start > best[1]):
+            best = (gap, x - start)
+    return best[0] if best else None
+
+
+def _reading_order(boxes, txts, width: float) -> list[str]:
+    """Text in the order a person reads it: each column top to bottom, pieces on one line left to right."""
+    items = []
+    for box, text in zip(boxes, txts):
+        xs, ys = [p[0] for p in box], [p[1] for p in box]
+        items.append((min(xs), max(xs), min(ys), max(ys), text))
+    gap = _column_gap([(x0, x1) for x0, x1, *_ in items], width)
+    columns = [[i for i in items if i[1] <= gap], [i for i in items if i[1] > gap]] if gap else [items]
+    lines = []
+    for column in columns:
+        column.sort(key=lambda i: (i[2] + i[3]) / 2)
+        row: list = []
+        for item in column:  # pieces whose middles share a line ("Pasir Gudang ... Jun - Aug 2025")
+            if row and abs((item[2] + item[3]) / 2 - (row[0][2] + row[0][3]) / 2) > (row[0][3] - row[0][2]) / 2:
+                lines.append(" ".join(i[4] for i in sorted(row)))
+                row = []
+            row.append(item)
+        if row:
+            lines.append(" ".join(i[4] for i in sorted(row)))
+    return lines
 
 
 def read_images(images: list) -> str:
@@ -65,7 +116,8 @@ def read_images(images: list) -> str:
     with _lock:
         for image in images:
             result = engine(image)
-            lines += [_tidy(t) for t in (result.txts or ())]
+            if result.txts:
+                lines += [_tidy(t) for t in _reading_order(result.boxes, result.txts, image.width)]
     return "\n".join(line for line in lines if line)
 
 

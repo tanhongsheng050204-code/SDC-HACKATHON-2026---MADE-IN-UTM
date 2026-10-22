@@ -272,6 +272,8 @@ const STRINGS = {
   "landing.footer": { en: "Forecasts are estimates under different scenarios, not predictions. Laluan supports your career decision; it never makes it.", ms: "Unjuran ialah anggaran di bawah senario berbeza, bukan ramalan. Laluan menyokong keputusan kerjaya anda; ia tidak membuat keputusan untuk anda.", zh: "预测是不同情景下的估计，不是预言。Laluan 支持您的职业决定，但从不替您做决定。" },
   // page headings and main actions
   "h.skills": { en: "Your skills", ms: "Kemahiran anda", zh: "您的技能" },
+  "rv.fromScan": { en: "Your CV was a scan or photo, so its text was read on our own server. Reading scans can miss a word: check the skills below and add any we missed.", ms: "CV anda ialah imbasan atau foto, jadi teksnya dibaca di pelayan kami sendiri. Bacaan imbasan boleh tertinggal perkataan: semak kemahiran di bawah dan tambah yang tertinggal.", zh: "您的简历是扫描件或照片，因此由我们自己的服务器识别文字。识别可能漏字：请检查下方技能并补充遗漏的。" },
+  "rv.sentTitle": { en: "What the AI read from your CV", ms: "Apa yang dibaca AI daripada CV anda", zh: "AI 从您的简历中读取的内容" },
   "h.check": { en: "Check your skills", ms: "Semak kemahiran anda", zh: "核对您的技能" },
   "h.roles": { en: "Your future roles", ms: "Peranan masa depan anda", zh: "您的未来职位" },
   "h.radar": { en: "Which skills are rising and declining", ms: "Kemahiran yang meningkat dan menurun", zh: "哪些技能在上升，哪些在下降" },
@@ -935,6 +937,7 @@ const STRINGS = {
   "pii.DOB": { en: "birth dates", ms: "tarikh lahir", zh: "出生日期" },
   "pii.AGE": { en: "ages", ms: "umur", zh: "年龄" },
   "pii.ADDRESS": { en: "addresses", ms: "alamat", zh: "地址" },
+  "pii.LINK": { en: "profile links", ms: "pautan profil", zh: "个人主页链接" },
   "pii.ORG": { en: "employer and school names", ms: "nama majikan dan sekolah", zh: "雇主和学校名称" },
   "mic.start": { en: "Speak instead of typing", ms: "Bercakap dan bukannya menaip", zh: "用语音代替打字" },
   "mic.stop": { en: "Stop recording", ms: "Henti merakam", zh: "停止录音" },
