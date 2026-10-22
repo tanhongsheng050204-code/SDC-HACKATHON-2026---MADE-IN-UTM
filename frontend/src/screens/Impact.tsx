@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { sdgReason, SdgTile } from "../components/Sdgs";
+import { RegionSdg } from "../components/RegionSdg";
 import { api, RoleInfo, RoleMatch } from "../lib/api";
 import { t, tf, tr } from "../lib/i18n";
 
@@ -47,6 +48,7 @@ export function Impact({ role, onBack }: { role: RoleMatch; onBack: () => void }
           ))}
         </ul>
       )}
+      <RegionSdg />
       <p className="source">{t("impact.source")}</p>
     </section>
   );

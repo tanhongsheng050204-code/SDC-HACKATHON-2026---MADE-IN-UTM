@@ -196,3 +196,21 @@ def test_digest_says_nothing_about_ads_when_the_source_is_down(client, email_on,
     text = _body(email_on["sent"][0])
     assert "No new job ads" not in text and "New job ads" not in text
     assert store.sent_job_keys(pid) == set()
+
+
+def test_digest_reports_re_planning_after_a_new_forecast(client, email_on, monkeypatch):
+    from app.services import replan
+    pid = owned_profile(client)
+    opt_in(client, pid)
+    today = __import__("app.services.progress", fromlist=["today"]).today().isoformat()
+    monkeypatch.setattr(replan, "compare", lambda ref, profile, scenario="baseline": {
+        "changed": True, "to_snapshot": {"id": "s2", "imported": today, "source": "x"}, "from_snapshot": {"id": "s1", "imported": "2026-10-01"},
+        "moves": [{"role_id": "data_analyst", "title": "Data analyst", "before": 2, "after": 5}],
+        "destination": {"role_id": "data_analyst", "title": "Data analyst", "rank_before": 2, "rank_after": 5,
+                        "outlook_before": 30, "outlook_after": 10, "label_before": "growing", "label_after": "steady"},
+        "new_top": {"role_id": "ai_operations_specialist", "title": "AI operations specialist"}})
+    client.post("/api/cron/weekly", headers=CRON)
+    text = _body(email_on["sent"][0])
+    assert "re-ranked your roles: Data analyst #2 → #5" in text
+    assert "Your destination Data analyst is now #5 (was #2)." in text
+    assert "AI operations specialist is now your best fit" in text and "nothing changes unless you choose" in text

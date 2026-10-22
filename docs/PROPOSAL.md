@@ -31,15 +31,16 @@ and keeps updating as AI moves.
 |---|---|---|
 | 1. Tell us about yourself | Upload a CV, answer five questions, or pick skills | Names, emails, phone and IC numbers removed before any AI reads it; the file is never stored |
 | 2. Future Skills Radar | Which skills and roles are rising or declining, each with a source and date | Research momentum per AI capability (arXiv, OpenAlex fallback) and skill demand in public job postings adjust a published baseline (WEF Future of Jobs 2025) within capped ranges; every refresh is a new dated snapshot |
-| 3. Get matched | Ranked future roles with "Why this rank?" | Score = 60% skill fit + 40% outlook + a bonus for roles serving the SDGs the user chose; declining roles never outrank growing ones |
+| 3. Get matched | Ranked future roles with "Why this rank?" | Score = 60% skill fit + 40% outlook, plus a small boost for roles that fit what the person enjoys; declining roles never outrank growing ones. When a new forecast is approved the ranking is re-planned automatically and Today shows what moved |
 | 4. Three futures, over time | Slow / baseline / accelerated AI adoption, and a year slider to 2030 | A transparent formula: roles that work *with* AI gain under faster adoption, exposed roles lose; we never extend past the sources' horizon |
 | 5. Follow a pathway | Ordered free or low-cost courses with hours, job links, progress and badges | Steps come only from a checked course catalogue, so the system cannot invent courses; AI-written text is checked sentence by sentence |
-| 6. SDG impact | Which goals the chosen career serves, with targets (4.3, 4.4, 8.2, 8.5 and others) | Every role and every skill is tagged; the user's chosen goals visibly change the ranking |
+| 6. SDG impact | Which goals the chosen career serves, with targets (4.3, 4.4, 8.2, 8.5 and others) | Every role and every skill is tagged with a UN target and a reason; the SDG impact page shows what the chosen path contributes, and an "Across Malaysia" view totals it for all users |
 | For employers | Workforce heatmap and cheapest reskilling moves | Anonymous CSV in, totals by role out; files with names or IDs are refused |
+| Fairness | A public fairness check on the Sources page | No age, gender or ethnicity is asked; sample profiles and CVs run under names from Malaysia's communities must give identical rankings, scores, pathways and skills (re-run whenever the forecast changes) |
 
 **Why this is more than "upload a CV and ask a chatbot":** the forecast is built from identifiable,
 dated signals that anyone can re-run; the scenarios and the year slider make uncertainty visible; and
-the SDG link changes what the user is shown, not just how it looks. ✍️ *Add your own angle.*
+each SDG link names a UN target and the reason the role or skill serves it, so it explains rather than decorates. ✍️ *Add your own angle.*
 
 **Humans stay in charge:** Laluan shows estimates and reasons, never decisions. Trend refreshes need
 an admin; course steps and goal choices stay with the user; the employer view never ranks individuals.
@@ -59,8 +60,8 @@ an admin; course steps and goal choices stay with the user; the employer view ne
 
 Shown live from the GitHub repo: CV upload and questionnaire, the trend pipeline feeding role
 matching (refresh → new dated snapshot → rankings change), explainable ranking, three scenarios and a
-year slider, pathway with progress, SDG mapping, and the employer heatmap. 50+ automated tests; CI on
-every push.
+year slider, pathway with progress, SDG mapping, and the employer heatmap. About 430 automated tests (backend
+and frontend); CI runs them on SQLite and Postgres on every push.
 
 ## 5. Hardest risks and our fallbacks
 

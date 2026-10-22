@@ -16,7 +16,7 @@ from app.schemas import (CardRequest, ClassIn, CounsellorDecision, CounsellorReq
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (alerts, cards, classes, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
+from app.services import (alerts, cards, classes, fairness, region, replan, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
                           openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
 from app.trends import refresh, review
@@ -639,6 +639,24 @@ def set_plan(profile_id: str, body: PlanRequest, user: str | None = User):
     if new_date is not None and new_date != before.get("target_date"):
         progress.record(get_reference(), profile_id, "plan_set", body.target_date.isoformat())
     return profile
+
+
+@router.get("/profiles/{profile_id}/replan")
+def profile_replan(profile_id: str, scenario: Scenario = "baseline", user: str | None = User):
+    """What the newest forecast changed in this person's recommendations (automatic re-planning)."""
+    return replan.compare(get_reference(), _profile_for(profile_id, user), scenario)
+
+
+@router.get("/fairness")
+def fairness_check():
+    """Rankings, scores, pathways and CV reading compared across names from Malaysia's communities."""
+    return fairness.cached(get_reference())
+
+
+@router.get("/sdg/region")
+def sdg_region():
+    """SDG contribution across Malaysia: counts of people heading for roles that serve each goal."""
+    return region.view(get_reference())
 
 
 @router.get("/profiles/{profile_id}/progress")

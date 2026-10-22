@@ -890,3 +890,11 @@ def memberships(profile_id: str) -> list[dict]:
                             "LEFT JOIN counsellors k ON k.user_id = c.counsellor_user_id "
                             "WHERE m.profile_id=? ORDER BY m.joined_at", (profile_id,)).fetchall()
     return [dict(r) for r in rows]
+
+
+def destination_counts() -> dict[str, int]:
+    """How many real (non-demo) profiles chose each destination. Counts only, no IDs."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT target_role_id AS role, COUNT(*) AS n FROM profiles WHERE is_demo = 0 "
+                            "AND target_role_id IS NOT NULL GROUP BY target_role_id").fetchall()
+    return {r["role"]: r["n"] for r in rows}

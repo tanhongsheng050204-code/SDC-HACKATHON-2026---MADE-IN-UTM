@@ -18,7 +18,7 @@ from urllib.parse import quote
 from app import mailer, store
 from app.config import get_settings
 from app.reference import Reference
-from app.services import openings, pathway, progress
+from app.services import openings, pathway, progress, replan
 from app.services.emailtext import STATES, say, state_name
 from app.services.scenario import outlook, signals_from_snapshot
 
@@ -182,6 +182,16 @@ def build_digest(ref: Reference, settings: dict, profile: dict) -> tuple[str, st
             line = say("next_course", lang, course=course["title"], provider=course["provider"], hours=course["hours"])
             paragraphs.append(f"{line}\n{course['url']}")
             blocks.append(f'<p>{html.escape(line)} <a href="{html.escape(course["url"])}">↗</a></p>')
+        moved = replan.compare(ref, profile)
+        fresh = moved["changed"] and (progress.today() - dt.date.fromisoformat(moved["to_snapshot"]["imported"])).days <= 7
+        if fresh:  # automatic re-planning: say what the new forecast changed, suggest, never switch
+            if moved["moves"]:
+                add(say("replan", lang, moves=", ".join(f"{m['title']} #{m['before']} → #{m['after']}" for m in moved["moves"][:3])))
+            d = moved["destination"]
+            if d and d["rank_before"] != d["rank_after"]:
+                add(say("replan_dest", lang, role=d["title"], before=d["rank_before"], after=d["rank_after"]))
+            if moved["new_top"]:
+                add(say("replan_top", lang, role=moved["new_top"]["title"]))
         change = forecast_change(ref, role_id)
         if change:
             add(say("forecast", lang, date=change["date"], role=role, before=_signed(change["before"]), after=_signed(change["after"])))

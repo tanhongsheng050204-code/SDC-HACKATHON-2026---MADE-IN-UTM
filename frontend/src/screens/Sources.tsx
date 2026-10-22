@@ -3,6 +3,7 @@ import { api, Snapshot } from "../lib/api";
 import { monthsOld } from "../lib/format";
 import { t, tf } from "../lib/i18n";
 import { PrivacyPanel } from "../components/PrivacyPanel";
+import { FairnessPanel } from "../components/FairnessPanel";
 
 // S9: every forecast snapshot the app has used, newest first, so anyone can trace a number back.
 export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onAdmin: () => void }) {
@@ -15,6 +16,7 @@ export function Sources({ onReviewKit, onAdmin }: { onReviewKit: () => void; onA
       <div className="page-head"><h1>{t("h.sources")}</h1>
         <p className="muted">{t("note.sources")}</p></div>
       <PrivacyPanel />
+      <FairnessPanel />
       {error && <p className="error" role="alert">{error}</p>}
       {!snapshots && !error && <p className="muted">{t("a.loading")}</p>}
       {snapshots?.length === 0 && <div className="empty-state"><p>{t("src.none")}</p></div>}

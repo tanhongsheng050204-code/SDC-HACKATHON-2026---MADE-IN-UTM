@@ -21,6 +21,22 @@ export interface Profile {
   target_role_id?: string | null; practised_at?: string | null;
   target_date?: string | null; weekly_hours?: number | null;
 }
+export interface Replan {
+  changed: boolean; to_snapshot: { id: string; imported: string; source: string }; from_snapshot: { id: string; imported: string } | null;
+  moves: { role_id: string; title: string; before: number; after: number }[];
+  destination: { role_id: string; title: string; rank_before: number; rank_after: number; outlook_before: number; outlook_after: number;
+    label_before: string; label_after: string } | null;
+  new_top: { role_id: string; title: string } | null;
+}
+export interface Fairness {
+  passed: boolean; checks: number; profiles: number; cvs: number; names: string[]; scenarios: string[];
+  failures: string[]; not_collected: string[]; method: string;
+}
+export interface RegionSdg {
+  region: string; people: number | null; min_group: number; note: string;
+  goals: { sdg: number; name: string; colour: string; people: number | null; roles: string[] }[];
+  roles: { role_id: string; title: string; people: number | null }[];
+}
 export type ProgressStatus = "on_track" | "ahead" | "behind" | "done";
 export interface Progress {
   role_id: string | null; target_date: string | null; weekly_hours: number | null; today: string;
@@ -470,6 +486,9 @@ export const api = {
   setTarget: (id: string, roleId: string | null) =>
     request<Profile>(`/profiles/${id}/target`, { method: "PUT", body: JSON.stringify({ role_id: roleId }) }),
   journey: (id: string) => request<Journey>(`/profiles/${id}/journey`),
+  replan: (id: string) => request<Replan>(`/profiles/${id}/replan`),
+  fairness: () => request<Fairness>("/fairness"),
+  sdgRegion: () => request<RegionSdg>("/sdg/region"),
   progress: (id: string) => request<Progress>(`/profiles/${id}/progress`),
   setPlan: (id: string, targetDate: string | null, weeklyHours: number | null) =>
     requestDetail<Profile>(`/profiles/${id}/plan`, { method: "PUT", body: JSON.stringify({ target_date: targetDate, weekly_hours: weeklyHours }) }),

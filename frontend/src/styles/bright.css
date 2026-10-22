@@ -498,3 +498,16 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 /* The difficulty shades (diff-1..3) darken the box, so the small text on them uses the stronger ink. */
 .tree-node[class*="diff-"] > small, .tree-node[class*="diff-"] .tree-course, .tree-node.locked .tree-step { color: var(--ink-2); }
 .error-detail { margin-top: 12px; } .error-detail code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px 10px; border-radius: 10px; }
+
+/* ---------- Re-planning card, fairness check, SDG view for Malaysia ---------- */
+.replan-card { border: 0; border-radius: 24px; background: var(--sand); box-shadow: none; gap: 8px; }
+.replan-card ul { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+.replan-card p { margin: 0; }
+.replan-card .btn { min-height: 44px; }
+.fairness { border-radius: 24px; gap: 8px; margin-top: 16px; }
+.fairness h2, .region-sdg h2 { font-size: 1.25rem; font-weight: 900; margin: 0; }
+.region-sdg { border: 0; border-radius: 26px; background: var(--mint); box-shadow: none; gap: 10px; margin-top: 18px; }
+.region-goals { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.region-goals li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.region-goals li span { display: grid; }
+.region-n { font-variant-numeric: tabular-nums; font-size: 1.1rem; }

@@ -86,6 +86,7 @@ Notes: ______
 - [ ] 5.9 Source line: forecast id and import date, "Estimates, not predictions. You decide."
 - [ ] 5.10 With the API stopped: "Couldn't load your results" with **Try again**.
 - [ ] 5.11 **What changed since your last visit** (blue card): with a destination and/or current job whose Baseline outlook moved in a newer forecast, it reads e.g. "Forecast updated on 20 Oct 2026: AI operations specialist moved from +60 to +35 under Baseline (estimate). Your route is unchanged." with the source and snapshot id. **Got it** hides it, and it stays hidden after a reload until a later forecast moves a number again. No card when nothing moved or there is only one forecast.
+- [ ] 5.13 After an admin approves a new trend refresh: a sand card **Your recommendations were updated** lists roles that moved ("Data analyst #6 → #3 ▲"), your destination's new rank, and, if another role is now your best fit, **Open …** to compare. Nothing changes until you choose; **Got it** hides it until the next forecast. The weekly email has the same lines.
 - [ ] 5.12 With a destination: the next-step card shows a progress line, e.g. **On track** "35% ready · target date 30 Jun 2027", or "35% ready. Set a target date…" when there is none.
 
 Notes: ______
@@ -209,6 +210,7 @@ Notes: ______
 - [ ] 14.1 "Your impact as a / an …" with the right article.
 - [ ] 14.2 One card per SDG for the role (official UN colours), with target and reason.
 - [ ] 14.3 **Skills that serve a goal**, each marked **In your plan** or **You have this**; **← Pathway** goes back.
+- [ ] 14.4 **Across Malaysia** (mint card at the bottom): how many Laluan users chose a destination and, per SDG, how many are heading for roles that serve it; demo copies are not counted and groups under 3 show "fewer than 3" (with few users it says there are not enough yet).
 
 Notes: ______
 
@@ -335,6 +337,7 @@ Notes: ______
 - [ ] 24.3 After a CV upload, `GET /api/profiles/{id}` contains no CV text, name, email or phone.
 - [ ] 24.4 Admin endpoints (e.g. `GET /api/signals/pending`) without `X-Admin-Token` return 401.
 - [ ] 24.5 A profile owned by an account cannot be read or changed by another account or anonymously.
+- [ ] 24.12 Sources → **Fairness check**: "Passed · 59 checks: 3 sample profiles under 8 names, and 5 sample CVs, give identical results", the names used and the fields never collected (age, gender, ethnicity…). `GET /api/fairness` returns the same.
 - [ ] 24.9 **Download my data** (sidebar, above Delete my profile) saves `laluan-my-data-xxxxxxxx.json` with the profile, Future Cards, proven skills, proof-check results, survey answers, progress events and consent records (one `profile_storage` row dated when the profile was made).
 - [ ] 24.10 After **Delete my profile**, `GET /api/profiles/{id}/export` returns 404 and nothing of the profile is left in any table.
 - [ ] 24.11 Sources → **Your data** shows the **Your rights** card, and its lists match what the download contains.

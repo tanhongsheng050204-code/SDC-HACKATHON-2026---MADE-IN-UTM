@@ -8,7 +8,7 @@
 | --- | --- |
 | Team name | Made in UTM |
 | Selected domain | Domain 1: The Aiversecity Future-Ready Workforce |
-| Selected SDG track (1–17) | **SDG 8** Decent Work and Economic Growth (targets 8.2, 8.5), with **SDG 4** Quality Education (targets 4.3, 4.4) |
+| Selected SDG track (1–17) | **SDG 4** Quality Education (targets 4.3, 4.4), the domain's main SDG, with **SDG 8** Decent Work and Economic Growth (targets 8.2, 8.5) |
 | Project / solution name | **Laluan** (Malay for “path”): a career GPS for the AI era |
 | Name (leader) | ______ |
 | Email and phone (leader) | ______ |
@@ -37,13 +37,13 @@ Aisyah, a data-entry clerk, learns her team has adopted an AI invoice reader. La
 2. **Forecasts, not lists.** A re-runnable pipeline collects three years of job-ad mentions, AI-research papers (arXiv) and Malaysian employment (OpenDOSM). Each series becomes a damped trend to 2030 with an 80% range, flagged *emerging* when growth speeds up. A backtest on the last year is shown in the app. Every refresh is dated and **only goes live after a person approves it**.
 3. **Three futures.** Slow, baseline and accelerated AI adoption change the forecasts and her ranked roles: 0.6 × skill fit + 0.4 × outlook. “Why this rank?”, a step-by-step forecast x-ray and **tipping points** (the adoption speed at which her job turns declining) explain every number.
 4. **A plan she can start this week.** Ordered courses for missing skills, with hours, RM price and HRD Corp status from a curated catalogue; AI summaries are checked against it, so nothing is invented.
-5. **SDG links with reasons** for every role and skill, an **AI coach** that only suggests (she presses Apply), and an aggregate **HR workforce view**.
+5. **SDG links with reasons** for every role and skill, an **AI coach** that only suggests, **automatic re-planning** when forecasts change, a public **fairness check**, and an **HR workforce view**.
 
 Hardest risk: reliable, updatable trend data. Fallbacks: noisy trends shrink towards no change, ranges stay visible, arXiv falls back to OpenAlex, and the last approved snapshot stays live.
 
 Workshops used: **GenAI APIs** (Gemini; Qwen2.5 and Whisper on RunPod; offline fallback), **database architecture** (Supabase Postgres) and **cloud deployment** (Vercel, Docker on Render, GitHub Actions).
 
-*Word count: 281*
+*Word count: 289*
 
 ## 3. Technical architecture and implementation plan
 
@@ -70,7 +70,7 @@ flowchart LR
     LLM --> GROUND["Grounding check<br/>against the catalogue"] --> API
 ```
 
-**Sponsor resources:** ______ *(the team confirms whether any official SDC sponsor GenAI API or cloud credit was used; the prototype currently uses the public Gemini API, Vercel's free plan and Render's free plan.)*
+**Sponsor resources:** **RunPod** (domain sponsor): Serverless endpoints run Qwen2.5-7B-Instruct for CV reading and Whisper for voice input. ______ *(team: confirm whether the RunPod credit came from the SDC sponsor; the prototype currently uses the public Gemini API, Vercel's free plan and Render's free plan.)*
 
 ### 3.2 Design-thinking and deployment strategy *(200 words max)*
 
@@ -90,7 +90,7 @@ flowchart LR
 
 | Metric category | Our response |
 | --- | --- |
-| **Target SDG sub-target(s)** | **8.5** “By 2030, achieve full and productive employment and decent work for all women and men, including for young people…”; **4.4** “By 2030, substantially increase the number of youth and adults who have relevant skills, including technical and vocational skills, for employment, decent jobs and entrepreneurship.” Supporting: 4.3 (affordable technical and vocational education), 8.2 (productivity through innovation). |
+| **Target SDG sub-target(s)** | **4.4** “By 2030, substantially increase the number of youth and adults who have relevant skills, including technical and vocational skills, for employment, decent jobs and entrepreneurship.”; **8.5** “By 2030, achieve full and productive employment and decent work for all women and men, including for young people…”. Supporting: 4.3 (affordable technical and vocational education), 8.2 (productivity through innovation). |
 | **Current problem baseline** | Only **26%** of Malaysian professionals using AI at work have had formal AI training (Hays Asia Salary Guide 2025, as cited in the Domain 1 brief); **600,000+** Malaysian workers need reskilling within 3–5 years (MOSTI, same source); data-entry clerk jobs are projected to fall **≈26%** by 2030 (WEF Future of Jobs Report 2025, Fig. 2.3). For an individual today: no source-cited, personalised pathway exists in one place, so the share of recommendations a user can trace to a source is effectively **0%** in generic chatbot advice. |
 | **Core measurable KPIs** | (1) Time from CV to a ranked, costed pathway (minutes). (2) Skill-extraction recall on 5 synthetic CVs marked by a person (%). (3) Share of role, skill, task and course recommendations that show a dated source (%). (4) Share of plan steps that are free or free to audit (%). (5) Reviewer agreement with the top-3 roles for the two personas (%). (6) Forecast backtest: share of clear skill trends whose direction held in the held-out year (%). |
 | **Phase 2 impact target** | (1) ≤ **5 minutes** in a timed run. (2) ≥ **80%** average recall. (3) **100%** of recommendations cited (already enforced by automated tests). (4) ≥ **70%** of steps free or free to audit in both demo pathways (currently 2 of 2 for Aisyah and 1 of 1 for Wei Jie). (5) ≥ **70%** reviewer agreement from a lecturer or career counsellor. (6) Above the “everything rises” guess, re-measured at every refresh (21 Oct 2026: 14 of 19 clear trends held, against 12 for “everything rises”; sizes still rougher than a “no change” guess). |
