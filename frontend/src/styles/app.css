@@ -722,6 +722,11 @@ main:focus { outline: none; }
 .role-graph.compact .graph-you .graph-you-name { font-size: 17px; }
 .actions button.danger { color: var(--risk); border-color: var(--risk); }
 .review-top { scroll-margin-top: 130px; outline: none; }
+/* Ticked rows are decided together; the bar stays in view at the bottom while the lists scroll. */
+.review.bulk { position: sticky; bottom: 12px; z-index: 2; box-shadow: 0 6px 24px rgb(0 0 0 / 0.12); }
+.row-actions { white-space: nowrap; }
+.row-actions .pick { margin: 0 10px 0 0; vertical-align: middle; width: 18px; height: 18px; }
+th .pick { width: 18px; height: 18px; vertical-align: middle; }
 .sdg-reasons { display: grid; gap: 8px; margin: 12px 0; }
 .sdg-reasons h2 { margin: 0; font-size: 1.05rem; }
 .sdg-reasons ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

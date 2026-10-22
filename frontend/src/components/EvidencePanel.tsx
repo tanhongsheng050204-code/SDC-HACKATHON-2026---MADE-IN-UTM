@@ -22,6 +22,7 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [picked, setPicked] = useState<Set<string>>(new Set());  // rows ticked for one decision on them all
   const listTop = useRef<HTMLDivElement>(null);
 
   async function loadPending(t = token) {
@@ -103,6 +104,47 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
     finally { setSaving(false); }
   }
 
+  // One decision on every ticked row, in turn: role results as the search found them (nothing unticked),
+  // cards and drafts as drafted. Rows that fail stay ticked and in the list, so they can be retried.
+  async function decidePicked(decision: "approve" | "reject") {
+    const labels = new Map<string, string>([
+      ...pending.map((p) => [p.id, p.title] as [string, string]),
+      ...emerging.map((e) => [e.id, e.title] as [string, string]),
+      ...days.map((d) => [d.id, `a day as ${d.title}`] as [string, string]),
+    ]);
+    const ids = [...picked].filter((id) => labels.has(id));
+    setError(null); setNote(null); setSaving(true);
+    save(KEYS.reviewer, reviewer.trim());
+    const left = new Set(ids);  // not yet decided: failed, or never tried after a refused token
+    let doneCount = 0, unauthorised = false;
+    for (const id of ids) {
+      try { await api.evidenceDecide(token, id, decision, { reviewer: reviewer.trim(), reason: reason.trim() || undefined }); left.delete(id); doneCount++; }
+      catch (e) { if (String(e).includes("401")) { unauthorised = true; break; } }
+    }
+    if (doneCount > 0) setNote(`${decision === "approve" ? "Approved" : "Rejected"} ${doneCount} item${doneCount === 1 ? "" : "s"}, by ${reviewer.trim()}.`);
+    if (unauthorised) setError("Admin token required.");
+    else if (left.size) setError(`Couldn't save ${left.size}: ${[...left].map((id) => labels.get(id)).join(", ")}. Try again.`);
+    setPicked(left); setReason("");
+    await loadPending();
+    setSaving(false);
+    if (decision === "approve" && doneCount > 0) await onDone();
+  }
+
+  function pickAll(ids: string[]) {
+    const all = ids.every((id) => picked.has(id));
+    const next = new Set(picked);
+    ids.forEach((id) => (all ? next.delete(id) : next.add(id)));
+    setPicked(next);
+  }
+  const pickBox = (id: string, label: string) => (
+    <input type="checkbox" className="pick" aria-label={`Select ${label}`} checked={picked.has(id)}
+      onChange={() => toggle(picked, id, setPicked)} />
+  );
+  const pickAllBox = (ids: string[], what: string) => (
+    <input type="checkbox" className="pick" aria-label={`Select all ${what}`}
+      checked={ids.length > 0 && ids.every((id) => picked.has(id))} onChange={() => pickAll(ids)} />
+  );
+
   const decideDay = (d: "approve" | "reject") => dayItem && decideItem(dayItem.id, `a day as ${dayItem.title}`, d);
   const decideCard = (d: "approve" | "reject") => card && decideItem(card.id, card.title.en, d, {}, true);
   const decide = (d: "approve" | "reject") => detail && decideItem(detail.id, detail.title, d,
@@ -144,11 +186,11 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       {emerging.length > 0 && !busy && (
         <div className="table-wrap">
           <table className="heatmap">
-            <thead><tr><th>Emerging role (prediction)</th><th>From AI capability</th><th>Sources</th><th></th></tr></thead>
+            <thead><tr><th>Emerging role (prediction)</th><th>From AI capability</th><th>Sources</th><th>{pickAllBox(emerging.map((e) => e.id), "emerging roles")}</th></tr></thead>
             <tbody>{emerging.map((e) => (
               <tr key={e.id}>
                 <th scope="row">{e.title}</th><td>{e.capability_name}{e.momentum !== null && ` (+${e.momentum.toFixed(2)})`}</td>
-                <td>{e.sources}</td><td><button className="link" onClick={() => openCard(e.id)}>Review</button></td>
+                <td>{e.sources}</td><td className="row-actions">{pickBox(e.id, e.title)}<button className="link" onClick={() => openCard(e.id)}>Review</button></td>
               </tr>
             ))}</tbody>
           </table>
@@ -188,12 +230,12 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       {pending.length > 0 && !busy && (
         <div className="table-wrap">
           <table className="heatmap">
-            <thead><tr><th>Role</th><th>Job ads</th><th>Other pages</th><th>Proposed skills</th><th></th></tr></thead>
+            <thead><tr><th>Role</th><th>Job ads</th><th>Other pages</th><th>Proposed skills</th><th>{pickAllBox(pending.map((p) => p.id), "roles")}</th></tr></thead>
             <tbody>{pending.map((p) => (
               <tr key={p.id}>
                 <th scope="row">{p.title}{p.widened && <span className="badge">widened</span>}</th>
                 <td>{p.job_ads}</td><td>{p.pages - p.job_ads}</td><td>{p.added_names.length ? p.added_names.join(", ") : "—"}</td>
-                <td><button className="link" onClick={() => open(p.id)}>Review</button></td>
+                <td className="row-actions">{pickBox(p.id, p.title)}<button className="link" onClick={() => open(p.id)}>Review</button></td>
               </tr>
             ))}</tbody>
           </table>
@@ -254,12 +296,26 @@ export function EvidencePanel({ onDone }: { onDone: () => Promise<void> }) {
       {days.length > 0 && !busy && (
         <div className="table-wrap">
           <table className="heatmap">
-            <thead><tr><th>"A day in this job" from approved ads</th><th>Drafted</th><th></th></tr></thead>
+            <thead><tr><th>"A day in this job" from approved ads</th><th>Drafted</th><th>{pickAllBox(days.map((d) => d.id), "drafts")}</th></tr></thead>
             <tbody>{days.map((d) => (
               <tr key={d.id}><th scope="row">{d.title}</th><td>{d.drafted}</td>
-                <td><button className="link" onClick={() => openDay(d.id)}>Review</button></td></tr>
+                <td className="row-actions">{pickBox(d.id, d.title)}<button className="link" onClick={() => openDay(d.id)}>Review</button></td></tr>
             ))}</tbody>
           </table>
+        </div>
+      )}
+
+      {picked.size > 0 && !busy && (
+        <div className="review bulk" role="group" aria-label="Decide the selected items">
+          <p className="eyebrow">{picked.size} selected</p>
+          <p className="muted">Approving a role takes its evidence as found, with no quote or added skill unticked; open a role with Review to untick any first.</p>
+          <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. most ads are from Singapore" /></label>
+          <div className="actions">
+            <button className="primary" disabled={saving || reviewer.trim().length < 2} onClick={() => decidePicked("approve")}>{saving ? "Saving…" : `Approve ${picked.size} selected`}</button>
+            <button disabled={saving || reviewer.trim().length < 2 || reason.trim().length < 3} onClick={() => decidePicked("reject")}>Reject {picked.size} selected</button>
+            <button className="link" disabled={saving} onClick={() => setPicked(new Set())}>Clear selection</button>
+          </div>
+          {reviewer.trim().length < 2 && <p className="muted">Enter your name above to decide.</p>}
         </div>
       )}
 
