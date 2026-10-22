@@ -4,7 +4,9 @@ export type Cell = string | number | null | undefined;
 
 export function toCsv(rows: Cell[][]): string {
   const cell = (v: Cell) => {
-    const s = v === null || v === undefined ? "" : String(v);
+    let s = v === null || v === undefined ? "" : String(v);
+    // Text a person typed (a display name, a class name) must not run as a spreadsheet formula.
+    if (typeof v === "string" && /^[=+@\t\r]|^-(?!\d+(\.\d+)?%?$)/.test(s)) s = `'${s}`;
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return "﻿" + rows.map((r) => r.map(cell).join(",")).join("\r\n") + "\r\n";
