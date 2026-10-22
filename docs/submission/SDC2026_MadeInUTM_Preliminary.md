@@ -123,7 +123,7 @@ flowchart LR
 | Font | Inter (via @fontsource-variable/inter 5.3.0) | SIL OFL 1.1 |
 | Code | FastAPI, Starlette, Pydantic | MIT / BSD-3 / MIT |
 | Code | Uvicorn, HTTPX, pypdf | BSD-3 |
-| Code | RapidOCR, ONNX Runtime, pypdfium2, Pillow (reading scanned CVs on our own server) | Apache-2.0 / MIT / Apache-2.0 or BSD-3 / MIT-CMU |
+| Code | RapidOCR, ONNX Runtime, pypdfium2, Pillow (reading scanned CVs with our own OCR: our RunPod worker, else the API server) | Apache-2.0 / MIT / Apache-2.0 or BSD-3 / MIT-CMU |
 | Model | PaddleOCR PP-OCRv4 English text recogniser and RapidOCR's text detector (pre-trained, run locally) | Apache-2.0 |
 | Code | python-multipart, google-genai SDK | Apache-2.0 |
 | Code | PyMuPDF (only for the one-off WEF figure extraction script, not in the app) | AGPL-3.0 |
