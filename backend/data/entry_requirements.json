@@ -1,50 +1,1085 @@
 {
   "_note": "What it takes to be hired into each role, beyond skills (DECISIONS #43). 'usual' comes from the role's MASCO 2020 major group and is what employers usually ask for, not a rule: MASCO itself says the skills may also come from informal training and experience. 'licence' is a legal or official requirement to do the work; a role with one is never shown as a short next move unless it is the person's own job. Sources checked 22 Oct 2026; team: confirm each and fill reviewed_by (REVIEW_LOG.md).",
-  "masco_source": {"title": "MASCO 2020 (Ministry of Human Resources), Introduction, p. ix: education level by major group", "url": "https://jtksm.gov.my/sites/default/files/2022-12/MASCO_2020_BI_Edaran.pdf"},
+  "masco_source": {
+    "title": "MASCO 2020 (Ministry of Human Resources), Introduction, p. ix: education level by major group",
+    "url": "https://jtksm.gov.my/sites/default/files/2022-12/MASCO_2020_BI_Edaran.pdf"
+  },
   "usual_by_group": {
-    "1": {"text": "No fixed education level: managers are hired on experience", "skill_level": null},
-    "2": {"text": "A university degree, or a Malaysian Skills Diploma (DKM) Level 5 and above", "skill_level": 4},
-    "3": {"text": "A diploma, a Malaysian Skills Certificate (SKM) Level 3 or a Malaysian Skills Diploma (DKM) Level 4", "skill_level": 3},
-    "4": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
-    "5": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
-    "6": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
-    "7": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
-    "8": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
-    "9": {"text": "Primary education", "skill_level": 1}
+    "1": {
+      "text": "No fixed education level: managers are hired on experience",
+      "skill_level": null
+    },
+    "2": {
+      "text": "A university degree, or a Malaysian Skills Diploma (DKM) Level 5 and above",
+      "skill_level": 4
+    },
+    "3": {
+      "text": "A diploma, a Malaysian Skills Certificate (SKM) Level 3 or a Malaysian Skills Diploma (DKM) Level 4",
+      "skill_level": 3
+    },
+    "4": {
+      "text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3",
+      "skill_level": 2
+    },
+    "5": {
+      "text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3",
+      "skill_level": 2
+    },
+    "6": {
+      "text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3",
+      "skill_level": 2
+    },
+    "7": {
+      "text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3",
+      "skill_level": 2
+    },
+    "8": {
+      "text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3",
+      "skill_level": 2
+    },
+    "9": {
+      "text": "Primary education",
+      "skill_level": 1
+    }
   },
   "licences": {
     "registered_nurse": {
+      "qualification": "A Diploma in Nursing (or a nursing degree) from an LJM-recognised programme",
       "name": "Registration with the Nursing Board Malaysia (Lembaga Jururawat Malaysia) and a yearly practising certificate",
       "law": "Nurses Act 1950",
       "route": "An LJM-recognised Diploma in Nursing (3 years full time), then the LJM licensing examination",
       "route_months": 36,
       "sources": [
-        {"title": "Nurses Act 1950 (Act 14), as published by the Ministry of Health Nursing Division", "url": "https://hq.moh.gov.my/nursing/wp-content/uploads/2015/04/1.-Akta-jururawat-141-1.pdf"},
-        {"title": "Lembaga Jururawat Malaysia (Nursing Board Malaysia), Ministry of Health", "url": "https://hq.moh.gov.my/nursing/"},
-        {"title": "IJN College, Diploma in Nursing: 3 years, then the LJM Licensing Examination", "url": "https://www.ijn.edu.my/diploma-in-nursing/"}
+        {
+          "title": "Nurses Act 1950 (Act 14), as published by the Ministry of Health Nursing Division",
+          "url": "https://hq.moh.gov.my/nursing/wp-content/uploads/2015/04/1.-Akta-jururawat-141-1.pdf"
+        },
+        {
+          "title": "Lembaga Jururawat Malaysia (Nursing Board Malaysia), Ministry of Health",
+          "url": "https://hq.moh.gov.my/nursing/"
+        },
+        {
+          "title": "IJN College, Diploma in Nursing: 3 years, then the LJM Licensing Examination",
+          "url": "https://www.ijn.edu.my/diploma-in-nursing/"
+        }
       ],
       "reviewed_by": null
     },
     "renewable_energy_technician": {
+      "qualification": "SPM, then an Energy Commission-accredited wireman (PW) course; ads often ask for a diploma in electrical engineering instead",
       "name": "A wireman competency certificate from the Energy Commission (Suruhanjaya Tenaga) for electrical wiring work",
       "law": "Electricity Regulations 1994 (examination for competent persons)",
       "route": "An ST-accredited wireman course (PW2, about 2 years plus 6 months on the job at a skills college) and the ST competency examination",
       "route_months": 30,
       "sources": [
-        {"title": "Suruhanjaya Tenaga Directive 12/2026: what each certificate of competency (including Pendawai, wireman) allows, under the Electricity Regulations 1994", "url": "https://www.st.gov.my/sites/default/files/2026-06/arahan-ST-bilangan-12-2026.pdf"},
-        {"title": "VTAR Institute, Wireman PW2 competency course (ST-accredited): 2 years + 6 months OJT", "url": "https://www.vtar.edu.my/wireman-pw2-competency-course/"}
+        {
+          "title": "Suruhanjaya Tenaga Directive 12/2026: what each certificate of competency (including Pendawai, wireman) allows, under the Electricity Regulations 1994",
+          "url": "https://www.st.gov.my/sites/default/files/2026-06/arahan-ST-bilangan-12-2026.pdf"
+        },
+        {
+          "title": "VTAR Institute, Wireman PW2 competency course (ST-accredited): 2 years + 6 months OJT",
+          "url": "https://www.vtar.edu.my/wireman-pw2-competency-course/"
+        }
       ],
       "reviewed_by": null
     },
     "tvet_instructor": {
+      "qualification": "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO certificate",
       "name": "A Vocational Training Officer (VTO) certificate from the Department of Skills Development (JPK), to teach at JPK-accredited centres",
       "law": "Department of Skills Development (JPK) accreditation of skills training centres",
       "route": "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO course at CIAST (about 9½ months: 3½ months of teaching methods and a 6-month internship)",
       "route_months": 10,
       "sources": [
-        {"title": "CIAST: Vocational Training Officer (VTO) certificate", "url": "https://www.ciast.gov.my/?p=1007"},
-        {"title": "Department of Skills Development (JPK), Ministry of Human Resources", "url": "https://www.dsd.gov.my/"}
+        {
+          "title": "CIAST: Vocational Training Officer (VTO) certificate",
+          "url": "https://www.ciast.gov.my/?p=1007"
+        },
+        {
+          "title": "Department of Skills Development (JPK), Ministry of Human Resources",
+          "url": "https://www.dsd.gov.my/"
+        }
       ],
+      "reviewed_by": null
+    }
+  },
+  "ads_source": {
+    "title": "freehire.me (Malaysian job postings, mostly JobStreet), read on 2026-10-22",
+    "url": "https://freehire.me/jobs"
+  },
+  "roles": {
+    "data_entry_clerk": {
+      "level": null,
+      "level_ads": 3,
+      "ads_with_level": 7,
+      "ads_read": 12,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Data Entry Processor (Penang)",
+          "company": "ocbc",
+          "url": "https://ocbc.wd102.myworkdayjobs.com/External/job/OCBC-Malaysia-Penang/Data-Entry-Processor--Penang-_JR00005115?utm_source=freehire.me",
+          "quote": "Preferably with Degree in any discipline"
+        },
+        {
+          "title": "Data Entry Processor (1 year contract)",
+          "company": "ocbc",
+          "url": "https://ocbc.wd102.myworkdayjobs.com/External/job/OCBC-Malaysia-Penang/Data-Entry-Processor--1-year-contract-_JR00008492?utm_source=freehire.me",
+          "quote": "Preferably with Degree in any discipline"
+        },
+        {
+          "title": "Part Time Data Entry Clerk",
+          "company": "usasurveyjob",
+          "url": "https://jobs.lever.co/usasurveyjob/4722b0ca-70a1-4025-bbf4-06e114309109?utm_source=freehire.me",
+          "quote": "Experience with pc and have at least an average functioning degree typing ability."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "admin_assistant": {
+      "level": "diploma",
+      "level_ads": 28,
+      "ads_with_level": 37,
+      "ads_read": 48,
+      "fields": [
+        "business administration",
+        "accounting",
+        "finance",
+        "administration"
+      ],
+      "sources": [
+        {
+          "title": "Culinary Administrative Assistant",
+          "company": "fourseasons",
+          "url": "https://fourseasons.wd3.myworkdayjobs.com/search/job/Four-Seasons-Hotel-Kuala-Lumpur/Culinary-Administrative-Assistant_REQ10395481?utm_source=freehire.me",
+          "quote": "Diploma or Bachelor's degree in Hospitality Management, Business Administration or related field preferred."
+        },
+        {
+          "title": "Admin Assistant",
+          "company": "LEA Group of Companies",
+          "url": "https://my.jobstreet.com/job/95137092?utm_source=freehire.me",
+          "quote": "Diploma / Degree in Business, Accounting, Finance, IT or related field"
+        },
+        {
+          "title": "Administrative Assistant",
+          "company": "The Church of Jesus Christ of Latter-day Saints",
+          "url": "https://epej.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ChurchEmployment/job/378428?utm_source=freehire.me",
+          "quote": "High school diploma or above"
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "customer_service_rep": {
+      "level": "diploma",
+      "level_ads": 12,
+      "ads_with_level": 20,
+      "ads_read": 42,
+      "fields": [
+        "business",
+        "logistics",
+        "supply chain",
+        "business administration"
+      ],
+      "sources": [
+        {
+          "title": "Customer Support Analyst (12-Month Contract)",
+          "company": "gxs",
+          "url": "https://gxs.wd3.myworkdayjobs.com/NSSB/job/Petaling-Jaya-NSSB/Customer-Support-Analyst--12-Month-Contract-_R-2026-10-101987?utm_source=freehire.me",
+          "quote": "Possess at least Diploma in any relevant field"
+        },
+        {
+          "title": "Customer Service Representative (Morning Shift | Monthly Weekend Rotation)",
+          "company": "tollgroup",
+          "url": "https://tollgroup.wd5.myworkdayjobs.com/TollGroup/job/Bayan-Lepas/Customer-Service-Representative--Morning-Shift---Monthly-Weekend-Rotation-_R000078660?utm_source=freehire.me",
+          "quote": "Education : Diploma/Degree in Logistics, Supply Chain, Business, or a related field (preferred)."
+        },
+        {
+          "title": "Customer Service Executive",
+          "company": "Experian",
+          "url": "https://jobs.smartrecruiters.com/Experian/744000156279470-customer-service-executive?utm_source=freehire.me",
+          "quote": "Diploma, Advanced/Higher/Graduate Diploma in Business Studies, Business Administration, Management, Marketing, Commerce, Economics, Information Technology, or an equivalent qualification."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "data_analyst": {
+      "level": "degree",
+      "level_ads": 33,
+      "ads_with_level": 42,
+      "ads_read": 60,
+      "fields": [
+        "computer science",
+        "statistics",
+        "data science",
+        "mathematics"
+      ],
+      "sources": [
+        {
+          "title": "Data Analyst Apprentice (Internship)",
+          "company": "Fomema Sdn. Bhd.",
+          "url": "https://my.jobstreet.com/job/95410747?utm_source=freehire.me",
+          "quote": "Bachelor's Degree in Computer Science (Hons.) or any related field"
+        },
+        {
+          "title": "Senior Data Analyst (Quick Commerce)",
+          "company": "Delivery Hero",
+          "url": "https://jobs.smartrecruiters.com/DeliveryHero/744000156703519-senior-data-analyst-quick-commerce-?utm_source=freehire.me",
+          "quote": "Bachelor's or advanced degree in Statistics, Data Science, Analytics, Mathematics, Economics, Computer Science, or related field."
+        },
+        {
+          "title": "Data Analyst",
+          "company": "Proforest Sdn Bhd",
+          "url": "https://my.jobstreet.com/job/95385780?utm_source=freehire.me",
+          "quote": "Degree in Data Analytics, Data Science, Statistics, Computer Science, Information Systems, Environmental Science, Geography, Geospatial Science, Sustainability, Business Analytics or a related field; equivalent practical experience considered."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "ai_ml_engineer": {
+      "level": "degree",
+      "level_ads": 25,
+      "ads_with_level": 27,
+      "ads_read": 60,
+      "fields": [
+        "computer science",
+        "data science",
+        "engineering",
+        "artificial intelligence"
+      ],
+      "sources": [
+        {
+          "title": "Senior Robotics AI Engineer (Robotics Skills is a Must Have)",
+          "company": "techstreet",
+          "url": "https://my.jobstreet.com/job/95400929?utm_source=freehire.me",
+          "quote": "Bachelor's or Master's degree in Robotics, Artificial Intelligence, Computer Science, Mechatronics, or a related field"
+        },
+        {
+          "title": "AI Engineer",
+          "company": "ThoughtFull™ World",
+          "url": "https://apply.workable.com/j/B295094051?utm_source=freehire.me",
+          "quote": "Degree in Computer Science, Engineering, or a related field"
+        },
+        {
+          "title": "AI Engineer (Jr/Sr)",
+          "company": "techstreet",
+          "url": "https://my.jobstreet.com/job/95373292?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Computer Science, Software Engineering, Artificial Intelligence, Data Science, Computer Engineering, or a related field"
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "ai_operations_specialist": {
+      "level": "degree",
+      "level_ads": 15,
+      "ads_with_level": 17,
+      "ads_read": 36,
+      "fields": [
+        "computer science",
+        "information technology"
+      ],
+      "sources": [
+        {
+          "title": "AI & Automation Manager",
+          "company": "Rigol",
+          "url": "https://my.jobstreet.com/job/95266582?utm_source=freehire.me",
+          "quote": "Bachelor's Degree in Artificial Intelligence, Computer Science, Information Technology, Automation Engineering, Electrical and Electronic Engineering, Mechatronics or a related discipline."
+        },
+        {
+          "title": "RPA Developer",
+          "company": "Tentacle Technologies",
+          "url": "https://my.jobstreet.com/job/95254708?utm_source=freehire.me",
+          "quote": "A degree, backed by working experience in the required areas of expertise"
+        },
+        {
+          "title": "RPA Developer / Automation Anywhere Developer",
+          "company": "HTC Global Services",
+          "url": "https://my.jobstreet.com/job/95253666?utm_source=freehire.me",
+          "quote": "Degree in Engineering, Computer Science, or a related field, and/or relevant professional certifications."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "software_developer": {
+      "level": "degree",
+      "level_ads": 29,
+      "ads_with_level": 34,
+      "ads_read": 60,
+      "fields": [
+        "computer science",
+        "information technology",
+        "software engineering",
+        "engineering"
+      ],
+      "sources": [
+        {
+          "title": "Backend Software Engineer",
+          "company": "Primeworq",
+          "url": "https://my.jobstreet.com/job/95409225?utm_source=freehire.me",
+          "quote": "A degree in Computer Science, Software Engineering or a related field is preferred."
+        },
+        {
+          "title": "Software Engineer (C Developer)",
+          "company": "Finexus Sdn Bhd",
+          "url": "https://my.jobstreet.com/job/95398604?utm_source=freehire.me",
+          "quote": "Degree in Information Technology, Software Engineering, or related disciplines"
+        },
+        {
+          "title": "Full Stack Developer",
+          "company": "IQI Holdings",
+          "url": "https://my.jobstreet.com/job/95395748?utm_source=freehire.me",
+          "quote": "A degree in Computer Science, Software Engineering or a related discipline is beneficial but not essential."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "cybersecurity_analyst": {
+      "level": "degree",
+      "level_ads": 34,
+      "ads_with_level": 41,
+      "ads_read": 54,
+      "fields": [
+        "computer science",
+        "information technology",
+        "cybersecurity",
+        "information security"
+      ],
+      "sources": [
+        {
+          "title": "Senior Information Security Compliance Analyst",
+          "company": "Monks",
+          "url": "https://www.monks.com/careers/6116872004/job?gh_jid=6116872004&utm_source=freehire.me",
+          "quote": "Bachelor's degree in Computer Science, Computer or Systems Engineering or equivalent."
+        },
+        {
+          "title": "Information and Application Security Analyst",
+          "company": "Turnkey Consulting",
+          "url": "https://turnkeyconsulting.hire.trakstar.com/jobs/fk0zdro?utm_source=freehire.me",
+          "quote": "While an Information Security background would be advantageous, intellectual curiosity and a can-do attitude is more important than the subject of your degree."
+        },
+        {
+          "title": "Junior SAP Security Analyst",
+          "company": "HTC Global Services",
+          "url": "https://my.jobstreet.com/job/95346922?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Computer Science, Information Technology, Cybersecurity, or a related discipline."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "CompTIA Security+",
+          "ads": 21,
+          "sources": [
+            {
+              "title": "Cyber Security SOC Executive",
+              "company": "Altel Communications",
+              "url": "https://my.jobstreet.com/job/95369395?utm_source=freehire.me",
+              "quote": "Relevant security certifications (e.g., CompTIA Security+, or any cyber security certificate)"
+            },
+            {
+              "title": "Cyber Security Analyst",
+              "company": "KUKA Robot Automation",
+              "url": "https://my.jobstreet.com/job/95265642?utm_source=freehire.me",
+              "quote": "Relevant certifications such as Security+, SC-200, CEH, CISSP, or CISM are advantageous."
+            },
+            {
+              "title": "IT Security Analyst",
+              "company": "techstreet",
+              "url": "https://my.jobstreet.com/job/95256841?utm_source=freehire.me",
+              "quote": "Relevant industry certifications (e.g., SANS, GIAC, CompTIA Security+, CEH, or similar) are an advantage"
+            }
+          ]
+        },
+        {
+          "name": "CEH",
+          "ads": 17,
+          "sources": [
+            {
+              "title": "Cyber Security Analyst",
+              "company": "KUKA Robot Automation",
+              "url": "https://my.jobstreet.com/job/95265642?utm_source=freehire.me",
+              "quote": "Relevant certifications such as Security+, SC-200, CEH, CISSP, or CISM are advantageous."
+            },
+            {
+              "title": "IT Security Analyst",
+              "company": "techstreet",
+              "url": "https://my.jobstreet.com/job/95256841?utm_source=freehire.me",
+              "quote": "Relevant industry certifications (e.g., SANS, GIAC, CompTIA Security+, CEH, or similar) are an advantage"
+            },
+            {
+              "title": "Senior SOC Analyst",
+              "company": "techstreet",
+              "url": "https://my.jobstreet.com/job/95256241?utm_source=freehire.me",
+              "quote": "Relevant industry certifications (e.g., CISSP, GCIH, GCFA, GNFA, OSCP, CEH) preferred"
+            }
+          ]
+        },
+        {
+          "name": "CISSP",
+          "ads": 16,
+          "sources": [
+            {
+              "title": "Senior Information Security Compliance Analyst",
+              "company": "Monks",
+              "url": "https://www.monks.com/careers/6116872004/job?gh_jid=6116872004&utm_source=freehire.me",
+              "quote": "CISSP, CCSP, CISM, AWS Security Specialist, etc)"
+            },
+            {
+              "title": "Cyber Security Analyst",
+              "company": "KUKA Robot Automation",
+              "url": "https://my.jobstreet.com/job/95265642?utm_source=freehire.me",
+              "quote": "Relevant certifications such as Security+, SC-200, CEH, CISSP, or CISM are advantageous."
+            },
+            {
+              "title": "Senior SOC Analyst",
+              "company": "techstreet",
+              "url": "https://my.jobstreet.com/job/95256241?utm_source=freehire.me",
+              "quote": "Relevant industry certifications (e.g., CISSP, GCIH, GCFA, GNFA, OSCP, CEH) preferred"
+            }
+          ]
+        },
+        {
+          "name": "CISA / CISM",
+          "ads": 10,
+          "sources": [
+            {
+              "title": "Senior Information Security Compliance Analyst",
+              "company": "Monks",
+              "url": "https://www.monks.com/careers/6116872004/job?gh_jid=6116872004&utm_source=freehire.me",
+              "quote": "CISSP, CCSP, CISM, AWS Security Specialist, etc)"
+            },
+            {
+              "title": "Cyber Security Analyst",
+              "company": "KUKA Robot Automation",
+              "url": "https://my.jobstreet.com/job/95265642?utm_source=freehire.me",
+              "quote": "Relevant certifications such as Security+, SC-200, CEH, CISSP, or CISM are advantageous."
+            },
+            {
+              "title": "Cybersecurity Engineer (SOC)",
+              "company": "Mode Fair Sdn Bhd",
+              "url": "https://my.jobstreet.com/job/95169045?utm_source=freehire.me",
+              "quote": "Certified Information Security Manager (CISM)"
+            }
+          ]
+        }
+      ],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "digital_marketing_specialist": {
+      "level": "degree",
+      "level_ads": 27,
+      "ads_with_level": 35,
+      "ads_read": 60,
+      "fields": [
+        "marketing",
+        "communications",
+        "business",
+        "information systems"
+      ],
+      "sources": [
+        {
+          "title": "Performance Marketing Executive/Senior Executive",
+          "company": "AnyMind Group",
+          "url": "https://anymindgroup.com/career/job/8104561?gh_jid=8104561&utm_source=freehire.me",
+          "quote": "Experience: At least 1 year of experience in digital marketing OR a fresh graduate with a degree in business or a related field."
+        },
+        {
+          "title": "PBTB | Assistant Manager, Digital Marketing & D2C",
+          "company": "prudential",
+          "url": "https://prudential.wd3.myworkdayjobs.com/prudential/job/Kuala-Lumpur-Takaful/PBTB---Assistant-Manager--Digital-Marketing---D2C_26040622?utm_source=freehire.me",
+          "quote": "Bachelor’s degree in marketing, Communications, Business, or a related field."
+        },
+        {
+          "title": "Digital Marketing Operations Manager (Japanese Speaker)",
+          "company": "Roche",
+          "url": "https://roche.wd3.myworkdayjobs.com/roche-ext/job/Petaling-Jaya/Digital-Marketing-Operations-Manager--Japanese-Speaker-_202610-125342?utm_source=freehire.me",
+          "quote": "Working closely with affiliates, hub colleagues, and digital marketing teams, the Digital Marketing Operations Manager manages assigned requests with a greater degree of independence, judgment, and accountability."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "ux_designer": {
+      "level": "degree",
+      "level_ads": 13,
+      "ads_with_level": 18,
+      "ads_read": 43,
+      "fields": [
+        "design",
+        "graphic design",
+        "hci",
+        "human-computer interaction"
+      ],
+      "sources": [
+        {
+          "title": "UI/UX Designer (Mid Level) | Fully Remote",
+          "company": "Elitez Group",
+          "url": "https://my.jobstreet.com/job/95102498?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Graphic Design, UI/UX Design, Multimedia Design or related field."
+        },
+        {
+          "title": "Sr Product Designer (Enterprise)",
+          "company": "OneCredit",
+          "url": "https://my.jobstreet.com/job/94860187?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Design, HCI, or a related field"
+        },
+        {
+          "title": "Lead Product Designer",
+          "company": "Electronic Arts",
+          "url": "https://jobs.ea.com/en_US/careers/JobDetail/Lead-Product-Designer/216136?utm_source=freehire.me",
+          "quote": "Operating with a high degree of autonomy, you will guide problem exploration, achieve cross-organizational alignment, and shape a culture of empowerment and design excellence."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "renewable_energy_technician": {
+      "level": "diploma",
+      "level_ads": 5,
+      "ads_with_level": 5,
+      "ads_read": 8,
+      "fields": [
+        "electrical engineering"
+      ],
+      "sources": [
+        {
+          "title": "Operation & Maintenance Technician (Perak)",
+          "company": "Solarvest",
+          "url": "https://apply.workable.com/j/3EA97F98EB?utm_source=freehire.me",
+          "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+        },
+        {
+          "title": "Operation & Maintenance Technician (Sitiawan, Perak)",
+          "company": "Solarvest",
+          "url": "https://apply.workable.com/j/6E125D4173?utm_source=freehire.me",
+          "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+        },
+        {
+          "title": "Operation & Maintenance Technician (JB)",
+          "company": "Solarvest",
+          "url": "https://apply.workable.com/j/E9D5A6CBE0?utm_source=freehire.me",
+          "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Driving licence",
+          "ads": 8,
+          "sources": [
+            {
+              "title": "Operation & Maintenance Technician (Perak)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/3EA97F98EB?utm_source=freehire.me",
+              "quote": "Possess valid driving license D and GDL will be advantages."
+            },
+            {
+              "title": "Operation & Maintenance Technician (Sitiawan, Perak)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/6E125D4173?utm_source=freehire.me",
+              "quote": "Possess valid driving license D and able to base in Sitiawan, Perak."
+            },
+            {
+              "title": "Operation & Maintenance Technician (Kedah)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/8913B3B485?utm_source=freehire.me",
+              "quote": "Possess a valid D and GDL driving license and be willing to be based in Penang."
+            }
+          ]
+        },
+        {
+          "name": "Chargeman certificate",
+          "ads": 5,
+          "sources": [
+            {
+              "title": "Operation & Maintenance Technician (Perak)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/3EA97F98EB?utm_source=freehire.me",
+              "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+            },
+            {
+              "title": "Operation & Maintenance Technician (Sitiawan, Perak)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/6E125D4173?utm_source=freehire.me",
+              "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+            },
+            {
+              "title": "Operation & Maintenance Technician (JB)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/E9D5A6CBE0?utm_source=freehire.me",
+              "quote": "Possess valid Chargeman A0/A1 certificate from Energy Commission (ST) or Diploma in Electrical Engineering."
+            }
+          ]
+        },
+        {
+          "name": "Wireman certificate (PW2/PW4)",
+          "ads": 3,
+          "sources": [
+            {
+              "title": "Operation & Maintenance Technician (Kedah)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/8913B3B485?utm_source=freehire.me",
+              "quote": "Possess a valid A0/A1/PW2/PW4 certificate from the Energy Commission (ST)."
+            },
+            {
+              "title": "Operations & Maintenance Technician (Penang)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/F5DD9FEBF5?utm_source=freehire.me",
+              "quote": "Possess a valid A0/A1/PW2/PW4 certificate from the Energy Commission (ST)."
+            },
+            {
+              "title": "Operation & Maintenance Technician (Central)",
+              "company": "Solarvest",
+              "url": "https://apply.workable.com/j/51CCD02DEA?utm_source=freehire.me",
+              "quote": "Possess a valid A0/A1/PW2/PW4 certificate from the Energy Commission (ST)."
+            }
+          ]
+        }
+      ],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "sustainability_analyst": {
+      "level": null,
+      "level_ads": 3,
+      "ads_with_level": 3,
+      "ads_read": 3,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Data Analyst – Sustainability & Business Intelligence",
+          "company": "Proforest",
+          "url": "https://jobs.smartrecruiters.com/Proforest/744000156521679-data-analyst-sustainability-business-intelligence?utm_source=freehire.me",
+          "quote": "Degree in Data Analytics, Data Science, Statistics, Computer Science, Information Systems, Environmental Science, Geography, Geospatial Science, Sustainability, Business Analytics or a related field; equivalent practical experience considered."
+        },
+        {
+          "title": "ESG Manager",
+          "company": "climatefundmanagers",
+          "url": "https://climatefundmanagers.bamboohr.com/careers/255?utm_source=freehire.me",
+          "quote": "Degree in an ESG-relevant discipline such as environmental science, sustainability, engineering, or development studies."
+        },
+        {
+          "title": "Business Development Executive - Sustainability",
+          "company": "Société Générale de Surveillance (SGS)",
+          "url": "https://jobs.smartrecruiters.com/SGS/744000142525256-business-development-executive-sustainability?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Environmental Science, Business, Sustainability, or related field."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "care_worker": {
+      "level": null,
+      "level_ads": 1,
+      "ads_with_level": 1,
+      "ads_read": 1,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Evening Caregiver Singapore Bukit Timah",
+          "company": "Fuku",
+          "url": "https://apply.workable.com/j/F4BF90F791?utm_source=freehire.me",
+          "quote": "Help to clear and clean the master room lounge"
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "production_operator": {
+      "level": "SPM",
+      "level_ads": 28,
+      "ads_with_level": 33,
+      "ads_read": 40,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Production Operator",
+          "company": "mksinst",
+          "url": "https://mksinst.wd1.myworkdayjobs.com/MKSCareersAsia/job/Malaysia-Penang-Bukit-Minyak/Production-Operator_R23191?utm_source=freehire.me",
+          "quote": "Passed SPM or equivalent qualification ."
+        },
+        {
+          "title": "Production Operator (CNC Manufacturing)",
+          "company": "Career Wise",
+          "url": "https://www.careers-page.com/career-wise/job/7XV33X35?utm_source=freehire.me",
+          "quote": "Minimum PMR/PT3 or SPM qualification."
+        },
+        {
+          "title": "6616 - Production Operator (x10)",
+          "company": "Agensi Pekerjaan Minde Group Sdn Bhd",
+          "url": "https://www.careers-page.com/mindegroup/job/L8WWR483?utm_source=freehire.me",
+          "quote": "Minimum qualification: SPM, technical certificate, or equivalent."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "cashier": {
+      "level": "SPM",
+      "level_ads": 7,
+      "ads_with_level": 12,
+      "ads_read": 12,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Cashier (Q Bistro)",
+          "company": "Hajris Group of Companies (Retail)",
+          "url": "https://my.jobstreet.com/job/95265331?utm_source=freehire.me",
+          "quote": "SPM / High School Certificate or equivalent (preferred but not mandatory)."
+        },
+        {
+          "title": "Cashier / Teller (Front Line Associate) – Kotaraya, Malaysia",
+          "company": "westernunion",
+          "url": "https://westernunion.wd5.myworkdayjobs.com/HiddenWUjobs/job/MYS---Kuala-Lumpur/Cashier---Teller--Front-Line-Associate----Kotaraya--Malaysia_JR0130274?utm_source=freehire.me",
+          "quote": "Minimum Qualification required – SPM."
+        },
+        {
+          "title": "Cashier & Sales Associate – Sungai Buloh, Malaysia",
+          "company": "westernunion",
+          "url": "https://westernunion.wd5.myworkdayjobs.com/HiddenWUjobs/job/MYS---Kuala-Lumpur/Cashier---Sales-Associate---Sungai-Buloh--Malaysia_JR0131012?utm_source=freehire.me",
+          "quote": "Minimum Qualification required – SPM."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "hotel_front_desk_clerk": {
+      "level": "diploma",
+      "level_ads": 6,
+      "ads_with_level": 11,
+      "ads_read": 23,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Front Desk Associate",
+          "company": "Marriott International",
+          "url": "https://ejwl.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/job/26135064?utm_source=freehire.me",
+          "quote": "Education: High school diploma or G.E.D. equivalent."
+        },
+        {
+          "title": "Front Desk Agent",
+          "company": "Marriott International",
+          "url": "https://ejwl.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/job/26135270?utm_source=freehire.me",
+          "quote": "Education: High school diploma or G.E.D. equivalent."
+        },
+        {
+          "title": "Front Desk Associate",
+          "company": "ejwl.fa.us2.oraclecloud.com/MI_CS_1",
+          "url": "https://ejwl.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/MI_CS_1/job/26135064?utm_source=freehire.me",
+          "quote": "Education: High school diploma or G.E.D. equivalent."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "farm_worker": {
+      "level": null,
+      "level_ads": 0,
+      "ads_with_level": 0,
+      "ads_read": 0,
+      "fields": [],
+      "sources": [],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "engineering_technician": {
+      "level": "diploma",
+      "level_ads": 4,
+      "ads_with_level": 7,
+      "ads_read": 12,
+      "fields": [
+        "chemical",
+        "mechanical",
+        "production engineering",
+        "mechanical engineering"
+      ],
+      "sources": [
+        {
+          "title": "Engineering Drafter/Designer II",
+          "company": "Entegris",
+          "url": "https://entegris.wd1.myworkdayjobs.com/EntegrisCareers/job/Kulim-Kedah-Malaysia/Engineering-Drafter-Designer-II_REQ-15458?utm_source=freehire.me",
+          "quote": "Diploma or technical qualification in Engineering Drafting, Mechanical Engineering, or related field"
+        },
+        {
+          "title": "Civil and Structural Drafter",
+          "company": "KinTec Recruitment Ltd",
+          "url": "https://www.energyjobline.com/job/civil-and-structural-drafter-31749972?utm_source=freehire.me",
+          "quote": "Certificate, diploma, or equivalent training in civil or structural drafting, engineering drawing, or a related field."
+        },
+        {
+          "title": "Engineering Drafter/Designer",
+          "company": "Entegris",
+          "url": "https://entegris.wd1.myworkdayjobs.com/EntegrisCareers/job/Kulim-Kedah-Malaysia/Engineering-Drafter-Designer-II_REQ-11815?utm_source=freehire.me",
+          "quote": "Diploma or technical qualification in Engineering Drafting, Mechanical Engineering, or related field"
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "accounts_clerk": {
+      "level": "degree",
+      "level_ads": 7,
+      "ads_with_level": 11,
+      "ads_read": 15,
+      "fields": [
+        "finance",
+        "accounting",
+        "accountancy"
+      ],
+      "sources": [
+        {
+          "title": "Assistant Manager, Finance Operations",
+          "company": "prudential",
+          "url": "https://prudential.wd3.myworkdayjobs.com/prudential/job/Kuala-Lumpur-Group-Head-Office/Assistant-Manager--Finance-Operations_26090440?utm_source=freehire.me",
+          "quote": "Bachelor's Degree in Accounting, Finance or related discipline."
+        },
+        {
+          "title": "Assistant Director of Sales",
+          "company": "AccorHotel",
+          "url": "https://jobs.smartrecruiters.com/AccorHotel/744000150980680-assistant-director-of-sales?utm_source=freehire.me",
+          "quote": "Bachelor’s degree in Business Administration, Hospitality Management, Sales, or a related field is preferred"
+        },
+        {
+          "title": "Group Finance Assistant Manager",
+          "company": "Talent Recruit",
+          "url": "https://www.careers-page.com/talentrecruit/job/L7RX493X?utm_source=freehire.me",
+          "quote": "Possess a Professional Certificate/ Bachelor's Degree in Finance/Accountancy or equivalent."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "ACCA",
+          "ads": 3,
+          "sources": [
+            {
+              "title": "Group Finance Assistant Manager",
+              "company": "Talent Recruit",
+              "url": "https://www.careers-page.com/talentrecruit/job/L7RX493X?utm_source=freehire.me",
+              "quote": "Member of ACCA, MIA"
+            },
+            {
+              "title": "Accounts Manager / Assistant Accounts Manager",
+              "company": "MVC Resources",
+              "url": "https://mvc-resources.zohorecruit.com/jobs/Careers/641778000035808054?utm_source=freehire.me",
+              "quote": "Professional qualifications such as ACCA, CPA, or MIA membership are highly advantageous"
+            },
+            {
+              "title": "Senior Executive/Assistant Manager, Finance & Accounts",
+              "company": "Allianz",
+              "url": "https://careers.allianz.com/global/en/job/AISAIPGB102896EXTERNALENGLOBAL?utm_source=freehire.me",
+              "quote": "Bachelor's Degree in Accountancy, Professional Qualifications (ACCA, CPA, etc.), or equivalent professional qualifications."
+            }
+          ]
+        },
+        {
+          "name": "MIA membership",
+          "ads": 2,
+          "sources": [
+            {
+              "title": "Group Finance Assistant Manager",
+              "company": "Talent Recruit",
+              "url": "https://www.careers-page.com/talentrecruit/job/L7RX493X?utm_source=freehire.me",
+              "quote": "Member of ACCA, MIA"
+            },
+            {
+              "title": "Accounts Manager / Assistant Accounts Manager",
+              "company": "MVC Resources",
+              "url": "https://mvc-resources.zohorecruit.com/jobs/Careers/641778000035808054?utm_source=freehire.me",
+              "quote": "Professional qualifications such as ACCA, CPA, or MIA membership are highly advantageous"
+            }
+          ]
+        },
+        {
+          "name": "CPA",
+          "ads": 2,
+          "sources": [
+            {
+              "title": "Accounts Manager / Assistant Accounts Manager",
+              "company": "MVC Resources",
+              "url": "https://mvc-resources.zohorecruit.com/jobs/Careers/641778000035808054?utm_source=freehire.me",
+              "quote": "Professional qualifications such as ACCA, CPA, or MIA membership are highly advantageous"
+            },
+            {
+              "title": "Senior Executive/Assistant Manager, Finance & Accounts",
+              "company": "Allianz",
+              "url": "https://careers.allianz.com/global/en/job/AISAIPGB102896EXTERNALENGLOBAL?utm_source=freehire.me",
+              "quote": "Bachelor's Degree in Accountancy, Professional Qualifications (ACCA, CPA, etc.), or equivalent professional qualifications."
+            }
+          ]
+        }
+      ],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "supply_chain_specialist": {
+      "level": "degree",
+      "level_ads": 29,
+      "ads_with_level": 43,
+      "ads_read": 60,
+      "fields": [
+        "logistics",
+        "supply chain management",
+        "business administration",
+        "supply chain"
+      ],
+      "sources": [
+        {
+          "title": "Manager - Logistics Excellence",
+          "company": "Bosch Group",
+          "url": "https://jobs.smartrecruiters.com/BoschGroup/744000156693824-manager-logistics-excellence?utm_source=freehire.me",
+          "quote": "Bachelor's degree in Logistics, Supply Chain Management, Business Administration, Information Systems or a related discipline."
+        },
+        {
+          "title": "Senior Procurement Specialist",
+          "company": "McDermott International, Ltd",
+          "url": "https://edsv.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch/job/26003988?utm_source=freehire.me",
+          "quote": "Bachelor’s Degree (or equivalent) in Supply Chain Management (or a relevant discipline) or HSD/GED/IGCSE with 6 years of relevant experience"
+        },
+        {
+          "title": "Senior Procurement Specialist",
+          "company": "McDermott",
+          "url": "https://edsv.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/26003988?utm_source=freehire.me",
+          "quote": "Bachelor’s Degree (or equivalent) in Supply Chain Management (or a relevant discipline) or HSD/GED/IGCSE with 6 years of relevant experience"
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "bank_teller": {
+      "level": "SPM",
+      "level_ads": 5,
+      "ads_with_level": 5,
+      "ads_read": 5,
+      "fields": [],
+      "sources": [
+        {
+          "title": "Cashier / Teller (Front Line Associate) – Kotaraya, Malaysia",
+          "company": "westernunion",
+          "url": "https://westernunion.wd5.myworkdayjobs.com/HiddenWUjobs/job/MYS---Kuala-Lumpur/Cashier---Teller--Front-Line-Associate----Kotaraya--Malaysia_JR0130274?utm_source=freehire.me",
+          "quote": "Minimum Qualification required – SPM."
+        },
+        {
+          "title": "Cashier / Teller (Front Line Associate) – Kajang, Malaysia",
+          "company": "westernunion",
+          "url": "https://westernunion.wd5.myworkdayjobs.com/HiddenWUjobs/job/MYS---Kuala-Lumpur/Cashier---Teller--Front-Line-Associate----Kajang--Malaysia_JR0130762-2?utm_source=freehire.me",
+          "quote": "Minimum Qualification required – SPM."
+        },
+        {
+          "title": "Cashier / Teller (Front Line Associate) - Malaysia",
+          "company": "westernunion",
+          "url": "https://westernunion.wd5.myworkdayjobs.com/HiddenWUjobs/job/MYS---Kuala-Lumpur/Cashier---Teller--Front-Line-Associate-_JR0130718?utm_source=freehire.me",
+          "quote": "Minimum Qualification required – SPM."
+        }
+      ],
+      "certifications": [],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "registered_nurse": {
+      "level": "diploma",
+      "level_ads": 3,
+      "ads_with_level": 5,
+      "ads_read": 8,
+      "fields": [
+        "nursing"
+      ],
+      "sources": [
+        {
+          "title": "Staff Nurse & Jobs in Singapore",
+          "company": "PeopleSolve",
+          "url": "https://www.careers-page.com/peoplesolve/job/LR93633X?utm_source=freehire.me",
+          "quote": "Diploma / Degree in Nursing from a recognized training institution as approved by the Overseas Nursing Board."
+        },
+        {
+          "title": "Registered Nurse & Healthcare Jobs in Singapore",
+          "company": "PeopleSolve",
+          "url": "https://www.careers-page.com/peoplesolve/job/L458VRXV?utm_source=freehire.me",
+          "quote": "Diploma / Degree in related field from a recognized training institution"
+        },
+        {
+          "title": "Registered Nurse | Bangsar, KL",
+          "company": "Hirehub Management Sdn. Bhd.",
+          "url": "https://www.careers-page.com/hirehub-management-sdn-bhd/job/RY9XXYR6?utm_source=freehire.me",
+          "quote": "Diploma or Bachelor's Degree in Nursing."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "BLS / CPR",
+          "ads": 3,
+          "sources": [
+            {
+              "title": "Staff Nurse & Jobs in Singapore",
+              "company": "PeopleSolve",
+              "url": "https://www.careers-page.com/peoplesolve/job/LR93633X?utm_source=freehire.me",
+              "quote": "Possess a valid BCLS or CPR/AED certification."
+            },
+            {
+              "title": "Registered Nurse (RN)",
+              "company": "Vurke Inc",
+              "url": "https://www.careers-page.com/vurke-inc/job/3WWWY3X8?utm_source=freehire.me",
+              "quote": "BLS required"
+            },
+            {
+              "title": "Registered Nurse | Bukit Jalil",
+              "company": "Hirehub Management Sdn. Bhd.",
+              "url": "https://www.careers-page.com/hirehub-management-sdn-bhd/job/3W8865VW?utm_source=freehire.me",
+              "quote": "Current BLS certification ."
+            }
+          ]
+        },
+        {
+          "name": "Annual Practising Certificate (APC)",
+          "ads": 2,
+          "sources": [
+            {
+              "title": "Registered Nurse | Bangsar, KL",
+              "company": "Hirehub Management Sdn. Bhd.",
+              "url": "https://www.careers-page.com/hirehub-management-sdn-bhd/job/RY9XXYR6?utm_source=freehire.me",
+              "quote": "Possess a valid Annual Practising Certificate (APC)."
+            },
+            {
+              "title": "Registered Nurse | Bukit Jalil",
+              "company": "Hirehub Management Sdn. Bhd.",
+              "url": "https://www.careers-page.com/hirehub-management-sdn-bhd/job/3W8865VW?utm_source=freehire.me",
+              "quote": "Registered Nurse with valid Malaysian Nursing Board registration and current Annual Practising Certificate (APC) ."
+            }
+          ]
+        }
+      ],
+      "searched": "2026-10-22",
+      "reviewed_by": null
+    },
+    "tvet_instructor": {
+      "level": null,
+      "level_ads": 0,
+      "ads_with_level": 0,
+      "ads_read": 0,
+      "fields": [],
+      "sources": [],
+      "certifications": [],
+      "searched": "2026-10-22",
       "reviewed_by": null
     }
   }

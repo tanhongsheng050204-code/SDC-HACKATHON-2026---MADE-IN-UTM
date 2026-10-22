@@ -709,6 +709,10 @@
    "ms": "Diploma Kejururawatan yang diiktiraf LJM (3 tahun sepenuh masa), kemudian lulus peperiksaan pelesenan LJM",
    "zh": "获LJM认证的护理文凭（3年全日制），随后通过LJM执照考试"
   },
+  "A Diploma in Nursing (or a nursing degree) from an LJM-recognised programme": {
+   "ms": "Diploma Kejururawatan (atau ijazah kejururawatan) daripada program yang diiktiraf LJM",
+   "zh": "经马来西亚护士局（LJM）认证的护理文凭（或护理学士学位）"
+  },
   "A wireman competency certificate from the Energy Commission (Suruhanjaya Tenaga) for electrical wiring work": {
    "ms": "Perakuan kekompetenan pendawai daripada Suruhanjaya Tenaga (ST) untuk kerja pendawaian elektrik",
    "zh": "能源委员会（Suruhanjaya Tenaga）颁发的电线工执业证书，用于电气接线工作"
@@ -717,6 +721,10 @@
    "ms": "Kursus pendawai bertauliah ST (PW2, kira-kira 2 tahun campur 6 bulan latihan industri di kolej kemahiran) dan peperiksaan kekompetenan ST",
    "zh": "ST认证的电线工课程（PW2，在技能学院就读约2年加6个月在职实习）并通过ST资格考试"
   },
+  "SPM, then an Energy Commission-accredited wireman (PW) course; ads often ask for a diploma in electrical engineering instead": {
+   "ms": "SPM, diikuti kursus pendawai (PW) bertauliah Suruhanjaya Tenaga; iklan jawatan sering meminta diploma kejuruteraan elektrik sebagai pilihan",
+   "zh": "SPM学历，随后考取能源委员会认证的电工（PW）证书；招聘广告通常也接受电机工程文凭"
+  },
   "A Vocational Training Officer (VTO) certificate from the Department of Skills Development (JPK), to teach at JPK-accredited centres": {
    "ms": "Sijil Pegawai Latihan Vokasional (VTO) daripada Jabatan Pembangunan Kemahiran (JPK), untuk mengajar di pusat bertauliah JPK",
    "zh": "技能发展局（JPK）颁发的职业培训官（VTO）证书，可在JPK认证中心任教"
@@ -724,6 +732,138 @@
   "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO course at CIAST (about 9½ months: 3½ months of teaching methods and a 6-month internship)": {
    "ms": "Sijil Kemahiran Malaysia (SKM) Tahap 3 dalam bidang berkaitan, kemudian kursus VTO di CIAST (kira-kira 9½ bulan: 3½ bulan metodologi pengajaran dan 6 bulan latihan industri)",
    "zh": "相关领域的马来西亚技能证书（SKM）第3级，随后参加CIAST的VTO课程（约9个半月：3个半月教学法加6个月实习）"
+  },
+  "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO certificate": {
+   "ms": "Sijil Kemahiran Malaysia (SKM) Tahap 3 dalam bidang berkaitan, kemudian sijil VTO",
+   "zh": "相关工种的马来西亚技能证书（SKM）第3级，随后考取VTO证书"
+  },
+  "business administration": {
+   "ms": "pentadbiran perniagaan",
+   "zh": "工商管理"
+  },
+  "accounting": {
+   "ms": "perakaunan",
+   "zh": "会计"
+  },
+  "finance": {
+   "ms": "kewangan",
+   "zh": "金融与财务"
+  },
+  "administration": {
+   "ms": "pentadbiran",
+   "zh": "行政"
+  },
+  "business": {
+   "ms": "perniagaan",
+   "zh": "商业"
+  },
+  "logistics": {
+   "ms": "logistik",
+   "zh": "物流"
+  },
+  "supply chain": {
+   "ms": "rantaian bekalan",
+   "zh": "供应链"
+  },
+  "computer science": {
+   "ms": "sains komputer",
+   "zh": "电脑科学"
+  },
+  "statistics": {
+   "ms": "statistik",
+   "zh": "统计学"
+  },
+  "data science": {
+   "ms": "sains data",
+   "zh": "数据科学"
+  },
+  "mathematics": {
+   "ms": "matematik",
+   "zh": "数学"
+  },
+  "engineering": {
+   "ms": "kejuruteraan",
+   "zh": "工程"
+  },
+  "artificial intelligence": {
+   "ms": "kecerdasan buatan",
+   "zh": "人工智能"
+  },
+  "information technology": {
+   "ms": "teknologi maklumat",
+   "zh": "资讯科技"
+  },
+  "software engineering": {
+   "ms": "kejuruteraan perisian",
+   "zh": "软件工程"
+  },
+  "cybersecurity": {
+   "ms": "keselamatan siber",
+   "zh": "网络安全"
+  },
+  "information security": {
+   "ms": "keselamatan maklumat",
+   "zh": "信息安全"
+  },
+  "marketing": {
+   "ms": "pemasaran",
+   "zh": "市场营销"
+  },
+  "communications": {
+   "ms": "komunikasi",
+   "zh": "传播学"
+  },
+  "information systems": {
+   "ms": "sistem maklumat",
+   "zh": "信息系统"
+  },
+  "design": {
+   "ms": "reka bentuk",
+   "zh": "设计"
+  },
+  "graphic design": {
+   "ms": "reka bentuk grafik",
+   "zh": "平面设计"
+  },
+  "hci": {
+   "ms": "HCI",
+   "zh": "HCI"
+  },
+  "human-computer interaction": {
+   "ms": "interaksi manusia-komputer",
+   "zh": "人机交互"
+  },
+  "electrical engineering": {
+   "ms": "kejuruteraan elektrik",
+   "zh": "电机工程"
+  },
+  "chemical": {
+   "ms": "kimia",
+   "zh": "化学"
+  },
+  "mechanical": {
+   "ms": "mekanikal",
+   "zh": "机械"
+  },
+  "production engineering": {
+   "ms": "kejuruteraan pengeluaran",
+   "zh": "生产工程"
+  },
+  "mechanical engineering": {
+   "ms": "kejuruteraan mekanikal",
+   "zh": "机械工程"
+  },
+  "accountancy": {
+   "ms": "perakaunan",
+   "zh": "会计"
+  },
+  "supply chain management": {
+   "ms": "pengurusan rantaian bekalan",
+   "zh": "供应链管理"
+  },
+  "nursing": {
+   "ms": "kejururawatan",
+   "zh": "护理"
   },
   "Compile, sort, and verify the accuracy of data before it is entered.": {
    "ms": "Mengumpul, menyusun dan mengesahkan ketepatan data sebelum dimasukkan.",
