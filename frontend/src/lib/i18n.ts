@@ -1294,6 +1294,13 @@ const STRINGS = {
   "coach.revised": { en: "Checked and corrected against your sources", ms: "Disemak dan dibetulkan berdasarkan sumber anda", zh: "已根据你的来源核对并更正" },
   "coach.dropped": { en: "{n} unsupported sentence removed.", ms: "{n} ayat yang tidak disokong telah dibuang.", zh: "已删除 {n} 句没有来源支持的内容。" },
   "coach.droppedMany": { en: "{n} unsupported sentences removed.", ms: "{n} ayat yang tidak disokong telah dibuang.", zh: "已删除 {n} 句没有来源支持的内容。" },
+  "changes.title": { en: "What changed since your last visit", ms: "Apa yang berubah sejak lawatan terakhir anda", zh: "自你上次访问以来的变化" },
+  "changes.moved": { en: "Forecast updated on {date}: {role} moved from {from} to {to} under Baseline (estimate).", ms: "Unjuran dikemas kini pada {date}: {role} berubah daripada {from} kepada {to} di bawah senario Asas (anggaran).", zh: "预测于 {date} 更新：在基准情景下，{role} 从 {from} 变为 {to}（估计值）。" },
+  "changes.dest": { en: "Your destination", ms: "Destinasi anda", zh: "你的目标" },
+  "changes.job": { en: "Your current job", ms: "Kerja semasa anda", zh: "你目前的工作" },
+  "changes.routeSame": { en: "Your route is unchanged.", ms: "Laluan anda tidak berubah.", zh: "你的路线没有变化。" },
+  "changes.source": { en: "Source: {source}, snapshot {id}. Estimates, not predictions.", ms: "Sumber: {source}, petikan {id}. Anggaran, bukan ramalan.", zh: "来源：{source}，快照 {id}。仅为估计，并非预言。" },
+  "changes.gotIt": { en: "Got it", ms: "Faham", zh: "知道了" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

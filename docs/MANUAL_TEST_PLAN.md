@@ -85,6 +85,7 @@ Notes: ______
 - [ ] 5.8 **Your best next roles**: three colour cards (rank, Robust pick / Your destination badges, fit %, outlook); clicking opens the role; **See all N roles** opens Future roles.
 - [ ] 5.9 Source line: forecast id and import date, "Estimates, not predictions. You decide."
 - [ ] 5.10 With the API stopped: "Couldn't load your results" with **Try again**.
+- [ ] 5.11 **What changed since your last visit** (blue card): with a destination and/or current job whose Baseline outlook moved in a newer forecast, it reads e.g. "Forecast updated on 20 Oct 2026: AI operations specialist moved from +60 to +35 under Baseline (estimate). Your route is unchanged." with the source and snapshot id. **Got it** hides it, and it stays hidden after a reload until a later forecast moves a number again. No card when nothing moved or there is only one forecast.
 
 Notes: ______
 

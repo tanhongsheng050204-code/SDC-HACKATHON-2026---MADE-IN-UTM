@@ -1,10 +1,11 @@
 import { FormEvent, KeyboardEvent, useEffect, useId, useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { Icon } from "../components/Icon";
-import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleMatch, Scenario } from "../lib/api";
+import { api, Journey, JourneyStep, Matches, Pathway, Profile, RoleHistory, RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE, priceText } from "../lib/labels";
+import { KEYS, load, save } from "../lib/storage";
 
 export type TargetScreen = "role" | "tree";
 
@@ -69,6 +70,8 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
           })}
         </ol>
       )}
+
+      <ForecastChanges profile={profile} />
 
       <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
 
@@ -137,6 +140,58 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
       {!data && !error && <div className="grid" aria-hidden="true">{[0, 1].map((i) => <div key={i} className="card skeleton" />)}</div>}
       {data && <p className="source">{tf("home.forecast", { id: data.signal_source.snapshot_id, date: data.signal_source.imported })} {t("shell.estimates")}</p>}
     </section>
+  );
+}
+
+// "What changed since your last visit": when a newer forecast moved the Baseline outlook of the
+// destination or the current job, say so with the date and source. Numbers come only from
+// /roles/{id}/history. "Got it" hides the card until a later forecast moves a number again.
+function ForecastChanges({ profile }: { profile: Profile }) {
+  const [histories, setHistories] = useState<{ kind: "dest" | "job"; title: string; h: RoleHistory }[]>([]);
+  const [seen, setSeen] = useState(() => load(KEYS.forecastSeen + profile.id));
+  const ids = [["dest", profile.target_role_id], ["job", profile.current_role_id]] as const;
+
+  useEffect(() => {
+    setSeen(load(KEYS.forecastSeen + profile.id));
+    let live = true;
+    const wanted = ids.filter((x): x is readonly ["dest" | "job", string] => !!x[1])
+      .filter(([kind, id]) => kind === "dest" || id !== profile.target_role_id);  // destination = current job: say it once
+    Promise.all(wanted.map(([kind, id]) => Promise.all([api.history(id, "baseline"), api.role(id).then((r) => r.title).catch(() => id)])
+      .then(([h, title]) => ({ kind, title, h })).catch(() => null)))
+      .then((all) => { if (live) setHistories(all.filter((x): x is NonNullable<typeof x> => x !== null)); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.id, profile.target_role_id, profile.current_role_id]);
+
+  // The most recent forecast that moved the number (a later forecast with the same number changes nothing).
+  const changes = histories.flatMap(({ kind, title, h }) => {
+    let i = h.points.length - 1;
+    while (i > 0 && h.points[i].index === h.points[i - 1].index) i--;
+    return i > 0 ? [{ kind, title, before: h.points[i - 1], latest: h.points[i] }] : [];
+  });
+  const latest = changes.map((c) => c.latest).sort((a, b) => a.imported.localeCompare(b.imported)).at(-1);
+  if (!latest || seen === latest.snapshot_id) return null;
+  const date = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString(document.documentElement.lang || undefined, { day: "numeric", month: "short", year: "numeric" });
+
+  function gotIt() {
+    save(KEYS.forecastSeen + profile.id, latest!.snapshot_id);
+    setSeen(latest!.snapshot_id);
+  }
+  return (
+    <div className="card forecast-changes" role="status">
+      <span className="eyebrow">{t("changes.title")}</span>
+      <ul>
+        {changes.map((c) => (
+          <li key={c.kind}>
+            <small className="muted">{t(c.kind === "dest" ? "changes.dest" : "changes.job")}</small>
+            <p>{tf("changes.moved", { date: date(c.latest.imported), role: tr(c.title), from: signed(c.before.index), to: signed(c.latest.index) })}
+              {c.kind === "dest" && <> {t("changes.routeSame")}</>}</p>
+            <small className="source">{tf("changes.source", { source: c.latest.source, id: c.latest.snapshot_id })}</small>
+          </li>
+        ))}
+      </ul>
+      <button className="btn quiet sm" onClick={gotIt}>{t("changes.gotIt")}</button>
+    </div>
   );
 }
 
