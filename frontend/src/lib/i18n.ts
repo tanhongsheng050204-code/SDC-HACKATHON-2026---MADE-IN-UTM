@@ -1530,6 +1530,14 @@ const STRINGS = {
   "hp.radarSub": { en: "Expected change in jobs by 2030, Baseline scenario", ms: "Jangkaan perubahan pekerjaan menjelang 2030, senario Asas", zh: "到 2030 年的预计岗位变化（基准情景）" },
   "hp.tasksSrc": { en: "Task list from O*NET; labels drafted with AI and marked until a person checks them.", ms: "Senarai tugasan daripada O*NET; label dirangka dengan AI dan ditanda sehingga disemak oleh manusia.", zh: "任务清单来自 O*NET；标签由 AI 起草，在人工核对前会有标注。" },
   "hp.scenesAria": { en: "Screens in the preview", ms: "Skrin dalam pratonton", zh: "预览中的页面" },
+  "lp.tryH": { en: "Try it in five clicks", ms: "Cuba dalam lima klik", zh: "五步体验" },
+  "lp.trySub": { en: "About three minutes with Aisyah, a data-entry clerk. Every step works on this site now.", ms: "Kira-kira tiga minit bersama Aisyah, seorang kerani kemasukan data. Setiap langkah berfungsi di laman ini sekarang.", zh: "与数据录入员 Aisyah 一起，大约三分钟。每一步现在都可以在本网站上操作。" },
+  "lp.try1": { en: "Open Aisyah's demo. Today shows how her job is trending to 2030.", ms: "Buka demo Aisyah. Hari Ini menunjukkan arah aliran pekerjaannya hingga 2030.", zh: "打开 Aisyah 的演示。“今天”页面显示她的工作到 2030 年的趋势。" },
+  "lp.try2": { en: "Press Open the role on her best match.", ms: "Tekan Buka peranan pada padanan terbaiknya.", zh: "在她最匹配的职位上点击“打开职位”。" },
+  "lp.try3": { en: "Tap a 🔍 percentage: see how the forecast is built, source by source.", ms: "Ketik peratusan 🔍: lihat cara ramalan dibina, sumber demi sumber.", zh: "点击带 🔍 的百分比：逐个来源查看预测是如何得出的。" },
+  "lp.try4": { en: "Set it as destination, open Pathway and tick a course as finished.", ms: "Tetapkan sebagai destinasi, buka Laluan pembelajaran dan tandakan satu kursus sebagai selesai.", zh: "设为目的地，打开学习路径，并勾选一门已完成的课程。" },
+  "lp.try5": { en: "Ask the coach, with a phone number in your question: it is removed before the AI reads it.", ms: "Tanya jurulatih, dengan nombor telefon dalam soalan anda: ia dibuang sebelum AI membacanya.", zh: "向教练提问，并在问题中写一个电话号码：AI 读取前它会被移除。" },
+  "lp.tryGo": { en: "Start with step 1", ms: "Mula dengan langkah 1", zh: "从第 1 步开始" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

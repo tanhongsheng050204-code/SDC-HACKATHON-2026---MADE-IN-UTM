@@ -304,6 +304,15 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           </ol>
         </section>
 
+        <section className="lp-frame lp-try" id="try">
+          <h2>{t("lp.tryH")}</h2>
+          <p className="lp-try-sub">{t("lp.trySub")}</p>
+          <ol>
+            {(["lp.try1", "lp.try2", "lp.try3", "lp.try4", "lp.try5"] as const).map((k) => <li key={k}>{t(k)}</li>)}
+          </ol>
+          <button className="btn ink lg" onClick={() => onDemo("clerk")}>{t("lp.tryGo")}</button>
+        </section>
+
         <section className="lp-faq" id="faq">
           <h2>{t("lp.faq")}</h2>
           {faq().map((f, i) => (

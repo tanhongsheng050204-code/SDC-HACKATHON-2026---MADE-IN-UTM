@@ -47,14 +47,14 @@ an admin; course steps and goal choices stay with the user; the employer view ne
 
 ## 3. Expected outcome
 
-✍️ *Make these concrete for your demo.*
-
 - A new user goes from profile to ranked roles and a costed pathway **in under five minutes**.
 - **Every recommendation shows its source and date**; no invented jobs, courses or statistics.
 - When the trend data changes, **the output visibly changes**, with a "what changed" summary.
-- Aisyah sees that her job is stable in 2026 but declining by 2030 in every scenario, that "AI
-  operations specialist" is a robust pick for her, and that about two free courses take her from 50%
-  to over 70% readiness. *(Re-check these figures once the real WEF baseline is in.)*
+- Aisyah sees that her job declines by 2030 in every scenario (about −14% slow, −32% baseline, −53%
+  accelerated), that "AI operations specialist" is her best match in all three futures (47% skill fit,
+  about +44% by 2030 under Baseline), and that three free or free-to-audit courses, about 71 hours,
+  cover the skills she is missing. *(Figures from the live app, forecast snapshot
+  2026-10-22-trend-092120; they change only when a person approves a newer forecast.)*
 
 ## 4. Feasibility: what already works
 

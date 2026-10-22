@@ -12,6 +12,16 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 >
 > **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. Pay figures are **DOSM Salaries & Wages Survey Report 2025**, Appendix table A10: monthly medians for Malaysian citizens by occupation group, shown as group medians, never as job offers. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
+## For judges: five clicks, three minutes
+
+1. Open **[Aisyah's demo](https://laluan-psi.vercel.app/?demo=clerk)**. She is a data-entry clerk; **Today** shows her job is estimated to shrink by about 32% by 2030 (Baseline: WEF Future of Jobs 2025 plus approved live signals).
+2. Press **Open the role** on her best match, **AI operations specialist** (47% skill fit, about +44% by 2030 under Baseline).
+3. On **Overview**, tap any **🔍 percentage** in the outlook table. The **forecast x-ray** rebuilds the number step by step: WEF baseline, Malaysian job-ad demand, OpenDOSM employment, AI research momentum and AI adoption, each with its source, dated snapshot and cap. Compare Slow, Baseline and Accelerated.
+4. Press **Set as destination**, then **Pathway**: three courses, about 71 hours, all free or free to audit. Tick one as finished and readiness rises.
+5. Press **Ask the coach** and include a name or phone number in your question. Laluan removes it before the AI reads the question, answers only from numbered sources, and rewrites or drops any sentence the sources don't support.
+
+If you have more time: **HR teams and career centres → Use the sample company** (190 synthetic staff, totals only), and **Sources** (every forecast snapshot with who approved it, plus the public fairness check).
+
 ## What it does
 
 | Feature | What you can do |
@@ -20,7 +30,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **Today** | One **next step** in plain words, a four-step journey (**Where I stand → Explore roles → Build my skills → Apply and share**) showing what is done, the coach, how your current job is trending and your best three roles. The sidebar follows the same four steps. |
 | **Role pages in four tabs** | **Overview** (a day in the job, why this rank, outlook by scenario with the x-ray, pay, pros and cons), **Fit and plan** (skills you bring, have and need, evidence, pathway), **Market** (open jobs in Malaysia, MyCOL and programmes, where experts disagree) and **Practise and share** (identity statement, interview practice, Future Card). The tab is kept in the address. |
 | **My profile** | Edit your skills, current job, years of experience and situation in place; add more skills from a CV or the questionnaire; your target role and progress stay. |
-| **Target role** | **Make this my target** on any role page. Pathway, SDG impact, practice and sharing follow it, and it is saved with your profile. |
+| **Destination** | **Set as destination** on any role page. Pathway, SDG impact, practice and sharing follow it, and it is saved with your profile. |
 | **Future Skills Radar** | A **forecast to 2030** for every skill with enough data: the change in the share of job ads that mention it, projected from three years of quarterly history and AI research momentum, with an 80% range under each AI-adoption scenario, a history-and-forecast chart, **Likely** or **Uncertain**, and **Emerging** when growth is speeding up. Jobs rising and declining under the same scenario, with Malaysia's own employment trend per occupation group (OpenDOSM). A **backtest** says how well the method did on the last year of data, good or bad. Every number names its source and date; your own skills are highlighted. |
 | **My job, task by task** | O\*NET tasks for a job, labelled *AI likely to automate*, *AI assists you* or *stays human*. Tick the tasks you do to see your own split. |
 | **Future roles** | Ranked roles under **Slow**, **Baseline** and **Accelerated** AI adoption, with a year slider up to the forecast horizon (2030). Every card shows an estimate range, its source and a **Why this rank?** breakdown. Robust picks stay in the top five in every scenario. |
@@ -38,6 +48,14 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | **For organisations** | For HR teams: upload an anonymous `role,skills` CSV (or use the synthetic 190-person company) to see a risk heatmap by role and the cheapest reskilling moves. Totals only, never a ranking of people. |
 | **Admin review** | One **Admin** page (linked from Sources, needs the admin token) for every check: trend refreshes, skill evidence, emerging roles and “a day in this job” drafts. New trend data waits for a person: a before/after table of every role that would move, then **Approve** (name recorded) or **Reject** (reason kept). |
 | **Review kit** | For the people checking our work: a native speaker marks each BM / 中文 string OK or fixes it, a teammate marks the 5 synthetic CVs without seeing the app's answers, and a lecturer reviews both personas' pathways. Each produces a file to commit. |
+| **Progress over time** | Set a target date and weekly study hours: Laluan says **On track**, **Ahead** or **Behind**, draws readiness over time on Pathway and shows a progress line on Today. |
+| **Re-planned when forecasts change** | When a newer forecast is approved, Today says which of your roles moved and your destination's new rank, and offers to compare a new best fit. Nothing switches without you. **What changed since your last visit** names the forecast date and the old and new estimate. |
+| **Choose with a goal in mind** | On **Future roles**, pick an SDG (for example SDG 8, decent work): Laluan shows which role serves it best and what that choice costs you in fit and outlook. |
+| **Coach checks itself** | Every coach sentence is checked against its numbered sources; unsupported sentences are rewritten once from the sources or removed, and the answer says so. Names, phone numbers and other personal details are removed before the AI reads the question, and the answer tells you what was removed. |
+| **Your data** | Plain words on what is stored, what is never stored and what the AI sees, with **Download my data** (everything, including consent records) and **Delete my profile**. |
+| **Fairness check** | Every sample profile and CV is run under eight names from Malaysia's communities, female and male; rankings, scores in all three scenarios, pathways and skills read from CVs must be identical. Shown on **Sources**, at `/api/fairness`, and run in CI. |
+| **Phone app and email** | Installs on a phone and keeps your last route for offline viewing. Logged-in users can opt in to a weekly email (progress, next course, new matching job ads) and job alerts by state, with one-click unsubscribe. |
+| **Counsellor classes** | Admin-approved counsellors create a class with a join code. Students see exactly what will be shared, consent, and can leave at any time; the counsellor sees progress only (destination, readiness, courses, proven skills, on track or behind), never skills, surveys, CVs or chats. |
 | **Sources** | Every forecast snapshot the app has used, with source, dates, status and who approved it. |
 | **Where experts disagree** | AI-exposure studies disagree, so each role shows three of them side by side inside its forecast x-ray: the Anthropic Economic Index (observed use), OpenAI's “GPTs are GPTs” and the ILO's 2025 global index, each as a percentile among the occupations it covers, next to Laluan's own estimate by rank. Display only; when Laluan's estimate falls outside every study, the role is flagged for the team to review. **Future roles → Map** plots every role's exposure against its outlook, with your top five highlighted. |
 | **How Malaysians use AI** | From the Anthropic Economic Index's Malaysia data: what people in Malaysia use AI for compared with the world (Skills Radar), and on each role how much AI use is about that kind of work and whether the AI does the task or helps a person. |
@@ -56,8 +74,26 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 | --- | --- |
 | **Innovation & Creativity (30%)** | *How trend signals become skill forecasts:* damped, shrunk trends over three years of job ads and research, projected to 2030 per scenario with an 80% range and a published backtest ([forecast.py](backend/app/trends/forecast.py), **Radar**); the **forecast x-ray** on any role ([xray.py](backend/app/services/xray.py)) and the approved snapshots on **Sources**. *How we handle disagreement:* the **Where experts disagree** band and the **Map** on Future roles. *How scenarios are modelled:* the adoption slider and **tipping points** ([tipping.py](backend/app/services/tipping.py)). *How SDG links change choices:* each role's and skill's SDG links on **SDG impact**. |
 | **Problem-Solution Fit (25%)** | The whole chain: AI-advancement tracking ([trends/](backend/app/trends/)), rising and declining skills (**Radar**), role matching (**Future roles**), skill tree and costed pathway, SDG links (**SDG impact**). People stay in charge: the coach only suggests, trend updates need an admin's approval, and every screen says “You decide”. |
-| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**, then approve: rankings change). **Hardest risk: reliable, updatable trend data.** Public job-ad and research counts are noisy proxies, and free APIs limit or refuse requests. Fallbacks: noisy trends are shrunk towards no change and shown with 80% ranges; the backtest is published even where it is weak; every source is dated and every refresh waits for a person's approval; arXiv → OpenAlex (optional API key) → the two-period comparison → the last approved snapshot. Other risks: AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. 337 automated tests. Public and synthetic data only. |
+| **Feasibility of Build (25%)** | Live demo (links above); the trend layer feeds matching live (**Admin: refresh trend data**, then approve: rankings change). **Hardest risk: reliable, updatable trend data.** Public job-ad and research counts are noisy proxies, and free APIs limit or refuse requests. Fallbacks: noisy trends are shrunk towards no change and shown with 80% ranges; the backtest is published even where it is weak; every source is dated and every refresh waits for a person's approval; arXiv → OpenAlex (optional API key) → the two-period comparison → the last approved snapshot. Other risks: AI inventing jobs or courses → catalogue-only steps, grounding check, prompt-injection guardrails; no API key → full offline mode. About 410 backend tests plus frontend component tests run in CI on every push, on SQLite and Postgres. Every AI endpoint is rate-limited per IP, per profile and in total. Public and synthetic data only. |
 | **Clarity of Proposal (20%)** | [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md), this README, and plain-language “?” tips in the app. |
+
+## How Laluan differs
+
+| | Job portals (e.g. JobStreet, MyFutureJobs) | A general AI chatbot | Laluan |
+| --- | --- | --- | --- |
+| Where jobs are heading, not only today's openings | No | In words, without dated figures | Forecast to 2030 in three scenarios, with ranges |
+| Every number traceable to a source and date | n/a | No | Yes; the **forecast x-ray** rebuilds each number |
+| Says how good its own forecasts were | n/a | No | A published **backtest** on the Radar |
+| Malaysian data | Openings | Rarely | OpenDOSM employment and pay, MyCOL, Malaysian job ads, HRD Corp, prices in RM |
+| Personal details kept from the AI | n/a | No | Removed before any model reads text; the app shows what was removed |
+| Answers checked against sources | n/a | No | Sentence by sentence; unsupported sentences are fixed or removed |
+
+## Cost and path to production
+
+- **The route itself needs no AI calls.** Matching, forecasts, scenarios, the x-ray, tipping points and pathways are plain calculations over approved data, so the main journey costs only server time. AI is called only to read a CV, for the coach, proof-check questions, interview feedback, the identity statement, free-text survey answers and a cached pathway summary.
+- **Every AI endpoint is capped** per IP, per profile and in total ([ratelimit.py](backend/app/ratelimit.py)); over the cap, the app shows a calm "try again in a few minutes".
+- **Without an API key everything still works** in offline mode (rules instead of AI text), which is also how CI tests it.
+- **For a real pilot:** an always-on paid API instance instead of Render's free plan (no cold start), a paid-tier Gemini key (Google does not use paid-tier requests to improve its products), a native-speaker review of BM and 中文, and a monthly trend refresh, still approved by a person.
 
 ## Suggested demo (about 3 minutes)
 
@@ -65,7 +101,7 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 2. On **Today**, point out the one **next step** and the four-step journey, then ask the coach *“Is my current job at risk?”*.
 3. Open **My job, task by task** to see which of her tasks AI is likely to automate, and how people actually use AI for them.
 4. Go to **Future roles**, switch between scenarios, drag the year slider, try the **Map**, and open **Why this rank?**.
-5. Open the top role, press **Make this my target**, then **Build my pathway** and tick a course as finished: readiness, rankings and the journey on Today update.
+5. Open the top role, press **Set as destination**, then **Build my pathway** and tick a course as finished: readiness, rankings and the journey on Today update.
 6. **See my impact** for the SDG links, then **Create my Future Card** and scan the QR code.
 7. Finish with **For organisations** and the synthetic sample company.
 
