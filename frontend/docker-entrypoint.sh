@@ -6,7 +6,7 @@ set -e
 
 echo "laluan-web: writing /config.js from the container environment"
 cat > /usr/share/nginx/html/config.js <<EOF
-window.__LALUAN__ = { apiUrl: "${VITE_API_URL}", supabaseUrl: "${VITE_SUPABASE_URL}", supabaseAnonKey: "${VITE_SUPABASE_ANON_KEY}" };
+window.__LALUAN__ = { apiUrl: "${VITE_API_URL}", supabaseUrl: "${VITE_SUPABASE_URL}", supabaseAnonKey: "${VITE_SUPABASE_ANON_KEY}", microsoftLogin: "${VITE_AUTH_MICROSOFT}" === "1" };
 EOF
 
 # Never exit without a server: with no arguments (or a failed exec) start nginx ourselves.

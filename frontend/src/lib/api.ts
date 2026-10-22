@@ -183,6 +183,7 @@ export interface Workforce {
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
 }
+export interface AdminLogEntry { action: string; subject: string | null; actor: string | null; created_at: string }
 export interface SavedReport {
   id: string; name: string; scenario: Scenario; snapshot_id: string; employees: number; at_risk: number; created_at: string;
 }
@@ -592,6 +593,7 @@ export const api = {
       Object.fromEntries(Object.entries(body).filter(([k]) => ["title", "employer", "url", "status", "interview_date", "note"].includes(k)))) }),
   deleteApplication: (id: string, appId: string) =>
     requestDetail<void>(`/profiles/${id}/applications/${encodeURIComponent(appId)}`, { method: "DELETE" }),
+  adminLog: (token: string) => request<AdminLogEntry[]>("/admin/log", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   adminCounsellors: (token: string) => request<Counsellor[]>("/admin/counsellors", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   decideCounsellor: (token: string, userId: string, approve: boolean, decidedBy: string) =>
     request<Counsellor>(`/admin/counsellors/${encodeURIComponent(userId)}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },

@@ -113,7 +113,7 @@ export function Journey() {
     <div className={`lp-journey ${auto && visible ? "is-auto" : ""}`} ref={box}>
       <ol className="lp-times" role="tablist" aria-label={t("jy.steps")}>
         {all.map((s, i) => (
-          <li key={s.title}>
+          <li key={s.title} role="presentation">
             <button role="tab" aria-selected={i === active} aria-controls="journey-panel" onClick={() => { setAuto(false); setActive(i); }}>
               <small>{s.time}</small>{s.title}
               {i === active && auto && visible && <span className="lp-time-bar" key={active} style={{ animationDuration: `${STEP_MS}ms` }} />}

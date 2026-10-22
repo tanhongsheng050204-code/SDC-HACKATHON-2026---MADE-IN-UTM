@@ -224,6 +224,7 @@ def start_refresh(force: bool = False, x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     if not refresh.start(force):
         raise HTTPException(409, "A refresh is already running")
+    store.log_admin("trend_refresh_started", "forced" if force else None)
     return refresh.status()
 
 
@@ -255,18 +256,22 @@ def pending_preview(snapshot_id: str, x_admin_token: str = Header(default="")):
 def approve_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     try:
-        return review.approve(snapshot_id, body.reviewer)
+        result = review.approve(snapshot_id, body.reviewer)
     except review.NotFound:
         raise HTTPException(404, "No snapshot waiting with that ID") from None
+    store.log_admin("snapshot_approved", snapshot_id, body.reviewer)
+    return result
 
 
 @router.post("/signals/pending/{snapshot_id}/reject")
 def reject_snapshot(snapshot_id: str, body: ReviewDecision, x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     try:
-        return review.reject(snapshot_id, body.reviewer, body.reason or "")
+        result = review.reject(snapshot_id, body.reviewer, body.reason or "")
     except review.NotFound:
         raise HTTPException(404, "No snapshot waiting with that ID") from None
+    store.log_admin("snapshot_rejected", snapshot_id, body.reviewer)
+    return result
 
 
 
@@ -335,6 +340,7 @@ def start_evidence_refresh(mode: str = Query("roles", pattern="^(roles|emerging)
     _require_admin(x_admin_token)
     if not evidence_refresh.start(mode):
         raise HTTPException(409, "An evidence search is already running")
+    store.log_admin("evidence_search_started", mode)
     return evidence_refresh.status()
 
 
@@ -344,6 +350,7 @@ def stop_evidence_refresh(x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     if not evidence_refresh.stop():
         raise HTTPException(409, "No evidence search is running")
+    store.log_admin("evidence_search_stopped")
     return evidence_refresh.status()
 
 
@@ -372,18 +379,22 @@ def pending_evidence_detail(evidence_id: str, x_admin_token: str = Header(defaul
 def approve_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     try:
-        return evidence_review.approve(evidence_id, body.reviewer, body.drop_sources, body.drop_added)
+        result = evidence_review.approve(evidence_id, body.reviewer, body.drop_sources, body.drop_added)
     except evidence_review.NotFound:
         raise HTTPException(404, "No evidence waiting with that ID") from None
+    store.log_admin("evidence_approved", evidence_id, body.reviewer)
+    return result
 
 
 @router.post("/evidence/pending/{evidence_id}/reject")
 def reject_evidence(evidence_id: str, body: EvidenceDecision, x_admin_token: str = Header(default="")):
     _require_admin(x_admin_token)
     try:
-        return evidence_review.reject(evidence_id, body.reviewer, body.reason or "")
+        result = evidence_review.reject(evidence_id, body.reviewer, body.reason or "")
     except evidence_review.NotFound:
         raise HTTPException(404, "No evidence waiting with that ID") from None
+    store.log_admin("evidence_rejected", evidence_id, body.reviewer)
+    return result
 
 
 @router.get("/radar")
@@ -437,6 +448,7 @@ def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
         raise HTTPException(409, "Snapshot already exists")
     store.save_snapshot(snapshot, "approved")
     reload_reference()
+    store.log_admin("snapshot_imported", snapshot["snapshot_id"])
     return {"snapshot_id": snapshot["snapshot_id"]}
 
 
@@ -1053,7 +1065,15 @@ def admin_decide_counsellor(user_id: str, body: CounsellorDecision, x_admin_toke
     _require_admin(x_admin_token)
     if not store.decide_counsellor(user_id, "approved" if body.approve else "revoked", body.decided_by.strip()):
         raise HTTPException(404, "No such counsellor request")
+    store.log_admin("counsellor_approved" if body.approve else "counsellor_revoked", user_id, body.decided_by.strip())
     return store.get_counsellor(user_id)
+
+
+@router.get("/admin/log")
+def admin_action_log(x_admin_token: str = Header(default="")):
+    """Every admin action, newest first: what, on what, by whom (the name typed), when."""
+    _require_admin(x_admin_token)
+    return store.admin_log()
 
 
 @router.post("/classes", status_code=201)

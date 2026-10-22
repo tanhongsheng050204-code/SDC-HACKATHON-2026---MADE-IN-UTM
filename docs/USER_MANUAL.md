@@ -321,7 +321,7 @@ Press **Settings** (top bar or sidebar footer). It has:
 ### Log in with Google
 **What it's for:** keep your route on any device. Without logging in, everything still works on this browser.
 
-**How to use it:** **Log in with Google** → **Continue with Google**. After the first login you can set the name to show. A profile you made before logging in is saved to your account; if the account already has one, you choose which to keep. **Log out** affects this device only.
+**How to use it:** **Log in with Google** → **Continue with Google** (or **Continue with Microsoft** for a school or work account, where the team has switched it on). After the first login you can set the name to show. A profile you made before logging in is saved to your account; if the account already has one, you choose which to keep. **Log out** affects this device only.
 
 ### On your phone
 - **Install:** on Android Chrome, Today shows **Install Laluan**. On iPhone Safari, tap **Share → Add to Home Screen**. It then opens full screen like an app.
@@ -352,6 +352,7 @@ Open **Sources → Admin: review new data** and enter the admin token. You can:
   - Users keep the old forecast until approval.
 - **Refresh skill evidence** and **Find emerging roles:** each waits for Approve or Reject.
 - **Career-centre counsellors:** approve or revoke counsellors.
+- **Admin action log:** every approval, rejection, refresh and counsellor decision, with who and when.
 - **Feedback and usage:** anonymous usage counts, "Was this helpful?" totals and problem reports.
 
 Approving a new forecast changes the numbers everywhere: rankings, the x-ray, Today. Do it on purpose, not just before a demo.

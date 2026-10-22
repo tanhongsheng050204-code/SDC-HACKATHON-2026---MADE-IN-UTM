@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { config } from "../lib/config";
 import { LegalLinks } from "../screens/Legal";
 import { createPortal } from "react-dom";
 import { authEnabled, signIn, signOut } from "../lib/auth";
@@ -45,6 +46,11 @@ export function LoginDialog({ onClose }: { onClose: () => void }) {
         <button ref={first} className="login-google" onClick={() => signIn()}>
           <span className="login-g" aria-hidden="true">G</span>{t("login.google")}
         </button>
+        {config.microsoftLogin && (
+          <button className="login-google login-microsoft" onClick={() => signIn("azure")}>
+            <span className="login-ms" aria-hidden="true"><i /><i /><i /><i /></span>{t("login.microsoft")}
+          </button>
+        )}
         <button className="link login-skip" onClick={onClose}>{t("login.notNow")}</button>
         <p className="login-note">{t("login.note")} <LegalLinks /></p>
       </div>

@@ -24,7 +24,8 @@ const METHODS: { id: Tab; labelKey: string; hintKey: string }[] = [
 function ProgressBar({ step, total }: { step: number; total: number }) {
   const pct = Math.round((step / total) * 100);
   return (
-    <div className="intake-progress" aria-label={tf("in.step", { n: step, total })}>
+    <div className="intake-progress" role="progressbar" aria-label={tf("in.step", { n: step, total })}
+      aria-valuemin={0} aria-valuemax={total} aria-valuenow={step}>
       <div className="intake-progress-fill" style={{ width: `${pct}%` }} />
     </div>
   );

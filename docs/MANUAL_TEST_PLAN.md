@@ -36,6 +36,7 @@ Notes: ______
 ## 2. Log in with Google
 
 - [ ] 2.1 **Log in with Google** opens a card: "Keep your route on any device", three pastel tiles (skills and destination, finished courses and proven skills, Future Card), **Continue with Google**, **Not now…**, and the privacy line.
+- [ ] 2.11 With `VITE_AUTH_MICROSOFT=1` on Vercel and the Azure provider on in Supabase: the login card also shows **Continue with Microsoft (school or work)**, which signs in with a university or work Microsoft account and returns to Today. Without the flag the button is not shown.
 - [ ] 2.2 **Not now**, **×**, **Esc** and a click outside each close the card without logging in.
 - [ ] 2.3 **Continue with Google** → Google → back on **Today** (not the landing page).
 - [ ] 2.4 With no profile on the account, logging in opens the onboarding instead.
@@ -310,6 +311,7 @@ Notes: ______
 - [ ] 20.2 **Refresh trend data** shows progress, then "1 waiting for review" with Now / Proposed / Change per role.
 - [ ] 20.3 Users keep the old forecast until approval; **Reject** needs a reason; **Approve and publish** → "Approved by …" and Future roles / Radar use the new snapshot; **Collect again (slower)** fetches fresh counts.
 - [ ] 20.4 **Refresh skill evidence** and **Find emerging roles** each wait for Approve / Reject.
+- [ ] 20.6 **Admin action log** (token → **Load**): every trend refresh started, forecast approved / rejected / imported, evidence search started or stopped, evidence approved / rejected and counsellor approved / revoked, newest first, with the name typed and the time (UTC). No personal data.
 - [ ] 20.5 **Feedback and usage**: with the admin token, **Load** shows counts per event (onboarding started/finished, demo opened, destination set, course finished, skill proven, card created, coach asked, app installed) for 7/30/90 days, helpful totals for coach and role advice, and the latest feedback and problem reports with contact details shown as [EMAIL]/[PHONE].
 
 Notes: ______
@@ -346,6 +348,7 @@ Notes: ______
 - [ ] 23.3 Opening a demo while the backend is down: "Couldn't open the demo profile…" with **Dismiss**.
 - [ ] 23.4 A screen error shows "Something went wrong on this screen" with **Reload**; the sidebar still works.
 - [ ] 23.5 An expired login says to log in again and does not lose the anonymous profile.
+- [ ] 23.7 Rate limits survive a restart: hit the coach limit, press Manual Deploy (or restart) on Render, ask again within ten minutes → still "You're going a bit fast". The `rate_hits` table holds hashes, never IP addresses or profile IDs.
 - [ ] 23.6 Asking the coach more than 30 times in 10 minutes: a sun-coloured notice "You're going a bit fast…" appears at the top and hides itself after about 15 seconds (or press ×); the coach panel says the same, not "offline". Other screens keep working.
 
 Notes: ______
@@ -372,6 +375,7 @@ Notes: ______
 ## 25. For developers (local)
 
 - [ ] 25.1 `cd backend` → `.\.venv\Scripts\python.exe -m pytest` → all pass (410 passed, 6 skipped on 22 Oct; the skips need TEST_DATABASE_URL for Postgres).
+- [ ] 25.6 `npm test` includes `src/a11y.test.tsx`: axe-core finds no serious or critical issue on the landing page, onboarding, login card, privacy notice, terms, HR view and application tracker (colour contrast is checked by hand, 21.4).
 - [ ] 25.2 `cd frontend` → `npm test` (Vitest), `npm run lint` (ESLint, warnings allowed) and `npm run build` → no errors.
 - [ ] 25.5 GitHub → Actions → **Scheduled jobs** → Run workflow → `ping` succeeds; scheduled pings appear every ~10 minutes between 07:00 and 23:00 Malaysia time.
 - [ ] 25.3 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.

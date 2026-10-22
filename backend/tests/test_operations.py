@@ -43,7 +43,38 @@ def test_a_refused_call_does_not_use_up_the_window(monkeypatch):
             ratelimit.check(Req(), "voice")
         except Exception as error:
             assert error.status_code == 429
-    assert len(ratelimit._hits[("voice", "ip", "192.0.2.5")]) == 1
+    from app import store
+    with store._connect() as conn:
+        rows = [dict(r) for r in conn.execute("SELECT who FROM rate_hits WHERE bucket='voice' AND who<>'all'").fetchall()]
+    assert len(rows) == 1 and rows[0]["who"] != "192.0.2.5"  # one hit, stored as a hash, never the address
+
+
+def test_limits_live_in_the_database_so_a_restart_or_second_server_keeps_them(client, monkeypatch):
+    import importlib
+
+    monkeypatch.setitem(ratelimit.LIMITS, "coach", (100, 2))
+    pid = client.post("/api/profiles/demo/clerk").json()["id"]
+    assert [_coach(client, pid).status_code for _ in range(2)] == [200, 200]
+    importlib.reload(ratelimit)  # nothing is kept in memory: a fresh module still sees the hits
+    monkeypatch.setitem(ratelimit.LIMITS, "coach", (100, 2))
+    assert _coach(client, pid).status_code == 429
+    from app import store
+    with store._connect() as conn:
+        stored = " ".join(r["who"] for r in conn.execute("SELECT who FROM rate_hits").fetchall())
+    assert pid not in stored and "203.0.113.7" not in stored
+
+
+def test_admin_actions_are_logged_with_who_and_when(client):
+    admin = {"X-Admin-Token": "test-admin-token"}
+    from tests.test_email import login
+    client.post("/api/counsellor/request", json={"name": "Puan Aminah", "organisation": "KV Shah Alam"}, headers=login("c-9"))
+    client.post("/api/admin/counsellors/c-9", json={"approve": True, "decided_by": "Admin Tan"}, headers=admin)
+    client.post("/api/admin/counsellors/c-9", json={"approve": False, "decided_by": "Admin Lee"}, headers=admin)
+    assert client.get("/api/admin/log").status_code == 401
+    log = client.get("/api/admin/log", headers=admin).json()
+    assert [(e["action"], e["subject"], e["actor"]) for e in log[:2]] == [
+        ("counsellor_revoked", "c-9", "Admin Lee"), ("counsellor_approved", "c-9", "Admin Tan")]
+    assert all(e["created_at"] for e in log)
 
 
 def test_security_headers_on_api_responses(client):

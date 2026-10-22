@@ -702,3 +702,10 @@ html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[dat
 .hr-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
 .hr-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 10px 14px; }
 .hr-login { margin: 8px 0; }
+
+/* Sign in with Microsoft */
+.login-microsoft { margin-top: 10px; }
+.login-ms { display: inline-grid; grid-template-columns: 9px 9px; gap: 2px; margin-right: 10px; vertical-align: middle; }
+.login-ms i { width: 9px; height: 9px; display: block; }
+.login-ms i:nth-child(1) { background: #F25022; } .login-ms i:nth-child(2) { background: #7FBA00; }
+.login-ms i:nth-child(3) { background: #00A4EF; } .login-ms i:nth-child(4) { background: #FFB900; }

@@ -81,13 +81,15 @@ export function onAuth(listener: Listener): () => void {
   return () => { listeners.delete(listener); };
 }
 
-export async function signIn(): Promise<void> {
+export async function signIn(provider: "google" | "azure" = "google"): Promise<void> {
   if (!client) return;
-  save(KEYS.loginPending, "1", "session");  // App opens Today (or the intake) when Google sends us back
-  // Come back to the same screen (the app keeps its state in the query string).
+  save(KEYS.loginPending, "1", "session");  // App opens Today (or the intake) when the provider sends us back
+  // Come back to the same screen (the app keeps its state in the query string). Microsoft (Azure)
+  // needs the email scope asked for explicitly, for emails and counsellor requests.
   await client.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: window.location.origin + window.location.pathname + window.location.search },
+    provider,
+    options: { redirectTo: window.location.origin + window.location.pathname + window.location.search,
+      ...(provider === "azure" ? { scopes: "email openid profile" } : {}) },
   });
 }
 

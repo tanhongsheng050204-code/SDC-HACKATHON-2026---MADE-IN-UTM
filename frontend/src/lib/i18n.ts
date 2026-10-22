@@ -1751,6 +1751,7 @@ const STRINGS = {
   "hr.none": { en: "No saved analyses yet.", ms: "Belum ada analisis yang disimpan.", zh: "还没有已保存的分析。" },
   "hr.counts": { en: "{n} people, {risk} in declining roles", ms: "{n} orang, {risk} dalam peranan menurun", zh: "{n} 人，{risk} 人处于衰退职位" },
   "hr.viewing": { en: "Showing \u201c{name}\u201d, saved on {date}, with the forecast it was made on. Analyse a file to see today's figures.", ms: "Menunjukkan \u201c{name}\u201d, disimpan pada {date}, dengan unjuran ketika itu. Analisis fail untuk melihat angka hari ini.", zh: "正在显示 {date} 保存的“{name}”，使用当时的预测。分析文件即可查看今天的数据。" },
+  "login.microsoft": { en: "Continue with Microsoft (school or work)", ms: "Teruskan dengan Microsoft (sekolah atau kerja)", zh: "使用 Microsoft 继续（学校或工作账户）" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

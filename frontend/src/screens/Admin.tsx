@@ -3,6 +3,7 @@ import { api } from "../lib/api";
 import { EvidencePanel } from "../components/EvidencePanel";
 import { FeedbackPanel } from "../components/FeedbackPanel";
 import { CounsellorPanel } from "../components/CounsellorPanel";
+import { AdminLogPanel } from "../components/AdminLogPanel";
 import { RefreshPanel } from "../components/RefreshPanel";
 
 // The human check on new data, in one place: trend refreshes, skill evidence from job ads,
@@ -33,6 +34,7 @@ export function Admin() {
       <EvidencePanel onDone={approved} />
       <FeedbackPanel />
       <CounsellorPanel />
+      <AdminLogPanel />
     </section>
   );
 }

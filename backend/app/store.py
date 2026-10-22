@@ -15,11 +15,11 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 19
+SCHEMA_VERSION = 20
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence", "progress_events", "consents", "feedback", "usage_counts",
               "email_settings", "sent_jobs", "counsellors", "classes", "class_members", "decisions",
-              "checkin_actions", "applications", "hr_reports")
+              "checkin_actions", "applications", "hr_reports", "admin_log", "rate_hits")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -277,6 +277,26 @@ _MIGRATIONS = {
         created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS hr_reports_user ON hr_reports(user_id, created_at);
+    """,
+    # Who did what on the Admin page (no personal data: an action, its subject and the name typed),
+    # and rate-limit hits shared by every API instance and kept across restarts. A hit stores a
+    # salted hash of the IP or profile, never the address itself, and lives for ten minutes.
+    20: """
+    CREATE TABLE IF NOT EXISTS admin_log (
+        id TEXT PRIMARY KEY,
+        action TEXT NOT NULL,
+        subject TEXT,
+        actor TEXT,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS admin_log_time ON admin_log(created_at);
+    CREATE TABLE IF NOT EXISTS rate_hits (
+        bucket TEXT NOT NULL,
+        who TEXT NOT NULL,
+        at DOUBLE PRECISION NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS rate_hits_key ON rate_hits(bucket, who, at);
+    CREATE INDEX IF NOT EXISTS rate_hits_at ON rate_hits(at);
     """,
 }
 
@@ -1109,4 +1129,63 @@ def get_hr_report(user_id: str, report_id: str) -> dict | None:
 def delete_hr_report(user_id: str, report_id: str) -> bool:
     with _connect() as conn:
         return conn.execute("DELETE FROM hr_reports WHERE id=? AND user_id=?", (report_id, user_id)).rowcount > 0
+
+
+# --- admin action log ---------------------------------------------------------------------------
+
+def log_admin(action: str, subject: str | None = None, actor: str | None = None) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO admin_log (id, action, subject, actor, created_at) VALUES (?, ?, ?, ?, ?)",
+                     (secrets.token_urlsafe(9), action, (subject or "")[:200] or None, (actor or "")[:80] or None,
+                      dt.datetime.now(dt.UTC).isoformat(timespec="microseconds")))
+
+
+def admin_log(limit: int = 200) -> list[dict]:
+    """Newest first."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT action, subject, actor, created_at FROM admin_log ORDER BY created_at DESC, id LIMIT ?",
+                            (limit,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+# --- rate-limit hits ----------------------------------------------------------------------------
+
+def _missing_table(error: Exception) -> bool:
+    return (isinstance(error, sqlite3.OperationalError) and "no such table" in str(error)) or \
+        type(error).__name__ == "UndefinedTable"
+
+
+def rate_take(keys: list[tuple[str, str, int]], now: float, window: float) -> float | None:
+    """For each (bucket, who, limit): if any is at its limit in the window, return seconds to wait
+    and record nothing; otherwise record one hit for each. Creates the tables on first use (a
+    script or test may call it before the app has started)."""
+    try:
+        return _rate_take(keys, now, window)
+    except Exception as error:
+        if not _missing_table(error):
+            raise
+        init_db()
+        return _rate_take(keys, now, window)
+
+
+def _rate_take(keys: list[tuple[str, str, int]], now: float, window: float) -> float | None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM rate_hits WHERE at <= ?", (now - window,))
+        for bucket, who, limit in keys:
+            row = conn.execute("SELECT COUNT(*) AS n, MIN(at) AS first FROM rate_hits WHERE bucket=? AND who=? AND at > ?",
+                               (bucket, who, now - window)).fetchone()
+            if row["n"] >= limit:
+                return row["first"] + window - now
+        for bucket, who, _ in keys:
+            conn.execute("INSERT INTO rate_hits (bucket, who, at) VALUES (?, ?, ?)", (bucket, who, now))
+    return None
+
+
+def rate_reset() -> None:
+    try:
+        with _connect() as conn:
+            conn.execute("DELETE FROM rate_hits")
+    except Exception as error:
+        if not _missing_table(error):
+            raise
 
