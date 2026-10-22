@@ -117,7 +117,7 @@ With Docker Desktop running:
 docker compose up --build
 ```
 
-Open **[localhost:8080](http://localhost:8080)** (API on port 8000). Settings come from `backend/.env` if it exists; profiles are kept in a Docker volume (`docker compose down -v` clears them).
+Open **[localhost:8081](http://localhost:8081)** (API on port 8000). Settings come from **`backend.env`** (API) and **`frontend.env`** (web: API address and Supabase login, applied when the container starts, no rebuild needed); profiles are kept in a Docker volume (`docker compose down -v` clears them). Port 8080 is used when it is free on the host.
 
 On Windows, Docker can't read files managed by OneDrive (“Files On-Demand”). If the build fails with `invalid file request`, clone the repository to a folder outside OneDrive.
 

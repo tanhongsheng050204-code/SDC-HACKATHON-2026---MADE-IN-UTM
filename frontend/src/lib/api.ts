@@ -1,6 +1,7 @@
 import { freshToken, refreshToken, signOut } from "./auth";
+import { config } from "./config";
 
-const BASE = import.meta.env.VITE_API_URL ?? "";
+const BASE = config.apiUrl;
 
 export type Scenario = "slow" | "baseline" | "accelerated";
 export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string }

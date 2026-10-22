@@ -263,8 +263,13 @@ legend { font-weight: 600; padding: 0 6px; }
 .chat-log li { max-width: 80%; padding: 10px 14px; border-radius: 14px; line-height: 1.45; }
 .chat-log .assistant { background: var(--surface-2); justify-self: start; border-bottom-left-radius: 4px; }
 .chat-log .user { background: var(--ink); color: var(--page); justify-self: end; border-bottom-right-radius: 4px; }
-.chat-form { display: flex; gap: 8px; }
-.chat-form input { flex: 1; }
+.chat-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.chat-form input, .chat-form textarea { flex: 1; min-width: 0; }
+.chat-form textarea { resize: none; min-height: 42px; max-height: 132px; padding: 10px 12px; line-height: 1.45; overflow-y: auto; }
+/* A mic / privacy note wraps onto its own full-width line: it must never squeeze the field. */
+.chat-form .mic-note { flex-basis: 100%; max-width: 72ch; }
+/* Live speech is still being written into the field: the accent border says so. */
+.chat-form textarea.is-interim { border-color: var(--accent); }
 
 /* ---------- Year slider, job links, progress ---------- */
 .year-slider { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
@@ -344,11 +349,19 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; font
   padding: 16px; background: var(--surface); border-left: 1px solid var(--line); box-shadow: var(--shadow-pop); overflow-y: auto; }
 .coach-head { display: flex; justify-content: space-between; align-items: center; }
 .coach-head h2 { margin: 0; }
+.coach-head-actions { display: flex; align-items: center; gap: 12px; }
+.coach-head-actions .link { font-size: .82rem; }
 .coach-note { margin: 0; font-size: .85rem; }
 .coach-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; flex: 1; align-content: start; }
 .coach-q { justify-self: end; margin: 0 0 6px auto; max-width: 85%; padding: 8px 12px; border-radius: 12px; background: var(--ink); color: var(--page); width: fit-content; }
 .coach-a { display: grid; gap: 8px; }
 .coach-a p { margin: 0; }
+.coach-list { margin: 4px 0; padding-left: 18px; display: grid; gap: 2px; }
+/* Every sentence is clickable: it quotes itself into the field as a "why do you say that?" question. */
+.coach-say { cursor: pointer; border-radius: 4px; }
+.coach-say:hover { background: var(--accent-soft); text-decoration: underline dotted; text-underline-offset: 3px; }
+.coach-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.coach-tools .btn { min-height: 30px; padding: .3rem .65rem; font-size: .78rem; font-weight: 500; }
 .coach-sources { margin: 6px 0 0; padding-left: 18px; font-size: .82rem; color: var(--ink-soft); display: grid; gap: 4px; }
 .proposal { display: grid; gap: 6px; border-color: var(--gold-bright); }
 .proposal p { margin: 0; }
@@ -445,15 +458,41 @@ main:focus { outline: none; }
 .dialog h2 { margin: 0 0 8px; font-size: 1.15rem; }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 
-/* Skill tree: rows of ring nodes, roots at the bottom, target role on top */
+/* Skill tree: rows of ring nodes, roots at the bottom, target role on top.
+   Colour carries the meaning: green = you already have it, teal = to learn,
+   dashed grey = locked, green + tick = course finished. */
 .tree { display: grid; gap: 14px; margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
-.tree-target { justify-self: center; padding: 8px 14px; border: 2px dashed var(--accent); border-radius: var(--radius-btn); font-weight: 600; }
+.tree-target { justify-self: center; padding: 8px 14px; border: 2px solid var(--accent); border-radius: var(--radius-btn); font-weight: 700; background: var(--accent); color: var(--page); }
+.tree-legend { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin: 0; padding: 0; font-size: .76rem; color: var(--ink-soft); }
+.tree-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.tree-legend .swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line-strong); background: var(--surface); flex: none; display: inline-grid; place-items: center; font-size: .6rem; font-weight: 700; }
+.tree-legend .swatch.have { background: var(--good-bg); border-color: var(--good); }
+.tree-legend .swatch.diff-1 { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 40%, var(--surface)); }
+.tree-legend .swatch.diff-2 { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 65%, var(--surface)); }
+.tree-legend .swatch.diff-3 { background: color-mix(in srgb, var(--accent) 38%, var(--surface)); border-color: var(--accent); }
+.tree-legend .swatch.locked { background: var(--surface-2); border-style: dashed; }
+.tree-legend .swatch.done { background: var(--good-bg); border-color: var(--good); color: var(--good); }
 .tree-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .tree-node { display: grid; justify-items: center; gap: 4px; width: 112px; padding: 10px 6px; border: 1px solid var(--line); border-radius: var(--radius-btn);
   background: var(--surface); color: var(--ink); font: inherit; text-align: center; box-shadow: none; }
 .tree-node:hover:not(:disabled) { background: var(--hover); }
-.tree-node.locked { opacity: .5; }
+/* Difficulty layers: the deeper the teal, the harder the step. colour-mix keeps both themes right. */
+.tree-node.diff-1 { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 40%, var(--surface)); }
+.tree-node.diff-2 { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 65%, var(--surface)); }
+.tree-node.diff-3 { background: color-mix(in srgb, var(--accent) 38%, var(--surface)); border-color: var(--accent); }
+.tree-node.diff-1:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.tree-node.diff-2:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 30%, var(--surface)); }
+.tree-node.diff-3:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 46%, var(--surface)); }
+.tree-node.from-cv { background: var(--good-bg); border-color: var(--good); }
+.tree-node.from-cv small { color: var(--good); font-weight: 600; }
+.tree-node.from-cv:hover:not(:disabled), .tree-node.course-done:hover:not(:disabled) { background: var(--good-bg); border-color: var(--good); }
+.tree-node.course-done { background: var(--good-bg); border-color: var(--good); }
+.tree-node.locked { background: var(--surface-2); border-style: dashed; border-color: var(--line-strong); opacity: .75; }
+.tree-node.locked:hover:not(:disabled) { background: var(--surface-2); }
 .tree-node small { color: var(--ink-soft); font-size: .74rem; }
+.tree-diff { font-size: .62rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-strong);
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--surface)); border-radius: 99px; padding: 1px 7px; }
+.tree-node.locked .tree-diff { color: var(--ink-soft); border-color: var(--line-strong); }
 .tree-name { font-size: .84rem; font-weight: 600; line-height: 1.2; }
 .tree-foot { text-align: center; font-size: .82rem; }
 .skill-ring .ring-track { fill: none; stroke: var(--line-strong); stroke-width: 5; }
@@ -541,7 +580,9 @@ main:focus { outline: none; }
 .pay { font-size: .82rem; }
 
 /* Pathway = tree + courses */
-.tree-step { font-size: .7rem; font-weight: 700; color: var(--accent-strong); text-transform: uppercase; letter-spacing: .04em; }
+.tree-step { font-size: .68rem; font-weight: 700; color: var(--page); background: var(--accent); text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 99px; }
+.tree-node.locked .tree-step { background: var(--line-strong); color: var(--ink-soft); }
+.tree-node.course-done .tree-step { background: var(--good); }
 .tree-course { font-size: .72rem; color: var(--ink-soft); line-height: 1.2; }
 .tree-node.course-done .ring-track { stroke: var(--good); stroke-dasharray: none; }
 .tree-node.has-step:not(.course-done) .ring-track { stroke-dasharray: 3 3; }

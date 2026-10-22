@@ -156,6 +156,14 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
 
   const depths = Array.from(new Set(tree.nodes.map((n) => n.depth))).sort((a, b) => b - a);
 
+  // Difficulty in three layers. The steps are the learning order, so the step number against the
+  // total places each skill in a band: the first third Easy, the middle third Intermediate, the
+  // last third Hard. Skills you already have have no step and no band.
+  const totalSteps = tree.total_steps || 0;
+  const diffName = ["", t("tree.diffEasy"), t("tree.diffMedium"), t("tree.diffHard")];
+  const difficultyOf = (step: number | null) =>
+    !step || totalSteps < 1 ? 0 : Math.max(1, Math.min(3, Math.ceil((step * 3) / totalSteps)));
+
   return (
     <section className="pathway-page">
       <button className="link back-link" onClick={onBack}>← {tr(tree.role.title)}</button>
@@ -252,15 +260,32 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
         <div className="tree">
           <p className="source">{t("path.sub")}</p>
           <div className="tree-target">🎯 {tr(tree.role.title)}</div>
+          {/* Colour key: rows show how far each skill sits from the target; colour depth and the
+              chips carry the learning order and its difficulty. */}
+          <ul className="tree-legend">
+            <li><span className="swatch have" aria-hidden="true" />{t("tree.legendHave")}</li>
+            <li><span className="swatch diff-1" aria-hidden="true" />{t("tree.diffEasy")}</li>
+            <li><span className="swatch diff-2" aria-hidden="true" />{t("tree.diffMedium")}</li>
+            <li><span className="swatch diff-3" aria-hidden="true" />{t("tree.diffHard")}</li>
+            <li><span className="swatch locked" aria-hidden="true" />{t("tree.legendLocked")}</li>
+            <li><span className="swatch done" aria-hidden="true">✓</span>{t("tree.legendDone")}</li>
+          </ul>
           {depths.map((d) => (
             <div key={d} className="tree-row">
               {tree.nodes.filter((n) => n.depth === d).map((n) => {
                 const state = !n.unlocked ? t("tree.locked") : n.level ? levelName(n.level) : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
-                const cls = ["tree-node", n.unlocked ? "" : "locked", n.step ? "has-step" : "", n.course_done ? "course-done" : ""].join(" ").trim();
+                const diff = difficultyOf(n.step);
+                const cls = ["tree-node",
+                  diff ? `diff-${diff}` : "",
+                  n.from_cv ? "from-cv" : "",
+                  n.step ? "has-step" : "",
+                  n.course_done ? "course-done" : "",
+                  n.unlocked ? "" : "locked"].filter(Boolean).join(" ");
                 return (
                   <button key={n.skill_id} className={cls} onClick={() => setOpen(n)}
-                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${tr(n.name)}: ${state}, ${n.level} / 3`}>
+                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${diff ? `${diffName[diff]}, ` : ""}${tr(n.name)}: ${state}, ${n.level} / 3`}>
                     {n.step && <span className="tree-step">{t("path.step")} {n.step}</span>}
+                    {diff > 0 && <span className="tree-diff">{diffName[diff]}</span>}
                     <SkillRing level={n.level} />
                     <span className="tree-name">{tr(n.name)}</span>
                     <small>{state}</small>

@@ -1,12 +1,14 @@
 // Google login through Supabase Auth. The browser holds the session; the backend only verifies the
-// token we send with each request (backend/app/auth.py). Without VITE_SUPABASE_* the app runs as
-// before, anonymous only, and the login button is hidden.
+// token we send with each request (backend/app/auth.py). Without Supabase settings the app runs as
+// before, anonymous only, and the login button is hidden. Values come from /config.js at runtime
+// (frontend.env in Docker) with the build-time VITE_SUPABASE_* as fallback.
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { clearOfflineData } from "./pwa";
 import { KEYS, save } from "./storage";
+import { config } from "./config";
 
-const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const URL = config.supabaseUrl || undefined;
+const KEY = config.supabaseAnonKey || undefined;
 
 export const authEnabled = Boolean(URL && KEY);
 const client: SupabaseClient | null = authEnabled ? createClient(URL!, KEY!) : null;
