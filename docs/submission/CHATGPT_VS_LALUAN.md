@@ -23,7 +23,7 @@ Date: ______ · Model shown: ______
 
 ## Side by side
 
-| | ChatGPT (from the answer above) | Laluan (live app, snapshot ______) |
+| | ChatGPT (from the answer above) | Laluan (live app, snapshot 2026-10-22-trend-092120) |
 |---|---|---|
 | Will her job exist in 2030? | ______ | Declines in every future: about −14% slow, −32% baseline, −53% accelerated |
 | Where the answer comes from | ______ (sources named? dated?) | Each figure opens to its sources and date: WEF Future of Jobs 2025, Malaysian job ads, AI research; a backtest is published |

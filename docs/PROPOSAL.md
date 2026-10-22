@@ -3,7 +3,7 @@
 > Draft for the team. Follow the official submission format and length limits (not yet known), and
 > rewrite the parts marked ✍️ in your own words. Every number here must stay sourced.
 
-**Team:** ______ · **Domain:** 1, The Aiversecity Future-Ready Workforce · **Repo:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
+**Team:** Made in UTM · **Domain:** 1, The Aiversecity Future-Ready Workforce · **Repo:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
 
 ## 1. Problem
 
@@ -58,11 +58,12 @@ an admin; course steps and goal choices stay with the user; the employer view ne
 
 **Does the forecast work? A test anyone can repeat.** We hid the last year of Malaysian job-ad
 data and forecast it from the years before. Where the history showed a clear trend, the next year
-moved the way we said for **____ of ____ skills**; guessing "everything rises" gets ____. On size,
-our forecast was off by about ____% on average, against ____% for simply assuming no change.
-*(Copy the four blanks from Future Skills Radar → "How well does this forecast do?" on the live
-site, forecast snapshot ______. The backtest is published with every snapshot, so the claim is
-re-checked each time the data changes.)*
+moved the way we said for **14 of 19 skills**; guessing "everything rises" gets 12. On size,
+our forecast was off by about 22% on average, against 17% for simply assuming no change, so we
+tell people to read the direction more than the number, and the app says so. *(Future Skills
+Radar → "How well does this forecast do?" on the live site, forecast snapshot
+2026-10-22-trend-092120, read on 23 Oct 2026. The backtest is published with every snapshot, so
+the claim is re-checked each time the data changes.)*
 
 ## 4. Feasibility: what already works
 
@@ -71,10 +72,13 @@ matching (refresh → new dated snapshot → rankings change), explainable ranki
 year slider, pathway with progress, SDG mapping, and the employer heatmap. About 430 automated tests (backend
 and frontend); CI runs them on SQLite and Postgres on every push.
 
-**Load:** with ____ people using the live API at once (each opening a demo profile and going
-through Today, Future roles, a pathway, progress and plan checks), ____ requests a second, ____
-failed, 95% answered within ____ ms. *(Run `python backend/scripts/load_test.py
-https://laluan-api.onrender.com --users 25` after waking the server and copy the "all" line.)*
+**Load:** with 25 people using the live API at once (each opening a demo profile and going
+through Today, Future roles, a pathway, progress and plan checks, three times), 550 requests at 6.5
+a second, 0 failed, 95% answered within 5.9 s on Render's free plan (one shared CPU). The slowest
+call is a new pathway, which waits once for its AI-written summary (95% within 29 s); summaries
+are cached after that. A paid instance is the first upgrade for a pilot. *(23 Oct 2026,
+`python backend/scripts/load_test.py https://laluan-api.onrender.com --users 25 --rounds 3`
+after waking the server.)*
 
 ### Keeping it running after the hackathon
 

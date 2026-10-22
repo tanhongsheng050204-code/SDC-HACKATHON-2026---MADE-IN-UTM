@@ -1,6 +1,6 @@
 # Laluan: see where your career goes before AI changes it
 
-**Team:** ______ · **Domain 1:** The Aiversecity Future-Ready Workforce · **Live:** https://laluan-psi.vercel.app · **Code:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
+**Team:** Made in UTM · **Domain 1:** The Aiversecity Future-Ready Workforce · **Live:** https://laluan-psi.vercel.app · **Code:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
 
 ## The problem
 
@@ -28,7 +28,7 @@ could go, or what to learn first.
 1. **A forecast you can open up.** Tap any percentage to see how it was built, source by source:
    the published baseline (WEF Future of Jobs 2025), Malaysian job ads, AI research momentum. A
    backtest is published with every forecast: hiding the last year, the direction was right for
-   ____ of ____ skills *(copy from the live Radar page)*. Three AI-adoption futures and a year slider
+   14 of 19 skills with a clear trend, against 12 for guessing "everything rises" (sizes are rougher, so the app says to read the direction). Three AI-adoption futures and a year slider
    make the uncertainty visible.
 2. **Privacy before any AI reads a word.** Names, emails, phone and IC numbers are removed first,
    and the person sees what was removed. CVs, chats, voice and interview answers are never stored.
@@ -44,7 +44,7 @@ could go, or what to learn first.
 | Minutes from landing page to a pathway (5 first-time testers, median) | ____ *(docs/EVALUATION.md §4)* |
 | Skills found in 5 synthetic CVs (recall vs a person) | ____ *(EVALUATION.md §1)* |
 | Expert review of persona routes | ____, ____ *(name, role; EVALUATION.md §2)* |
-| Live API under load | ____ requests a second, ____ failed, 95% within ____ ms *(backend/scripts/load_test.py)* |
+| Live API under load | 25 people at once: 550 requests, 0 failed, 95% within 5.9 s on the free plan *(backend/scripts/load_test.py, 23 Oct)* |
 | Fairness | Rankings, scores, pathways and CV reading identical across names from Malaysia's communities (public check on the Sources page) |
 | Engineering | Automated tests on every push, run on SQLite and Postgres, plus accessibility checks |
 
