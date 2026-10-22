@@ -33,6 +33,8 @@ services:
         sync: false
       - key: RUNPOD_WHISPER_ENDPOINT
         sync: false
+      - key: RUNPOD_OCR_ENDPOINT
+        sync: false
       - key: CONTACT_EMAIL
         sync: false
       - key: OPENALEX_API_KEY
