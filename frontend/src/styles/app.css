@@ -109,7 +109,7 @@ button.link:hover:not(:disabled) { background: none; }
 .who { display: flex; gap: 10px; align-items: center; padding: 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-card); }
 .who strong { display: block; font-size: .88rem; }
 .who small { color: var(--ink-soft); font-size: .76rem; }
-.avatar { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 700; }
+.avatar { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent, #fff); font-weight: 700; }
 .side-nav { display: grid; gap: 6px; }
 .side-group { display: grid; gap: 1px; }
 .side-label { font-size: .76rem; font-weight: 500; color: var(--ink-soft); padding: 8px 11px 4px; }
@@ -776,7 +776,7 @@ main:focus { outline: none; }
 .journey-num { flex: none; width: 26px; height: 26px; border-radius: 99px; display: grid; place-items: center; background: var(--surface-2); color: var(--ink-soft); font-size: .85rem; }
 .journey-step.is-done .journey-num { background: var(--good-bg); color: var(--good); }
 .journey-step.is-now button { border-color: var(--accent); background: var(--accent-soft); }
-.journey-step.is-now .journey-num { background: var(--accent); color: #fff; }
+.journey-step.is-now .journey-num { background: var(--accent); color: var(--on-accent, #fff); }
 @media (max-width: 760px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .role-head { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-start; justify-content: space-between; }
 .target-button { display: inline-flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }

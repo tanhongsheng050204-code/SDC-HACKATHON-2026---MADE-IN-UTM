@@ -30,7 +30,7 @@
 .lp-search kbd { font: inherit; font-size: .75rem; color: var(--ink-faint); }
 .lp-nav { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; color: var(--ink-2); font-weight: 500; }
 .lp-nav.is-on { background: var(--hover); color: var(--ink); }
-.lp-nav i { font-style: normal; font-size: .72rem; font-weight: 700; color: #fff; background: var(--accent); border-radius: 99px; padding: 1px 7px; }
+.lp-nav i { font-style: normal; font-size: .72rem; font-weight: 700; color: var(--on-accent, #fff); background: var(--accent); border-radius: 99px; padding: 1px 7px; }
 .lp-main { display: grid; align-content: start; gap: 14px; padding: 22px 26px 26px; }
 .lp-hello { font-size: 1.35rem; font-weight: 650; letter-spacing: -.02em; }
 .lp-ask { padding: 11px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; color: var(--ink-2); }

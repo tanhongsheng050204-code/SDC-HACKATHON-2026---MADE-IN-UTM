@@ -90,3 +90,10 @@ def test_sentry_events_are_stripped_of_personal_data():
 def test_sentry_stays_off_without_a_dsn():
     from app.config import get_settings
     assert get_settings().sentry_dsn == "" and observability.init_sentry(get_settings()) is False
+
+
+def test_a_global_cap_stops_faked_addresses(client, monkeypatch):
+    monkeypatch.setitem(ratelimit.GLOBAL, "cv", 3)
+    send = lambda ip: client.post("/api/intake/extract", json={"text": "I use Excel every day for data entry and reports. " * 3},
+                                  headers={"X-Forwarded-For": ip}).status_code
+    assert [send(f"203.0.113.{n}") for n in range(4)] == [200, 200, 200, 429]

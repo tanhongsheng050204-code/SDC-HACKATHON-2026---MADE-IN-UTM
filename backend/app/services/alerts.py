@@ -186,7 +186,7 @@ def build_digest(ref: Reference, settings: dict, profile: dict) -> tuple[str, st
         if change:
             add(say("forecast", lang, date=change["date"], role=role, before=_signed(change["before"]), after=_signed(change["after"])))
         if settings["alerts"] != "off":
-            jobs = new_jobs(ref, settings, role_id) or []
+            jobs = new_jobs(ref, settings, role_id)  # None: the job-ad source is down, so say nothing this week
             where = "" if settings.get("state") in (None, "anywhere") else say("where", lang, state=state_name(settings["state"], lang))
             if jobs:
                 lines = [_job_line(j, lang) for j in jobs]
@@ -195,7 +195,7 @@ def build_digest(ref: Reference, settings: dict, profile: dict) -> tuple[str, st
                 blocks.append(f"<p><strong>{html.escape(title)}</strong></p><ul>{''.join(i for _, i in lines)}</ul>"
                               f'<p style="font-size:12px;color:#5A6B66">{html.escape(say("jobs_source", lang))}</p>')
                 keys = [job_key(j) for j in jobs]
-            else:
+            elif jobs is not None:
                 add(say("no_jobs", lang, role=role))
     text, page = _wrap(lang, say("digest_subject", lang), paragraphs, blocks, say("footer", lang),
                        (say("unsubscribe", lang), links(profile["id"], "all")[0]))

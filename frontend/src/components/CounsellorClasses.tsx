@@ -17,6 +17,7 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
   const [open, setOpen] = useState<ClassDashboard | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
   const id = useId();
 
   useEffect(() => {
@@ -76,7 +77,8 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
                       <small>{t("cls.code")}: <code className="class-code">{c.code}</code> · <span className="muted">{joinLink(c.code)}</span></small></span>
                     <span className="actions">
                       <button className="btn ink sm" onClick={() => show(c.id)}>{t("cls.open")}</button>
-                      <button className="btn quiet sm" onClick={() => navigator.clipboard?.writeText(joinLink(c.code))}>{t("cls.copy")}</button>
+                      <button className="btn quiet sm" onClick={() => navigator.clipboard?.writeText(joinLink(c.code)).then(() => setCopied(c.id)).catch(() => {})}>
+                        {copied === c.id ? t("cls.copied") : t("cls.copy")}</button>
                     </span>
                   </li>
                 ))}

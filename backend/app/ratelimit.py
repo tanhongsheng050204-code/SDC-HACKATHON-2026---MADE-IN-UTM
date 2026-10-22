@@ -30,6 +30,11 @@ LIMITS: dict[str, tuple[int, int | None]] = {
     "join": (20, None),          # class codes looked up or joined, so codes can't be guessed
 }
 
+# Everyone together, per window: a backstop for the AI calls that cost money, because an address
+# in X-Forwarded-For can be faked. Generous enough for a busy demo day (about one call a second).
+GLOBAL: dict[str, int] = {"coach": 600, "interview": 600, "cv": 300, "voice": 300, "intake_turn": 600, "survey": 300,
+                          "checks": 300, "identity": 300, "search": 300}
+
 MESSAGE = "You're going a bit fast. Please wait a few minutes and try again."
 
 _lock = threading.Lock()
@@ -69,6 +74,8 @@ def check(request: Request, bucket: str, profile_id: str | None = None) -> None:
     keys = [(bucket, "ip", client_ip(request), per_ip)]
     if profile_id and per_profile:
         keys.append((bucket, "profile", profile_id, per_profile))
+    if bucket in GLOBAL:
+        keys.append((bucket, "all", "", GLOBAL[bucket]))
     with _lock:
         _prune(now)
         for bucket_, kind, who, limit in keys:

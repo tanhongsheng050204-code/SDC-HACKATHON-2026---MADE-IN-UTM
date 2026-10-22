@@ -617,11 +617,11 @@ def export_profile(profile_id: str, user: str | None = User):
 @router.put("/profiles/{profile_id}/target")
 def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
     """Choose the role you are aiming for (or clear it). Pathway and practice follow it."""
-    _profile_for(profile_id, user)
+    before = _profile_for(profile_id, user)
     if body.role_id is not None and body.role_id not in get_reference().roles:
         raise HTTPException(422, "Unknown role")
     profile = store.set_target(profile_id, body.role_id)
-    if body.role_id is not None:
+    if body.role_id is not None and body.role_id != before.get("target_role_id"):  # the same choice again is not a restart
         progress.record(get_reference(), profile_id, "destination_set", body.role_id)
         store.count_usage("destination_set")
     return profile
@@ -630,11 +630,13 @@ def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
 @router.put("/profiles/{profile_id}/plan")
 def set_plan(profile_id: str, body: PlanRequest, user: str | None = User):
     """A target date and weekly study hours for the destination. Starts the on-track line from today."""
-    _profile_for(profile_id, user)
-    if body.target_date is not None and body.target_date <= progress.today():
+    before = _profile_for(profile_id, user)
+    new_date = body.target_date.isoformat() if body.target_date else None
+    if body.target_date is not None and body.target_date <= progress.today() and new_date != before.get("target_date"):
         raise HTTPException(422, "Choose a date after today")
-    profile = store.set_plan(profile_id, body.target_date.isoformat() if body.target_date else None, body.weekly_hours)
-    if body.target_date is not None:
+    profile = store.set_plan(profile_id, new_date, body.weekly_hours)
+    # Only a new date restarts the on-track line; changing the weekly hours keeps where you started.
+    if new_date is not None and new_date != before.get("target_date"):
         progress.record(get_reference(), profile_id, "plan_set", body.target_date.isoformat())
     return profile
 

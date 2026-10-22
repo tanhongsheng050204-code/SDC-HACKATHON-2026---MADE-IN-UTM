@@ -260,8 +260,9 @@ function StoryBanner({ profile, target }: { profile: Profile; target: RoleMatch 
   }
 
   return (
-    <div className="card story-banner" onClick={creating ? undefined : openRoute} role="button" tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") openRoute(); }}>
+    // The whole card is clickable with a mouse; keyboard and screen-reader users use the button inside
+    // (a card with role="button" around a button is a nested control).
+    <div className="card story-banner" onClick={creating ? undefined : openRoute}>
       <span className="eyebrow">{t("fc.storyReady")}</span>
       <h3>{tf("fc.storyReadySub", { role: tr(target.title) })}</h3>
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>

@@ -6,7 +6,7 @@
   --canvas: #FBFAF6; --page: #FBFAF6; --surface: #FFFFFF; --surface-2: #F3F4EF; --hover: #EEF0EA;
   --line: #EFEDE6; --line-strong: #E3E6E0;
   --mint: #DDF0E8; --mint-2: #B9E2D3; --sand: #F6EEDC; --sky: #E7EEF6; --sky-ink: #28456B;
-  --sun: #F6E2A6; --fill-good: #58C79F; --fill-good-edge: #3FA67F; --accent-edge: #054A40; --sun-edge: #B48A20;
+  --sun: #F6E2A6; --on-accent: #fff; --fill-good: #58C79F; --fill-good-edge: #3FA67F; --accent-edge: #054A40; --sun-edge: #B48A20;
   --radius-card: 24px; --radius-btn: 14px; --radius-sm: 12px;
   --shadow-card: none; --shadow-pop: 0 30px 60px -30px rgba(16, 36, 31, .4);
 }
@@ -15,14 +15,14 @@
     --canvas: #0E1916; --page: #0E1916; --surface: #15231F; --surface-2: #1B2B26; --hover: #20322C;
     --line: #22332D; --line-strong: #2A3C36;
     --mint: #17352C; --mint-2: #22483C; --sand: #2E2A1E; --sky: #1C2836; --sky-ink: #A9C3E6;
-    --sun: #3A321A; --fill-good: #3FB98B; --fill-good-edge: #2B8A66; --accent-edge: #1B7A68; --sun-edge: #8A6A1A;
+    --sun: #3A321A; --on-accent: #0C1714; --fill-good: #3FB98B; --fill-good-edge: #2B8A66; --accent-edge: #1B7A68; --sun-edge: #8A6A1A;
   }
 }
 :root[data-theme="dark"] {
   --canvas: #0E1916; --page: #0E1916; --surface: #15231F; --surface-2: #1B2B26; --hover: #20322C;
   --line: #22332D; --line-strong: #2A3C36;
   --mint: #17352C; --mint-2: #22483C; --sand: #2E2A1E; --sky: #1C2836; --sky-ink: #A9C3E6;
-  --sun: #3A321A; --fill-good: #3FB98B; --fill-good-edge: #2B8A66; --accent-edge: #1B7A68; --sun-edge: #8A6A1A;
+  --sun: #3A321A; --on-accent: #0C1714; --fill-good: #3FB98B; --fill-good-edge: #2B8A66; --accent-edge: #1B7A68; --sun-edge: #8A6A1A;
 }
 
 /* ---------- Type ---------- */
@@ -35,7 +35,7 @@ h3 { font-weight: 750; }
 button { border-radius: var(--radius-btn); border: 2px solid var(--line-strong); box-shadow: 0 3px 0 var(--line-strong); font-weight: 700; min-height: 44px; }
 button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--line-strong); }
 button:disabled { opacity: 1; color: var(--ink-faint); background: var(--surface-2); border-color: var(--surface-2); box-shadow: none; }
-.btn.ink, button.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 0 var(--accent-edge); }
+.btn.ink, button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 4px 0 var(--accent-edge); }
 .btn.ink:hover:not(:disabled), button.primary:hover:not(:disabled) { background: var(--accent-strong); border-color: var(--accent-strong); }
 .btn.ink:active:not(:disabled), button.primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--accent-edge); }
 .btn.sm { min-height: 40px; font-weight: 700; }
@@ -219,7 +219,7 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .lp-next b { font-size: 1.35rem; font-weight: 900; letter-spacing: -.035em; line-height: 1.1; }
 .lp-next-bar { height: 10px; border-radius: 99px; background: var(--surface); overflow: hidden; }
 .lp-next-bar span { display: block; height: 100%; width: 50%; border-radius: 99px; background: var(--fill-good); }
-.lp-next em { justify-self: start; font-style: normal; font-weight: 750; font-size: .82rem; color: #fff; background: var(--accent); border-radius: 10px; padding: 7px 12px; box-shadow: 0 3px 0 var(--accent-edge); }
+.lp-next em { justify-self: start; font-style: normal; font-weight: 750; font-size: .82rem; color: var(--on-accent, #fff); background: var(--accent); border-radius: 10px; padding: 7px 12px; box-shadow: 0 3px 0 var(--accent-edge); }
 .lp-legs { display: flex; align-items: center; padding: 12px 16px; border-radius: 18px; background: var(--canvas); }
 .lp-legs i { flex: none; width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: .8rem; background: var(--surface-2); color: var(--ink-soft); }
 .lp-legs i.done { background: var(--fill-good); color: #fff; } .lp-legs i.now { background: var(--gold-bright); color: #10241F; box-shadow: 0 0 0 5px var(--sun); }
@@ -441,7 +441,7 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .helpful > span { font-weight: 800; }
 .helpful-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 .helpful .chip { min-height: 44px; }
-.helpful .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.helpful .chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .helpful-more { display: grid; gap: 8px; }
 .helpful textarea, .report-problem textarea { width: 100%; border-radius: 14px; padding: 10px 12px; font: inherit; }
 .helpful.done { background: var(--mint); color: var(--good); font-weight: 700; }
@@ -483,9 +483,15 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .class-list .btn { min-height: 44px; }
 .class-code { font-size: 1rem; font-weight: 900; letter-spacing: .12em; padding: 2px 8px; border-radius: 8px; background: var(--sun); color: var(--ink); }
 .class-board .chip { min-height: 44px; }
-.class-board .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.class-board .chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .class-table td, .class-table th { white-space: nowrap; }
 .join-class { border: 0; border-radius: 26px; background: var(--mint); box-shadow: none; gap: 10px; margin-top: 16px; }
 .join-class h2 { font-size: 1.3rem; font-weight: 900; margin: 0; }
 .join-preview { display: grid; gap: 6px; padding: 14px 16px; border-radius: 22px; background: var(--surface); }
 .join-preview ul { margin: 0; padding-left: 20px; }
+
+/* ---------- Contrast fixes (axe-core audit, Oct 2026) ---------- */
+/* Locked skills stay readable: a dashed outline says "not yet", instead of fading the text below 4.5:1. */
+.tree-node.locked { opacity: 1; border-style: dashed; background: var(--surface-2); }
+.tree-node.locked > *, .tree-node.locked .tree-step { color: var(--ink-soft); }
+.kpis > .kpi:nth-child(4n+2) .kpi-label { color: var(--ink-2); }

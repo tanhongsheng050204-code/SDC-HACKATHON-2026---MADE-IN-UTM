@@ -100,3 +100,13 @@ def test_events_go_with_the_profile(client):
     pid = _start(client)
     assert client.delete(f"/api/profiles/{pid}").status_code == 204
     assert store.list_events(pid) == []
+
+
+def test_changing_hours_or_reselecting_the_destination_keeps_the_start(client):
+    pid = _start(client)
+    date = (progress.today() + dt.timedelta(days=90)).isoformat()
+    client.put(f"/api/profiles/{pid}/plan", json={"target_date": date, "weekly_hours": 4})
+    client.put(f"/api/profiles/{pid}/plan", json={"target_date": date, "weekly_hours": 8})
+    client.put(f"/api/profiles/{pid}/target", json={"role_id": "data_analyst"})
+    assert [e["kind"] for e in store.list_events(pid)] == ["destination_set", "plan_set"]
+    assert store.get_profile(pid)["weekly_hours"] == 8

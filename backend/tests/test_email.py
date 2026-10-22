@@ -186,3 +186,13 @@ def test_smtp_uses_starttls_and_login(monkeypatch, email_on):
     monkeypatch.setattr(mailer.smtplib, "SMTP", FakeSMTP)
     mailer.send(mailer.build("a@b.my", "Hi", "text", "<p>html</p>", "https://x/unsub"))
     assert calls == [("connect", "smtp.gmail.com", 587), ("starttls",), ("login", "team@example.com"), ("send", "a@b.my")]
+
+
+def test_digest_says_nothing_about_ads_when_the_source_is_down(client, email_on, monkeypatch):
+    pid = owned_profile(client)
+    opt_in(client, pid, alerts="weekly")
+    monkeypatch.setattr(openings, "all_titled", lambda role_id, **_: None)
+    client.post("/api/cron/weekly", headers=CRON)
+    text = _body(email_on["sent"][0])
+    assert "No new job ads" not in text and "New job ads" not in text
+    assert store.sent_job_keys(pid) == set()
