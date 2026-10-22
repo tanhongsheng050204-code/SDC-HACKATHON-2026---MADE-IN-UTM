@@ -23,10 +23,18 @@ def _closure(ref: Reference, skill_ids: list[str]) -> list[str]:
     return seen
 
 
+# A skill's difficulty tier (data/skills.json) is the lowest row it can sit on.
+TIER_ROW = {"foundation": 0, "core": 1, "advanced": 2}
+
+
 def _depth(ref: Reference, skill_id: str, memo: dict[str, int]) -> int:
+    """The skill's row in the tree, counted from the bottom: the higher of its difficulty tier and one
+    above each of its prerequisites. So a skill always sits above what it builds on, and an advanced
+    skill never sits beside a foundation one even when no prerequisite links them."""
     if skill_id not in memo:
         prereqs = ref.skill_prereqs.get(skill_id, [])
-        memo[skill_id] = 1 + max((_depth(ref, p, memo) for p in prereqs), default=-1)
+        tier = TIER_ROW.get(ref.skills[skill_id].get("tier", "foundation"), 0)
+        memo[skill_id] = max(tier, 1 + max((_depth(ref, p, memo) for p in prereqs), default=-1))
     return memo[skill_id]
 
 
@@ -63,6 +71,7 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
             "unlocked": all(p in have for p in prereqs),
             "prereqs": prereqs,
             "depth": _depth(ref, skill_id, memo),
+            "tier": ref.skills[skill_id].get("tier", "foundation"),
             "in_role": any(rs["skill_id"] == skill_id for rs in role["skills"]),
             "course": ({k: steps[skill_id][1][k] for k in ("id", "title", "url", "hours", "cost")}
                        if skill_id in steps else course_for(ref, skill_id)),

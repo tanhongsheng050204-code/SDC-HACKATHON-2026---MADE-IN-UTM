@@ -1,5 +1,5 @@
 {
-  "note": "Which skills sit below which in the skill tree. AI-drafted from typical course sequences, to be reviewed by the team (REVIEW_LOG). Skills not listed have no prerequisite and sit at the bottom of the tree.",
+  "note": "Which skills sit below which in the skill tree. AI-drafted from typical course sequences, to be reviewed by the team (REVIEW_LOG). Each skill's difficulty tier (foundation, core, advanced) is in skills.json: a skill's row in the tree is the higher of its tier and one above each of its prerequisites.",
   "prereqs": {
     "sql": ["excel"],
     "statistics": ["excel"],
@@ -18,6 +18,15 @@
     "solar_pv": ["electrical_systems", "safety_compliance"],
     "esg_reporting": ["excel"],
     "carbon_accounting": ["esg_reporting"],
-    "patient_care": ["empathy"]
+    "patient_care": ["empathy"],
+    "bookkeeping": ["excel"],
+    "payroll_processing": ["bookkeeping"],
+    "inventory_management": ["excel"],
+    "project_management": ["scheduling"],
+    "risk_assessment": ["critical_thinking"],
+    "crop_care_and_spraying": ["safety_compliance"],
+    "electronic_assembly": ["safety_compliance"],
+    "vocational_pedagogy": ["communication"],
+    "electrical_systems": ["safety_compliance"]
   }
 }

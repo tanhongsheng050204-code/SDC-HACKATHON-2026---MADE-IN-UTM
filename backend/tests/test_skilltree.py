@@ -63,3 +63,24 @@ def test_nodes_carry_their_pathway_step_and_course_progress(client):
     client.post(f"/api/profiles/{pid}/complete", json={"course_id": first["course"]["id"], "done": True})
     tree = client.get(f"/api/profiles/{pid}/tree", params={"role": "data_analyst"}).json()
     assert all(_node(tree, s["skill_id"])["course_done"] for s in first["skills"])
+
+
+def test_every_skill_has_a_tier_and_rows_respect_tiers_and_prerequisites():
+    """A skill sits on the higher of its tier and one above each prerequisite: never below its difficulty,
+    never beside or below what it builds on."""
+    ref = get_reference()
+    assert all(s.get("tier") in skilltree.TIER_ROW for s in ref.skills.values())
+    memo: dict[str, int] = {}
+    for skill_id, skill in ref.skills.items():
+        row = skilltree._depth(ref, skill_id, memo)
+        assert row >= skilltree.TIER_ROW[skill["tier"]], skill_id
+        assert all(row > skilltree._depth(ref, p, memo) for p in ref.skill_prereqs.get(skill_id, [])), skill_id
+
+
+def test_hard_and_easy_skills_no_longer_share_the_bottom_row():
+    profile = {"skills": [], "skill_levels": {}, "completed_courses": []}
+    tree = skilltree.build(get_reference(), profile, "data_analyst")
+    assert _node(tree, "python")["depth"] > _node(tree, "communication")["depth"] == 0
+    assert _node(tree, "python")["tier"] == "core" and _node(tree, "communication")["tier"] == "foundation"
+    clerk = skilltree.build(get_reference(), profile, "accounts_clerk")
+    assert _node(clerk, "excel")["depth"] < _node(clerk, "bookkeeping")["depth"] < _node(clerk, "payroll_processing")["depth"]
