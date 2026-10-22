@@ -311,6 +311,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
             <h3>{t("lp.resources")}</h3>
             <ul>
               <li><button className="link" onClick={onSources}>{t("nav.sources")}</button></li>
+              <li><button className="link" onClick={() => { onSources(); window.setTimeout(() => document.getElementById("your-data")?.scrollIntoView(), 300); }}>{t("priv.link")}</button></li>
               <li><button className="link" onClick={onReviewKit}>{t("lp.reviewKit")}</button></li>
               <li><a href={`${REPO}/blob/main/docs/PROPOSAL.md`} target="_blank" rel="noreferrer">{t("lp.proposal")}</a></li>
               <li><a href={`${REPO}/blob/main/docs/CODE_TO_EXPLAIN.md`} target="_blank" rel="noreferrer">{t("lp.howItWorks")}</a></li>

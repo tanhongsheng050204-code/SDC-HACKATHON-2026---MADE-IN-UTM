@@ -14,7 +14,9 @@ from app.config import get_settings
 from app.llm import generate_json
 from app.reference import Reference
 from app.services import grounding, guardrails, matching, pathway
-from app.services.deid import scrub
+import re
+
+from app.services.deid import removed_counts, scrub
 
 SCENARIO_WORDS = {"accelerated": ("faster", "fast", "accelerat", "quick"), "slow": ("slower", "slow")}
 SDG_WORDS = {
@@ -155,18 +157,36 @@ def _valid_proposal(raw, ref: Reference) -> dict | None:
     return None
 
 
+# A name the person gives in the question ("my name is …", "nama saya …", "我叫…"), so it is removed
+# with the profile's own display name. Contact details are caught by scrub() itself.
+_SELF_NAMED = re.compile(r"(?i:\bmy name is|\bnama saya(?:\s+ialah|\s+adalah)?|\bcall me|我叫|我的名字是)\s*"
+                         r"([A-Z\u4e00-\u9fff][\w'\u4e00-\u9fff-]*(?:\s+(?:bin|binti|bt|a/l|a/p|[A-Z][\w'-]*)){0,4})")
+
+
+def clean_question(question: str, profile: dict) -> tuple[str, dict[str, int]]:
+    """The question as the AI will read it, and how many personal details were removed."""
+    names = [m.group(1) for m in _SELF_NAMED.finditer(question)]
+    own = re.sub(r"\s*\(demo\)\s*$", "", profile.get("display_name") or "").strip()
+    if own:
+        names.append(own)
+    clean = scrub(question, names)
+    return clean, removed_counts(clean)
+
+
 def answer(ref: Reference, profile: dict, question: str, scenario: str = "baseline",
            role_id: str | None = None) -> dict:
+    clean, removed = clean_question(question, profile)
     guard = guardrails.check(question)
     if not guard.safe:
         return {"answer": guardrails.REFUSAL[guard.category], "mode": "blocked", "sources": [],
-                "grounding": None, "proposal": None, "suggestions": SUGGESTIONS, "guard": guard.as_dict()}
+                "grounding": None, "proposal": None, "suggestions": SUGGESTIONS, "guard": guard.as_dict(),
+                "removed": removed}
     sources, ctx = _sources(ref, profile, scenario, role_id)
     mode, reply = "offline", None
     if _llm_available():
         try:
             numbered = "\n".join(f"[SOURCE-{i}] {s}" for i, s in enumerate(sources, start=1))
-            raw = generate_json(PROMPT.format(sources=numbered, question=scrub(question)))
+            raw = generate_json(PROMPT.format(sources=numbered, question=clean))
             reply = {"answer": str(raw["answer"])[:1500], "cited": list(range(1, len(sources) + 1)),
                      "proposal": _valid_proposal(raw.get("proposal"), ref)}
             mode = "gemini"
@@ -183,4 +203,6 @@ def answer(ref: Reference, profile: dict, question: str, scenario: str = "baseli
         "grounding": report.as_dict() if report else None,
         "proposal": reply["proposal"],
         "suggestions": reply.get("suggestions", SUGGESTIONS if mode == "offline" else []),
+        # What was taken out of the question before any AI read it, shown under the message.
+        "removed": removed,
     }

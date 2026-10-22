@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, CoachProposal, CoachReply, Profile, Scenario } from "../lib/api";
-import { t, tf, tr } from "../lib/i18n";
+import { t, tf, tr, type StringKey } from "../lib/i18n";
 import { AiBadge } from "./AiBadge";
 import { MicButton } from "./MicButton";
 
@@ -63,6 +63,12 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
         {turns.map((turn, i) => (
           <li key={i}>
             <p className="coach-q">{turn.question}</p>
+            {turn.reply?.removed && Object.keys(turn.reply.removed).length > 0 && (
+              <p className="coach-removed">
+                {t("coach.removed")}{" "}
+                {Object.entries(turn.reply.removed).map(([kind, n]) => `${n} ${t(`${n === 1 ? "pii1" : "pii"}.${kind}` as StringKey)}`).join(", ")}
+              </p>
+            )}
             {!turn.reply && !turn.error && <p className="muted typing">{t("coach.thinking")}</p>}
             {turn.error && <p className="error" role="alert">{turn.error}</p>}
             {turn.reply && (

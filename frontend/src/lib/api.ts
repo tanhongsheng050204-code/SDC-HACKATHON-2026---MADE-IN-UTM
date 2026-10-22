@@ -217,6 +217,7 @@ export interface CoachReply {
   answer: string; mode: string; sources: { id: string; text: string }[];
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   proposal: CoachProposal | null; suggestions: string[];
+  removed?: Record<string, number>;  // personal details taken out of the question before any AI read it
 }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[] }
 export interface Course {
