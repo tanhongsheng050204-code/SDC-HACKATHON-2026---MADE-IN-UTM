@@ -20,7 +20,9 @@ _PROFILE_LINK = re.compile(r"(?:https?://)?(?:[\w-]+\.)?(?:linkedin\.com/(?:in|p
                            r"/[\w.@%~/-]*", re.IGNORECASE)
 # A title before capitalised words is a person ("Dr. Tan Wei Ming", "Puan Siti Aminah"), wherever it appears.
 _TITLED_NAME = re.compile(r"\b(?:Dr|Prof|Professor|Assoc\.?[ \t]+Prof|Ir|Ts|Encik|En|Puan|Pn|Cik|Tuan|Mr|Mrs|Ms|Mdm|Madam|"
-                          r"Dato'?|Datuk|Datin|Tan[ \t]+Sri|Puan[ \t]+Sri)\.?(?:[ \t]+[A-Z][\w'\-]*\.?){1,5}")
+                          r"Dato'?|Datuk|Datin|Tan[ \t]+Sri|Puan[ \t]+Sri)"
+                          # "Dr. Tan", "Dr Tan" and, as OCR sometimes reads it, "Dr.Tan"
+                          r"(?:\.[ \t]*|[ \t]+)[A-Z][\w'\-]*\.?(?:[ \t]+[A-Z][\w'\-]*\.?){0,4}")
 
 _MONTH = (r"(?:Jan(?:uary)?|Januari|Feb(?:ruary)?|Februari|Mac|Mar(?:ch)?|Apr(?:il)?|May|Mei|Jun(?:e)?|"
           r"Jul(?:y)?|Julai|Aug(?:ust)?|Ogos|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Okt(?:ober)?|Nov(?:ember)?|"

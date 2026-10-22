@@ -1,4 +1,4 @@
-"""RunPod Serverless: an open model for CV reading and Whisper for voice input.
+"""RunPod Serverless: an open model for CV reading, Whisper for voice input and OCR for scanned CVs.
 
 Same pattern as llm.py: one timeout-bounded call that raises on any failure, so every caller
 keeps its fallback. Timeouts are short on purpose: a cold start (10-60 s) should fall back to
@@ -82,3 +82,27 @@ def transcribe(audio: bytes, language: str | None = None) -> str:
     if body.get("status") != "COMPLETED":
         raise RuntimeError(f"Transcription {body.get('status', 'failed').lower()}")
     return str(body["output"]["transcription"]).strip()
+
+
+def ocr_available() -> bool:
+    settings = get_settings()
+    return bool(settings.runpod_api_key and settings.runpod_ocr_endpoint)
+
+
+def read_pages(images: list[bytes]) -> list[dict]:
+    """Text boxes for each page image, from the OCR worker in runpod/ocr. The images (a scanned CV,
+    not yet scrubbed) go to our own worker only and are not stored. Raises on any failure, so the
+    caller reads the scan on this server instead."""
+    settings = get_settings()
+    if not ocr_available():
+        raise RuntimeError("RunPod OCR is not configured")
+    job = {"images": [base64.b64encode(image).decode("ascii") for image in images]}
+    response = _post(f"{_BASE}/{settings.runpod_ocr_endpoint}/runsync", headers=_headers(), json={"input": job})
+    response.raise_for_status()
+    body = response.json()
+    if body.get("status") != "COMPLETED" or "pages" not in (body.get("output") or {}):
+        raise RuntimeError(f"OCR {body.get('status', 'failed').lower()}")
+    pages = body["output"]["pages"]
+    if len(pages) != len(images):
+        raise RuntimeError("OCR returned a different number of pages")
+    return pages

@@ -6,15 +6,24 @@ words, so the English recogniser is used instead; scripts/fetch_ocr_models.py do
 checksum) into backend/models/ocr, which the Docker build does too. The text then goes through the
 same scrubbing as any CV (app/services/deid.py) before a language model sees it.
 
+When RUNPOD_OCR_ENDPOINT is set, pages go first to our own OCR worker on RunPod Serverless
+(runpod/ocr, the same engine and model), so this server keeps its memory for everything else; the
+engine here is the fallback for a worker that is not set up, still waking or failing.
+
 Everything is imported lazily, so the app starts, and every other upload works, without these
-libraries or models: available() says whether scans can be read.
+libraries or models: available() says whether scans can be read here.
 """
 
 import io
+import logging
 import re
 import threading
 from functools import lru_cache
 from pathlib import Path
+
+from app import runpod
+
+log = logging.getLogger(__name__)
 
 MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "ocr"
 REC_MODEL = MODEL_DIR / "en_PP-OCRv4_rec_infer.onnx"
@@ -110,14 +119,39 @@ def _reading_order(boxes, txts, width: float) -> list[str]:
     return lines
 
 
-def read_images(images: list) -> str:
+def _jpeg(image) -> bytes:
+    buffer = io.BytesIO()
+    image.save(buffer, "JPEG", quality=85)
+    return buffer.getvalue()
+
+
+def _read_here(images: list) -> list[tuple]:
     engine = _engine()
-    lines = []
+    pages = []
     with _lock:
         for image in images:
             result = engine(image)
-            if result.txts:
-                lines += [_tidy(t) for t in _reading_order(result.boxes, result.txts, image.width)]
+            pages.append(([] if result.boxes is None else result.boxes, result.txts or (), image.width))
+    return pages
+
+
+def read_images(images: list) -> str:
+    """The text of each page in reading order. Our OCR worker on RunPod reads first when it is set up
+    (RUNPOD_OCR_ENDPOINT), so this server never loads the engine; when it is not set up, is still
+    waking past the deadline or fails, this server reads the scan itself. Either way the boxes are put
+    in order and the text scrubbed here."""
+    pages = None
+    if runpod.ocr_available():
+        try:
+            pages = [(p["boxes"], p["txts"], p["width"]) for p in runpod.read_pages([_jpeg(i) for i in images])]
+        except Exception as error:  # noqa: BLE001 - any failure falls back to this server
+            log.warning("RunPod OCR unavailable (%s); reading the scan on this server", type(error).__name__)
+    if pages is None:
+        pages = _read_here(images)
+    lines = []
+    for boxes, txts, width in pages:
+        if txts:
+            lines += [_tidy(t) for t in _reading_order(boxes, txts, width)]
     return "\n".join(line for line in lines if line)
 
 

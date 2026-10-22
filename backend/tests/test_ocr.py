@@ -110,3 +110,68 @@ def test_two_column_pages_are_read_one_column_at_a_time():
     lines = documents.read("cv.png", _two_columns())[0].splitlines()
     assert lines[:5] == ["SKILLS", "AutoCAD", "MATLAB", "Power BI", "Python"]
     assert lines[5] == "EXPERIENCE" and lines[-1] == "Taught SPM Mathematics"
+
+
+def _box(x0, y0, x1, y1):
+    return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]
+
+
+def test_runpod_reads_first_and_this_server_never_loads_the_engine(monkeypatch):
+    from app import runpod
+    sidebar = [(_box(30, 80 + 60 * i, 200, 110 + 60 * i), t) for i, t in enumerate(["SKILLS", "Excel", "SQL", "Python"])]
+    main = [(_box(500, 80 + 60 * i, 900, 110 + 60 * i), t) for i, t in enumerate(["EXPERIENCE", "Data clerk", "Built reports", "Filing"])]
+    pairs = sidebar + main
+    pairs.sort(key=lambda p: p[0][0][1])  # as a worker returns them: top to bottom, columns interleaved
+    sent = []
+
+    def worker(images):
+        sent.append(len(images))
+        return [{"width": 1000, "boxes": [b for b, _ in pairs], "txts": [t for _, t in pairs]}]
+
+    monkeypatch.setattr(runpod, "ocr_available", lambda: True)
+    monkeypatch.setattr(runpod, "read_pages", worker)
+    monkeypatch.setattr(ocr, "_engine", lambda: pytest.fail("the local engine was loaded"))
+    from PIL import Image
+    text = ocr.read_images([Image.new("RGB", (1000, 400), "white")])
+    assert sent == [1] and text.splitlines() == ["SKILLS", "Excel", "SQL", "Python", "EXPERIENCE", "Data clerk",
+                                                 "Built reports", "Filing"]
+
+
+@needs_ocr
+def test_a_cold_or_failing_runpod_worker_falls_back_to_this_server(monkeypatch):
+    from app import runpod
+
+    def cold(images):
+        raise TimeoutError("worker still waking")
+
+    monkeypatch.setattr(runpod, "ocr_available", lambda: True)
+    monkeypatch.setattr(runpod, "read_pages", cold)
+    text, from_scan = documents.read("cv.pdf", _scanned_pdf())
+    assert from_scan and "Excel" in text
+
+
+def test_runpod_read_pages_sends_images_and_checks_the_answer(monkeypatch):
+    import httpx
+
+    from app import runpod
+    from app.config import get_settings
+    monkeypatch.setenv("RUNPOD_API_KEY", "test-key")
+    monkeypatch.setenv("RUNPOD_OCR_ENDPOINT", "ocr123")
+    get_settings.cache_clear()
+    calls = []
+
+    def post(url, **kwargs):
+        calls.append((url, kwargs["json"]["input"]["images"]))
+        return httpx.Response(200, json={"status": "COMPLETED", "output": {"pages": [{"width": 10, "boxes": [], "txts": []}]}},
+                              request=httpx.Request("POST", url))
+
+    monkeypatch.setattr(runpod, "_post", post)
+    try:
+        assert runpod.read_pages([b"jpeg-bytes"]) == [{"width": 10, "boxes": [], "txts": []}]
+        assert calls[0][0].endswith("/ocr123/runsync") and calls[0][1] == ["anBlZy1ieXRlcw=="]
+        monkeypatch.setattr(runpod, "_post", lambda url, **k: httpx.Response(
+            200, json={"status": "FAILED"}, request=httpx.Request("POST", url)))
+        with pytest.raises(RuntimeError):
+            runpod.read_pages([b"x"])
+    finally:
+        get_settings.cache_clear()

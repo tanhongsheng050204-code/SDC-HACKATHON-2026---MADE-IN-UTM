@@ -69,3 +69,4 @@ def test_a_heading_first_cv_keeps_the_heading_and_loses_the_split_name():
 def test_titled_names_are_removed_anywhere():
     from app.services.deid import scrub
     assert scrub("Reported to Puan Siti Aminah and Ir. Lim Chee Keong weekly.") == "Reported to [NAME] and [NAME] weekly."
+    assert scrub("Dr.Tan Wei Ming, Senior Lecturer") == "[NAME], Senior Lecturer"  # OCR can drop the space
