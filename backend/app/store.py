@@ -1170,6 +1170,14 @@ def rate_take(keys: list[tuple[str, str, int]], now: float, window: float) -> fl
 
 def _rate_take(keys: list[tuple[str, str, int]], now: float, window: float) -> float | None:
     with _connect() as conn:
+        # Count-then-insert must be atomic, or parallel requests could all slip under the limit:
+        # Postgres takes a per-key advisory lock (in a fixed order, so two requests never deadlock),
+        # SQLite takes the write lock before reading.
+        if isinstance(conn, _PgConnection):
+            for bucket, who, _ in sorted(keys):
+                conn.execute("SELECT pg_advisory_xact_lock(hashtext(?))", (f"rate|{bucket}|{who}",))
+        else:
+            conn.execute("BEGIN IMMEDIATE")
         conn.execute("DELETE FROM rate_hits WHERE at <= ?", (now - window,))
         for bucket, who, limit in keys:
             row = conn.execute("SELECT COUNT(*) AS n, MIN(at) AS first FROM rate_hits WHERE bucket=? AND who=? AND at > ?",

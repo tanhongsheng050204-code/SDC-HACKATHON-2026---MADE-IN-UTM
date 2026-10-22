@@ -8,7 +8,9 @@ Over the limit, the API answers 429 with a plain message the app shows as it is.
 """
 
 import hashlib
+import hmac
 import math
+import secrets
 import time
 
 from fastapi import HTTPException, Request
@@ -41,10 +43,15 @@ GLOBAL: dict[str, int] = {"coach": 600, "interview": 600, "cv": 300, "voice": 30
 
 MESSAGE = "You're going a bit fast. Please wait a few minutes and try again."
 
+_PROCESS_SALT = secrets.token_bytes(32)
+
+
 def _hash(kind: str, who: str) -> str:
-    """A salted hash, so the table never holds an IP address or profile ID."""
-    salt = get_settings().admin_token or "laluan"
-    return hashlib.sha256(f"{salt}|{kind}|{who}".encode()).hexdigest()[:32]
+    """A keyed hash (HMAC-SHA256), so the table never holds an IP address or profile ID. The key is
+    RATE_LIMIT_SALT, shared by every instance so limits hold across restarts; without it each
+    process uses a random key of its own (limits then reset when the process restarts)."""
+    key = get_settings().rate_limit_salt.encode() or _PROCESS_SALT
+    return hmac.new(key, f"{kind}|{who}".encode(), hashlib.sha256).hexdigest()[:32]
 
 
 def client_ip(request: Request) -> str:

@@ -32,6 +32,7 @@ class Settings:
     cors_origins: tuple[str, ...]
     cors_origin_regex: str | None
     contact_email: str
+    rate_limit_salt: str  # HMAC key for rate-limit hashes; empty = a random key per process
     openalex_api_key: str
     supabase_url: str
     supabase_jwt_secret: str  # legacy HS256 secret; empty = verify with the project's public keys
@@ -90,6 +91,7 @@ def get_settings() -> Settings:
         database_url=os.environ.get("DATABASE_URL", ""),
         data_dir=Path(os.environ.get("DATA_DIR", str(BACKEND_DIR / "data"))),
         contact_email=os.environ.get("CONTACT_EMAIL", ""),
+        rate_limit_salt=os.environ.get("RATE_LIMIT_SALT", ""),
         openalex_api_key=os.environ.get("OPENALEX_API_KEY", ""),
         supabase_url=os.environ.get("SUPABASE_URL", ""),
         supabase_jwt_secret=os.environ.get("SUPABASE_JWT_SECRET", ""),

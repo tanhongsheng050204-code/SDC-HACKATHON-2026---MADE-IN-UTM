@@ -52,6 +52,9 @@ def test_a_refused_call_does_not_use_up_the_window(monkeypatch):
 def test_limits_live_in_the_database_so_a_restart_or_second_server_keeps_them(client, monkeypatch):
     import importlib
 
+    from app.config import get_settings
+    monkeypatch.setenv("RATE_LIMIT_SALT", "shared-by-every-instance")  # as on Render
+    get_settings.cache_clear()
     monkeypatch.setitem(ratelimit.LIMITS, "coach", (100, 2))
     pid = client.post("/api/profiles/demo/clerk").json()["id"]
     assert [_coach(client, pid).status_code for _ in range(2)] == [200, 200]
@@ -128,3 +131,16 @@ def test_a_global_cap_stops_faked_addresses(client, monkeypatch):
     send = lambda ip: client.post("/api/intake/extract", json={"text": "I use Excel every day for data entry and reports. " * 3},
                                   headers={"X-Forwarded-For": ip}).status_code
     assert [send(f"203.0.113.{n}") for n in range(4)] == [200, 200, 200, 429]
+
+
+def test_without_a_shared_salt_each_process_keys_its_own_hashes(monkeypatch):
+    """No fallback to a fixed or reused secret: an unset RATE_LIMIT_SALT means a random key per process."""
+    import importlib
+
+    from app.config import get_settings
+    monkeypatch.setenv("RATE_LIMIT_SALT", "")
+    get_settings.cache_clear()
+    first = ratelimit._hash("ip", "192.0.2.5")
+    importlib.reload(ratelimit)
+    assert ratelimit._hash("ip", "192.0.2.5") != first
+    get_settings.cache_clear()
