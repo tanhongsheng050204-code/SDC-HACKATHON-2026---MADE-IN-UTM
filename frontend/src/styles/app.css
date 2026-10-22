@@ -871,7 +871,8 @@ main:focus { outline: none; }
   .pathway-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .route-map { position: static; }
   .route-map svg { max-height: 250px; }
-  .pathway-sheet { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 0 14px 20px; max-height: 55dvh; overflow: auto; overscroll-behavior-y: contain; box-shadow: var(--shadow-pop); }
+  .pathway-sheet { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 0 14px 20px; max-height: 55dvh; overflow: auto; overscroll-behavior-y: contain; box-shadow: var(--shadow-pop); scrollbar-width: none; }
+  .pathway-sheet::-webkit-scrollbar { display: none; } /* still scrolls by touch, wheel and keyboard */
   .pathway-sheet.expanded { max-height: calc(100dvh - 112px); }
   .sheet-handle { display: grid; justify-items: center; gap: 6px; width: 100%; position: sticky; top: 0; z-index: 2; background: var(--surface); border: 0; border-radius: 0; box-shadow: none; min-height: 52px; touch-action: none; cursor: ns-resize; color: var(--ink-soft); font-size: .78rem; }
   .sheet-handle span { display: block; width: 36px; height: 4px; border-radius: 99px; background: var(--line-strong); }
