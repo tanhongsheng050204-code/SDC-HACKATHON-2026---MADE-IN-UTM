@@ -9,7 +9,7 @@ import { Icon } from "./Icon";
 
 type Recognition = {
   lang: string; interimResults: boolean; maxAlternatives: number;
-  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onresult: ((e: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string; isFinal?: boolean }>> }) => void) | null;
   onerror: (() => void) | null; onend: (() => void) | null;
   start: () => void; stop: () => void;
 };
@@ -28,7 +28,7 @@ function canRecord(): boolean {
   return typeof MediaRecorder !== "undefined" && !!navigator.mediaDevices?.getUserMedia;
 }
 
-export function MicButton({ onText }: { onText: (text: string) => void }) {
+export function MicButton({ onText, onInterim }: { onText: (text: string) => void; onInterim?: (text: string) => void }) {
   const [mode, setMode] = useState<"server" | "browser" | null>(null);
   const [state, setState] = useState<"idle" | "recording" | "working">("idle");
   const [note, setNote] = useState<string | null>(null);
@@ -87,11 +87,26 @@ export function MicButton({ onText }: { onText: (text: string) => void }) {
     if (!Ctor) return;
     const rec = new Ctor();
     rec.lang = BROWSER_LANG[getLang()];
-    rec.interimResults = false;
+    // Interim results: words appear as they are spoken. Only final chunks are appended to the
+    // field; the live guess goes to onInterim, which the caller shows as provisional text.
+    rec.interimResults = true;
     rec.maxAlternatives = 1;
-    rec.onresult = (e) => { const text = e.results[0]?.[0]?.transcript?.trim(); if (text && alive.current) onText(text); };
-    rec.onerror = () => { if (alive.current) setNote(t("mic.failed")); };
-    rec.onend = () => { if (alive.current) setState("idle"); };
+    rec.onresult = (e) => {
+      let final = "";
+      let interim = "";
+      const from = typeof e.resultIndex === "number" ? e.resultIndex : 0;
+      for (let i = from; i < e.results.length; i++) {
+        const text = e.results[i]?.[0]?.transcript ?? "";
+        if (e.results[i]?.[0]?.isFinal) final += text; else interim += text;
+      }
+      if (final.trim() && alive.current) onText(final.trim());
+      if (alive.current) onInterim?.(interim.trim());
+    };
+    let failed = false;
+    rec.onerror = () => { if (alive.current) { failed = true; setNote(t("mic.failed")); } };
+    // The privacy note is a before-you-speak notice: once recording ends normally it goes away,
+    // so it never sits under the input taking up space. An error note stays until the next try.
+    rec.onend = () => { if (alive.current) { setState("idle"); onInterim?.(""); if (!failed) setNote(null); } };
     recognition.current = rec;
     rec.start();
     setState("recording"); setNote(t("mic.browser"));
@@ -108,13 +123,17 @@ export function MicButton({ onText }: { onText: (text: string) => void }) {
 
   const label = state === "recording" ? t("mic.stop") : state === "working" ? t("mic.working") : t("mic.start");
   return (
-    <span className="mic">
-      <button type="button" className={state === "recording" ? "mic-btn recording" : "mic-btn"} onClick={toggle}
-        disabled={state === "working"} aria-pressed={state === "recording"} aria-label={label} title={label}>
-        <Icon name="mic" />
-      </button>
-      {state === "working" && <span className="muted" aria-live="polite">{t("mic.working")}</span>}
+    <>
+      <span className="mic">
+        <button type="button" className={state === "recording" ? "mic-btn recording" : "mic-btn"} onClick={toggle}
+          disabled={state === "working"} aria-pressed={state === "recording"} aria-label={label} title={label}>
+          <Icon name="mic" />
+        </button>
+        {state === "working" && <span className="muted" aria-live="polite">{t("mic.working")}</span>}
+      </span>
+      {/* Outside .mic on purpose: a note here must never squeeze the field it belongs to.
+          Inside a flex row (e.g. the coach chat form) it wraps to its own full-width line. */}
       {note && <span className="muted mic-note" role="status">{note}</span>}
-    </span>
+    </>
   );
 }

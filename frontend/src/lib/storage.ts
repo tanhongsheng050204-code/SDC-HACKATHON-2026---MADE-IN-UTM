@@ -16,6 +16,7 @@ export const KEYS = {
   joinCode: "laluan.joinCode",  // session only: a class code from a ?join= link, used once on My profile
   forecastSeen: "laluan.forecastSeen.",  // + profile id: the forecast whose changes "Got it" dismissed
   loginPending: "laluan.loginPending",  // session only: set before Google, read once on the way back  // + user id, session only: "Skip" holds until the next login
+  coach: "laluan.coach.",  // + profile/role id, session only: the conversation survives closing the drawer
 } as const;
 
 type Area = "local" | "session";
