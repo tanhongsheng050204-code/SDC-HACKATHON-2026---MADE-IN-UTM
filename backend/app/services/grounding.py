@@ -51,16 +51,34 @@ def _stem(word: str) -> str:
     return word
 
 
+def _pieces(answer: str) -> list[str]:
+    """The answer's sentences as written (citations kept). A citation standing on its own after a
+    full stop joins the sentence before it, so sentence numbers match what the person reads."""
+    pieces: list[str] = []
+    for part in _SENTENCE.split(answer.strip()):
+        if _CITATION.sub("", part).strip():
+            pieces.append(part)
+        elif part.strip() and pieces:
+            pieces[-1] += " " + part
+    return pieces
+
+
+def drop(answer: str, numbers: list[int]) -> str:
+    """The answer without the given sentences (numbered from 1, as in a GroundingReport)."""
+    gone = set(numbers)
+    return " ".join(p for i, p in enumerate(_pieces(answer), start=1) if i not in gone)
+
+
 def check(answer: str, cited_texts: list[str]) -> GroundingReport | None:
     if not cited_texts or not answer.strip():
         return None
-    answer = _CITATION.sub("", answer)
     source = "\n".join(cited_texts)
     source_words = {_stem(w) for w in _words(source)}
     source_numbers = {_norm_number(n) for n in _NUMBER.findall(source)}
     counted = supported = 0
     unsupported: list[int] = []
-    for index, sentence in enumerate(s for s in _SENTENCE.split(answer.strip()) if s.strip()):
+    for index, piece in enumerate(_pieces(answer)):
+        sentence = _CITATION.sub("", piece)
         words = {_stem(w) for w in _words(sentence)}
         numbers = {_norm_number(n) for n in _NUMBER.findall(sentence)}
         if not words and not numbers:

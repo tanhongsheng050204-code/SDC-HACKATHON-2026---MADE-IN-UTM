@@ -1291,6 +1291,9 @@ const STRINGS = {
   "pii1.AGE": { en: "age", ms: "umur", zh: "年龄" },
   "pii1.ADDRESS": { en: "address", ms: "alamat", zh: "地址" },
   "pii1.ORG": { en: "employer or school name", ms: "nama majikan atau sekolah", zh: "雇主或学校名称" },
+  "coach.revised": { en: "Checked and corrected against your sources", ms: "Disemak dan dibetulkan berdasarkan sumber anda", zh: "已根据你的来源核对并更正" },
+  "coach.dropped": { en: "{n} unsupported sentence removed.", ms: "{n} ayat yang tidak disokong telah dibuang.", zh: "已删除 {n} 句没有来源支持的内容。" },
+  "coach.droppedMany": { en: "{n} unsupported sentences removed.", ms: "{n} ayat yang tidak disokong telah dibuang.", zh: "已删除 {n} 句没有来源支持的内容。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

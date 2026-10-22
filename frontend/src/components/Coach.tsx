@@ -80,6 +80,12 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
                     {turn.reply.grounding.all_supported ? t("coach.grounded") : tf("coach.ungrounded", { list: turn.reply.grounding.unsupported.join(", ") })}
                   </span>
                 )}
+                {turn.reply.revised && (
+                  <p className="coach-revised">
+                    <span aria-hidden="true">✓</span> {t("coach.revised")}
+                    {!!turn.reply.dropped && <> · {tf(turn.reply.dropped === 1 ? "coach.dropped" : "coach.droppedMany", { n: turn.reply.dropped })}</>}
+                  </p>
+                )}
                 <details><summary className="muted">{tf("coach.sources", { n: turn.reply.sources.length })}</summary>
                   <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {tr(s.text)}</li>)}</ul>
                 </details>

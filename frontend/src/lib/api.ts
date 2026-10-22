@@ -218,6 +218,7 @@ export interface CoachReply {
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   proposal: CoachProposal | null; suggestions: string[];
   removed?: Record<string, number>;  // personal details taken out of the question before any AI read it
+  revised?: boolean; dropped?: number;  // the AI answer was checked against the sources and corrected
 }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[] }
 export interface Course {

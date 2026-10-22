@@ -287,7 +287,7 @@ def test_coach_validates_input_and_scrubs_before_any_llm_call(client, monkeypatc
 
     def fake_llm(prompt):
         seen["prompt"] = prompt
-        return {"answer": "Your top role is shown first [SOURCE-1].", "proposal": None}
+        return {"answer": "Your top roles under the Baseline scenario are listed [SOURCE-1].", "proposal": None}
 
     monkeypatch.setattr(coach, "_llm_available", lambda: True)
     monkeypatch.setattr(coach, "generate_json", fake_llm)

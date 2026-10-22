@@ -393,3 +393,7 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .privacy-card h3 { font-size: 1rem; font-weight: 800; }
 .privacy-card p { font-size: .9rem; line-height: 1.55; color: var(--ink-2); }
 .coach-removed { justify-self: end; max-width: 90%; margin: 4px 0 0; padding: 4px 10px; border-radius: 99px; background: var(--mint); color: var(--good); font-size: .76rem; font-weight: 700; text-align: right; }
+
+/* ---------- The coach's self-check note under a corrected answer ---------- */
+.coach-revised { margin: 6px 0 0; padding: 6px 12px; border-radius: 99px; width: fit-content; max-width: 100%; background: var(--sky); color: var(--ink-2); font-size: .78rem; font-weight: 700; }
+.coach-revised span { color: var(--good); }
