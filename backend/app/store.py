@@ -15,9 +15,9 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 13
+SCHEMA_VERSION = 14
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
-              "evidence", "progress_events", "consents")
+              "evidence", "progress_events", "consents", "feedback", "usage_counts")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -138,6 +138,28 @@ _MIGRATIONS = {
         created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS consents_profile ON consents(profile_id, created_at);
+    """,
+    # "Was this helpful?" and "Report a problem", and usage counts per event per day. Neither has a
+    # profile ID: feedback keeps only the day, and a usage row is just (event, day, count).
+    14: """
+    CREATE TABLE IF NOT EXISTS feedback (
+        id TEXT PRIMARY KEY,
+        target TEXT NOT NULL,
+        subject TEXT,
+        helpful INTEGER,
+        reason TEXT,
+        note TEXT,
+        screen TEXT,
+        language TEXT,
+        day TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS feedback_day ON feedback(day);
+    CREATE TABLE IF NOT EXISTS usage_counts (
+        event TEXT NOT NULL,
+        day TEXT NOT NULL,
+        count INTEGER NOT NULL,
+        PRIMARY KEY (event, day)
+    );
     """,
 }
 
@@ -608,3 +630,51 @@ def save_survey(profile_id: str, answers: list[dict]) -> None:
         for a in answers:
             conn.execute("INSERT INTO survey_responses (profile_id, card_id, answer, note, created_at) VALUES (?, ?, ?, ?, ?)",
                          (profile_id, a["card_id"], a["answer"], a.get("note"), now))
+
+
+# --- feedback and usage counts (no profile IDs) ---------------------------------------------------
+
+def malaysia_day(now: dt.datetime | None = None) -> str:
+    return (now or dt.datetime.now(dt.UTC)).astimezone(MALAYSIA).date().isoformat()
+
+
+def add_feedback(target: str, subject: str | None, helpful: bool | None, reason: str | None, note: str | None,
+                 screen: str | None, language: str | None) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO feedback (id, target, subject, helpful, reason, note, screen, language, day) "
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                     (secrets.token_urlsafe(9), target, subject, None if helpful is None else int(helpful), reason, note,
+                      screen, language, malaysia_day()))
+
+
+def list_feedback(limit: int = 100) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT target, subject, helpful, reason, note, screen, language, day FROM feedback "
+                            "ORDER BY day DESC, id DESC LIMIT ?", (limit,)).fetchall()
+    return [{**dict(r), "helpful": None if r["helpful"] is None else bool(r["helpful"])} for r in rows]
+
+
+def feedback_totals() -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT target, helpful, COUNT(*) AS n FROM feedback GROUP BY target, helpful "
+                            "ORDER BY target, helpful").fetchall()
+    return [{"target": r["target"], "helpful": None if r["helpful"] is None else bool(r["helpful"]), "count": r["n"]}
+            for r in rows]
+
+
+def count_usage(event: str) -> None:
+    """Add one to today's count for this event. Never fails the request that triggered it."""
+    try:
+        with _connect() as conn:
+            conn.execute("INSERT INTO usage_counts (event, day, count) VALUES (?, ?, 1) "
+                         "ON CONFLICT (event, day) DO UPDATE SET count = usage_counts.count + 1",
+                         (event, malaysia_day()))
+    except Exception:
+        pass
+
+
+def usage_since(day: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT event, day, count FROM usage_counts WHERE day >= ? ORDER BY day, event",
+                            (day,)).fetchall()
+    return [dict(r) for r in rows]

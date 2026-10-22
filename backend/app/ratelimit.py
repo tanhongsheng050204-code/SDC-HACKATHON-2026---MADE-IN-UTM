@@ -25,6 +25,8 @@ LIMITS: dict[str, tuple[int, int | None]] = {
     "checks": (30, None),        # proof-check questions (also limited per profile per hour)
     "identity": (30, 20),
     "search": (30, None),        # live job-ad and emerging-role web searches
+    "feedback": (30, None),      # helpful buttons and problem reports
+    "usage": (120, None),        # anonymous usage counts sent by the app
 }
 
 MESSAGE = "You're going a bit fast. Please wait a few minutes and try again."

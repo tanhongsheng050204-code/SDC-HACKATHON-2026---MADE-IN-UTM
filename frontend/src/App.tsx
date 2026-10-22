@@ -99,6 +99,13 @@ function MainApp({ demo }: { demo: string | null }) {
   const screen = route.screen;
   const scenario = route.scenario;
 
+  // Anonymous usage count: someone without a profile opened onboarding (once per browser session).
+  useEffect(() => {
+    if (screen !== "intake" || profile || load(KEYS.onboardingCounted, "session")) return;
+    save(KEYS.onboardingCounted, "1", "session");
+    api.usage("onboarding_started").catch(() => {});
+  }, [screen, profile]);
+
   function go(next: Screen, extra: Partial<Route> = {}) {
     const r = { ...routeRef.current, ...extra, screen: next };
     routeRef.current = r;

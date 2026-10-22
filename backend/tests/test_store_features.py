@@ -57,3 +57,16 @@ def test_consents_and_export_rows(anydb):
     assert rows["progress_events"][0]["subject"] == "khan_statistics"
     store.delete_profile(pid)
     assert all(v == [] for v in store.export_rows(pid).values())
+
+
+def test_feedback_and_usage_counts(anydb):
+    store.add_feedback("coach", None, True, "clear", None, None, "en")
+    store.add_feedback("problem", None, None, None, "chart empty", "tree", None)
+    assert {"target": "coach", "helpful": True, "count": 1} in store.feedback_totals()
+    assert store.list_feedback(5)[0]["target"] in ("coach", "problem")
+    day = store.malaysia_day()
+    with store._connect() as conn:
+        conn.execute("DELETE FROM usage_counts WHERE event=?", ("test_event",))
+    store.count_usage("test_event")
+    store.count_usage("test_event")
+    assert {"event": "test_event", "day": day, "count": 2} in store.usage_since(day)

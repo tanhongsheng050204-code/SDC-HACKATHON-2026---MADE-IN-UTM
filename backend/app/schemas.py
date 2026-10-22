@@ -205,3 +205,32 @@ class ProfileIn(BaseModel):
 
 class LiveSearchRequest(BaseModel):
     profile_id: str = Field(min_length=1, max_length=64)
+
+
+FEEDBACK_REASONS = ("clear", "useful", "wrong", "unclear", "not_relevant", "other")
+
+
+class FeedbackIn(BaseModel):
+    """"Was this helpful?" on role advice or a coach answer. No profile ID is sent or stored."""
+    model_config = ConfigDict(extra="forbid")
+    target: Literal["role_advice", "coach"]
+    subject: str | None = Field(default=None, max_length=80)  # the role, for role advice
+    helpful: bool
+    reason: Literal[FEEDBACK_REASONS] | None = None  # type: ignore[valid-type]
+    note: str | None = Field(default=None, max_length=500)
+    language: Literal["en", "ms", "zh"] | None = None
+
+
+class ProblemIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    note: str = Field(min_length=3, max_length=1000)
+    screen: str | None = Field(default=None, max_length=40, pattern=r"^[a-z-]*$")
+    language: Literal["en", "ms", "zh"] | None = None
+
+
+USAGE_EVENTS_FROM_APP = ("onboarding_started", "app_installed")
+
+
+class UsageIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal[USAGE_EVENTS_FROM_APP]  # type: ignore[valid-type]

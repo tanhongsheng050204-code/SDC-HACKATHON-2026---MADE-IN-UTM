@@ -12,7 +12,7 @@ from app import ratelimit, runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, PlanRequest, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
@@ -559,6 +559,7 @@ def create_profile(body: ProfileIn):
     profile = store.create_profile(body.display_name, body.current_role_id, body.skills, body.experience_years,
                                    audience=body.audience)
     store.add_consent(profile["id"], "profile_storage", PRIVACY_VERSION)
+    store.count_usage("onboarding_finished")
     return profile
 
 
@@ -571,6 +572,7 @@ def create_demo_profile(key: str):
                                    demo["skills"], demo.get("experience_years"),
                                    is_demo=True, audience=demo.get("audience"))
     store.add_consent(profile["id"], "profile_storage", PRIVACY_VERSION)
+    store.count_usage("demo_opened")
     answers = demo.get("survey_answers") or []
     if answers:  # demos arrive with the survey done, so the preference line shows for judges
         store.save_survey(profile["id"], answers)
@@ -621,6 +623,7 @@ def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
     profile = store.set_target(profile_id, body.role_id)
     if body.role_id is not None:
         progress.record(get_reference(), profile_id, "destination_set", body.role_id)
+        store.count_usage("destination_set")
     return profile
 
 
@@ -698,6 +701,8 @@ def complete_course(profile_id: str, body: CompleteRequest, user: str | None = U
     updated = store.set_completed(profile_id, done)
     if body.done != (body.course_id in profile["completed_courses"]):  # only real changes are events
         progress.record(get_reference(), profile_id, "course_finished" if body.done else "course_unfinished", body.course_id)
+        if body.done:
+            store.count_usage("course_finished")
     return updated
 
 
@@ -707,7 +712,9 @@ def create_card(profile_id: str, body: CardRequest, user: str | None = User):
     _profile_for(profile_id, user)
     if body.role_id not in get_reference().roles:
         raise HTTPException(422, "Unknown role")
-    return {"card_id": store.create_card(profile_id, body.role_id)}
+    card_id = store.create_card(profile_id, body.role_id)
+    store.count_usage("card_created")
+    return {"card_id": card_id}
 
 
 @router.get("/cards/{card_id}")
@@ -748,10 +755,56 @@ def practise_interview(body: InterviewRequest, request: Request, user: str | Non
 def ask_coach(body: CoachRequest, request: Request, user: str | None = User):
     """A cited answer about the person's own results, plus at most one change they can apply."""
     ratelimit.check(request, "coach", body.profile_id)
+    store.count_usage("coach_asked")
     ref = get_reference()
     if body.role_id is not None and body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
     return coach.answer(ref, _profile_for(body.profile_id, user), body.question, body.scenario, body.role_id)
+
+
+# --- feedback and usage counts --------------------------------------------------------------------
+
+@router.post("/feedback", status_code=204)
+def give_feedback(body: FeedbackIn, request: Request):
+    """"Was this helpful?" No profile ID; the optional note is scrubbed of personal details first."""
+    ratelimit.check(request, "feedback")
+    if body.target == "role_advice" and body.subject not in get_reference().roles:
+        raise HTTPException(422, "Unknown role")
+    note = scrub(body.note.strip())[:500] if body.note and body.note.strip() else None
+    store.add_feedback(body.target, body.subject if body.target == "role_advice" else None, body.helpful,
+                       body.reason, note, None, body.language)
+
+
+@router.post("/feedback/problem", status_code=204)
+def report_problem(body: ProblemIn, request: Request):
+    """"Report a problem": the screen it happened on and a scrubbed description. No profile ID."""
+    ratelimit.check(request, "feedback")
+    store.add_feedback("problem", None, None, None, scrub(body.note.strip())[:1000], body.screen, body.language)
+
+
+@router.post("/usage", status_code=204)
+def count_event(body: UsageIn, request: Request):
+    """Add one to today's anonymous count for an event the app reports (the rest are counted here)."""
+    ratelimit.check(request, "usage")
+    store.count_usage(body.event)
+
+
+@router.get("/admin/feedback")
+def admin_feedback(x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return {"totals": store.feedback_totals(), "recent": store.list_feedback(100)}
+
+
+@router.get("/admin/usage")
+def admin_usage(days: int = Query(30, ge=1, le=365), x_admin_token: str = Header(default="")):
+    """Anonymous counts per event per day, with totals for the period."""
+    _require_admin(x_admin_token)
+    since = (dt.date.fromisoformat(store.malaysia_day()) - dt.timedelta(days=days - 1)).isoformat()
+    rows = store.usage_since(since)
+    totals: dict[str, int] = {}
+    for r in rows:
+        totals[r["event"]] = totals.get(r["event"], 0) + r["count"]
+    return {"since": since, "days": rows, "totals": totals}
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)
@@ -818,6 +871,7 @@ def submit_check(check_id: str, body: CheckAnswers, user: str | None = User):
     if passed:
         store.set_skill_level(profile["id"], check["skill_id"], check["level"])
         progress.record(ref, profile["id"], "skill_proven", check["skill_id"], check["level"])
+        store.count_usage("skill_proven")
     return {"passed": passed, "correct": correct, "level": check["level"],
             "level_name": ref.skill_levels[check["level"] - 1]["name"],
             "answers": [q["answer"] for q in check["questions"]],

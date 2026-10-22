@@ -230,6 +230,12 @@ export interface CoachReply {
   removed?: Record<string, number>;  // personal details taken out of the question before any AI read it
   revised?: boolean; dropped?: number;  // the AI answer was checked against the sources and corrected
 }
+export interface AdminFeedback {
+  totals: { target: string; helpful: boolean | null; count: number }[];
+  recent: { target: string; subject: string | null; helpful: boolean | null; reason: string | null; note: string | null;
+    screen: string | null; language: string | null; day: string }[];
+}
+export interface AdminUsage { since: string; days: { event: string; day: string; count: number }[]; totals: Record<string, number> }
 export interface ChatTurn { next_question: string; is_complete: boolean; skills_found: string[] }
 export interface Course {
   id: string; title: string; provider: string; url: string; hours: number; level: string; cost: string; checked: string | null;
@@ -441,6 +447,14 @@ export const api = {
   setPlan: (id: string, targetDate: string | null, weeklyHours: number | null) =>
     requestDetail<Profile>(`/profiles/${id}/plan`, { method: "PUT", body: JSON.stringify({ target_date: targetDate, weekly_hours: weeklyHours }) }),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
+  feedback: (body: { target: "role_advice" | "coach"; subject?: string; helpful: boolean; reason: string | null; note: string | null; language: string }) =>
+    request<void>("/feedback", { method: "POST", body: JSON.stringify(body) }),
+  reportProblem: (note: string, screen: string, language: string) =>
+    request<void>("/feedback/problem", { method: "POST", body: JSON.stringify({ note, screen: screen.replace(/[^a-z-]/g, "").slice(0, 40) || null, language }) }),
+  usage: (event: "onboarding_started" | "app_installed") =>
+    request<void>("/usage", { method: "POST", body: JSON.stringify({ event }) }),
+  adminFeedback: (token: string) => request<AdminFeedback>("/admin/feedback", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  adminUsage: (token: string, days: number) => request<AdminUsage>(`/admin/usage?days=${days}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   exportData: (id: string) => request<Record<string, unknown>>(`/profiles/${id}/export`),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),

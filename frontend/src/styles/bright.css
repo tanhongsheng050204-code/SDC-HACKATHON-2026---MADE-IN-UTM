@@ -435,3 +435,21 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .progress-form input, .progress-form select { min-height: 44px; border-radius: 14px; }
 .progress-form .btn { min-height: 44px; }
 .progress-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 0; font-weight: 700; }
+
+/* ---------- Was this helpful? / Report a problem / Admin feedback ---------- */
+.helpful { display: grid; gap: 8px; margin-top: 10px; padding: 12px 14px; border-radius: 22px; background: var(--sand); font-size: .9rem; }
+.helpful > span { font-weight: 800; }
+.helpful-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.helpful .chip { min-height: 44px; }
+.helpful .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.helpful-more { display: grid; gap: 8px; }
+.helpful textarea, .report-problem textarea { width: 100%; border-radius: 14px; padding: 10px 12px; font: inherit; }
+.helpful.done { background: var(--mint); color: var(--good); font-weight: 700; }
+.report-problem { display: grid; gap: 10px; max-width: 480px; border-radius: 26px; }
+.admin-feedback { gap: 12px; }
+.table-scroll { overflow-x: auto; }
+.usage-table { border-collapse: collapse; font-size: .85rem; }
+.usage-table th, .usage-table td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+.usage-table th[scope="row"], .usage-table thead th:first-child { text-align: left; }
+.feedback-list { list-style: none; padding: 0; display: grid; gap: 8px; }
+.feedback-list p { margin: 4px 0 0; }

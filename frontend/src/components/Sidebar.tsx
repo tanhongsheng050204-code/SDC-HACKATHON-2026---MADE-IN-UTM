@@ -3,6 +3,7 @@ import { api, type Journey, type JourneyStep, type Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
 import { AccountButton } from "./AccountButton";
+import { ReportProblem } from "./ReportProblem";
 import { LogoMark } from "./Brand";
 import { Icon, IconName } from "./Icon";
 
@@ -75,6 +76,7 @@ export function Sidebar({ current, roleId, profile, journey, model, prefs, userI
         <p className="side-note">{t("shell.estimates")}</p>
         <div className="side-prefs">{prefs}</div>
         <AccountButton userId={userId} className="side-link" />
+        <ReportProblem screen={current} className="side-link" />
         {profile && <DownloadData profileId={profile.id} />}
         {profile && <button className="side-link danger" onClick={onDelete}><Icon name="trash" />{t("shell.delete")}</button>}
       </div>

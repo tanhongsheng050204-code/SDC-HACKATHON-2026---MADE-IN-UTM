@@ -1,4 +1,5 @@
 import { EntryRequirements } from "../components/EntryRequirements";
+import { Helpful } from "../components/Helpful";
 import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
@@ -147,6 +148,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
           </>
         )}
       </Tabs>
+      <Helpful target="role_advice" subject={role.role_id} />
 
       {xray && <SignalXray roleId={role.role_id} scenario={xray} year={role.estimate_range.year}
         adoption={xray === scenario ? adoption : undefined} onClose={() => setXray(null)} />}

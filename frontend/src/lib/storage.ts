@@ -11,6 +11,7 @@ export const KEYS = {
   adminToken: "laluan.adminToken",
   reviewer: "laluan.reviewer",
   nameSkipped: "laluan.nameSkipped.",
+  onboardingCounted: "laluan.onboardingCounted",  // session only: the anonymous onboarding_started count was sent
   forecastSeen: "laluan.forecastSeen.",  // + profile id: the forecast whose changes "Got it" dismissed
   loginPending: "laluan.loginPending",  // session only: set before Google, read once on the way back  // + user id, session only: "Skip" holds until the next login
 } as const;
