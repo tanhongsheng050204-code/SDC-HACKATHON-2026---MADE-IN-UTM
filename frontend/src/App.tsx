@@ -83,6 +83,7 @@ function MainApp({ demo }: { demo: string | null }) {
   roleRef.current = role;
   const routeRef = useRef(route);
   routeRef.current = route;
+  const autoLanded = useRef(false);  // the logged-in landing page has sent the person to Today once
 
   const screen = route.screen;
   const scenario = route.scenario;
@@ -174,12 +175,14 @@ function MainApp({ demo }: { demo: string | null }) {
       if (profileRef.current?.user_id) { setProfile(null); setRole(null); go("landing", { role: undefined }); }
       return;
     }
-    // Just back from Google: land on Today (or the intake if there is no profile yet), not the
-    // landing page the login started from. A plain reload while logged in stays where it is.
-    const justLoggedIn = load(KEYS.loginPending, "session") === "1";
+    // Logged in and on the landing page (back from Google, or opening the site again): go to Today,
+    // or the intake if the account has no profile yet. Only once per page load, so the logo still
+    // opens the landing page afterwards.
+    const firstLogin = !autoLanded.current;
+    autoLanded.current = true;
     save(KEYS.loginPending, null, "session");
     const landHome = () => {
-      if (justLoggedIn && routeRef.current.screen === "landing") go(profileRef.current ? "home" : "intake", { role: undefined });
+      if (firstLogin && routeRef.current.screen === "landing") go(profileRef.current ? "home" : "intake", { role: undefined });
     };
     (async () => {
       try {
