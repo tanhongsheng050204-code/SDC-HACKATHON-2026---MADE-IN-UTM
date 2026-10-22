@@ -224,16 +224,16 @@ def test_source_check_never_reads_private_addresses(monkeypatch):
                 "https://[::1]/", "https://localhost/"):
         assert not emerging._public_https(url), url
 
-    class Hop:
-        def __init__(self, location):
-            self.is_redirect, self.status_code, self.headers, self.text = True, 302, {"location": location}, ""
-
     calls = []
     monkeypatch.setattr(emerging, "_public_https", lambda url: "169.254" not in url)
-    monkeypatch.setattr(emerging.httpx, "get", lambda url, **kw: calls.append(url) or Hop("https://169.254.169.254/x"))
+    monkeypatch.setattr(emerging, "_get", lambda url: calls.append(url) or ("8.8.8.8", 302, "https://169.254.169.254/x", ""))
     assert REAL_PAGE_TEXT("https://jobs.example.my/ad") is None
     assert calls == ["https://jobs.example.my/ad"]  # the redirect to a private address is never fetched
     calls.clear()
     monkeypatch.setattr(emerging, "_public_https", lambda url: True)
-    monkeypatch.setattr(emerging.httpx, "get", lambda url, **kw: calls.append(url) or Hop(url + "/next"))
+    monkeypatch.setattr(emerging, "_get", lambda url: calls.append(url) or ("8.8.8.8", 302, url + "/next", ""))
     assert REAL_PAGE_TEXT("https://loop.example.my") is None and len(calls) == emerging.MAX_HOPS + 1
+    # DNS rebinding: the name passed the check but the connection landed on a private address
+    monkeypatch.setattr(emerging, "_get", lambda url: (None, 0, "", ""))
+    assert REAL_PAGE_TEXT("https://rebind.example.my") is None
+    assert not emerging._public_ip("10.1.2.3") and not emerging._public_ip("fe80::1%eth0") and emerging._public_ip("8.8.8.8")

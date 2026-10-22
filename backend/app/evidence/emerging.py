@@ -105,11 +105,26 @@ def _public_https(url: str) -> bool:
         infos = socket.getaddrinfo(parts.hostname, parts.port or 443, proto=socket.IPPROTO_TCP)
     except (socket.gaierror, UnicodeError, ValueError):
         return False
-    for info in infos:
-        ip = ipaddress.ip_address(info[4][0].split("%")[0])
-        if not ip.is_global or ip.is_multicast:
-            return False
-    return bool(infos)
+    return bool(infos) and all(_public_ip(info[4][0]) for info in infos)
+
+
+def _public_ip(address: str) -> bool:
+    ip = ipaddress.ip_address(address.split("%")[0])
+    return ip.is_global and not ip.is_multicast
+
+
+def _get(url: str) -> tuple[str | None, int, str, str]:
+    """(address actually connected to, status, redirect location, body). The address is checked
+    again after connecting, so a hostname that changes its answer between the check and the
+    request (DNS rebinding) still cannot reach a private address; its body is never read."""
+    with httpx.stream("GET", url, follow_redirects=False, timeout=10,
+                      headers={"User-Agent": "Mozilla/5.0 (Laluan source check)"}) as response:
+        stream = response.extensions.get("network_stream")
+        peer = stream.get_extra_info("server_addr") if stream else None
+        if not peer or not _public_ip(peer[0]):
+            return None, 0, "", ""
+        body = response.read().decode(response.encoding or "utf-8", "replace") if response.status_code == 200 else ""
+        return peer[0], response.status_code, response.headers.get("location", "") if response.is_redirect else "", body
 
 
 def _page_text(url: str) -> str | None:
@@ -117,13 +132,14 @@ def _page_text(url: str) -> str | None:
         if not _public_https(url):
             return None
         try:
-            response = httpx.get(url, follow_redirects=False, timeout=10,
-                                 headers={"User-Agent": "Mozilla/5.0 (Laluan source check)"})
+            peer, status, location, body = _get(url)
         except httpx.HTTPError:
             return None
-        if not response.is_redirect:
-            return response.text if response.status_code == 200 else None
-        url = urllib.parse.urljoin(url, response.headers.get("location", ""))
+        if peer is None:
+            return None
+        if not location:
+            return body if status == 200 else None
+        url = urllib.parse.urljoin(url, location)
     return None
 
 
