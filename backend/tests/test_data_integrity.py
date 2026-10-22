@@ -191,3 +191,21 @@ def test_programmes_use_catalogue_skills_with_courses():
     for prog in ref.programmes:
         assert set(prog["name"]) == {"en", "ms", "zh"} and prog["aliases"] and 3 <= len(prog["skills"]) <= 6
         assert all(s in ref.skills and s in taught for s in prog["skills"]), prog["id"]
+
+
+def test_course_alternatives_are_sourced_and_never_change_a_plan():
+    """Free courses in BM and other languages sit beside a step; plans and hours ignore them."""
+    from app.services import pathway
+
+    ref = get_reference()
+    assert ref.course_alternatives
+    plan_ids = {c["id"] for c in ref.courses}
+    for alt in ref.course_alternatives:
+        assert alt["id"] not in plan_ids and set(alt["skills"]) <= ref.skills.keys()
+        assert alt["url"].startswith("https://") and alt["checked"] and alt["cost"] == "free"
+        assert "ms" in alt["languages"] and set(alt["languages"]) <= {"ms", "en", "zh", "ta"}
+    plan = pathway.build(ref, {"skills": ["excel", "data_entry"]}, "ai_operations_specialist", summarize=False)
+    assert all(s["course"]["id"] in plan_ids for s in plan["steps"])
+    assert plan["total_hours"] == sum(s["course"]["hours"] for s in plan["steps"])
+    genai = [s for s in plan["steps"] if any(k["skill_id"] == "genai_tools" for k in s["skills"])]
+    assert genai and {a["id"] for a in genai[0]["alternatives"]} >= {"rd_pengenalan_ai"}

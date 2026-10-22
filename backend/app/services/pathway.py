@@ -79,6 +79,8 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
                    + f" for {role['title']}.",
             "why_key": "core" if weight == 3 else "important" if weight == 2 else "useful",  # the app words it per language
             "done": course["id"] in done,
+            # The same skills, free, in Bahasa Malaysia and other languages: another way in, not a swap.
+            "alternatives": [a for a in ref.course_alternatives if set(a["skills"]) & set(taught)],
         })
     uncovered = [rs["skill_id"] for rs in missing
                  if not any(rs["skill_id"] in s["course"]["skills"] for s in steps)]

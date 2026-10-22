@@ -198,6 +198,8 @@ Notes: ______
 - [ ] 13.4 Proof check: three quick questions; passing fills the skill's ring and adds it to **Proven skills**; failing explains and suggests the course.
 - [ ] 13.5 **List** tab: dark time-to-ready bar (hours left, RM, stops, readiness now → after plan; "+ N price to confirm" for unpriced paid courses); route map on the left with numbered stops and the destination pin.
 - [ ] 13.6 Each step: skills taught, course link, provider, hours, level, reason, cost badge (Free / Free to audit / Paid · RM …), HRD Corp badge, source and checked date.
+- [ ] 13.16 A step that teaches Generative AI tools or cloud computing shows a sky box **Also free in Bahasa Malaysia, 中文 and Tamil:** with Rakyat Digital courses (duration, free, languages). Plan hours do not change.
+- [ ] 13.17 A step whose course offers a certificate shows **🎓 Certificate available from …**; in the Tree, opening a step says how to get that certificate, or that the course lists none, and that a proof check is practice, not a certificate.
 - [ ] 13.7 **I finished this** ticks immediately with a small confetti burst; hours, readiness, route and Today's next-step card update; unticking reverses it.
 - [ ] 13.8 Grounding line: "Every sentence is backed by the course catalogue" (or lists sentences to check).
 - [ ] 13.9 **Plan it in my calendar**: pick days, session length and start time; the finish date updates; **Download calendar file (.ics)** opens in Google / Outlook / Apple Calendar.

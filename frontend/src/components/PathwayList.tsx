@@ -7,6 +7,14 @@ import { getLang, t, tf, tr, tv, type StringKey } from "../lib/i18n";
 
 // The pathway as an ordered list: courses, hours, cost and HRD Corp status, for budgeting and print.
 // Readiness itself is the bar at the top of the pathway screen; this adds where you started and what is done.
+const LANG_NAME: Record<string, string> = { ms: "Bahasa Malaysia", en: "English", zh: "中文", ta: "தமிழ்" };
+const duration = (h: number) => (h < 1 ? `${Math.round(h * 60)} min` : tf("pl.hours", { h }));
+
+// A provider's own certificate, when the dated price note says the course offers one (never guessed).
+export function hasCertificate(note?: string | null) {
+  return !!note && /certificate/i.test(note) && !/no certificate/i.test(note);
+}
+
 export function PathwayList({ plan, role, freeOnly, saving, onToggle }: {
   plan: Pathway; role: RoleMatch; freeOnly?: boolean; saving?: boolean;
   onToggle: (courseId: string, done: boolean, anchor?: HTMLElement) => void;
@@ -57,6 +65,17 @@ export function PathwayList({ plan, role, freeOnly, saving, onToggle }: {
               <span className="source">{t("pl.catalogue")} · {c.url ? (c.checked ? tf("pl.checked", { date: c.checked }) : t("pl.notChecked")) : t("pl.noPage")}</span>
               {c.price_note && <span className="source">{c.price_note}{c.hrd_note ? ` ${c.hrd_note}` : ""}{c.price_checked ? ` ${tf("pl.priceChecked", { date: c.price_checked })}` : ""}</span>}
               {c.cost === "paid" && <span className="source">{t("pl.priceWarn")}</span>}
+              {hasCertificate(c.price_note) && <span className="cert-line">🎓 {tf("cert.fromCourse", { provider: c.provider })}</span>}
+              {s.alternatives && s.alternatives.length > 0 && (
+                <div className="alt-courses">
+                  <strong>{t("alt.title")}</strong>
+                  <ul>{s.alternatives.map((a) => (
+                    <li key={a.id}><a href={a.url} target="_blank" rel="noreferrer">{a.title} ↗</a> · {a.provider} · {duration(a.hours)} · {t("alt.free")}
+                      {a.languages && <span className="muted"> · {a.languages.map((l) => LANG_NAME[l] ?? l).join(", ")}</span>}</li>
+                  ))}</ul>
+                  <span className="source">{t("alt.note")}</span>
+                </div>
+              )}
               <label className="check">
                 <input type="checkbox" checked={s.done} disabled={saving}
                   onChange={(e) => {

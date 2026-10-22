@@ -9,7 +9,7 @@ The latest by `imported` date is the one used.
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 
@@ -43,6 +43,9 @@ class Reference:
     ai_exposure: dict  # published exposure estimates and AI usage (scripts/build_ai_exposure.py)
     entry_requirements: dict  # usual education by MASCO group and licences per role (data/entry_requirements.json)
     malaysia_programmes: dict  # MyCOL, MyMahir and Jelajah AI links on role pages (data/malaysia_programmes.json)
+    # Free courses in BM and other languages shown beside a pathway step, never chosen for a plan
+    # (data/course_alternatives.json), so plans and hours do not change.
+    course_alternatives: list[dict] = field(default_factory=list)
 
     @property
     def latest_snapshot(self) -> dict:
@@ -115,6 +118,7 @@ def get_reference() -> Reference:
         ai_exposure=_read(data_dir / "ai_exposure.json"),
         entry_requirements=_read(data_dir / "entry_requirements.json"),
         malaysia_programmes=_read(data_dir / "malaysia_programmes.json"),
+        course_alternatives=_read(data_dir / "course_alternatives.json")["courses"],
     )
 
 

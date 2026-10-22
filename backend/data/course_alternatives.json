@@ -1,0 +1,101 @@
+{
+ "note": "Free courses in Bahasa Malaysia and other languages, shown beside a pathway step as another way to learn the same skill. They never replace the step's course, so plans, hours and rankings are unchanged. Titles, durations and the number of languages are as listed on Rakyat Digital's Literacy Hub (Ministry of Digital, run by MyDIGITAL Corporation), checked on the date given; the four languages are those named when the Ministry launched AI Untuk Rakyat (Bahasa Malaysia, English, Chinese and Tamil).",
+ "source": {
+  "title": "Rakyat Digital, Hab Literasi Digital (Ministry of Digital)",
+  "url": "https://rakyatdigital.gov.my/literacy-hub"
+ },
+ "language_source": {
+  "title": "Vulcan Post: AI Untuk Rakyat course launch",
+  "url": "https://vulcanpost.com/849537/ai-untuk-rakyat-course-launch-improve-literacy-malaysia"
+ },
+ "courses": [
+  {
+   "id": "rd_pengenalan_ai",
+   "title": "Pengenalan untuk AI (Introduction to AI)",
+   "provider": "Rakyat Digital, Ministry of Digital",
+   "url": "https://rakyatdigital.gov.my/literacy-hub",
+   "skills": [
+    "genai_tools"
+   ],
+   "level": "intro",
+   "hours": 4,
+   "modules": 11,
+   "cost": "free",
+   "price_rm": 0,
+   "languages": [
+    "ms",
+    "en",
+    "zh",
+    "ta"
+   ],
+   "checked": "2026-10-22",
+   "price_note": "Free (\"Sentiasa Percuma\") on Rakyat Digital. 11 modules, about 4 hours."
+  },
+  {
+   "id": "rd_generatif_ai",
+   "title": "Generatif AI (Generative AI)",
+   "provider": "Rakyat Digital, Ministry of Digital",
+   "url": "https://rakyatdigital.gov.my/literacy-hub",
+   "skills": [
+    "genai_tools"
+   ],
+   "level": "intro",
+   "hours": 0.5,
+   "modules": 8,
+   "cost": "free",
+   "price_rm": 0,
+   "languages": [
+    "ms",
+    "en",
+    "zh",
+    "ta"
+   ],
+   "checked": "2026-10-22",
+   "price_note": "Free (\"Sentiasa Percuma\") on Rakyat Digital. 8 modules, about 30 minutes."
+  },
+  {
+   "id": "rd_agentic_ai",
+   "title": "Agentic AI untuk Semua (Agentic AI for everyone)",
+   "provider": "Rakyat Digital, Ministry of Digital",
+   "url": "https://rakyatdigital.gov.my/literacy-hub",
+   "skills": [
+    "genai_tools"
+   ],
+   "level": "intro",
+   "hours": 2,
+   "modules": 5,
+   "cost": "free",
+   "price_rm": 0,
+   "languages": [
+    "ms",
+    "en",
+    "zh",
+    "ta"
+   ],
+   "checked": "2026-10-22",
+   "price_note": "Free (\"Sentiasa Percuma\") on Rakyat Digital. 5 modules, about 2 hours."
+  },
+  {
+   "id": "rd_cloud",
+   "title": "Cloud untuk Rakyat (Cloud for everyone)",
+   "provider": "Rakyat Digital, Ministry of Digital",
+   "url": "https://rakyatdigital.gov.my/literacy-hub",
+   "skills": [
+    "cloud_computing"
+   ],
+   "level": "intro",
+   "hours": 0.7,
+   "modules": 7,
+   "cost": "free",
+   "price_rm": 0,
+   "languages": [
+    "ms",
+    "en",
+    "zh",
+    "ta"
+   ],
+   "checked": "2026-10-22",
+   "price_note": "Free (\"Sentiasa Percuma\") on Rakyat Digital. 7 modules, about 40 minutes."
+  }
+ ]
+}

@@ -179,6 +179,8 @@ Use synthetic or non-sensitive information when testing. Never upload someone el
   - The dark bar shows hours left, cost in RM, number of stops and readiness now → after the plan.
   - Each step shows the course, provider, hours, level, cost (**Free**, **Free to audit**, **Paid · RM…**), HRD Corp status and when the link was checked.
   - **I finished this** ticks a course off. Readiness, the route and Today update at once; untick to undo.
+- **Also free in Bahasa Malaysia, 中文 and Tamil:** where a step teaches Generative AI tools or cloud computing, free Rakyat Digital courses (Ministry of Digital) are listed as another way in. Your plan's hours still count the main course.
+- **Certificates:** a step shows **🎓 Certificate available** when the provider offers one. A proof check in Laluan is practice for you; to show an employer, use the provider's certificate.
 - **Free courses only** rebuilds the plan using only free or free-to-audit courses.
 - **Tree** tab: skills you have at the bottom, the steps above, harder steps deeper in colour.
   - Open a step to see its course, tick it finished, or **Prove** the skill.

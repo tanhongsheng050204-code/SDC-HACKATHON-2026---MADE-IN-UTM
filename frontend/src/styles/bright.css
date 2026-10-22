@@ -709,3 +709,8 @@ html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[dat
 .login-ms i { width: 9px; height: 9px; display: block; }
 .login-ms i:nth-child(1) { background: #F25022; } .login-ms i:nth-child(2) { background: #7FBA00; }
 .login-ms i:nth-child(3) { background: #00A4EF; } .login-ms i:nth-child(4) { background: #FFB900; }
+
+/* Courses in other languages, and certificates */
+.alt-courses { background: var(--sky); border-radius: 16px; padding: 10px 14px; display: grid; gap: 4px; }
+.alt-courses ul { margin: 0; padding-left: 18px; }
+.cert-line { font-size: .92rem; font-weight: 600; color: var(--ink-2); }

@@ -41,7 +41,7 @@ def _depth(ref: Reference, skill_id: str, memo: dict[str, int]) -> int:
 def course_for(ref: Reference, skill_id: str) -> dict | None:
     teaching = [c for c in ref.courses if skill_id in c["skills"]]
     course = next((c for c in teaching if c.get("url")), teaching[0] if teaching else None)  # one people can open first
-    return {k: course[k] for k in ("id", "title", "url", "hours", "cost")} if course else None
+    return {k: course.get(k) for k in ("id", "title", "url", "hours", "cost", "provider", "price_note")} if course else None
 
 
 def is_unlocked(ref: Reference, profile: dict, skill_id: str) -> bool:
@@ -73,7 +73,7 @@ def build(ref: Reference, profile: dict, role_id: str) -> dict:
             "depth": _depth(ref, skill_id, memo),
             "tier": ref.skills[skill_id].get("tier", "foundation"),
             "in_role": any(rs["skill_id"] == skill_id for rs in role["skills"]),
-            "course": ({k: steps[skill_id][1][k] for k in ("id", "title", "url", "hours", "cost")}
+            "course": ({k: steps[skill_id][1].get(k) for k in ("id", "title", "url", "hours", "cost", "provider", "price_note")}
                        if skill_id in steps else course_for(ref, skill_id)),
             "step": steps[skill_id][0] if skill_id in steps else None,
             "course_done": skill_id in steps and steps[skill_id][1]["id"] in done,

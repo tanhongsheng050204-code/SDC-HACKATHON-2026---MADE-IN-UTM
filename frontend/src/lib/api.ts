@@ -330,7 +330,7 @@ export interface Course {
 export interface TreeNode {
   skill_id: string; name: string; level: number; from_cv: boolean; unlocked: boolean;
   prereqs: string[]; depth: number; tier: "foundation" | "core" | "advanced"; in_role: boolean;
-  course: { id: string; title: string; url: string; hours: number; cost: string } | null;
+  course: { id: string; title: string; url: string; hours: number; cost: string; provider?: string; price_note?: string } | null;
   step: number | null; course_done: boolean;
   evidence?: SkillEvidence | null; added_from_ads?: boolean;
 }
@@ -402,7 +402,8 @@ export interface Tipping {
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
   requirements?: Requirements;
-  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean }[];
+  steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean;
+    alternatives?: (Course & { languages?: string[]; modules?: number })[] }[];
   summary_template?: { key: string; vars: Record<string, unknown> };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;
   uncovered_skills: string[];

@@ -1,4 +1,5 @@
 import { EntryRequirements, years } from "../components/EntryRequirements";
+import { hasCertificate } from "../components/PathwayList";
 import { useEffect, useRef, useState } from "react";
 import { Tabs } from "../components/Tabs";
 import { LoginToKeep } from "../components/AccountButton";
@@ -320,6 +321,8 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
             {open.course
               ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{tr(open.course.title)} ↗</a> · {open.course.hours} h</p>
               : <p className="muted">{t("path.noCourse")}</p>}
+            <p className="proof-practice">{open.course && hasCertificate(open.course.price_note)
+              ? tf("cert.forEmployers", { provider: open.course.provider ?? "" }) : t("cert.none")}</p>
             {open.step && open.course && (
               <label className="check"><input type="checkbox" checked={open.course_done} disabled={saving}
                 onChange={(e) => { setCourse(open.course!.id, e.target.checked, e.currentTarget); }} /> {t("path.courseDone")}</label>

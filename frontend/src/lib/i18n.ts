@@ -1752,6 +1752,12 @@ const STRINGS = {
   "hr.counts": { en: "{n} people, {risk} in declining roles", ms: "{n} orang, {risk} dalam peranan menurun", zh: "{n} 人，{risk} 人处于衰退职位" },
   "hr.viewing": { en: "Showing \u201c{name}\u201d, saved on {date}, with the forecast it was made on. Analyse a file to see today's figures.", ms: "Menunjukkan \u201c{name}\u201d, disimpan pada {date}, dengan unjuran ketika itu. Analisis fail untuk melihat angka hari ini.", zh: "正在显示 {date} 保存的“{name}”，使用当时的预测。分析文件即可查看今天的数据。" },
   "login.microsoft": { en: "Continue with Microsoft (school or work)", ms: "Teruskan dengan Microsoft (sekolah atau kerja)", zh: "使用 Microsoft 继续（学校或工作账户）" },
+  "alt.title": { en: "Also free in Bahasa Malaysia, 中文 and Tamil:", ms: "Juga percuma dalam Bahasa Malaysia, 中文 dan Tamil:", zh: "也有免费的马来文、中文和淡米尔文版本：" },
+  "alt.free": { en: "free", ms: "percuma", zh: "免费" },
+  "alt.note": { en: "Another way in, from the Ministry of Digital's Rakyat Digital portal. Your plan's hours count the course above.", ms: "Satu lagi cara bermula, daripada portal Rakyat Digital Kementerian Digital. Jam dalam pelan anda mengira kursus di atas.", zh: "另一种入门方式，来自数码部的 Rakyat Digital 平台。计划时数按上方课程计算。" },
+  "cert.fromCourse": { en: "Certificate available from {provider} (see the price note)", ms: "Sijil tersedia daripada {provider} (lihat nota harga)", zh: "{provider} 提供证书（见价格说明）" },
+  "cert.forEmployers": { en: "To show an employer, finish the course and take the certificate from {provider}. A proof check here is practice for you, not a certificate.", ms: "Untuk ditunjukkan kepada majikan, habiskan kursus dan ambil sijil daripada {provider}. Semakan bukti di sini ialah latihan untuk anda, bukan sijil.", zh: "如需向雇主证明，请完成课程并获取 {provider} 的证书。这里的验证测验只是给您的练习，不是证书。" },
+  "cert.none": { en: "A proof check here is practice for you, not a certificate. This course does not list a certificate; ask the provider, or look for a recognised one in the same skill.", ms: "Semakan bukti di sini ialah latihan untuk anda, bukan sijil. Kursus ini tidak menyenaraikan sijil; tanya penyedia, atau cari sijil yang diiktiraf untuk kemahiran yang sama.", zh: "这里的验证测验只是给您的练习，不是证书。本课程未列出证书；可询问课程方，或寻找同一技能的认可证书。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;
