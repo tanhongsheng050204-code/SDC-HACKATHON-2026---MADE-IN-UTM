@@ -113,6 +113,11 @@ Notes: ______
 - [ ] 7.2 Change the years → **Save changes** → "Profile saved", back on Today, change kept; the destination is unchanged.
 - [ ] 7.3 **Add skills from a CV** reads a CV and keeps the old skills plus the new ones on the same profile.
 - [ ] 7.4 **Start over (deletes this profile)** asks for confirmation first.
+- [ ] 7.5 **Email and job alerts** (sky card under My profile): anonymous → "Log in with Google to get emails"; without SMTP settings on the server → "Email isn't set up on this server yet".
+- [ ] 7.6 Logged in: everything starts off. Tick **Email me a weekly summary**, choose job ads (Don't send / In my weekly email / As they appear) and a state, **Save email choices** → "Saved. Every email has a one-click unsubscribe link." and "Sent to you@gmail.com". "In my weekly email" is greyed out while the weekly email is off. Turning everything off says the address is no longer kept.
+- [ ] 7.7 GitHub → Actions → Scheduled jobs → Run workflow → `weekly`: the email arrives with readiness, this week's course hours vs your weekly hours, the next course with its link, new job ads for your destination in your state, and a forecast-change line if a new forecast moved it. Running it again the same week sends nothing.
+- [ ] 7.8 With "As they appear": Run workflow → `alerts` sends only ads not emailed before; a second run sends nothing until a new ad appears.
+- [ ] 7.9 **Unsubscribe with one click** (email footer) opens "You're unsubscribed" without logging in; Gmail's own Unsubscribe button works too. A changed link shows "That link didn't work". **Download my data** lists the email setting and consent rows (email_digest, job_alerts_…) with dates.
 
 Notes: ______
 

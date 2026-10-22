@@ -230,6 +230,13 @@ export interface CoachReply {
   removed?: Record<string, number>;  // personal details taken out of the question before any AI read it
   revised?: boolean; dropped?: number;  // the AI answer was checked against the sources and corrected
 }
+export type EmailAlerts = "off" | "weekly" | "instant";
+export type EmailState = "anywhere" | "johor" | "kedah" | "kelantan" | "melaka" | "negeri_sembilan" | "pahang" | "perak" | "perlis"
+  | "pulau_pinang" | "sabah" | "sarawak" | "selangor" | "terengganu" | "kuala_lumpur" | "labuan" | "putrajaya";
+export interface EmailSettingsReply {
+  available: boolean; logged_in: boolean; email: string | null;
+  settings: { digest: boolean; alerts: EmailAlerts; state: EmailState | null; language: string } | null;
+}
 export interface AdminFeedback {
   totals: { target: string; helpful: boolean | null; count: number }[];
   recent: { target: string; subject: string | null; helpful: boolean | null; reason: string | null; note: string | null;
@@ -456,6 +463,11 @@ export const api = {
     request<void>("/usage", { method: "POST", body: JSON.stringify({ event }) }),
   adminFeedback: (token: string) => request<AdminFeedback>("/admin/feedback", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   adminUsage: (token: string, days: number) => request<AdminUsage>(`/admin/usage?days=${days}`, { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  emailSettings: (id: string) => request<EmailSettingsReply>(`/profiles/${id}/email`),
+  saveEmailSettings: (id: string, body: { digest: boolean; alerts: EmailAlerts; state: EmailState; language: string }) =>
+    request<EmailSettingsReply>(`/profiles/${id}/email`, { method: "PUT", body: JSON.stringify(body) }),
+  unsubscribe: (token: string) =>
+    request<{ done: "all" | "alerts" }>(`/email/unsubscribe?token=${encodeURIComponent(token)}`, { method: "POST" }),
   exportData: (id: string) => request<Record<string, unknown>>(`/profiles/${id}/export`),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),

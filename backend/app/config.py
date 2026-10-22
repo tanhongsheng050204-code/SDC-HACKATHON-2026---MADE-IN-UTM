@@ -44,6 +44,18 @@ class Settings:
     runpod_timeout_seconds: int
     sentry_dsn: str  # error tracking; empty = off
     sentry_environment: str
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str  # e.g. the team Gmail address; empty = email is not set up
+    smtp_password: str  # a Gmail app password, never the account password
+    mail_from: str
+    cron_secret: str  # header X-Cron-Secret for /api/cron/*; also signs unsubscribe links
+    app_url: str  # the site, for links in emails
+    public_api_url: str  # this API, for the one-click unsubscribe header
+
+    @property
+    def email_available(self) -> bool:
+        return bool(self.smtp_user and self.smtp_password and self.cron_secret)
 
     @property
     def llm_mode(self) -> str:
@@ -89,6 +101,14 @@ def get_settings() -> Settings:
         runpod_timeout_seconds=int(os.environ.get("RUNPOD_TIMEOUT_SECONDS", "20")),
         sentry_dsn=os.environ.get("SENTRY_DSN", ""),
         sentry_environment=os.environ.get("SENTRY_ENVIRONMENT") or "production",
+        smtp_host=os.environ.get("SMTP_HOST") or "smtp.gmail.com",
+        smtp_port=int(os.environ.get("SMTP_PORT") or "587"),
+        smtp_user=os.environ.get("SMTP_USER", ""),
+        smtp_password=os.environ.get("SMTP_PASSWORD", ""),
+        mail_from=os.environ.get("MAIL_FROM") or os.environ.get("SMTP_USER", ""),
+        cron_secret=os.environ.get("CRON_SECRET", ""),
+        app_url=(os.environ.get("APP_URL") or "https://laluan-psi.vercel.app").rstrip("/"),
+        public_api_url=(os.environ.get("PUBLIC_API_URL") or "https://laluan-api.onrender.com").rstrip("/"),
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")

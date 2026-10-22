@@ -234,3 +234,22 @@ USAGE_EVENTS_FROM_APP = ("onboarding_started", "app_installed")
 class UsageIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     event: Literal[USAGE_EVENTS_FROM_APP]  # type: ignore[valid-type]
+
+
+EMAIL_STATES = ("anywhere", "johor", "kedah", "kelantan", "melaka", "negeri_sembilan", "pahang", "perak", "perlis",
+                "pulau_pinang", "sabah", "sarawak", "selangor", "terengganu", "kuala_lumpur", "labuan", "putrajaya")
+
+
+class EmailSettingsIn(BaseModel):
+    """"Email me" (weekly digest) and job alerts. Turning both off deletes the stored address."""
+    model_config = ConfigDict(extra="forbid")
+    digest: bool
+    alerts: Literal["off", "weekly", "instant"] = "off"
+    state: Literal[EMAIL_STATES] | None = None  # type: ignore[valid-type]
+    language: Literal["en", "ms", "zh"] = "en"
+
+    @model_validator(mode="after")
+    def weekly_needs_digest(self):
+        if self.alerts == "weekly" and not self.digest:
+            raise ValueError("Job ads in the weekly email need the weekly email turned on")
+        return self

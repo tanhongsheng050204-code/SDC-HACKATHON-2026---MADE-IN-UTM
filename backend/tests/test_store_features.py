@@ -60,9 +60,12 @@ def test_consents_and_export_rows(anydb):
 
 
 def test_feedback_and_usage_counts(anydb):
+    def coach_yes():  # the Postgres database is shared between runs, so compare before and after
+        return next((t["count"] for t in store.feedback_totals() if t["target"] == "coach" and t["helpful"] is True), 0)
+    before = coach_yes()
     store.add_feedback("coach", None, True, "clear", None, None, "en")
     store.add_feedback("problem", None, None, None, "chart empty", "tree", None)
-    assert {"target": "coach", "helpful": True, "count": 1} in store.feedback_totals()
+    assert coach_yes() == before + 1
     assert store.list_feedback(5)[0]["target"] in ("coach", "problem")
     day = store.malaysia_day()
     with store._connect() as conn:
@@ -70,3 +73,21 @@ def test_feedback_and_usage_counts(anydb):
     store.count_usage("test_event")
     store.count_usage("test_event")
     assert {"event": "test_event", "day": day, "count": 2} in store.usage_since(day)
+
+
+def test_email_settings_and_sent_jobs(anydb):
+    pid = _profile()
+    store.save_email_settings(pid, "user-1", "a@b.my", True, "instant", "selangor", "ms")
+    store.save_email_settings(pid, "user-1", "a@b.my", True, "weekly", "johor", "ms")  # update in place
+    saved = store.get_email_settings(pid)
+    assert (saved["digest"], saved["alerts"], saved["state"]) == (True, "weekly", "johor")
+    assert any(s["profile_id"] == pid for s in store.list_email_settings())
+    store.add_sent_jobs(pid, ["k1", "k2"])
+    store.add_sent_jobs(pid, ["k2", "k3"])  # already sent: ignored
+    assert store.sent_job_keys(pid) == {"k1", "k2", "k3"}
+    store.mark_emailed(pid, "last_digest_at")
+    assert store.get_email_settings(pid)["last_digest_at"]
+    rows = store.export_rows(pid)
+    assert rows["email_settings"][0]["email"] == "a@b.my" and len(rows["emailed_job_ads"]) == 3
+    store.delete_profile(pid)
+    assert store.get_email_settings(pid) is None and store.sent_job_keys(pid) == set()

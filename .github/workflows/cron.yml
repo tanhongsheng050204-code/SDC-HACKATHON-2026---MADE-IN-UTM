@@ -37,10 +37,10 @@ jobs:
         run: curl -fsS --max-time 90 --retry 2 "$API_URL/api/health" -o /dev/null || echo "::warning::API did not answer"
 
   weekly-digest:
-    # Switched on in phase 6, once POST /api/cron/weekly exists. Needs the CRON_SECRET repository secret.
+    # Needs the CRON_SECRET repository secret (the same value as CRON_SECRET on Render).
     if: >-
-      false && ((github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1')
-      || (github.event_name == 'workflow_dispatch' && inputs.job == 'weekly'))
+      (github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'weekly')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -51,10 +51,9 @@ jobs:
           curl -fsS --max-time 600 -X POST -H "X-Cron-Secret: $CRON_SECRET" "$API_URL/api/cron/weekly"
 
   job-alerts:
-    # Switched on in phase 6, once POST /api/cron/alerts exists.
     if: >-
-      false && ((github.event_name == 'schedule' && github.event.schedule == '0 1 * * *')
-      || (github.event_name == 'workflow_dispatch' && inputs.job == 'alerts'))
+      (github.event_name == 'schedule' && github.event.schedule == '0 1 * * *')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'alerts')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

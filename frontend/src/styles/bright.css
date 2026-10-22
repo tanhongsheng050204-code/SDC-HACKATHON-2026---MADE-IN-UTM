@@ -460,3 +460,17 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .install-prompt p { margin: 2px 0 0; }
 .install-prompt .actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
 .install-prompt .btn { min-height: 44px; }
+
+/* ---------- Email and job alerts (My profile) and the unsubscribe page ---------- */
+.email-settings { border: 0; border-radius: 26px; background: var(--sky); box-shadow: none; gap: 12px; margin-top: 16px; }
+.email-settings h2 { font-size: 1.3rem; font-weight: 900; margin: 0; }
+.email-settings .check { min-height: 44px; display: flex; gap: 10px; align-items: center; }
+.email-settings .check.big span { display: grid; }
+.email-settings fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 2px; }
+.email-settings legend { font-weight: 800; margin-bottom: 4px; }
+.email-state { display: grid; gap: 4px; font-weight: 700; max-width: 320px; }
+.email-state select { min-height: 44px; border-radius: 14px; }
+.email-login { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.unsubscribe-page { min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--canvas); }
+.unsubscribe-card { max-width: 460px; border-radius: 28px; gap: 12px; text-align: center; justify-items: center; }
+.unsubscribe-card .btn { min-height: 44px; }

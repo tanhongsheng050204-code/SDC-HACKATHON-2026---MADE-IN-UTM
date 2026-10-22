@@ -29,6 +29,11 @@ def _jwks(url: str) -> jwt.PyJWKClient:
 
 def user_from_token(token: str) -> str:
     """The Supabase user id in a valid token. Raises jwt.InvalidTokenError otherwise."""
+    return str(claims_from_token(token)["sub"])
+
+
+def claims_from_token(token: str) -> dict:
+    """The verified claims of a Supabase token (sub, and email for a Google login)."""
     settings = get_settings()
     if settings.supabase_jwt_secret:
         claims = jwt.decode(token, settings.supabase_jwt_secret, algorithms=["HS256"], audience=AUDIENCE,
@@ -41,18 +46,24 @@ def user_from_token(token: str) -> str:
         raise jwt.InvalidTokenError("Login is not configured on this server")
     if not claims.get("sub"):
         raise jwt.InvalidTokenError("Token has no user")
-    return str(claims["sub"])
+    return claims
 
 
 def current_user(authorization: str = Header(default="")) -> str | None:
     """FastAPI dependency: the caller's user id, or None for an anonymous visitor."""
+    claims = current_claims(authorization)
+    return str(claims["sub"]) if claims else None
+
+
+def current_claims(authorization: str = Header(default="")) -> dict | None:
+    """FastAPI dependency: the caller's verified token claims, or None for an anonymous visitor."""
     if not authorization:
         return None
     scheme, _, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not token:
         raise HTTPException(401, "Please log in again")
     try:
-        return user_from_token(token)
+        return claims_from_token(token)
     except jwt.PyJWKClientError:
         # The key server is unreachable: not the person's fault, so don't sign them out.
         raise HTTPException(503, "Login check is unavailable right now. Try again shortly.") from None

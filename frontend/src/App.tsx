@@ -16,6 +16,8 @@ import { KEYS, load, save } from "./lib/storage";
 import { clearOfflineData } from "./lib/pwa";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CardPage } from "./screens/CardPage";
+import { Unsubscribe } from "./screens/Unsubscribe";
+import { EmailSettings } from "./components/EmailSettings";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
 import { Admin } from "./screens/Admin";
@@ -37,6 +39,8 @@ const NEEDS_PROFILE: Screen[] = ["home", "radar", "tasks", "roles", "role", "imp
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const cardId = params.get("card");
+  const unsubscribe = params.get("unsubscribe");
+  if (unsubscribe) return <Unsubscribe token={unsubscribe} />;
   return cardId ? <CardPage cardId={cardId} /> : <MainApp demo={params.get("demo")} />;
 }
 
@@ -409,6 +413,7 @@ function MainApp({ demo }: { demo: string | null }) {
               <Review key="profile" initial={profile.skills} audience={profile.audience ?? null} existing={profile}
                 onBack={() => go("home")} onSaved={profileEdited} onAddMore={() => go("intake")} onStartOver={deleteProfile} />
             )}
+            {screen === "profile" && profile && <EmailSettings profile={profile} userId={userId} />}
             {screen === "admin" && <Admin />}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}

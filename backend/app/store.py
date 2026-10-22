@@ -15,9 +15,10 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 14
+SCHEMA_VERSION = 15
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
-              "evidence", "progress_events", "consents", "feedback", "usage_counts")
+              "evidence", "progress_events", "consents", "feedback", "usage_counts",
+              "email_settings", "sent_jobs")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -159,6 +160,29 @@ _MIGRATIONS = {
         day TEXT NOT NULL,
         count INTEGER NOT NULL,
         PRIMARY KEY (event, day)
+    );
+    """,
+    # Email: only for profiles saved to a Google account, after the person ticks "Email me". The
+    # address is the account's Google email. Turning everything off deletes the row. sent_jobs
+    # remembers which job ads were already emailed, so none is sent twice.
+    15: """
+    CREATE TABLE IF NOT EXISTS email_settings (
+        profile_id TEXT PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL,
+        email TEXT NOT NULL,
+        digest INTEGER NOT NULL,
+        alerts TEXT NOT NULL,
+        state TEXT,
+        language TEXT NOT NULL,
+        last_digest_at TEXT,
+        last_alert_at TEXT,
+        updated_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS sent_jobs (
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        job_key TEXT NOT NULL,
+        sent_at TEXT NOT NULL,
+        PRIMARY KEY (profile_id, job_key)
     );
     """,
 }
@@ -398,7 +422,62 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
     for row in out["proof_checks"]:
         row["passed"] = None if row["passed"] is None else bool(row["passed"])
     out["consents"] = list_consents(profile_id)
+    settings = get_email_settings(profile_id)
+    out["email_settings"] = [settings] if settings else []
+    with _connect() as conn:
+        out["emailed_job_ads"] = [dict(r) for r in conn.execute(
+            "SELECT job_key, sent_at FROM sent_jobs WHERE profile_id=? ORDER BY sent_at", (profile_id,)).fetchall()]
     return out
+
+
+def get_email_settings(profile_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM email_settings WHERE profile_id=?", (profile_id,)).fetchone()
+    return None if row is None else {**dict(row), "digest": bool(row["digest"])}
+
+
+def save_email_settings(profile_id: str, user_id: str, email: str, digest: bool, alerts: str, state: str | None,
+                        language: str) -> None:
+    now = _now()
+    with _connect() as conn:
+        updated = conn.execute("UPDATE email_settings SET user_id=?, email=?, digest=?, alerts=?, state=?, language=?, "
+                               "updated_at=? WHERE profile_id=?",
+                               (user_id, email, int(digest), alerts, state, language, now, profile_id)).rowcount
+        if not updated:
+            conn.execute("INSERT INTO email_settings (profile_id, user_id, email, digest, alerts, state, language, updated_at) "
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (profile_id, user_id, email, int(digest), alerts, state, language, now))
+
+
+def delete_email_settings(profile_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM email_settings WHERE profile_id=?", (profile_id,))
+        conn.execute("DELETE FROM sent_jobs WHERE profile_id=?", (profile_id,))
+
+
+def list_email_settings() -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT * FROM email_settings ORDER BY profile_id").fetchall()
+    return [{**dict(r), "digest": bool(r["digest"])} for r in rows]
+
+
+def mark_emailed(profile_id: str, column: str) -> None:
+    assert column in ("last_digest_at", "last_alert_at")
+    with _connect() as conn:
+        conn.execute(f"UPDATE email_settings SET {column}=? WHERE profile_id=?", (_now(), profile_id))
+
+
+def sent_job_keys(profile_id: str) -> set[str]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT job_key FROM sent_jobs WHERE profile_id=?", (profile_id,)).fetchall()
+    return {r["job_key"] for r in rows}
+
+
+def add_sent_jobs(profile_id: str, keys: list[str]) -> None:
+    now = _now()
+    with _connect() as conn:
+        for key in keys:
+            conn.execute("INSERT INTO sent_jobs (profile_id, job_key, sent_at) VALUES (?, ?, ?) "
+                         "ON CONFLICT (profile_id, job_key) DO NOTHING", (profile_id, key, now))
 
 
 def mark_practised(profile_id: str) -> None:

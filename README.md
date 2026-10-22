@@ -139,6 +139,8 @@ The **frontend is on Vercel** ([laluan-psi.vercel.app](https://laluan-psi.vercel
 | `RUNPOD_LLM_MODEL` | Only if changed | Default `Qwen/Qwen2.5-7B-Instruct`; must match the model the worker loaded |
 | `CONTACT_EMAIL` | Optional | Sent to OpenAlex with research-trend requests |
 | `OPENALEX_API_KEY` | Optional | Free key from [openalex.org](https://openalex.org). Without one, OpenAlex searches share a small daily budget per IP address (Render's addresses are shared); it is only used when arXiv refuses |
+| `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | For email | A team Gmail with 2-Step Verification, then Google Account → Security → **App passwords**; `SMTP_PASSWORD` is that 16-letter app password. Without them the app says email is not set up |
+| `CRON_SECRET` | For email | Any long random string; the same value as the GitHub repository secret `CRON_SECRET`. Protects `/api/cron/*` and signs unsubscribe links |
 | `SENTRY_DSN` | Optional | Error tracking: a free [Sentry](https://sentry.io) project → Project Settings → Client Keys. Events carry no request body, headers, user or local variables |
 
 Not needed: `SUPABASE_JWT_SECRET` (legacy projects only), `DATABASE_PATH`, `DATA_DIR`, `FRONTEND_DIST`.
@@ -160,7 +162,9 @@ Security headers (a Content Security Policy that allows only this site, the Rend
 
 **4. After the first deploy.** On the **Admin** page (Sources → *Admin: review new data*, needs `ADMIN_TOKEN`), run **Refresh trend data** and approve it, then **Refresh skill evidence** and **Find emerging roles** and approve what checks out. Try a proof check, a CV upload and a voice clip to confirm the Gemini and RunPod keys.
 
-**5. Scheduled jobs (GitHub Actions).** [`cron.yml`](.github/workflows/cron.yml) pings `/api/health` every 10 minutes from 07:00 to 23:00 Malaysia time so the free Render service stays awake by day (about 500 of Render's 750 free hours a month). Add the repository secret `API_URL` (Settings → Secrets and variables → Actions), e.g. `https://laluan-api.onrender.com`. GitHub can start scheduled runs a few minutes late.
+**5. Scheduled jobs (GitHub Actions).** [`cron.yml`](.github/workflows/cron.yml) pings `/api/health` every 10 minutes from 07:00 to 23:00 Malaysia time so the free Render service stays awake by day (about 500 of Render's 750 free hours a month), sends the weekly digest on Mondays at 08:00 (`POST /api/cron/weekly`) and job alerts daily at 09:00 (`POST /api/cron/alerts`). Add the repository secrets `API_URL` (e.g. `https://laluan-api.onrender.com`) and `CRON_SECRET` (Settings → Secrets and variables → Actions). GitHub can start scheduled runs a few minutes late; Actions → Scheduled jobs → Run workflow runs one now.
+
+**Email** goes only to people who logged in with Google and ticked "Email me" (My profile), to their Google address. Gmail allows about 500 messages a day and new senders can land in spam; for more people, move to a sending service such as Brevo or Resend (only `app/mailer.py` changes).
 
 **Before a live demo:** Render's free plan sleeps after about 15 minutes without visitors and takes up to a minute to wake (the app shows "Waking up the server…"), so open the site a minute before. Wake the RunPod workers the same way (one CV and one voice clip), or set the endpoints' active workers to 1 for the session and back to 0 afterwards.
 
@@ -188,6 +192,9 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `SUPABASE_URL` | Supabase project URL; login tokens are verified against its public keys. |
 | `SUPABASE_JWT_SECRET` | Only for Supabase projects still on the legacy shared JWT secret. |
 | `FRONTEND_DIST` | Built frontend to serve at `/`, default `frontend/dist` when it exists. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | Email through SMTP, default `smtp.gmail.com:587`. Empty user or password = email off. |
+| `CRON_SECRET` | Protects `/api/cron/weekly` and `/api/cron/alerts` (header `X-Cron-Secret`) and signs unsubscribe links. |
+| `APP_URL`, `PUBLIC_API_URL` | Links in emails; defaults are the Vercel site and the Render API. |
 | `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Optional error tracking; empty means off. Personal data is stripped before sending. |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Build-time, for the frontend's Google login. Without them the login button is hidden. |
 | `DATA_DIR` | Reference data, default `backend/data`. |

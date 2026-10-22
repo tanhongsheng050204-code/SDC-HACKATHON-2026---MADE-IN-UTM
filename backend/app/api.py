@@ -9,14 +9,14 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 
 from app import ratelimit, runpod, store
-from app.auth import current_user
+from app.auth import current_claims, current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, EmailSettingsIn, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
+from app.services import (alerts, cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
                           openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
 from app.trends import refresh, review
@@ -805,6 +805,101 @@ def admin_usage(days: int = Query(30, ge=1, le=365), x_admin_token: str = Header
     for r in rows:
         totals[r["event"]] = totals.get(r["event"], 0) + r["count"]
     return {"since": since, "days": rows, "totals": totals}
+
+
+# --- email: weekly digest and job alerts -----------------------------------------------------------
+
+EMAIL_VERSION = "2026-10-22"  # the wording of the email opt-in a consent row refers to
+Claims = Depends(current_claims)
+
+
+def _owned_by(profile_id: str, claims: dict | None) -> dict:
+    """Email is only for a profile saved to the caller's Google account."""
+    if not claims:
+        raise HTTPException(401, "Log in with Google to get emails")
+    profile = _profile_for(profile_id, str(claims["sub"]))
+    if profile["user_id"] != str(claims["sub"]):
+        raise HTTPException(403, "Save this profile to your account first")
+    return profile
+
+
+@router.get("/profiles/{profile_id}/email")
+def email_settings(profile_id: str, claims: dict | None = Claims):
+    """Whether email works on this server, and this person's choices (if logged in)."""
+    available = get_settings().email_available
+    if not claims:
+        return {"available": available, "logged_in": False, "email": None, "settings": None}
+    profile = _owned_by(profile_id, claims)
+    saved = store.get_email_settings(profile["id"])
+    return {"available": available, "logged_in": True, "email": (saved or {}).get("email") or claims.get("email"),
+            "settings": {k: saved[k] for k in ("digest", "alerts", "state", "language")} if saved else None}
+
+
+@router.put("/profiles/{profile_id}/email")
+def save_email_settings(profile_id: str, body: EmailSettingsIn, claims: dict | None = Claims):
+    profile = _owned_by(profile_id, claims)
+    before = store.get_email_settings(profile["id"]) or {"digest": False, "alerts": "off"}
+    if body.digest or body.alerts != "off":
+        if not get_settings().email_available:
+            raise HTTPException(503, "Email is not set up on this server yet")
+        email = claims.get("email")
+        if not email:
+            raise HTTPException(422, "Your Google account has no email address")
+        store.save_email_settings(profile["id"], str(claims["sub"]), email, body.digest, body.alerts, body.state, body.language)
+    else:
+        store.delete_email_settings(profile["id"])
+    if body.digest != before["digest"]:
+        store.add_consent(profile["id"], "email_digest", EMAIL_VERSION, body.digest)
+    if body.alerts != before["alerts"]:  # job_alerts_weekly / job_alerts_instant given, or job_alerts withdrawn
+        kind = "job_alerts" if body.alerts == "off" else f"job_alerts_{body.alerts}"
+        store.add_consent(profile["id"], kind, EMAIL_VERSION, body.alerts != "off")
+    return email_settings(profile_id, claims)
+
+
+@router.post("/email/unsubscribe")
+def unsubscribe(request: Request, token: str = Query(..., max_length=200)):
+    """One click from an email, no login: "all" stops every email, "alerts" stops job alerts."""
+    ratelimit.check(request, "feedback")
+    found = alerts.read_token(token)
+    if found is None:
+        raise HTTPException(400, "This unsubscribe link is not valid")
+    profile_id, kind = found
+    saved = store.get_email_settings(profile_id)
+    if saved is None:
+        return {"done": kind}  # already unsubscribed: a second click changes nothing
+    if saved["alerts"] != "off":
+        store.add_consent(profile_id, "job_alerts", EMAIL_VERSION, False)
+    if kind == "all" or not saved["digest"]:  # nothing left to send: forget the address
+        store.delete_email_settings(profile_id)
+        if saved["digest"]:
+            store.add_consent(profile_id, "email_digest", EMAIL_VERSION, False)
+    else:
+        store.save_email_settings(profile_id, saved["user_id"], saved["email"], True, "off", saved["state"], saved["language"])
+    return {"done": kind}
+
+
+def _require_cron(secret: str) -> None:
+    expected = get_settings().cron_secret
+    if not expected or not hmac.compare_digest(secret, expected):
+        raise HTTPException(401, "Cron secret required")
+
+
+@router.post("/cron/weekly")
+def cron_weekly(x_cron_secret: str = Header(default="")):
+    """Monday 08:00 Malaysia time (GitHub Actions): the weekly digest to everyone who opted in."""
+    _require_cron(x_cron_secret)
+    if not get_settings().email_available:
+        return {"email": "not set up", "sent": 0, "skipped": 0, "failed": 0}
+    return {"email": "ok", **alerts.run_weekly(get_reference())}
+
+
+@router.post("/cron/alerts")
+def cron_alerts(x_cron_secret: str = Header(default="")):
+    """Daily (GitHub Actions): new job ads to people who chose instant job alerts."""
+    _require_cron(x_cron_secret)
+    if not get_settings().email_available:
+        return {"email": "not set up", "sent": 0, "skipped": 0, "failed": 0}
+    return {"email": "ok", **alerts.run_alerts(get_reference())}
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

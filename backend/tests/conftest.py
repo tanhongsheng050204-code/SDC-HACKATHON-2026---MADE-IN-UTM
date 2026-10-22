@@ -16,6 +16,8 @@ os.environ["RUNPOD_API_KEY"] = ""
 os.environ["RUNPOD_LLM_ENDPOINT"] = ""
 os.environ["RUNPOD_WHISPER_ENDPOINT"] = ""
 os.environ["SENTRY_DSN"] = ""
+for _name in ("SMTP_USER", "SMTP_PASSWORD", "MAIL_FROM", "CRON_SECRET"):  # no email is ever sent from tests
+    os.environ[_name] = ""
 
 
 @pytest.fixture

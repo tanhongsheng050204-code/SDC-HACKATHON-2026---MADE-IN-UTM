@@ -37,3 +37,18 @@ services:
         sync: false
       - key: OPENALEX_API_KEY
         sync: false
+      - key: SENTRY_DSN  # optional error tracking
+        sync: false
+      # Email (weekly digest and job alerts) through a team Gmail with an app password.
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD  # a Gmail app password, not the account password
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: CRON_SECRET  # same value as the GitHub repository secret CRON_SECRET
+        sync: false
+      - key: APP_URL
+        value: https://laluan-psi.vercel.app
+      - key: PUBLIC_API_URL
+        value: https://laluan-api.onrender.com
