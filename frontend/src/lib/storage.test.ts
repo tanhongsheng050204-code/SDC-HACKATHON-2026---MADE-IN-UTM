@@ -18,3 +18,14 @@ describe("browser storage", () => {
     expect(load("laluan.test")).toBeNull();
   });
 });
+
+describe("clearing a person's data from this device", () => {
+  it("removes coach conversations kept in the tab", async () => {
+    const { clearOfflineData } = await import("./pwa");
+    sessionStorage.setItem("laluan.coach.p1.any", "[]");
+    sessionStorage.setItem("laluan.other", "keep");
+    clearOfflineData();
+    expect(sessionStorage.getItem("laluan.coach.p1.any")).toBeNull();
+    expect(sessionStorage.getItem("laluan.other")).toBe("keep");
+  });
+});

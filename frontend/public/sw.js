@@ -56,6 +56,11 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
+  // Runtime settings (written by the Docker image at start-up): fresh when online, last copy offline.
+  if (url.origin === self.location.origin && url.pathname === "/config.js") {
+    event.respondWith(networkFirst(request, SHELL));
+    return;
+  }
   if (request.mode === "navigate" && url.origin === self.location.origin) {
     event.respondWith(networkFirst(request, SHELL, "/index.html"));
     return;

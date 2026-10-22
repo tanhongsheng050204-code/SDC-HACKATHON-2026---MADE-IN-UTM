@@ -8,9 +8,13 @@ export function registerServiceWorker() {
   });
 }
 
-// Remove this device's offline copy of the person's data (after Delete my profile or logging out).
+// Remove this device's copy of the person's data (after Delete my profile or logging out): the
+// service worker's offline copy, and coach conversations kept in this tab.
 export function clearOfflineData() {
   try { navigator.serviceWorker?.controller?.postMessage("clear-data"); } catch { /* no worker */ }
+  try {
+    for (const key of Object.keys(window.sessionStorage)) if (key.startsWith("laluan.coach.")) window.sessionStorage.removeItem(key);
+  } catch { /* storage blocked */ }
 }
 
 interface InstallEvent extends Event { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> }
