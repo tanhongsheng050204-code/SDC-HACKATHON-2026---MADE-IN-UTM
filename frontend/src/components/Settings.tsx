@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { api, type Profile } from "../lib/api";
+import { downloadMyData } from "../lib/exportFile";
 import { authEnabled, signOut } from "../lib/auth";
 import { Lang, t } from "../lib/i18n";
 import { AccountButton } from "./AccountButton";
@@ -92,12 +93,7 @@ function DownloadData({ profileId }: { profileId: string }) {
   async function download() {
     setState("busy");
     try {
-      const data = await api.exportData(profileId);
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-      const a = document.createElement("a");
-      a.href = url; a.download = `laluan-my-data-${profileId.slice(0, 8)}.json`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
+      downloadMyData(profileId, await api.exportData(profileId));
       setState("idle");
     } catch { setState("failed"); }
   }

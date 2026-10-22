@@ -8,7 +8,7 @@ export const STATES: EmailState[] = ["anywhere", "johor", "kedah", "kelantan", "
 
 // "Email me": a weekly summary and optional job alerts. Off by default, only for a profile saved to
 // a Google account, sent to that account's email. Every email has a one-click unsubscribe link.
-export function EmailSettings({ profile, userId }: { profile: Profile; userId: string | null }) {
+export function EmailSettings({ profile, userId, inSheet = false }: { profile: Profile; userId: string | null; inSheet?: boolean }) {
   const [info, setInfo] = useState<Awaited<ReturnType<typeof api.emailSettings>> | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [digest, setDigest] = useState(false);
@@ -43,9 +43,8 @@ export function EmailSettings({ profile, userId }: { profile: Profile; userId: s
 
   if (!info && !blocked) return null;
   return (
-    <section className="card email-settings" aria-labelledby={`${id}-h`}>
-      <h2 id={`${id}-h`}>{t("mail.title")}</h2>
-      <p className="muted">{t("mail.sub")}</p>
+    <section className={inSheet ? "email-settings in-sheet" : "card email-settings"} aria-labelledby={inSheet ? undefined : `${id}-h`}>
+      {!inSheet && <><h2 id={`${id}-h`}>{t("mail.title")}</h2><p className="muted">{t("mail.sub")}</p></>}
       {info && !info.available ? <p className="muted" role="note">{t("mail.notSetUp")}</p>
         : blocked ? <p className="muted" role="note">{t("mail.saveFirst")}</p>
         : !info?.logged_in ? (

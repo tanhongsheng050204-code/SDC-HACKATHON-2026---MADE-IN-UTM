@@ -27,3 +27,12 @@ export function downloadCsv(name: string, rows: Cell[][]) {
   a.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Everything stored about a profile, as one JSON file (data rights: Settings and My profile). */
+export function downloadMyData(profileId: string, data: unknown) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = `laluan-my-data-${profileId.slice(0, 8)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}

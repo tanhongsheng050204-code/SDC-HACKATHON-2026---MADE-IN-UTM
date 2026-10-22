@@ -8,12 +8,12 @@ export interface Pay { group: string; median_rm: number; mean_rm: number; year: 
 export interface PrefMatch { dim: string; label: string; labels?: Record<string, string> }
 export type Audience = "worker" | "graduate" | "switcher";
 
-export interface Skill { id: string; name: string; category: string }
+export interface Skill { id: string; name: string; category: string; aliases?: string[] }
 /** The scrubbed CV text that would go to a language model, and how many details were removed. */
 export interface SendPreview { text: string; removed: Partial<Record<"NAME" | "EMAIL" | "PHONE" | "IC" | "DOB" | "AGE" | "ADDRESS" | "ORG", number>>; characters: number; from_scan?: boolean }
 export interface Sdg { number: number; name: string; colour: string; target?: string; reason?: string; reasons?: Texts }
 export interface SkillRef { skill_id: string; name: string; weight: number; sdgs: number[]; added_from_ads?: boolean }
-export interface RoleOption { id: string; title: string }
+export interface RoleOption { id: string; title: string; skills?: { skill_id: string; weight: number }[] }
 export interface Profile {
   id: string; display_name: string | null; current_role_id: string | null;
   skills: string[]; experience_years: number | null; completed_courses: string[]; story?: string;

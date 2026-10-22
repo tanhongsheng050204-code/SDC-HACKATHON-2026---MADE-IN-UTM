@@ -19,8 +19,7 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CardPage } from "./screens/CardPage";
 import { Unsubscribe } from "./screens/Unsubscribe";
 import { Legal, type LegalDoc } from "./screens/Legal";
-import { EmailSettings } from "./components/EmailSettings";
-import { JoinClass } from "./components/JoinClass";
+import { ProfileSettings } from "./components/ProfileSettings";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
 import { Admin } from "./screens/Admin";
@@ -329,8 +328,8 @@ function MainApp({ demo }: { demo: string | null }) {
     }
   }, [userId, profile, accountName]);
 
-  async function deleteProfile() {
-    if (!profile || !window.confirm(t("shell.deleteConfirm"))) return;
+  async function deleteProfile(confirmed = false) {
+    if (!profile || (!confirmed && !window.confirm(t("shell.deleteConfirm")))) return;
     await api.deleteProfile(profile.id).catch(() => undefined);
     clearOfflineData();
     save(KEYS.profile, null); setProfile(null); setRole(null);
@@ -358,7 +357,7 @@ function MainApp({ demo }: { demo: string | null }) {
   }
   const settings = (variant: string) => (
     <Settings profile={profile} userId={userId} screen={screen} lang={lang} onLang={changeLang}
-      onLeave={leaveDemo} onDelete={deleteProfile} className={variant} />
+      onLeave={leaveDemo} onDelete={() => deleteProfile()} className={variant} />
   );
   const banners = (
     <>
@@ -451,10 +450,9 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "profile" && profile && (
               <Review key="profile" initial={profile.skills} audience={profile.audience ?? null} existing={profile}
-                onBack={() => go("home")} onSaved={profileEdited} onAddMore={() => go("intake")} onStartOver={deleteProfile} />
+                onBack={() => go("home")} onSaved={(p) => { setProfile(p); flash(t("prof.saved")); }} onAddMore={() => go("intake")}
+                settings={<ProfileSettings profile={profile} userId={userId} onDelete={() => deleteProfile(true)} />} />
             )}
-            {screen === "profile" && profile && <EmailSettings profile={profile} userId={userId} />}
-            {screen === "profile" && profile && <JoinClass profile={profile} userId={userId} />}
             {screen === "admin" && <Admin />}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && (

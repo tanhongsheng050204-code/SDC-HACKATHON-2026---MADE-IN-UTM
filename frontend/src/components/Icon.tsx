@@ -3,10 +3,11 @@ export type IconName =
   | "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash"
   | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target"
   | "go-straight" | "turn-left" | "turn-right" | "flag" | "check"
-  | "arrowLeft" | "arrowRight" | "mapPin" | "arrowUp" | "download" | "settings";
+  | "arrowLeft" | "arrowRight" | "mapPin" | "arrowUp" | "download" | "settings" | "mail";
 
 const ICONS: Record<IconName, string> = {
   chat: "M4 5h16v11H9l-5 4z",
+  mail: "M4 6h16v12H4zM4 7l8 6 8-6",
   list: "M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0",
   radar: "M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 12l6-6",

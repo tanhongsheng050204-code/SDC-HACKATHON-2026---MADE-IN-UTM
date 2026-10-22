@@ -8,7 +8,7 @@ import { SHARED_LABELS } from "./ClassShare";
 
 // A student joins a counsellor's class with a code: first they see who runs it and exactly what
 // will be shared, then they confirm. Leaving takes effect at once.
-export function JoinClass({ profile, userId }: { profile: Profile; userId: string | null }) {
+export function JoinClass({ profile, userId, inSheet = false }: { profile: Profile; userId: string | null; inSheet?: boolean }) {
   const [code, setCode] = useState(() => load(KEYS.joinCode, "session") ?? "");
   const [preview, setPreview] = useState<ClassPreview | null>(null);
   const [mine, setMine] = useState<Membership[]>([]);
@@ -42,8 +42,8 @@ export function JoinClass({ profile, userId }: { profile: Profile; userId: strin
   }
 
   return (
-    <section className="card join-class" aria-labelledby={`${id}-h`}>
-      <h2 id={`${id}-h`}>{t("cls.studentTitle")}</h2>
+    <section className={inSheet ? "join-class in-sheet" : "card join-class"} aria-labelledby={inSheet ? undefined : `${id}-h`}>
+      {!inSheet && <h2 id={`${id}-h`}>{t("cls.studentTitle")}</h2>}
       <p className="muted">{t("cls.studentSub")}</p>
       {mine.length > 0 && (
         <ul className="class-list">
