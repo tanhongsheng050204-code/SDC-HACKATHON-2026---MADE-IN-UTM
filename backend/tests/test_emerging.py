@@ -8,6 +8,7 @@ from app.evidence import emerging, search
 from app.reference import get_reference
 
 ADMIN = {"X-Admin-Token": "test-admin-token"}
+REAL_PAGE_TEXT = emerging._page_text  # the autouse fixture below swaps it out
 
 
 def _answer(cap_id: str, **over) -> dict:
@@ -213,3 +214,26 @@ def test_role_openings_are_live_unreviewed_job_ads_first_and_share_the_limit(cli
     statuses = [client.post(f"/api/roles/{r}/openings", json={"profile_id": pid}).status_code for r in roles]
     assert statuses[:4] == [200] * 4 and statuses[4] == 429  # five searches an hour per profile
     assert client.post("/api/roles/nope/openings", json={"profile_id": pid}).status_code == 404
+
+
+def test_source_check_never_reads_private_addresses(monkeypatch):
+    """The source page comes from a model's search results, so it (or a redirect) must not reach
+    the server itself, its network or a cloud metadata address."""
+    assert not emerging._public_https("http://example.org/")  # https only
+    for url in ("https://127.0.0.1/", "https://10.0.0.5/", "https://169.254.169.254/latest/meta-data/",
+                "https://[::1]/", "https://localhost/"):
+        assert not emerging._public_https(url), url
+
+    class Hop:
+        def __init__(self, location):
+            self.is_redirect, self.status_code, self.headers, self.text = True, 302, {"location": location}, ""
+
+    calls = []
+    monkeypatch.setattr(emerging, "_public_https", lambda url: "169.254" not in url)
+    monkeypatch.setattr(emerging.httpx, "get", lambda url, **kw: calls.append(url) or Hop("https://169.254.169.254/x"))
+    assert REAL_PAGE_TEXT("https://jobs.example.my/ad") is None
+    assert calls == ["https://jobs.example.my/ad"]  # the redirect to a private address is never fetched
+    calls.clear()
+    monkeypatch.setattr(emerging, "_public_https", lambda url: True)
+    monkeypatch.setattr(emerging.httpx, "get", lambda url, **kw: calls.append(url) or Hop(url + "/next"))
+    assert REAL_PAGE_TEXT("https://loop.example.my") is None and len(calls) == emerging.MAX_HOPS + 1

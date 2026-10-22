@@ -21,9 +21,12 @@ same way, with the same cache and limit, for catalogue roles.
 
 import datetime as dt
 import html
+import ipaddress
 import re
+import socket
 import threading
 import time
+import urllib.parse
 
 import httpx
 
@@ -89,12 +92,39 @@ def _google_link(url: str, chunks: list[dict], used: set[int], resolve) -> str |
     return None
 
 
-def _page_text(url: str) -> str | None:
+MAX_HOPS = 3
+
+
+def _public_https(url: str) -> bool:
+    """Only https pages on public addresses: the URL comes from a model's search results, so a page
+    (or a redirect) must never make the server call itself, its network or a cloud metadata address."""
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme != "https" or not parts.hostname:
+        return False
     try:
-        response = httpx.get(url, follow_redirects=True, timeout=10, headers={"User-Agent": "Mozilla/5.0 (Laluan source check)"})
-    except httpx.HTTPError:
-        return None
-    return response.text if response.status_code == 200 else None
+        infos = socket.getaddrinfo(parts.hostname, parts.port or 443, proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, UnicodeError, ValueError):
+        return False
+    for info in infos:
+        ip = ipaddress.ip_address(info[4][0].split("%")[0])
+        if not ip.is_global or ip.is_multicast:
+            return False
+    return bool(infos)
+
+
+def _page_text(url: str) -> str | None:
+    for _ in range(MAX_HOPS + 1):
+        if not _public_https(url):
+            return None
+        try:
+            response = httpx.get(url, follow_redirects=False, timeout=10,
+                                 headers={"User-Agent": "Mozilla/5.0 (Laluan source check)"})
+        except httpx.HTTPError:
+            return None
+        if not response.is_redirect:
+            return response.text if response.status_code == 200 else None
+        url = urllib.parse.urljoin(url, response.headers.get("location", ""))
+    return None
 
 
 def _norm(text: str) -> str:
