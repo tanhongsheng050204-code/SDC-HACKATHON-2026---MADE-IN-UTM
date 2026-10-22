@@ -11,8 +11,9 @@ never stored or logged.
 ## Deploy
 
 1. RunPod → Serverless → **New Endpoint** → **GitHub repo**: this repository, branch `main`,
-   Dockerfile path `runpod/ocr/Dockerfile`, build context `runpod/ocr`.
-   (Or build and push it yourself: `docker build -t <you>/laluan-ocr runpod/ocr`, then use that image.)
+   Dockerfile path `runpod/ocr/Dockerfile`. RunPod builds from the repository root, and the Dockerfile
+   expects that. (Or build and push it yourself: `docker build -f runpod/ocr/Dockerfile -t <you>/laluan-ocr .`
+   from the repository root, then use that image.)
 2. A **CPU** worker is enough (a page takes about 2 s). Max workers 1; idle timeout to taste.
 3. Copy the endpoint ID into the API's environment as `RUNPOD_OCR_ENDPOINT` (the same `RUNPOD_API_KEY`
    calls it). On Render: `laluan-api` → Environment.
@@ -20,7 +21,7 @@ never stored or logged.
 ## Try it locally
 
 ```bash
-docker build -t laluan-ocr-worker runpod/ocr
+docker build -f runpod/ocr/Dockerfile -t laluan-ocr-worker .
 ```
 
 Put a job in `test_input.json` (`{"input": {"images": ["<base64 JPEG>"]}}`) next to `handler.py`

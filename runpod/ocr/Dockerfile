@@ -1,4 +1,5 @@
 # Laluan OCR worker for RunPod Serverless (CPU is enough; a page takes about 2 s).
+# Built from the repository root, as RunPod's GitHub builds do: docker build -f runpod/ocr/Dockerfile .
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
@@ -7,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY runpod/ocr/requirements.txt .
 RUN pip install -r requirements.txt
 
 # The English recogniser (RapidOCR's bundled one is Chinese and drops the spaces between English
@@ -19,7 +20,7 @@ RUN mkdir /models \
     && echo "e8770c967605983d1570cdf5352041dfb68fa0c21664f49f47b155abd3e0e318  /models/en_PP-OCRv4_rec_infer.onnx" | sha256sum -c - \
     && echo "5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3  /models/en_dict.txt" | sha256sum -c -
 
-COPY handler.py .
+COPY runpod/ocr/handler.py .
 # Start the engine once at build time so RapidOCR fetches its own text detector into the image.
 RUN python -c "import handler"
 
