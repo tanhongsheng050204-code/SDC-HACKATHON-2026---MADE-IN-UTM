@@ -250,6 +250,8 @@ Notes: ______
 - [ ] 17.4 **Option 1 · Upskill in place**, **Option 2 · Nearest move** (people, hours, fees, fit, SDGs).
 - [ ] 17.5 **Training budget**: course fees, staff time in RM (DOSM pay), unpriced courses listed, upskill-in-place comparison.
 - [ ] 17.6 **Get ahead: stable roles AI will change a lot**; SDG totals.
+- [ ] 17.9 **Download CSV** saves `laluan-hr-report-YYYY-MM-DD.csv` (opens in Excel with BM / 中文 intact): date, scenario, forecast id, totals, heatmap, moves, upskill in place, budget, the HRD Corp plan and SDG totals. **Print or save as PDF** prints the report without the sidebar or buttons.
+- [ ] 17.10 **HRD Corp training-grant plan**: one row per course in the moves (link, provider, the roles it is for, people, learning hours, fees, HRD Corp status), totals, and the line that Laluan does not submit claims; its own **Download CSV**.
 - [ ] 17.7 Scenario switch re-analyses; **Upload CSV** and **Analyse** work with a `role,skills` file.
 - [ ] 17.8 A CSV with `name`, `email`, `ic` or `staff_id` columns is refused: "Remove columns that identify people…". Unknown roles appear under **Rows skipped**.
 
@@ -266,6 +268,7 @@ Notes: ______
 
 - [ ] 18.1 **Class (career centre)** tab: **Use the sample class (synthetic, 52 students)**.
 - [ ] 18.2 Roles the class fits best, the skills most students still need, and the courses that help the most students.
+- [ ] 18.11 Class view **Download CSV** (best-fit roles, skill gaps, courses; totals only) and, on **My classes**, the class table's **Download CSV** and **Print or save as PDF**.
 - [ ] 18.3 Results split by programme when the CSV has a programme column; groups smaller than 3 are hidden ("Totals only").
 - [ ] 18.4 Upload CSV and Analyse work; identifying columns are refused as in 17.8.
 - [ ] 18.5 The anonymous CSV class view (tab **Class (career centre)**) works as before.

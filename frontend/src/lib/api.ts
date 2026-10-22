@@ -174,8 +174,14 @@ export interface Workforce {
   moves: { from_role: string; to_role: string; to_role_id: string; people: number; avg_hours: number; avg_fit_now: number; fees_each_rm: number; sdgs: Sdg[] }[];
   in_place: InPlace[]; get_ahead: InPlace[];
   sdg_contribution: (Sdg & { people: number })[];
+  grant_plan?: GrantRow[];  // missing from an API that predates it
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
+}
+export interface GrantRow {
+  course_id: string; title: string; provider: string; url: string; cost: string; hrd_corp: "claimable" | "check" | "not_needed";
+  checked: string | null; people: number; hours_each: number; hours_total: number;
+  price_each_rm: number | null; fees_total_rm: number | null; for_roles: string[];
 }
 export type TaskLabel = "automate" | "assist" | "human";
 export interface RoleTasks {

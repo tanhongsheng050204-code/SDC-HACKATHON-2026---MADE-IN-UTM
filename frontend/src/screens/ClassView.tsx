@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ExportBar } from "../components/ExportBar";
 import { SdgTile } from "../components/Sdgs";
 import { api, ClassResult, Scenario } from "../lib/api";
 import { t, tr } from "../lib/i18n";
@@ -54,6 +55,13 @@ export function ClassView({ loadSample }: { loadSample: boolean }) {
               <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => { setScenario(s.id); analyse(csv, s.id); }}>{t(`sc.${s.id}`)}</button>
             ))}
           </div>
+          <ExportBar name="laluan-class-view" rows={() => [
+            [t("class.exportTitle"), new Date().toISOString().slice(0, 10), t(`sc.${scenario}`)], [t("class.totalsOnly")], [],
+            [t("class.students"), String(result.students)], [],
+            [t("class.bestFit")], ...result.best_fit.map((r) => [r.title, String(r.students), OUTLOOK_TEXT[r.outlook[scenario].label]]), [],
+            [t("class.gaps")], ...result.top_gaps.map((g) => [g.name, String(g.students), g.course?.title ?? "", g.course?.url ?? ""]), [],
+            [t("class.courses")], ...result.courses.map((c) => [c.course.title, c.course.provider, c.course.url, c.hours, String(c.students_helped)]),
+          ]} />
           <p className="banner info" role="note">{t("class.totalsOnly")}</p>
           <div className="home-kpis">
             <div className="kpi"><span className="kpi-label">{t("class.students")}</span><strong>{result.students}</strong>

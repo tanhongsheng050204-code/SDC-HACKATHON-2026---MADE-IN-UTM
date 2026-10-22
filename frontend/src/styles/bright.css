@@ -666,3 +666,15 @@ html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[dat
 .legal-body p { line-height: 1.6; }
 .legal-links a { color: inherit; }
 .proof-practice { background: var(--sky); border-radius: 14px; padding: 8px 12px; font-size: .92rem; }
+
+/* Report exports and the HRD Corp plan */
+.export-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.report-head { display: flex; justify-content: flex-end; }
+.grant-meta { display: block; font-weight: 400; color: var(--ink-soft); font-size: .85rem; margin-top: 2px; }
+.print-only { display: none; }
+@media print {
+  .print-only { display: block; }
+  .export-bar { display: none !important; }
+  .table-wrap, .table-scroll { overflow: visible !important; }
+  .card { break-inside: avoid; }
+}

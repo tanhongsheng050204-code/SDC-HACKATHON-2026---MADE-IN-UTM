@@ -4,6 +4,7 @@ import { percent, shortDate } from "../lib/format";
 import { t, tf, tr } from "../lib/i18n";
 import { AccountButton } from "./AccountButton";
 import { CheckinPanel } from "./CheckinPanel";
+import { ExportBar } from "./ExportBar";
 import { STATUS_KEY, STATUS_TONE } from "./ProgressPanel";
 
 type Filter = "all" | ProgressStatus | "no_date";
@@ -95,8 +96,19 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
         <div className="card class-board">
           <div className="progress-head">
             <h2>{open.name}</h2>
-            <button className="btn quiet sm" onClick={() => remove(open.id, open.name)}>{t("cls.delete")}</button>
+            <div className="export-bar">
+              {open.students.length > 0 && <ExportBar name="laluan-class" rows={() => [
+                [open.name, new Date().toISOString().slice(0, 10)],
+                [t("cls.f.display_name"), t("cls.f.destination"), t("cls.f.readiness"), t("cls.f.courses_finished"), t("cls.f.skills_proven"),
+                  t("cls.f.target_date"), t("cls.f.status"), t("cls.f.last_active")],
+                ...open.students.map((s) => [s.display_name ?? t("cls.unnamed"), s.destination ?? "", s.readiness === null ? "" : `${percent(s.readiness)}%`,
+                  s.courses_finished, s.skills_proven.map((k) => `${k.name} (${k.level})`).join("; "), s.target_date ?? "",
+                  s.status ? t(STATUS_KEY[s.status]) : t("cls.noDate"), s.last_active.slice(0, 10)]),
+              ]} />}
+              <button className="btn quiet sm" onClick={() => remove(open.id, open.name)}>{t("cls.delete")}</button>
+            </div>
           </div>
+          <p className="print-only">{open.name} · {new Date().toISOString().slice(0, 10)}</p>
           <p className="muted">{t("cls.boardNote")}</p>
           <div className="chips" role="radiogroup" aria-label={t("cls.filter")}>
             {(["all", "on_track", "ahead", "behind", "done", "no_date"] as const).map((f) => (

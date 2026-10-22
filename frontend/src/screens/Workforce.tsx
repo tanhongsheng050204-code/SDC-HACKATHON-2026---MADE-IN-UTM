@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
+import { ExportBar } from "../components/ExportBar";
+import type { Cell } from "../lib/exportFile";
 import { InfoTip } from "../components/InfoTip";
 import { ClassView } from "./ClassView";
 import { CounsellorClasses } from "../components/CounsellorClasses";
 import { SdgTile, Sdgs } from "../components/Sdgs";
-import { api, Scenario, Workforce as WorkforceData } from "../lib/api";
+import { api, GrantRow, Scenario, Workforce as WorkforceData } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { t, tf, tr } from "../lib/i18n";
 import { HEAT, SCENARIOS } from "../lib/labels";
@@ -133,10 +135,77 @@ function InPlaceTable({ title, sub, rows }: { title: string; sub: string; rows: 
   );
 }
 
+const HRD_KEY = { claimable: "hrd.claimable", check: "hrd.check", not_needed: "grant.notNeeded" } as const;
+
+function grantRows(plan: GrantRow[]): Cell[][] {
+  return [[t("grant.course"), t("grant.provider"), t("grant.link"), t("grant.forRoles"), t("wf.peopleCol"), t("grant.hoursEach"),
+    t("grant.hoursTotal"), t("grant.priceEach"), t("grant.feesTotal"), t("grant.hrd"), t("grant.checked")],
+  ...plan.map((r) => [r.title, r.provider, r.url, r.for_roles.join("; "), r.people, r.hours_each, r.hours_total,
+    r.price_each_rm ?? t("grant.noPrice"), r.fees_total_rm ?? t("grant.noPrice"), t(HRD_KEY[r.hrd_corp]), r.checked])];
+}
+
+// The whole report as one CSV: what the screen shows, section by section, with its source.
+function reportRows(result: WorkforceData, scenario: Scenario): Cell[][] {
+  const src = result.signal_source;
+  const out: Cell[][] = [
+    [t("exp.hrTitle")], [t("exp.made"), new Date().toISOString().slice(0, 10)], [t("exp.scenario"), t(`sc.${scenario}`)],
+    [t("exp.forecast"), `${src.snapshot_id} (${src.imported.slice(0, 10)})`], [t("exp.totalsOnly")], [],
+    [t("wf.people"), result.employees], [t("wf.declining"), result.at_risk], [t("wf.hours"), result.total_hours], [],
+    [t("wf.heatmap")], [t("wf.role"), t("wf.peopleCol"), ...SCENARIOS.map((s) => t(`sc.${s.id}`)), t("wf.fitToday")],
+    ...result.roles.map((r) => [r.title, r.headcount, ...SCENARIOS.map((s) => `${signed(r.outlook[s.id].index)}%`), `${percent(r.avg_fit)}%`]), [],
+    [t("wf.moves")], [t("wf.from"), t("wf.to"), t("wf.peopleCol"), t("wf.hoursEach"), t("bud.feesEach"), t("wf.fitToday")],
+    ...result.moves.map((m) => [m.from_role, m.to_role, m.people, m.avg_hours, m.fees_each_rm, `${percent(m.avg_fit_now)}%`]), [],
+  ];
+  if (result.in_place.length) out.push([t("wf.inPlace")], [t("wf.role"), t("wf.peopleCol"), t("aa.skills"), t("wf.hoursEach"), t("bud.feesEach"), t("bud.time")],
+    ...result.in_place.map((r) => [r.title, r.people, r.ai_skills.join("; "), r.avg_hours, r.fees_each_rm, r.staff_time_rm]), []);
+  const b = result.budget;
+  out.push([t("bud.title")], [t("bud.fees"), b.total_rm], [t("bud.claimable"), b.claimable_rm], [t("bud.ask"), b.ask_provider_rm],
+    [t("bud.time"), b.staff_time_rm], [tf("bud.source", { year: b.pay_year })], []);
+  if (result.grant_plan?.length) out.push([t("grant.title")], [t("grant.disclaimer")], ...grantRows(result.grant_plan), []);
+  if (result.sdg_contribution.length) out.push([t("wf.sdgs")], ...result.sdg_contribution.map((g) => [`SDG ${g.number} ${g.name}`, g.people]));
+  return out;
+}
+
+// For the company's own HRD Corp application: each course in the moves, who takes it, hours, dated
+// price and HRD Corp status. Laluan does not submit claims.
+function GrantPlan({ plan }: { plan: GrantRow[] }) {
+  if (!plan.length) return null;
+  const fees = plan.reduce((sum, r) => sum + (r.fees_total_rm ?? 0), 0);
+  const claimable = plan.filter((r) => r.hrd_corp === "claimable").reduce((sum, r) => sum + (r.fees_total_rm ?? 0), 0);
+  return (
+    <div className="card grant-plan">
+      <div className="progress-head">
+        <h2>{t("grant.title")}</h2>
+        <ExportBar name="laluan-hrd-corp-plan" rows={() => grantRows(plan)} print={false} />
+      </div>
+      <p className="muted">{t("grant.sub")}</p>
+      <div className="table-wrap">
+        <table className="heatmap">
+          <thead><tr><th>{t("grant.course")}</th><th>{t("wf.peopleCol")}</th><th>{t("grant.hoursTotal")}</th><th>{t("grant.feesTotal")}</th><th>{t("grant.hrd")}</th></tr></thead>
+          <tbody>{plan.map((r) => (
+            <tr key={r.course_id}>
+              <th scope="row"><a href={r.url} target="_blank" rel="noreferrer">{tr(r.title)} ↗</a><small className="grant-meta">{r.provider} · {tf("grant.forList", { list: r.for_roles.map((x) => tr(x)).join(", ") })}</small></th>
+              <td>{r.people}</td><td>{r.hours_total.toLocaleString()}</td>
+              <td>{r.fees_total_rm === null ? t("grant.noPrice") : rm(r.fees_total_rm)}</td>
+              <td><span className={`badge ${r.hrd_corp === "claimable" ? "good" : ""}`}>{t(HRD_KEY[r.hrd_corp])}</span></td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+      <p><strong>{tf("grant.totals", { fees: rm(fees), claimable: rm(claimable) })}</strong></p>
+      <p className="banner">{t("grant.disclaimer")}</p>
+    </div>
+  );
+}
+
 function Results({ result, scenario, onScenario }: { result: WorkforceData; scenario: Scenario; onScenario: (s: Scenario) => void }) {
   const src = result.signal_source;
   return (
     <>
+      <div className="report-head">
+        <p className="print-only"><strong>{t("exp.hrTitle")}</strong> · {new Date().toISOString().slice(0, 10)} · {t(`sc.${scenario}`)} · {src.snapshot_id}</p>
+        <ExportBar name="laluan-hr-report" rows={() => reportRows(result, scenario)} />
+      </div>
       <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
         {SCENARIOS.map((s) => (
           <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
@@ -193,6 +262,7 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
       </div>
 
       <Budget budget={result.budget} hours={result.total_hours} inPlace={result.in_place} />
+      <GrantPlan plan={result.grant_plan ?? []} />
       {result.get_ahead.length > 0 && <InPlaceTable title={t("wf.getAhead")} sub={t("wf.getAheadSub")} rows={result.get_ahead} />}
 
       {result.sdg_contribution.length > 0 && (

@@ -175,7 +175,7 @@ def test_workforce_aggregates_and_suggests_moves():
     assert result["sdg_contribution"] and "Row 9" in result["problems"][0]
     # Aggregates only: groups by role and by move, never a row per employee.
     assert set(result) == {"scenario", "employees", "at_risk", "total_hours", "budget", "roles", "moves",
-                           "in_place", "get_ahead", "sdg_contribution", "problems", "signal_source"}
+                           "in_place", "get_ahead", "sdg_contribution", "grant_plan", "problems", "signal_source"}
     assert all("headcount" in r for r in result["roles"]) and all("people" in m for m in result["moves"])
 
 
@@ -333,6 +333,26 @@ def test_workforce_reports_course_fees_and_staff_time():
     budget = workforce.analyse(ref, csv_text, "baseline")["budget"]
     assert set(budget) >= {"total_rm", "claimable_rm", "ask_provider_rm", "unpriced_courses", "staff_time_rm"}
     assert budget["staff_time_rm"] > 0 and budget["total_rm"] >= budget["claimable_rm"]
+
+
+def test_grant_plan_lists_each_course_once_with_people_and_never_guesses_a_price():
+    from app.services import workforce
+
+    ref = get_reference()
+    result = workforce.analyse(ref, open("data/sample_workforce.csv", encoding="utf-8").read(), "baseline")
+    plan = result["grant_plan"]
+    assert plan and len({r["course_id"] for r in plan}) == len(plan)
+    for r in plan:
+        assert r["hrd_corp"] in {"claimable", "check", "not_needed"} and r["people"] > 0 and r["url"].startswith("https://")
+        assert r["hours_total"] == r["hours_each"] * r["people"]
+        if r["cost"] != "paid":
+            assert r["price_each_rm"] == 0 and r["fees_total_rm"] == 0
+    priced = [r for r in plan if r["fees_total_rm"] is not None]
+    assert round(sum(r["fees_total_rm"] for r in priced), 2) == result["budget"]["total_rm"]
+    unpriced = workforce.grant_plan({"x": {"course": {"id": "x", "title": "X", "provider": "P", "url": "https://p",
+                                                      "cost": "paid", "price_rm": None, "hrd_corp": "check", "hours": 4},
+                                           "people": 3, "roles": {"Data analyst"}}})
+    assert unpriced[0]["fees_total_rm"] is None and unpriced[0]["price_each_rm"] is None
 
 
 def test_hr_moves_go_to_the_nearest_role_and_offer_upskilling_in_place():

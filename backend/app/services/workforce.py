@@ -104,6 +104,8 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
     in_place: dict[str, dict] = defaultdict(lambda: {"people": 0, "hours": 0, "fees": 0.0, "time": 0.0})
     exposed = {r: tasks.for_role(ref, r)["shares"]["automate"] >= GET_AHEAD_SHARE for r in ref.roles}
     sdg_people: Counter = Counter()
+    # The training-grant plan: every course in the nearest moves, with how many people take it.
+    course_use: dict[str, dict] = {}
     for (role_id, person_skills), count in groups.items():
         profile = {"skills": list(person_skills), "current_role_id": role_id}
         result = matching.match(ref, profile, scenario_id)
@@ -129,6 +131,11 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         candidates = [r for r in result["roles"] if not r["at_risk"] and r["role_id"] != role_id]
         target = max(candidates, key=lambda r: (r["fit"], -r.get("plan_hours", 0)))
         plan = pathway.build(ref, profile, target["role_id"], summarize=False)
+        for step in plan["steps"]:
+            course = step["course"]
+            use = course_use.setdefault(course["id"], {"course": course, "people": 0, "roles": set()})
+            use["people"] += count
+            use["roles"].add(ref.roles[target["role_id"]]["title"])
         move = moves[(role_id, target["role_id"])]
         move["people"] += count
         move["hours"] += plan["total_hours"] * count
@@ -178,6 +185,26 @@ def analyse(ref: Reference, text: str, scenario_id: str) -> dict:
         "in_place": sorted((stay_row(r, m) for r, m in in_place.items() if r in risk_roles), key=lambda x: -x["people"]),
         "get_ahead": sorted((stay_row(r, m) for r, m in in_place.items() if r not in risk_roles), key=lambda x: -x["people"]),
         "sdg_contribution": [{**ref.sdgs[n], "people": c} for n, c in sdg_people.most_common()],
+        "grant_plan": grant_plan(course_use),
         "problems": problems[:20],
         "signal_source": {k: ref.latest_snapshot[k] for k in ("snapshot_id", "imported", "illustrative")},
     }
+
+
+def grant_plan(course_use: dict[str, dict]) -> list[dict]:
+    """One row per course in the nearest moves: who takes it, hours, its dated price and HRD Corp
+    status, so HR can prepare its own HRD Corp application. Laluan does not submit claims; a paid
+    course without a price stays unpriced, never guessed."""
+    rows = []
+    for use in course_use.values():
+        c = use["course"]
+        price = c.get("price_rm") if c["cost"] == "paid" else 0
+        rows.append({
+            "course_id": c["id"], "title": c["title"], "provider": c["provider"], "url": c["url"],
+            "cost": c["cost"], "hrd_corp": c.get("hrd_corp") or "not_needed", "checked": c.get("checked"),
+            "people": use["people"], "hours_each": c["hours"], "hours_total": c["hours"] * use["people"],
+            "price_each_rm": price, "fees_total_rm": None if price is None else round(price * use["people"], 2),
+            "for_roles": sorted(use["roles"]),
+        })
+    order = {"claimable": 0, "check": 1, "not_needed": 2}
+    return sorted(rows, key=lambda r: (order.get(r["hrd_corp"], 3), -r["people"], r["title"]))

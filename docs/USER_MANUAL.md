@@ -258,11 +258,14 @@ Open **HR teams and career centres** in the sidebar.
   - stable roles that AI will still change a lot
   - SDG totals
 - Switch scenarios to re-analyse.
+- **Download CSV** saves the whole report for a spreadsheet; **Print or save as PDF** gives a clean copy for management.
+- **HRD Corp training-grant plan:** each course in the moves with who takes it, hours, fees and HRD Corp status, with its own CSV, to prepare the company's own HRD Corp application. Laluan does not submit claims.
 
 ### Class (career centre)
 **What it's for:** advise a class: which roles it fits, which skills most students still need, which courses help the most students.
 
 **How to use it:** **Use the sample class (synthetic, 52 students)** or upload an anonymous CSV (optionally with a programme column). Groups smaller than 3 are hidden.
+**Download CSV** saves the results. On **My classes**, the class table also has **Download CSV** and **Print or save as PDF**.
 
 ### My classes (counsellors)
 **What it's for:** a counsellor follows the progress of students who choose to join.
