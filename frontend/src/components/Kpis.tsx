@@ -7,7 +7,7 @@ import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
 export function Kpis({ data, scenario }: { data: Matches; scenario: Scenario }) {
   const top = data.roles[0];
   const robust = data.roles.filter((r) => r.robust_pick).length;
-  const current = data.roles.find((r) => r.is_current_role);
+  const current = data.roles.find((r) => r.is_current_role) ?? data.current_role ?? undefined;
   const src = data.signal_source;
   return (
     <div className="kpis">

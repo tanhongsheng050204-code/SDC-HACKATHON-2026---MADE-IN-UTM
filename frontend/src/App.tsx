@@ -5,7 +5,8 @@ import { AccountButton } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
 import { Icon } from "./components/Icon";
-import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
+import { LangPicker, useLang } from "./components/Preferences";
+import { Settings } from "./components/Settings";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onRateLimited, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
@@ -57,6 +58,9 @@ function MainApp({ demo }: { demo: string | null }) {
     const r = readRoute();
     return NEEDS_PROFILE.includes(r.screen) || r.screen === "review" ? { ...r, screen: "landing" } : r;
   });
+  // A reload deep in the app reopens the saved profile; until it arrives, show a calm loading
+  // screen rather than flashing the landing page.
+  const [restoring, setRestoring] = useState(() => !demo && NEEDS_PROFILE.includes(readRoute().screen) && !!load(KEYS.profile));
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<RoleMatch | null>(null);
   const [journey, setJourney] = useState<Journey | null>(null);
@@ -102,8 +106,6 @@ function MainApp({ demo }: { demo: string | null }) {
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachQuestion, setCoachQuestion] = useState<string | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
-  const { theme, toggle: toggleTheme } = useTheme();
-  const { lite, setLite } = useLite();
   const { lang, change: changeLang } = useLang();
   const storedId = load(KEYS.profile);
 
@@ -199,7 +201,8 @@ function MainApp({ demo }: { demo: string | null }) {
     if (demo === "class") { setWorkforceTab("class"); go("workforce"); return; }
     // A reload on ?view=roles (or deeper) resumes the saved profile and the role in the URL.
     const wanted = readRoute();
-    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) authReady.then(() => resume(wanted));
+    if (NEEDS_PROFILE.includes(wanted.screen) && storedId) authReady.then(() => resume(wanted)).finally(() => setRestoring(false));
+    else setRestoring(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -338,8 +341,22 @@ function MainApp({ demo }: { demo: string | null }) {
     flash(`Applied: ${p.label}`);
   }
 
-  const prefs = <><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>;
-  const themeButton = <ThemeButton theme={theme} onToggle={toggleTheme} />;
+  // Leaving a demo keeps it on the server (other visitors share it) and only forgets it here.
+  function leaveDemo() {
+    save(KEYS.profile, null); setProfile(null); setRole(null);
+    go("landing", { role: undefined });
+  }
+  // The organisations view is for an HR team or a counsellor, not a person's own route: a demo
+  // person opened earlier (Wei Jie, say) is left behind so their name doesn't follow along.
+  function openWorkforce(tab: "company" | "class") {
+    if (profile?.is_demo) { save(KEYS.profile, null); setProfile(null); setRole(null); }
+    setWorkforceTab(tab);
+    go("workforce", { role: undefined });
+  }
+  const settings = (variant: string) => (
+    <Settings profile={profile} userId={userId} screen={screen} lang={lang} onLang={changeLang}
+      onLeave={leaveDemo} onDelete={deleteProfile} className={variant} />
+  );
   const banners = (
     <>
       {noNetwork && <div className="banner info" role="status">{t("pwa.offline")}</div>}
@@ -355,6 +372,15 @@ function MainApp({ demo }: { demo: string | null }) {
     </>
   );
 
+  if (restoring && screen === "landing") {
+    return (
+      <div className="restoring" role="status" aria-live="polite">
+        <LogoMark size={56} />
+        <p>{t("shell.restoring")}</p>
+      </div>
+    );
+  }
+
   if (screen === "landing") {
     const nav = (
       <nav className="site-nav" aria-label={t("nav.main")}>
@@ -366,7 +392,6 @@ function MainApp({ demo }: { demo: string | null }) {
           <a href="#faq">{t("landing.navFaq")}</a>
         </div>
         <div className="site-nav-actions">
-          {themeButton}
           <AccountButton userId={userId} />
           {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
           <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
@@ -374,8 +399,8 @@ function MainApp({ demo }: { demo: string | null }) {
       </nav>
     );
     return (
-      <Landing nav={nav} banners={banners} model={model} prefs={<><LangPicker lang={lang} onChange={changeLang} /><LiteToggle lite={lite} onChange={setLite} /></>}
-        onStart={() => go("intake")} onDemo={(k) => (k === "class" ? (setWorkforceTab("class"), go("workforce")) : openDemo(k))} onHr={() => go("workforce")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
+      <Landing nav={nav} banners={banners} model={model} prefs={<LangPicker lang={lang} onChange={changeLang} />}
+        onStart={() => go("intake")} onDemo={(k) => (k === "class" ? openWorkforce("class") : openDemo(k))} onHr={() => openWorkforce("company")} onSources={() => go("sources")} onReviewKit={() => go("review-kit")} />
     );
   }
 
@@ -387,16 +412,21 @@ function MainApp({ demo }: { demo: string | null }) {
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey} model={model} prefs={prefs} userId={userId}
+      <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey} model={model} settings={settings("side-link")}
         onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : s === "intake" ? goProfile() : go(s))}
-        onHome={() => go("landing")} onDelete={deleteProfile} />
+        onHome={() => go("landing")} />
       <div className="workspace">
         <header className="workbar">
           <span className="workbar-title">{titles[screen]}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
-            {profile && <button className="btn sm" onClick={() => { setCoachQuestion(undefined); setCoachOpen(true); }} aria-expanded={coachOpen}><Icon name="chat" />{t("shell.coach")}</button>}
-            {themeButton}
+            {profile && (
+              <button className="coach-btn" onClick={() => { setCoachQuestion(undefined); setCoachOpen(true); }} aria-expanded={coachOpen}>
+                <span className="coach-btn-icon" aria-hidden="true"><Icon name="chat" /></span>
+                <span>{t("shell.coach")}<small>{t("shell.coachSub")}</small></span>
+              </button>
+            )}
+            {settings("icon-btn")}
           </div>
         </header>
         {banners}

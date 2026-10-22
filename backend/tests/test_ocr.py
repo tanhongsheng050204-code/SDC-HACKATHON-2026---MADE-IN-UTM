@@ -175,3 +175,12 @@ def test_runpod_read_pages_sends_images_and_checks_the_answer(monkeypatch):
             runpod.read_pages([b"x"])
     finally:
         get_settings.cache_clear()
+
+
+def test_a_spreadsheet_is_not_called_a_broken_word_document():
+    data = io.BytesIO()
+    import zipfile
+    with zipfile.ZipFile(data, "w") as archive:
+        archive.writestr("xl/workbook.xml", "<workbook/>")
+    with pytest.raises(documents.UnreadableDocument, match="Upload a PDF, Word"):
+        documents.read("skills.xlsx", data.getvalue())

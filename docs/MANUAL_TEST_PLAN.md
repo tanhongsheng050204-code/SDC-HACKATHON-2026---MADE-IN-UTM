@@ -15,21 +15,21 @@ Tester: ______ · Date: ______ · Browser / device: ______
 ## 1. Landing page (`/`)
 
 - [ ] 1.1 Mint announcement bar **"Judging Laluan? Open the demo profile in one click →"** opens Aisyah's **Today**.
-- [ ] 1.2 Top bar: logo, **Who it's for · How it works · Trust · FAQ** (each scrolls to its section), theme button, **Log in with Google**, **Get started**.
+- [ ] 1.2 Top bar: logo, **Who it's for · How it works · Trust · FAQ** (each scrolls to its section), **Log in with Google**, **Get started**.
 - [ ] 1.3 **Continue** appears only after you have opened a profile in this browser, and reopens it.
 - [ ] 1.4 Hero: big headline with **"before AI changes it."** in teal; **Open the demo profile** opens Aisyah; **Start with my skills** opens the onboarding.
 - [ ] 1.5 Route ribbon: the route draws itself from **You are here** through the course stops to the **Destination** card.
-- [ ] 1.6 **Try a route**: **Clerk** (≈ 11 hours, 2 free courses), **Student** (≈ 190 hours, 1 course), **Career switcher** (≈ 500 hours) each redraw the route, stop cards and the hours line.
+- [ ] 1.6 **Try a route**: **Clerk** (≈ 11 hours, 2 free courses), **Student** (≈ 190 hours, 1 course), **Career switcher** (≈ 215 hours, 2 courses, to digital marketing) each redraw the route, stop cards and the hours line.
 - [ ] 1.7 Four number tiles: roles tracked (live count from the server), RM 0 courses, 3 futures, 0 CVs stored; the forecast line shows the update date.
-- [ ] 1.8 App preview below shows the Today screen (Aisyah, next course card, four steps, three role cards).
+- [ ] 1.8 App preview below plays three screens in turn — **Today** (Aisyah, next course card, four steps, three role cards), **Future Skills Radar** (job outlook to 2030 from WEF) and **My job, task by task** (O*NET tasks with AI labels); clicking a screen's button holds it.
 - [ ] 1.9 **Made for the people AI is changing first**: three colour cards with photos, a big number (11 h, 190 h, 73 / 160) and tags; **Open Aisyah's demo**, **Open the student demo**, **Open the workforce view** go to the right place.
 - [ ] 1.10 **Changing careers?** link opens Farid's demo; **Open the class view** opens the class view; photo credit line names the photographers.
-- [ ] 1.11 **Starts from what you already have**: blacked-out CV → confirmed skills.
+- [ ] 1.11 **Starts from what you already have**: a one-page CV (photo, name, contact line, work experience, education, skills); the photo, name, email and phone black out, then the confirmed skills appear.
 - [ ] 1.12 **One afternoon with Laluan**: clicking each time (14:00 … 14:40) changes the text and the picture.
 - [ ] 1.13 Sand band **"You make the call. Not without a plan."**: **See where the numbers come from** opens Sources.
 - [ ] 1.14 FAQ: six questions open and close; the first starts open.
 - [ ] 1.15 Closing mint panel buttons work like 1.4.
-- [ ] 1.16 Footer links (demos, class view, workforce, Sources, Review kit open in the app; Proposal, How it works, GitHub, AI declaration, Licence open GitHub in a new tab); footer shows the AI model line, language picker and Lite mode.
+- [ ] 1.16 Footer links (demos, class view, workforce, Sources, Review kit open in the app; Proposal, How it works, GitHub, AI declaration, Licence open GitHub in a new tab); footer shows the AI model line and the language picker.
 
 Notes: ______
 
@@ -68,8 +68,8 @@ Notes: ______
 - [ ] 4.2 A finished step shows ✓ beside its group name; the current screen is highlighted in mint.
 - [ ] 4.3 With no profile, profile items are greyed out; with no destination, Pathway, SDG impact and My target role say to choose a target first.
 - [ ] 4.4 Pathway, SDG impact and My target role always open the **destination** role.
-- [ ] 4.5 Profile chip shows name and number of skills; top bar shows the screen title, persona badge, **Ask the coach** and the theme button.
-- [ ] 4.6 Sidebar footer: AI model line, "Estimates, not predictions. You decide.", language picker, Lite mode, Log in / Log out, **Delete my profile** (asks first; OK deletes and returns to the landing page).
+- [ ] 4.5 Profile chip shows name and number of skills; top bar shows the screen title, persona badge, **Ask the coach** (a bright pill button) and a **Settings** button. There is no dark-mode button: the app is always light.
+- [ ] 4.6 Sidebar footer: AI model line, "Estimates, not predictions. You decide." and **Settings**. Settings (also in the top bar, so it works on a phone) holds Language, Log in / Log out (or **Leave the demo** on a demo profile), **Download my data**, **Delete my profile** (asks first; OK deletes and returns to the landing page) and **Report a problem**.
 
 Notes: ______
 
@@ -299,8 +299,8 @@ Notes: ______
 ## 21. Settings and accessibility
 
 - [ ] 21.1 Language **EN / BM / 中文** changes every screen (landing included); role, skill and course names follow where translated; the choice survives a reload.
-- [ ] 21.2 **Lite mode** uses system fonts, hides photos and decorations, and turns off animations.
-- [ ] 21.3 Dark theme: every screen readable, soft colour blocks darkened, no white boxes.
+- [ ] 21.2 With the system's **Reduce motion** setting on, the landing scenes and route stand still on their finished picture.
+- [ ] 21.3 With the computer or phone in dark mode, Laluan still shows its light theme, readable everywhere.
 - [ ] 21.4 Keyboard only: every control reachable with **Tab** with a visible focus ring; switches, sliders and tabs work with the keys.
 - [ ] 21.5 With "reduce motion" on, the route drawing, confetti and slide animations stop and nothing waits for them.
 - [ ] 21.6 **Report a problem** (sidebar) opens a dialog above the page; Esc closes it; sending shows "Thank you. The team reads every report."

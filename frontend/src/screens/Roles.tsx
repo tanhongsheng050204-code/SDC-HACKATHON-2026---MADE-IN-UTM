@@ -10,6 +10,7 @@ import { RoleGraph } from "../components/RoleGraph";
 import { percent } from "../lib/format";
 import { AiAssisted } from "../components/AiAssisted";
 import { api, Matches, Profile, RoleMatch, Scenario } from "../lib/api";
+import { ForecastHow } from "../components/ForecastHow";
 import { t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, SCENARIOS } from "../lib/labels";
 import { KEYS, load, save } from "../lib/storage";
@@ -87,6 +88,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         </div>
       )}
       {data && <p className="muted scenario-note">{tr(data.scenario.description)}</p>}
+      {data && <ForecastHow data={data} />}
       {data && <DataBanner illustrative={data.signal_source.illustrative} imported={data.signal_source.imported} />}
       {error && <p className="error" role="alert">{error}</p>}
       {noCloseRole && (

@@ -2,9 +2,9 @@
 // first course, finishes it, and her readiness and journey move on; then it plays again. Figures are
 // copied from the synthetic demo profile (Aisyah) so the picture matches what "Open the demo
 // profile" shows. With reduce motion or Lite mode it shows the finished state, still.
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { LogoMark } from "../../components/Brand";
-import { useDemoLoop, useTyping } from "../../lib/demoLoop";
+import { stillMode, useDemoLoop, useTyping } from "../../lib/demoLoop";
 import { t, tf, tr } from "../../lib/i18n";
 import { OUTLOOK_TEXT } from "../../lib/labels";
 
@@ -14,8 +14,8 @@ const TYPED = 1, ANSWER = 2, PRESS = 3, DONE = 4, MOVED = 5;
 
 const ROLES = [
   { title: "AI operations specialist", fit: 50, after: 71 },
-  { title: "UX / UI designer", fit: 25, after: 25 },
-  { title: "Sustainability and ESG analyst", fit: 29, after: 29 },
+  { title: "Engineering drafting and BIM technician", fit: 40, after: 40 },
+  { title: "Supply chain and logistics specialist", fit: 38, after: 38 },
 ];
 
 export function HeroPreview() {
@@ -40,15 +40,7 @@ export function HeroPreview() {
   return (
     <div className="lp-stage" ref={stage} aria-hidden="true">
       <div className="lp-window is-live" ref={win}>
-        <div className="lp-side">
-          <div className="lp-who"><span className="avatar">A</span><span>Aisyah (demo)</span></div>
-          <span className="lp-nav is-on">{t("nav.home")}</span>
-          <span className="lp-nav">{t("nav.radar")}</span>
-          <span className="lp-nav">{t("nav.tasks")}</span>
-          <span className="lp-nav">{t("nav.roles")} <i>13</i></span>
-          <span className="lp-nav">{t("nav.pathway")}</span>
-          <span className="lp-nav">{t("nav.impact")}</span>
-        </div>
+        <Side on="home" />
         <div className="lp-main">
           <p className="lp-hello">{t("hp.hello")}</p>
           <div className={`lp-next ${done ? "is-done" : ""}`}>
@@ -96,6 +88,120 @@ export function HeroPreview() {
         {pointer && <span className={`lp-pointer ${phase === PRESS ? "is-click" : ""}`} style={{ left: pointer.x, top: pointer.y }} />}
       </div>
       <p className="lp-caption">{t("hp.caption")}</p>
+    </div>
+  );
+}
+
+type Nav = "home" | "radar" | "tasks";
+
+function Side({ on }: { on: Nav }) {
+  return (
+    <div className="lp-side">
+      <div className="lp-who"><span className="avatar">A</span><span>Aisyah (demo)</span></div>
+      <span className={`lp-nav ${on === "home" ? "is-on" : ""}`}>{t("nav.home")}</span>
+      <span className={`lp-nav ${on === "radar" ? "is-on" : ""}`}>{t("nav.radar")}</span>
+      <span className={`lp-nav ${on === "tasks" ? "is-on" : ""}`}>{t("nav.tasks")}</span>
+      <span className="lp-nav">{t("nav.roles")} <i>13</i></span>
+      <span className="lp-nav">{t("nav.pathway")}</span>
+      <span className="lp-nav">{t("nav.impact")}</span>
+    </div>
+  );
+}
+
+// Job outlook to 2030 under the Baseline scenario: WEF Future of Jobs Report 2025, Figure 2.3, as in
+// backend/data/signals/2026-10-22-wef-foj-2025.json.
+const OUTLOOK = [
+  { title: "Data analyst", pct: 41.5, label: "growing" },
+  { title: "AI operations specialist", pct: 35.0, label: "growing" },
+  { title: "Digital marketing specialist", pct: 29.2, label: "growing" },
+  { title: "Customer service representative", pct: -2.8, label: "stable" },
+  { title: "Data entry clerk", pct: -25.9, label: "declining", mine: true },
+];
+
+function RadarScene() {
+  return (
+    <div className="lp-stage" aria-hidden="true">
+      <div className="lp-window is-live">
+        <Side on="radar" />
+        <div className="lp-main lp-scene">
+          <p className="lp-hello">{t("nav.radar")}</p>
+          <small className="muted">{t("hp.radarSub")}</small>
+          <ul className="lp-outlook">
+            {OUTLOOK.map((o, i) => (
+              <li key={o.title} className={o.mine ? "is-mine" : ""} style={{ animationDelay: `${i * 0.12}s` }}>
+                <span>{tr(o.title)}{o.mine && <em>{t("radar.yours")}</em>}</span>
+                <span className="lp-outlook-bar"><span className={o.label} style={{ width: `${Math.min(100, Math.abs(o.pct) * 2)}%` }} /></span>
+                <b className={o.label}>{o.pct > 0 ? "+" : "−"}{Math.abs(o.pct).toFixed(1)}%</b>
+              </li>
+            ))}
+          </ul>
+          <small className="lp-scene-src">WEF Future of Jobs Report 2025 · {OUTLOOK_TEXT.growing} / {OUTLOOK_TEXT.declining} · 2025–2030</small>
+        </div>
+      </div>
+      <p className="lp-caption">{t("hp.caption")}</p>
+    </div>
+  );
+}
+
+// Aisyah's own job, task by task: O*NET 30.0 task statements for data entry keyers (43-9021.00),
+// labels drafted with AI assistance (backend/data/tasks.json).
+const TASKS = [
+  { text: "Compile, sort, and verify the accuracy of data before it is entered.", label: "automate" },
+  { text: "Compare data with source documents, or re-enter data in verification format to detect errors.", label: "automate" },
+  { text: "Locate and correct data entry errors, or report them to supervisors.", label: "assist" },
+  { text: "Select materials needed to complete work assignments.", label: "human" },
+] as const;
+
+function TasksScene() {
+  return (
+    <div className="lp-stage" aria-hidden="true">
+      <div className="lp-window is-live">
+        <Side on="tasks" />
+        <div className="lp-main lp-scene">
+          <p className="lp-hello">{t("nav.tasks")}</p>
+          <small className="muted">{tr("Data entry clerk")} · O*NET 30.0</small>
+          <ul className="lp-tasks">
+            {TASKS.map((task, i) => (
+              <li key={task.text} style={{ animationDelay: `${i * 0.15}s` }}>
+                <span>{tr(task.text)}</span>
+                <b className={`lp-task-tag ${task.label}`}>{t(`task.${task.label}`)}</b>
+              </li>
+            ))}
+          </ul>
+          <small className="lp-scene-src">{t("hp.tasksSrc")}</small>
+        </div>
+      </div>
+      <p className="lp-caption">{t("hp.caption")}</p>
+    </div>
+  );
+}
+
+const SCENES = [
+  { key: "home", label: () => t("nav.home"), ms: 11500 },
+  { key: "radar", label: () => t("nav.radar"), ms: 7000 },
+  { key: "tasks", label: () => t("nav.tasks"), ms: 7000 },
+] as const;
+
+// The hero shows three app screens in turn: Today, Future Skills Radar and My job, task by task.
+// Picking one holds it; with reduce motion it stays on Today.
+export function HeroScenes() {
+  const [scene, setScene] = useState(0);
+  const [held, setHeld] = useState(false);
+  useEffect(() => {
+    if (held || stillMode()) return;
+    const id = window.setTimeout(() => setScene((s) => (s + 1) % SCENES.length), SCENES[scene].ms);
+    return () => window.clearTimeout(id);
+  }, [scene, held]);
+  return (
+    <div className="lp-scenes">
+      <div className="lp-scene-tabs" role="group" aria-label={t("hp.scenesAria")}>
+        {SCENES.map((s, i) => (
+          <button key={s.key} aria-pressed={scene === i} onClick={() => { setScene(i); setHeld(true); }}>{s.label()}</button>
+        ))}
+      </div>
+      <div key={scene} className="lp-scene-swap">
+        {scene === 0 ? <HeroPreview /> : scene === 1 ? <RadarScene /> : <TasksScene />}
+      </div>
     </div>
   );
 }

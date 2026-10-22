@@ -1,9 +1,7 @@
-import { ReactNode, useState } from "react";
-import { api, type Journey, type JourneyStep, type Profile } from "../lib/api";
+import { ReactNode } from "react";
+import { type Journey, type JourneyStep, type Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
-import { AccountButton } from "./AccountButton";
-import { ReportProblem } from "./ReportProblem";
 import { LogoMark } from "./Brand";
 import { Icon, IconName } from "./Icon";
 
@@ -11,9 +9,9 @@ interface Item { id: Screen; label: string; icon: IconName; enabled: boolean; hi
 
 // The sidebar follows the four-step journey (lib/api Journey): where I stand, explore roles,
 // build my skills, apply and share. Steps 3 and 4 open the target role, so they wait for one.
-export function Sidebar({ current, roleId, profile, journey, model, prefs, userId, onGo, onHome, onDelete }: {
-  current: Screen; roleId: string | null; profile: Profile | null; journey: Journey | null; model: string | null; prefs: ReactNode;
-  userId: string | null; onGo: (s: Screen) => void; onHome: () => void; onDelete: () => void;
+export function Sidebar({ current, roleId, profile, journey, model, settings, onGo, onHome }: {
+  current: Screen; roleId: string | null; profile: Profile | null; journey: Journey | null; model: string | null;
+  settings: ReactNode; onGo: (s: Screen) => void; onHome: () => void;
 }) {
   const hasTarget = !!profile?.target_role_id;
   const needsTarget = profile ? t("shell.needsTarget") : t("shell.needsProfile");
@@ -74,37 +72,8 @@ export function Sidebar({ current, roleId, profile, journey, model, prefs, userI
       <div className="side-foot">
         {model && <p className="side-note">{t("shell.model")}: {model}</p>}
         <p className="side-note">{t("shell.estimates")}</p>
-        <div className="side-prefs">{prefs}</div>
-        <AccountButton userId={userId} className="side-link" />
-        <ReportProblem screen={current} className="side-link" />
-        {profile && <DownloadData profileId={profile.id} />}
-        {profile && <button className="side-link danger" onClick={onDelete}><Icon name="trash" />{t("shell.delete")}</button>}
+        {settings}
       </div>
     </aside>
-  );
-}
-
-// Data rights: everything stored about this profile as one JSON file, saved in the browser.
-function DownloadData({ profileId }: { profileId: string }) {
-  const [state, setState] = useState<"idle" | "busy" | "failed">("idle");
-  async function download() {
-    setState("busy");
-    try {
-      const data = await api.exportData(profileId);
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-      const a = document.createElement("a");
-      a.href = url; a.download = `laluan-my-data-${profileId.slice(0, 8)}.json`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-      setState("idle");
-    } catch { setState("failed"); }
-  }
-  return (
-    <>
-      <button className="side-link" onClick={download} disabled={state === "busy"} aria-busy={state === "busy"}>
-        <Icon name="download" />{t("shell.download")}
-      </button>
-      {state === "failed" && <p className="side-note error" role="alert">{t("shell.downloadFailed")}</p>}
-    </>
   );
 }

@@ -524,3 +524,89 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .lens-result p { margin: 0; }
 .lens-trade { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
 .lens-result .btn { min-height: 44px; }
+
+/* ---------- Settings dialog ---------- */
+.dialog.settings { width: min(480px, 100%); border-radius: 26px; padding: 22px 24px 24px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.settings-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.settings-top .icon-btn { width: 44px; min-height: 44px; font-size: 1.4rem; }
+.settings-group { display: grid; gap: 10px; justify-items: start; padding: 16px 0; border-top: 1px solid var(--line); }
+.settings-group:first-of-type { border-top: 0; }
+.settings-group h3 { margin: 0; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.settings-group p { margin: 0; }
+.settings-group .btn { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; }
+.settings-group .lang-picker select { min-height: 44px; border-radius: 14px; padding: 0 14px; }
+.settings-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn.danger { color: var(--risk, #B3261E); }
+
+/* ---------- Ask the coach: the one bright button in the top bar ---------- */
+.coach-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 16px 4px 5px; border-radius: 999px;
+  border: 1px solid var(--mint-2); background: linear-gradient(135deg, var(--mint), var(--sky)); color: var(--ink);
+  font: 700 .92rem/1.1 var(--font); text-align: left; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.coach-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -14px rgba(16, 36, 31, .5); }
+.coach-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.coach-btn small { display: block; font-weight: 500; font-size: .74rem; color: var(--ink-soft); }
+.coach-btn-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--on-accent); }
+.coach-btn-icon svg { width: 18px; height: 18px; }
+.workbar-actions .icon-btn { width: 44px; min-height: 44px; }
+@media (max-width: 720px) { .coach-btn small { display: none; } .coach-btn { padding-right: 12px; } }
+@media (prefers-reduced-motion: reduce) { .coach-btn { transition: none; } .coach-btn:hover { transform: none; } }
+
+/* ---------- Reopening a saved profile after a reload ---------- */
+.restoring { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--canvas); color: var(--ink-soft); font-weight: 600; }
+.restoring svg { animation: restoring-pulse 1.4s ease-in-out infinite; }
+@keyframes restoring-pulse { 50% { opacity: .45; transform: scale(.94); } }
+@media (prefers-reduced-motion: reduce) { .restoring svg { animation: none; } }
+html[data-lite="1"] .restoring svg { animation: none; }
+
+/* ---------- How the forecast is worked out ---------- */
+.forecast-how { background: var(--sky); border: 0; }
+.forecast-how summary { cursor: pointer; font-weight: 800; min-height: 44px; display: flex; align-items: center; }
+.forecast-how ol { display: grid; gap: 12px; margin: 8px 0 12px; padding-left: 0; list-style: none; }
+.forecast-how li { line-height: 1.55; }
+.how-formula { display: block; margin: 8px 0; padding: 10px 14px; border-radius: 14px; background: var(--surface); font-size: .86rem; white-space: normal; overflow-wrap: anywhere; }
+
+/* ---------- Landing: the CV as a real one-page CV ---------- */
+.lp-cv { gap: 12px; text-align: left; }
+.lp-cv .cv-head { display: flex; gap: 14px; align-items: center; padding-bottom: 12px; border-bottom: 2px solid var(--mint-2); }
+.lp-cv .cv-head > div { display: grid; gap: 2px; min-width: 0; }
+.lp-cv .cv-photo { position: relative; flex: none; width: 64px; height: 64px; border-radius: 14px; overflow: hidden; }
+.lp-cv .cv-photo svg { display: block; }
+.lp-cv .cv-photo::after { content: ""; position: absolute; inset: 0; background: var(--ink); opacity: 0; transition: opacity .35s ease; }
+.lp-cv .cv-photo.is-hidden::after { opacity: 1; }
+.lp-cv .cv-name { font-size: 1.12rem; font-weight: 850; letter-spacing: -.02em; color: var(--ink); }
+.lp-cv .cv-role { font-weight: 700; color: var(--accent); font-size: .9rem; }
+.lp-cv .lp-pii { font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.lp-cv mark { background: transparent; color: inherit; border-radius: 3px; transition: background-color .35s ease, color .35s ease; }
+.lp-cv mark.is-hidden { background: var(--ink); color: var(--ink); }
+.lp-cv .cv-sec { display: grid; gap: 3px; }
+.lp-cv .cv-sec h4 { margin: 0; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.lp-cv .cv-sec p { margin: 0; font-size: .88rem; line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) { .lp-cv mark, .lp-cv .cv-photo::after { transition: none; } }
+
+/* ---------- Landing hero: three app screens in turn ---------- */
+.lp-scenes { display: grid; gap: 14px; }
+.lp-scene-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.lp-scene-tabs button { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); font-weight: 700; cursor: pointer; }
+.lp-scene-tabs button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.lp-scene-swap { animation: rise-in .45s ease-out; }
+.lp-scene { display: grid; align-content: start; gap: 10px; }
+.lp-outlook, .lp-tasks { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+.lp-outlook li { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); animation: rise-in .45s ease-out both; }
+.lp-outlook li.is-mine { background: var(--sand); }
+.lp-outlook li > span:first-child { font-weight: 700; font-size: .86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-outlook em { margin-left: 6px; font-style: normal; font-size: .7rem; padding: 2px 8px; border-radius: 99px; background: var(--surface); }
+.lp-outlook-bar { height: 10px; border-radius: 99px; background: var(--surface); overflow: hidden; }
+.lp-outlook-bar span { display: block; height: 100%; border-radius: 99px; background: var(--fill-good); }
+.lp-outlook-bar span.stable { background: var(--sun-edge); }
+.lp-outlook-bar span.declining { background: var(--risk); }
+.lp-outlook b { font-weight: 900; font-size: .95rem; }
+.lp-outlook b.growing { color: var(--good); } .lp-outlook b.declining { color: var(--risk); }
+.lp-tasks li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); font-size: .84rem; animation: rise-in .45s ease-out both; }
+.lp-task-tag { flex: none; padding: 4px 10px; border-radius: 99px; font-size: .72rem; font-weight: 800; }
+.lp-task-tag.automate { background: var(--risk-bg); color: var(--risk); }
+.lp-task-tag.assist { background: var(--sky); color: var(--sky-ink); }
+.lp-task-tag.human { background: var(--mint); color: var(--accent-edge); }
+.lp-scene-src { color: var(--ink-faint); font-size: .74rem; }
+@media (max-width: 560px) { .lp-outlook li { grid-template-columns: minmax(0, 1fr) auto; } .lp-outlook-bar { display: none; } .lp-tasks li { flex-direction: column; align-items: flex-start; } }
+@media (prefers-reduced-motion: reduce) { .lp-scene-swap, .lp-outlook li, .lp-tasks li { animation: none; } }
+html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[data-lite="1"] .lp-tasks li { animation: none; }

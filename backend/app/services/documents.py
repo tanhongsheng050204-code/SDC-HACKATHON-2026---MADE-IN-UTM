@@ -19,6 +19,10 @@ _TAG = re.compile(r"<[^>]+>")
 _ENTITIES = {"&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&apos;": "'"}
 
 
+# Zip files that are not Word documents: a spreadsheet or slides would otherwise read as a "broken" .docx.
+_OTHER_ZIPS = (".xlsx", ".xls", ".pptx", ".odt", ".ods", ".odp", ".zip", ".pages", ".numbers", ".key")
+
+
 class UnreadableDocument(ValueError):
     pass
 
@@ -79,7 +83,7 @@ def read(filename: str, data: bytes) -> tuple[str, bool]:
             return _scan_text(lambda: ocr.pdf_pages(data))[:MAX_CHARS], True
     elif name.endswith((".jpg", ".jpeg", ".png")) or data[:3] == b"\xff\xd8\xff" or data[:8] == b"\x89PNG\r\n\x1a\n":
         return _scan_text(lambda: [ocr.photo(data)])[:MAX_CHARS], True
-    elif name.endswith(".docx") or data[:2] == b"PK":
+    elif name.endswith(".docx") or (data[:2] == b"PK" and not name.endswith(_OTHER_ZIPS)):
         text = _clean(_docx_text(data))
     elif name.endswith((".txt", ".md")):
         text = _clean(data.decode("utf-8", errors="ignore"))

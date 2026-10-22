@@ -5,7 +5,7 @@ import { OUTLOOK_TEXT } from "../../lib/labels";
 import { api } from "../../lib/api";
 import { useDemoLoop } from "../../lib/demoLoop";
 import "../../styles/landing.css";
-import { HeroPreview } from "./HeroPreview";
+import { HeroScenes } from "./HeroPreview";
 import { Journey } from "./Journey";
 
 const REPO = "https://github.com/tanhongsheng050204-code/XMUM-HACKATHON";
@@ -25,8 +25,8 @@ const ROUTES: Record<Persona, { from: string | null; fromWord: string; fromTone:
     stops: [{ course: "Critical Thinking Skills for the Professional", hours: 9, audit: true }, { course: "ChatGPT Prompt Engineering for Developers", hours: 2, audit: false }] },
   student: { from: null, fromWord: "", fromTone: "", to: "Digital marketing specialist", toWord: "growing", toIndex: "+29.2", hours: 190,
     stops: [{ course: "Google Digital Marketing & E-commerce Professional Certificate", hours: 190, audit: true }] },
-  switcher: { from: "Customer service representative", fromWord: "stable", fromTone: "gold", to: "UX / UI designer", toWord: "growing", toIndex: "+47.8", hours: 500,
-    stops: [{ course: "Google UX Design Professional Certificate", hours: 200, audit: true }, { course: "The Odin Project: Full Stack JavaScript", hours: 300, audit: false }] },
+  switcher: { from: "Customer service representative", fromWord: "stable", fromTone: "gold", to: "Digital marketing specialist", toWord: "growing", toIndex: "+29.2", hours: 215,
+    stops: [{ course: "Google Digital Marketing & E-commerce Professional Certificate", hours: 190, audit: true }, { course: "Excel Skills for Business: Essentials", hours: 25, audit: true }] },
 };
 const RIBBON = "M-20,370 C 200,370 300,260 460,260 S 700,310 860,210 S 1120,90 1300,80";
 const STOP_AT: [number, number][][] = [[], [[660, 262]], [[460, 260], [860, 210]]];
@@ -135,10 +135,24 @@ function RouteWalker({ track, stopsX }: { track: RefObject<SVGPathElement>; stop
   return <div ref={box} className="rb-walker"><WalkingGirl /></div>;
 }
 
-// "Starts from what you already have", played live: the CV shows a (synthetic) name, email and
-// phone, a scan line blacks each one out, then the skills pop in one by one. Loops while on screen.
+// "Starts from what you already have", played live: a one-page CV (synthetic person, drawn photo)
+// with work, education and skills; a scan line blacks out the photo and name, the email, then the
+// phone, and the skills pop in one by one. Loops while on screen.
 const REDACT_PHASES = [1300, 700, 700, 700, 500, 450, 450, 450, 3000];
 const PII = ["Aisyah binti Ahmad", "aisyah.ahmad@mail.my", "012-345 6789"];
+
+// A drawn head-and-shoulders portrait: the CV has a photo like a real one, without a real person's face.
+function CvPhoto() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <rect width="64" height="64" rx="14" fill="#DDF0E8" />
+      <path d="M12 64c2-13 10-19 20-19s18 6 20 19z" fill="#0B6E5F" />
+      <path d="M17 33c0-12 6-20 15-20s15 8 15 20c0 7-3 10-6 12H23c-3-2-6-5-6-12z" fill="#2E4A44" />
+      <ellipse cx="32" cy="32" rx="10" ry="11.5" fill="#E8B98F" />
+      <path d="M21 30c2-9 7-12 11-12s9 3 11 12c-4-4-8-6-11-6s-7 2-11 6z" fill="#2E4A44" />
+    </svg>
+  );
+}
 
 function RedactDemo() {
   const box = useRef<HTMLDivElement>(null);
@@ -147,14 +161,33 @@ function RedactDemo() {
   const scanning = phase >= 1 && phase <= 3;
   return (
     <div className="lp-redact is-live" ref={box} aria-hidden="true">
-      <div className={`lp-doc ${scanning ? "is-scanning" : ""}`}>
+      <div className={`lp-doc lp-cv ${scanning ? "is-scanning" : ""}`}>
         <p className="jp-label">cv_aisyah.pdf</p>
-        <p className="lp-pii">{PII.map((v, i) => (
-          <span key={v}>{i > 0 && " · "}<mark className={phase >= i + 1 ? "is-hidden" : ""}>{v}</mark></span>
-        ))}</p>
-        <p>{t("lp.cvLine1")}</p>
-        <p>{t("lp.cvLine2")}</p>
-        <p className={`lp-removed ${phase >= 4 ? "is-on" : ""}`}>{t("jy.removed")}</p>
+        <div className="cv-head">
+          <span className={`cv-photo ${phase >= 1 ? "is-hidden" : ""}`}><CvPhoto /></span>
+          <div>
+            <b className="cv-name"><mark className={phase >= 1 ? "is-hidden" : ""}>{PII[0]}</mark></b>
+            <span className="cv-role">{t("lp.cvTitle")}</span>
+            <small className="lp-pii">
+              <mark className={phase >= 2 ? "is-hidden" : ""}>{PII[1]}</mark> · <mark className={phase >= 3 ? "is-hidden" : ""}>{PII[2]}</mark> · Shah Alam, Selangor
+            </small>
+          </div>
+        </div>
+        <div className="cv-sec">
+          <h4>{t("lp.cvExp")}</h4>
+          <p><b>{t("lp.cvLine1")}</b></p>
+          <p>{t("lp.cvLine2")}</p>
+        </div>
+        <div className="cv-sec">
+          <h4>{t("lp.cvEdu")}</h4>
+          <p>{t("lp.cvEdu1")}</p>
+          <p>{t("lp.cvEdu2")}</p>
+        </div>
+        <div className="cv-sec">
+          <h4>{t("lp.cvSkills")}</h4>
+          <p>{t("lp.cvSkillsLine")}</p>
+        </div>
+        <p className={`lp-removed ${phase >= 4 ? "is-on" : ""}`}>{t("lp.cvRemoved")}</p>
       </div>
       <span className={`lp-arrow ${phase >= 4 ? "is-on" : ""}`}>→</span>
       <div className="lp-doc">
@@ -220,7 +253,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
           </div>
           <RibbonRoute />
           <LiveStats />
-          <HeroPreview />
+          <HeroScenes />
         </header>
 
         <section className="lp-frame" id="people">

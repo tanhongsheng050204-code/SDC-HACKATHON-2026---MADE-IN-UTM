@@ -97,7 +97,7 @@ def _matched_preferences(ref: Reference, prefs: dict[str, float], context: dict[
 
 
 def _breakdown(ref: Reference, role_id: str, skills: set[str], outlook: Outlook, prefs: dict[str, float],
-               audience: str | None = None) -> dict:
+               audience: str | None = None, current_id: str | None = None) -> dict:
     fit, _, _ = fit_and_gap(ref.roles[role_id], skills)
     context = ref.roles[role_id].get("work_context", {})
     match = preference_match(prefs, context)
@@ -107,16 +107,24 @@ def _breakdown(ref: Reference, role_id: str, skills: set[str], outlook: Outlook,
         "preference_points": round(PREFERENCE_BOOST * max(0.0, match), 4),
         "entry_points": ENTRY_BOOST if audience == "graduate" and ref.roles[role_id].get("entry_level") else 0.0,
     }
+    role = ref.roles[role_id]
+    core = {rs["skill_id"] for rs in role["skills"] if rs["weight"] >= CORE_WEIGHT} - SOFT_SKILLS
+    has_core = bool(core & skills)
+    licence = role_id in ref.entry_requirements["licences"] and role_id != current_id
     return {"fit": fit, "score": round(sum(parts.values()), 4), "preference_match": match,
+            "has_core_skill": has_core, "big_jump": fit < LONG_SHOT_FIT or not has_core or licence,
             "matched_preferences": _matched_preferences(ref, prefs, context) if parts["preference_points"] else [],
             **parts}
 
 
 def _ranked(ref: Reference, skills: set[str], by_role: dict[str, Outlook],
-            prefs: dict[str, float], audience: str | None = None, exclude: str | None = None) -> list[tuple[str, dict]]:
-    rows = [(role_id, _breakdown(ref, role_id, skills, by_role[role_id], prefs, audience))
+            prefs: dict[str, float], audience: str | None = None, exclude: str | None = None,
+            current_id: str | None = None) -> list[tuple[str, dict]]:
+    """Declining roles last; before them, roles that are a big jump (no core skill yet, little
+    overlap, or a licence to earn) come after roles the person can reach as a next move."""
+    rows = [(role_id, _breakdown(ref, role_id, skills, by_role[role_id], prefs, audience, current_id))
             for role_id in ref.roles if role_id in by_role and role_id != exclude]
-    return sorted(rows, key=lambda r: (by_role[r[0]].label == "declining", -r[1]["score"], r[0]))
+    return sorted(rows, key=lambda r: (by_role[r[0]].label == "declining", r[1]["big_jump"], -r[1]["score"], r[0]))
 
 
 def _skill_view(ref: Reference, rs: dict) -> dict:
@@ -186,7 +194,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
     exclude = current_id if audience == "switcher" else None
     carry_from = {rs["skill_id"] for rs in ref.roles[current_id]["skills"]} if current_id in ref.roles else set()
     def rank_all(by_scenario: dict) -> dict:
-        return {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role, prefs, audience, exclude))}
+        return {sid: {role_id: i + 1 for i, (role_id, _) in enumerate(_ranked(ref, skills, by_role, prefs, audience, exclude, current_id))}
                 for sid, by_role in by_scenario.items()}
 
     ranks = rank_all(all_outlooks)
@@ -196,10 +204,10 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
                      and presets[sid][role_id].label != "declining" for sid in preset_ranks)}
 
     without_extra = ({role_id: i + 1 for i, (role_id, _) in
-                      enumerate(_ranked(ref, own_skills, all_outlooks[scenario_id], prefs, audience, exclude))}
+                      enumerate(_ranked(ref, own_skills, all_outlooks[scenario_id], prefs, audience, exclude, current_id))}
                      if extra_skills else {})
     roles = []
-    for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id], prefs, audience, exclude):
+    for role_id, why in _ranked(ref, skills, all_outlooks[scenario_id], prefs, audience, exclude, current_id):
         role = ref.roles[role_id]
         _, covered, missing = fit_and_gap(role, skills)
         indexes = [o[role_id].index for o in all_outlooks.values()]
@@ -272,6 +280,10 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
 
 
 LONG_SHOT_FIT = 0.2       # below this skill fit a role is a long-term goal, not a next move
+CORE_WEIGHT = 2           # a role's core or important skills; with none of them a role is a long-term goal too
+# Skills every job asks for. They count towards fit, but on their own they don't make a role a next
+# move: communication and empathy don't make a front-desk clerk a UX designer.
+SOFT_SKILLS = frozenset({"communication", "problem_solving", "critical_thinking", "empathy", "adaptability"})
 STEPPING_MIN_SHARED = 2   # a stepping stone already uses at least this many of the goal's core or important missing skills
 
 
@@ -284,7 +296,9 @@ def _add_routes(ref: Reference, profile: dict, roles: list[dict], scenario_id: s
     for r in roles:
         r["plan_hours"] = pathway.build(ref, profile, r["role_id"], summarize=False)["total_hours"]
         # A licence the person does not hold takes years, not a few courses: a long-term goal however close the skills.
-        r["long_shot"] = r["fit"] < LONG_SHOT_FIT or r["requirements"]["needs_licence"]
+        # So does a role where the person has none of the core skills: shared soft skills such as
+        # communication don't make a front-desk clerk a software developer.
+        r["long_shot"] = r["why"]["big_jump"]
     for r in roles:
         r["stepping_stone"] = None
         if not r["long_shot"] or r["at_risk"]:  # no route towards a declining job
