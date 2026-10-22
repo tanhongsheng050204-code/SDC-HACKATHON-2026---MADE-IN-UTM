@@ -56,12 +56,43 @@ an admin; course steps and goal choices stay with the user; the employer view ne
   cover the skills she is missing. *(Figures from the live app, forecast snapshot
   2026-10-22-trend-092120; they change only when a person approves a newer forecast.)*
 
+**Does the forecast work? A test anyone can repeat.** We hid the last year of Malaysian job-ad
+data and forecast it from the years before. Where the history showed a clear trend, the next year
+moved the way we said for **____ of ____ skills**; guessing "everything rises" gets ____. On size,
+our forecast was off by about ____% on average, against ____% for simply assuming no change.
+*(Copy the four blanks from Future Skills Radar → "How well does this forecast do?" on the live
+site, forecast snapshot ______. The backtest is published with every snapshot, so the claim is
+re-checked each time the data changes.)*
+
 ## 4. Feasibility: what already works
 
 Shown live from the GitHub repo: CV upload and questionnaire, the trend pipeline feeding role
 matching (refresh → new dated snapshot → rankings change), explainable ranking, three scenarios and a
 year slider, pathway with progress, SDG mapping, and the employer heatmap. About 430 automated tests (backend
 and frontend); CI runs them on SQLite and Postgres on every push.
+
+**Load:** with ____ people using the live API at once (each opening a demo profile and going
+through Today, Future roles, a pathway, progress and plan checks), ____ requests a second, ____
+failed, 95% answered within ____ ms. *(Run `python backend/scripts/load_test.py
+https://laluan-api.onrender.com --users 25` after waking the server and copy the "all" line.)*
+
+### Keeping it running after the hackathon
+
+| | Now (free tiers) | For a real pilot |
+|---|---|---|
+| Hosting | Render free web service (sleeps when idle), Vercel Hobby, Supabase Free | Render Starter (always on), Supabase Pro (daily backups), Vercel Pro: about USD 52 a month at list price* |
+| AI cost | Optional: everything works offline with rules and templates; only the coach, CV reading and voice call a model, each rate-limited per person and in total | The same limits cap the bill; the rules fall back if the model budget runs out |
+| Cost per person | USD 0 | About USD 0.05 a month each at 1,000 active people a month (hosting only)* |
+| Who pays | The team | Career centres and HR teams, who get the class and workforce views; individuals stay free |
+| Who runs it | The team | A pilot partner: ______ (a career centre or TVET college) runs a class for one semester; an admin from the partner approves forecast refreshes |
+
+\*List prices on render.com/pricing, supabase.com/pricing and vercel.com/pricing; check them
+before submitting. The figure per person is the monthly hosting total divided by 1,000.
+
+**Roadmap:** (1) a one-semester pilot with one career centre, measuring minutes to a pathway and
+courses finished; (2) Malaysian job-ad history refreshed monthly and reviewed by the partner's admin;
+(3) more roles and BM course options from the partner's own programmes; (4) a native-speaker review
+of every BM and Chinese screen.
 
 ## 5. Hardest risks and our fallbacks
 

@@ -26,11 +26,19 @@ Reviewer: ______ (role: lecturer / career counsellor) · Date: ______
 |---|---|---|---|---|---|
 | Aisyah (working adult) | AI operations specialist (47% fit); Engineering drafting and BIM technician (40%); Supply chain and logistics specialist (38%) | | | | |
 | Wei Jie (graduate) | Digital marketing specialist (64% fit); Engineering drafting and BIM technician (40%); AI operations specialist (40%) | | | | |
-| Farid (career switcher) | AI operations specialist (33% fit); Digital marketing specialist (36%); UX / UI designer (46%) | | | | |
+| Farid (career switcher) | ______ *(re-read from the live app: on 22 Oct the ranking changed so that roles with none of their core skills (UX / UI designer before) come after roles he can move into; DECISIONS #62)* | | | | |
 | HR sample company | | | | | |
 | Career-centre sample class | | | | | |
 
 One row per group in the brief: working adults, graduates and career switchers, HR and L&D teams, and TVET / university career centres. Each group also has an automated guarantee in `backend/tests/test_audiences.py` (`test_group_*`), so a change that stops serving a group fails the build.
+
+## 2b. Organisations
+
+One sentence from someone who would use the HR view or the class view.
+
+| Name and role | Organisation | Which view | What they said | Date |
+|---|---|---|---|---|
+| | | | | |
 
 ## 3. Task labels
 
