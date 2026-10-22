@@ -669,6 +669,62 @@
    "ms": "Hospitaliti dan Pelancongan",
    "zh": "酒店与旅游"
   },
+  "Logistics and supply chain": {
+   "ms": "Logistik dan rantaian bekalan",
+   "zh": "物流与供应链"
+  },
+  "Agriculture and plantation": {
+   "ms": "Pertanian dan perladangan",
+   "zh": "农业与种植业"
+  },
+  "Civil engineering technology": {
+   "ms": "Teknologi kejuruteraan awam",
+   "zh": "土木工程技术"
+  },
+  "No fixed education level: managers are hired on experience": {
+   "ms": "Tiada kelayakan pendidikan tetap: pengurus diambil berdasarkan pengalaman",
+   "zh": "无固定学历要求：管理人员凭经验录用"
+  },
+  "A university degree, or a Malaysian Skills Diploma (DKM) Level 5 and above": {
+   "ms": "Ijazah universiti, atau Diploma Kemahiran Malaysia (DKM) Tahap 5 ke atas",
+   "zh": "大学学士学位，或马来西亚技能文凭（DKM）第5级及以上"
+  },
+  "A diploma, a Malaysian Skills Certificate (SKM) Level 3 or a Malaysian Skills Diploma (DKM) Level 4": {
+   "ms": "Diploma, Sijil Kemahiran Malaysia (SKM) Tahap 3 atau Diploma Kemahiran Malaysia (DKM) Tahap 4",
+   "zh": "文凭（Diploma）、马来西亚技能证书（SKM）第3级或马来西亚技能文凭（DKM）第4级"
+  },
+  "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3": {
+   "ms": "SPM atau pendidikan pascamenengah, atau Sijil Kemahiran Malaysia (SKM) Tahap 1 hingga 3",
+   "zh": "SPM或中后教育学历，或马来西亚技能证书（SKM）第1至3级"
+  },
+  "Primary education": {
+   "ms": "Pendidikan rendah",
+   "zh": "小学学历"
+  },
+  "Registration with the Nursing Board Malaysia (Lembaga Jururawat Malaysia) and a yearly practising certificate": {
+   "ms": "Pendaftaran dengan Lembaga Jururawat Malaysia (LJM) dan perakuan amalan tahunan",
+   "zh": "在马来西亚护士局（LJM）注册并持有年度执业证书"
+  },
+  "An LJM-recognised Diploma in Nursing (3 years full time), then the LJM licensing examination": {
+   "ms": "Diploma Kejururawatan yang diiktiraf LJM (3 tahun sepenuh masa), kemudian lulus peperiksaan pelesenan LJM",
+   "zh": "获LJM认证的护理文凭（3年全日制），随后通过LJM执照考试"
+  },
+  "A wireman competency certificate from the Energy Commission (Suruhanjaya Tenaga) for electrical wiring work": {
+   "ms": "Perakuan kekompetenan pendawai daripada Suruhanjaya Tenaga (ST) untuk kerja pendawaian elektrik",
+   "zh": "能源委员会（Suruhanjaya Tenaga）颁发的电线工执业证书，用于电气接线工作"
+  },
+  "An ST-accredited wireman course (PW2, about 2 years plus 6 months on the job at a skills college) and the ST competency examination": {
+   "ms": "Kursus pendawai bertauliah ST (PW2, kira-kira 2 tahun campur 6 bulan latihan industri di kolej kemahiran) dan peperiksaan kekompetenan ST",
+   "zh": "ST认证的电线工课程（PW2，在技能学院就读约2年加6个月在职实习）并通过ST资格考试"
+  },
+  "A Vocational Training Officer (VTO) certificate from the Department of Skills Development (JPK), to teach at JPK-accredited centres": {
+   "ms": "Sijil Pegawai Latihan Vokasional (VTO) daripada Jabatan Pembangunan Kemahiran (JPK), untuk mengajar di pusat bertauliah JPK",
+   "zh": "技能发展局（JPK）颁发的职业培训官（VTO）证书，可在JPK认证中心任教"
+  },
+  "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO course at CIAST (about 9½ months: 3½ months of teaching methods and a 6-month internship)": {
+   "ms": "Sijil Kemahiran Malaysia (SKM) Tahap 3 dalam bidang berkaitan, kemudian kursus VTO di CIAST (kira-kira 9½ bulan: 3½ bulan metodologi pengajaran dan 6 bulan latihan industri)",
+   "zh": "相关领域的马来西亚技能证书（SKM）第3级，随后参加CIAST的VTO课程（约9个半月：3个半月教学法加6个月实习）"
+  },
   "Compile, sort, and verify the accuracy of data before it is entered.": {
    "ms": "Mengumpul, menyusun dan mengesahkan ketepatan data sebelum dimasukkan.",
    "zh": "在录入前整理、分类并核实数据的准确性。"

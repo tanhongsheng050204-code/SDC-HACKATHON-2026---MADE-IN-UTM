@@ -54,7 +54,7 @@ def test_long_shots_get_a_stepping_stone_and_workers_get_a_shortest_route():
     ref = get_reference()
     result = matching.match(ref, _profile("clerk"), "baseline")
     long_shots = [r for r in result["roles"] if r["long_shot"]]
-    assert long_shots and all(r["fit"] < matching.LONG_SHOT_FIT for r in long_shots)
+    assert long_shots and all(r["fit"] < matching.LONG_SHOT_FIT or r["requirements"]["needs_licence"] for r in long_shots)
     assert any(r["stepping_stone"] for r in long_shots)
     shortest = next(r for r in result["roles"] if r["role_id"] == result["shortest_route"])
     assert shortest["outlook"]["baseline"]["label"] in ("growing", "emerging") and not shortest["is_current_role"]

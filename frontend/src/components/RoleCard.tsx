@@ -2,6 +2,7 @@ import type { RoleMatch, Scenario } from "../lib/api";
 import { percent, signed } from "../lib/format";
 import { OUTLOOK_TEXT, OUTLOOK_TONE } from "../lib/labels";
 import { pick, t, tf, tr } from "../lib/i18n";
+import { EntryRequirements } from "./EntryRequirements";
 import { PayLine } from "./PayLine";
 import { Sdgs } from "./Sdgs";
 
@@ -33,6 +34,7 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
       {role.why.entry_points > 0 && <span className="badge gold">{t("lead.openToGrads")}</span>}
       {role.long_shot && role.stepping_stone && <span className="muted">{tf("card.startWith", { role: tr(role.stepping_stone.title) })}</span>}
       {role.plan_hours !== undefined && role.plan_hours > 0 && <span className="muted">{tf("card.planHours", { h: role.plan_hours })}</span>}
+      {role.requirements && <EntryRequirements req={role.requirements} compact />}
       <Sdgs sdgs={role.sdgs} />
       <span className="source">{tf("card.source", { id: role.citation.snapshot_id, date: role.citation.imported })}</span>
     </button>

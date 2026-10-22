@@ -41,6 +41,7 @@ class Reference:
     day_in_job: dict[str, dict]  # role_id -> {"text": {en, ms, zh}, "basis", "drafted", "reviewed_by"}
     role_occupations: dict[str, dict]  # role_id -> {"soc", "onet", "isco08", "note"}
     ai_exposure: dict  # published exposure estimates and AI usage (scripts/build_ai_exposure.py)
+    entry_requirements: dict  # usual education by MASCO group and licences per role (data/entry_requirements.json)
     malaysia_programmes: dict  # MyCOL, MyMahir and Jelajah AI links on role pages (data/malaysia_programmes.json)
 
     @property
@@ -112,6 +113,7 @@ def get_reference() -> Reference:
         day_in_job={**_read(data_dir / "day_in_job.json")["roles"], **store.latest_approved_evidence("day")},
         role_occupations=_read(data_dir / "role_occupations.json")["roles"],
         ai_exposure=_read(data_dir / "ai_exposure.json"),
+        entry_requirements=_read(data_dir / "entry_requirements.json"),
         malaysia_programmes=_read(data_dir / "malaysia_programmes.json"),
     )
 

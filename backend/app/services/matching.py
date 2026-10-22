@@ -28,6 +28,17 @@ ENTRY_BOOST = 0.05  # for graduates, on roles open to people without experience;
 ROBUST_TOP_N = 5
 
 
+def requirements(ref: Reference, role_id: str, current_id: str | None = None) -> dict:
+    """What it takes to be hired beyond skills: the education employers usually ask for (MASCO 2020
+    group) and any licence the law or an official body requires. A licence counts as held only for
+    the person's own job."""
+    data = ref.entry_requirements
+    usual = data["usual_by_group"][ref.roles[role_id]["masco_major"]]
+    licence = data["licences"].get(role_id)
+    return {"usual": usual["text"], "skill_level": usual["skill_level"], "usual_source": data["masco_source"],
+            "licence": licence, "needs_licence": bool(licence) and role_id != current_id}
+
+
 def being_checked(role: dict) -> bool:
     """A role added to the catalogue whose drafted data the team has not signed off yet."""
     return bool(role.get("added")) and not role.get("reviewed_by")
@@ -130,6 +141,7 @@ def _current_role_card(ref: Reference, role_id: str, skills: set[str], all_outlo
     return {
         "role_id": role_id, "title": role["title"], "family": role["family"], "summary": role["summary"],
         "fit": fit, "is_current_role": True, "being_checked": being_checked(role),
+        "requirements": requirements(ref, role_id, role_id),
         "outlook": {sid: {"index": o[role_id].index, "label": o[role_id].label} for sid, o in all_outlooks.items()},
         "at_risk": all_outlooks[scenario_id][role_id].label == "declining",
         "covered": [_skill_view(ref, rs) for rs in covered], "missing": [_skill_view(ref, rs) for rs in missing],
@@ -182,6 +194,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "family": role["family"],
             "summary": role["summary"],
             "being_checked": being_checked(role),
+            "requirements": requirements(ref, role_id, current_id),
             "rank": ranks[scenario_id][role_id],
             "rank_change_vs_baseline": ranks["baseline"][role_id] - ranks[scenario_id][role_id],
             "score": why["score"],
@@ -255,7 +268,8 @@ def _add_routes(ref: Reference, profile: dict, roles: list[dict], scenario_id: s
 
     for r in roles:
         r["plan_hours"] = pathway.build(ref, profile, r["role_id"], summarize=False)["total_hours"]
-        r["long_shot"] = r["fit"] < LONG_SHOT_FIT
+        # A licence the person does not hold takes years, not a few courses: a long-term goal however close the skills.
+        r["long_shot"] = r["fit"] < LONG_SHOT_FIT or r["requirements"]["needs_licence"]
     for r in roles:
         r["stepping_stone"] = None
         if not r["long_shot"] or r["at_risk"]:  # no route towards a declining job
@@ -277,5 +291,6 @@ def _shortest_route(roles: list[dict], current_id: str | None, scenario_id: str)
     if not current_id:
         return None
     options = [r for r in roles if not r["is_current_role"] and r["plan_hours"] > 0
+               and not r["requirements"]["needs_licence"]
                and r["outlook"][scenario_id]["label"] in ("growing", "emerging")]
     return min(options, key=lambda r: (r["plan_hours"], -r["score"]))["role_id"] if options else None

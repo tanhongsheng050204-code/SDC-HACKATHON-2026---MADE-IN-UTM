@@ -56,8 +56,13 @@ export interface EmergingDetail {
   sdg: { number: number; reason: Texts } | null; sources: EmergingSource[]; skill_names: Record<string, string>;
 }
 export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
+export interface Requirements {
+  usual: string; skill_level: number | null; usual_source: { title: string; url: string };
+  licence: { name: string; law: string; route: string; route_months: number; sources: { title: string; url: string }[] } | null;
+  needs_licence: boolean;
+}
 export interface RoleMatch {
-  role_id: string; title: string; family: string; summary: string; being_checked?: boolean;
+  role_id: string; title: string; family: string; summary: string; being_checked?: boolean; requirements: Requirements;
   evidence: RoleEvidence | null;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
   plan_hours?: number; long_shot?: boolean; stepping_stone?: { role_id: string; title: string } | null;
@@ -286,6 +291,7 @@ export interface Tipping {
 
 export interface Pathway {
   role_id: string; fit: number; readiness: number; total_hours: number; hours_left: number; summary: string; summary_mode: string;
+  requirements?: Requirements;
   steps: { step: number; skills: { skill_id: string; name: string }[]; course: Course; why: string; why_key?: string; done: boolean }[];
   summary_template?: { key: string; vars: Record<string, unknown> };
   grounding: { sentences: number; supported: number; unsupported: number[]; all_supported: boolean } | null;

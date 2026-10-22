@@ -934,3 +934,7 @@ main:focus { outline: none; }
 .method-card small { color: var(--ink-soft); font-size: .88rem; }
 .intake-back { background: none; border: none; color: var(--ink-soft); font-size: .9rem; cursor: pointer; padding: 0; text-decoration: underline; justify-self: start; }
 .intake-sticky { position: sticky; bottom: 16px; padding-top: 16px; }
+.req-line { display: block; font-size: .84rem; }
+.req-line .badge { margin-right: 4px; }
+.req-licence { border-color: var(--risk); }
+.req .sources { margin: 4px 0 8px; padding-left: 18px; font-size: .84rem; }

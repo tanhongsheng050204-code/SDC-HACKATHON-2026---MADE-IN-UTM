@@ -9,7 +9,7 @@ sentence that the catalogue and role data do not support (draft, then validate a
 from app.llm import generate_json
 from app.reference import Reference
 from app.services import grounding
-from app.services.matching import effective_skills, fit_and_gap
+from app.services.matching import effective_skills, fit_and_gap, requirements
 
 LEVEL_ORDER = {"intro": 0, "intermediate": 1, "advanced": 2}
 
@@ -80,13 +80,14 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
     uncovered = [rs["skill_id"] for rs in missing
                  if not any(rs["skill_id"] in s["course"]["skills"] for s in steps)]
     total_hours = sum(s["course"]["hours"] for s in steps)
+    entry = requirements(ref, role_id, profile.get("current_role_id"))
 
     if not steps:
         key = "unavailable" if uncovered else "ready"
         summary = (f"No courses in this plan cover the remaining skills for {role['title']}."
                    if uncovered else f"You already have every skill we track for {role['title']}.")
         return {"role_id": role_id, "fit": fit, "readiness": readiness, "steps": [], "total_hours": 0,
-                "hours_left": 0, "summary": summary,
+                "hours_left": 0, "summary": summary, "requirements": entry,
                 "summary_template": {"key": key, "vars": {"role": role["title"]}},
                 "summary_mode": "template", "grounding": None, "uncovered_skills": uncovered}
 
@@ -112,6 +113,8 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
         "role_id": role_id,
         "fit": fit,
         "readiness": readiness,
+        # Courses build skills; a licensed job also needs its qualification route first (shown above the steps).
+        "requirements": entry,
         "hours_left": sum(s["course"]["hours"] for s in steps if not s["done"]),
         "steps": steps,
         "total_hours": total_hours,
