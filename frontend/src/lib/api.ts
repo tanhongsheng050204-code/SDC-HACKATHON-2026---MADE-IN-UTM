@@ -57,7 +57,7 @@ export interface EmergingDetail {
 }
 export interface EvidenceStatus { state: "idle" | "running" | "done" | "stopped" | "failed"; steps: string[]; saved: string[]; failed: string[]; error: string | null; stopping?: boolean }
 export interface RoleMatch {
-  role_id: string; title: string; family: string; summary: string;
+  role_id: string; title: string; family: string; summary: string; being_checked?: boolean;
   evidence: RoleEvidence | null;
   rank: number; rank_change_vs_baseline: number; score: number; fit: number;
   plan_hours?: number; long_shot?: boolean; stepping_stone?: { role_id: string; title: string } | null;

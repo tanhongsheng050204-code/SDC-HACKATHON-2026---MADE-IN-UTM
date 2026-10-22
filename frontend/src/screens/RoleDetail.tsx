@@ -39,7 +39,8 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
       <div className="page-head role-head">
-        <div><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p></div>
+        <div><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p>
+          {role.being_checked && <p className="badge" title={t("card.newRoleHelp")}>{t("card.newRole")}</p>}</div>
         <div className="role-actions">
           <TargetButton profile={profile} roleId={role.role_id} onProfile={onProfile} />
           {role.missing.length > 0 && <button className="btn" onClick={onTree}>{t("a.build")}</button>}

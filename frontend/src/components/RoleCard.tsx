@@ -16,6 +16,7 @@ export function RoleCard({ role, scenario, onOpen }: { role: RoleMatch; scenario
         {role.robust_pick && <span className="badge gold">{t("card.robust")}</span>}
         {role.is_current_role && <span className="badge">{t("card.current")}</span>}
         {role.long_shot && <span className="badge risk" title={t("card.longShotHelp")}>{t("card.longShot")}</span>}
+        {role.being_checked && <span className="badge" title={t("card.newRoleHelp")}>{t("card.newRole")}</span>}
       </div>
       <h2>{tr(role.title)}</h2>
       <div className="fit" role="img" aria-label={tf("card.fitAria", { n: percent(role.fit) })}>
