@@ -197,6 +197,7 @@ export interface RoleTasks {
   role_id: string; onet_code: string | null; onet_note: string | null;
   source: string; source_url: string; labels_note: string;
   tasks: { id: string; text: string; label: TaskLabel; reason: string; reviewed_by: string | null;
+    short?: string; short_reason?: string;
     observed: { automation_pct: number; augmentation_pct: number } | null }[];
   counted: number; shares: Record<TaskLabel, number>; reviewed: number;
   observed_source: { name: string; url: string; month: string; licence: string };

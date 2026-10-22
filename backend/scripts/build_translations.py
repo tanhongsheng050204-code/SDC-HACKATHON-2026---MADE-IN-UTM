@@ -56,7 +56,7 @@ def texts() -> list[str]:
     out += [f for entry in req.get("roles", {}).values() for f in entry.get("fields", [])]
     for role in _read("tasks.json")["roles"]:
         for task in role["tasks"]:
-            out += [task["text"], task["reason"]]
+            out += [task["text"], task["reason"], task.get("short"), task.get("short_reason")]
     return list(dict.fromkeys(t.strip() for t in out if t and t.strip()))
 
 

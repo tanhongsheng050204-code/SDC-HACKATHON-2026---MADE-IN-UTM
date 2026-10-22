@@ -13,35 +13,45 @@
           "text": "Compile, sort, and verify the accuracy of data before it is entered.",
           "label": "automate",
           "reason": "Document-reading AI already extracts and checks fields from invoices and forms.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check and sort data",
+          "short_reason": "AI extracts and verifies form data"
         },
         {
           "id": "onet-11403",
           "text": "Compare data with source documents, or re-enter data in verification format to detect errors.",
           "label": "automate",
           "reason": "Comparing entries with source documents is rule-based and is done by validation software.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Spot data entry errors",
+          "short_reason": "Validation software checks documents"
         },
         {
           "id": "onet-11404",
           "text": "Store completed documents in appropriate locations.",
           "label": "automate",
           "reason": "Digital filing and records systems store documents automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "File completed documents",
+          "short_reason": "Digital filing systems store files automatically"
         },
         {
           "id": "onet-11405",
           "text": "Locate and correct data entry errors, or report them to supervisors.",
           "label": "assist",
           "reason": "Software flags likely errors, but a person decides the correction and when to escalate.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Fix data mistakes",
+          "short_reason": "Software flags errors, you decide corrections"
         },
         {
           "id": "onet-11407",
           "text": "Select materials needed to complete work assignments.",
           "label": "human",
           "reason": "Planning one's own work and materials stays with the person.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Prepare work materials",
+          "short_reason": "Planning your work needs personal judgement"
         }
       ]
     },
@@ -55,42 +65,54 @@
           "text": "Create, maintain, and enter information into databases.",
           "label": "automate",
           "reason": "Entering and updating database records is increasingly done by forms, integrations and document AI.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update database records",
+          "short_reason": "Online forms and tools enter data"
         },
         {
           "id": "onet-2797",
           "text": "Review work done by others to check for correct spelling and grammar, ensure that company format policies are followed, and recommend revisions.",
           "label": "assist",
           "reason": "Grammar and style tools check text; a person judges tone and company context.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check documents for errors",
+          "short_reason": "Grammar tools check text, you judge tone"
         },
         {
           "id": "onet-20284",
           "text": "Compose, type, and distribute meeting notes, routine correspondence, or reports, such as presentations or expense, statistical, or monthly reports.",
           "label": "assist",
           "reason": "Generative AI drafts notes and reports; a person checks facts and sends them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write meeting notes",
+          "short_reason": "AI drafts notes, you check facts"
         },
         {
           "id": "onet-2790",
           "text": "Answer telephones and give information to callers, take messages, or transfer calls to appropriate individuals.",
           "label": "assist",
           "reason": "Voice assistants route routine calls; people handle the rest.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Answer phone calls",
+          "short_reason": "Voice bots route calls, people answer"
         },
         {
           "id": "onet-2791",
           "text": "Greet visitors or callers and handle their inquiries or direct them to the appropriate persons according to their needs.",
           "label": "human",
           "reason": "Welcoming visitors in person depends on presence and judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Welcome office visitors",
+          "short_reason": "Greeting guests needs human warmth"
         },
         {
           "id": "onet-20289",
           "text": "Train and assist staff with computer usage.",
           "label": "human",
           "reason": "Training colleagues needs patience, trust and knowing the team.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Train staff on computers",
+          "short_reason": "Teaching colleagues takes patience and trust"
         }
       ]
     },
@@ -104,42 +126,54 @@
           "text": "Keep records of customer interactions or transactions, recording details of inquiries, complaints, or comments, as well as actions taken.",
           "label": "automate",
           "reason": "Contact-centre software logs and summarises interactions automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Log customer interactions",
+          "short_reason": "Call centre software logs calls automatically"
         },
         {
           "id": "onet-2583",
           "text": "Determine charges for services requested, collect deposits or payments, or arrange for billing.",
           "label": "automate",
           "reason": "Charges and billing follow rules that systems apply.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Calculate charges and bills",
+          "short_reason": "Billing systems apply pricing rules automatically"
         },
         {
           "id": "onet-2584",
           "text": "Complete contract forms, prepare change of address records, or issue service discontinuance orders, using computers.",
           "label": "automate",
           "reason": "Standard forms and account changes are handled by self-service and workflow tools.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Process account forms",
+          "short_reason": "Self-service forms handle requests automatically"
         },
         {
           "id": "onet-18565",
           "text": "Confer with customers by telephone or in person to provide information about products or services, take or enter orders, cancel accounts, or obtain details of complaints.",
           "label": "assist",
           "reason": "Chatbots answer routine questions; people handle complex or upset customers with AI-suggested answers.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Help customers with requests",
+          "short_reason": "Chatbots answer basics, you calm customers"
         },
         {
           "id": "onet-2581",
           "text": "Contact customers to respond to inquiries or to notify them of claim investigation results or any planned adjustments.",
           "label": "assist",
           "reason": "Notifications can be drafted and sent by AI; sensitive news still needs a person.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update customers on claims",
+          "short_reason": "AI drafts updates, people handle sensitivity"
         },
         {
           "id": "onet-2582",
           "text": "Refer unresolved customer grievances to designated departments for further investigation.",
           "label": "human",
           "reason": "Deciding how to handle an unresolved complaint takes judgement and ownership.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Escalate complex complaints",
+          "short_reason": "Handling tough disputes takes human judgement"
         }
       ]
     },
@@ -153,42 +187,54 @@
           "text": "Generate standard or custom reports summarizing business, financial, or economic data for review by executives, managers, clients, and other stakeholders.",
           "label": "automate",
           "reason": "Standard reports are generated on a schedule by BI tools.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Generate data reports",
+          "short_reason": "Reporting software creates reports automatically"
         },
         {
           "id": "onet-16146",
           "text": "Collect business intelligence data from available industry reports, public information, field reports, or purchased sources.",
           "label": "assist",
           "reason": "AI gathers and summarises sources; a person judges which are reliable.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Gather market data",
+          "short_reason": "AI collects data, you verify sources"
         },
         {
           "id": "onet-16139",
           "text": "Maintain or update business intelligence tools, databases, dashboards, systems, or methods.",
           "label": "assist",
           "reason": "AI helps write queries and dashboard code; the analyst designs and maintains them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update data dashboards",
+          "short_reason": "AI writes queries, analysts maintain dashboards"
         },
         {
           "id": "onet-16144",
           "text": "Create business intelligence tools or systems, including design of related databases, spreadsheets, or outputs.",
           "label": "assist",
           "reason": "AI speeds up building tools; deciding what to build stays with the analyst.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Build dashboard tools",
+          "short_reason": "AI writes code, analysts design tools"
         },
         {
           "id": "onet-16141",
           "text": "Identify and analyze industry or geographic trends with business strategy implications.",
           "label": "human",
           "reason": "Linking trends to business strategy needs context and accountability.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Analyze market trends",
+          "short_reason": "Spotting business opportunities needs human experience"
         },
         {
           "id": "onet-16149",
           "text": "Synthesize current business intelligence or trend data to support recommendations for action.",
           "label": "human",
           "reason": "Recommending action is a judgement the analyst owns.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Recommend business actions",
+          "short_reason": "Making final decisions needs human judgement"
         }
       ]
     },
@@ -202,42 +248,54 @@
           "text": "Clean and manipulate raw data using statistical software.",
           "label": "assist",
           "reason": "AI coding tools speed up data cleaning; the engineer checks the result.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Clean raw data",
+          "short_reason": "AI tools clean data, engineers verify"
         },
         {
           "id": "onet-21823",
           "text": "Analyze, manipulate, or process large sets of data using statistical software.",
           "label": "assist",
           "reason": "Analysis is faster with AI help, but the engineer designs and verifies it.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Process large datasets",
+          "short_reason": "Software runs calculations, engineers check logic"
         },
         {
           "id": "onet-21824",
           "text": "Apply feature selection algorithms to models predicting outcomes of interest, such as sales, attrition, and healthcare use.",
           "label": "assist",
           "reason": "AutoML tries feature sets; the engineer judges what is valid and fair.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Select model features",
+          "short_reason": "AutoML tests features, you judge fairness"
         },
         {
           "id": "onet-21827",
           "text": "Compare models using statistical performance metrics, such as loss functions or proportion of explained variance.",
           "label": "assist",
           "reason": "Metrics are computed automatically; choosing the right one is a judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Compare model scores",
+          "short_reason": "Tools calculate scores, you pick best"
         },
         {
           "id": "onet-21831",
           "text": "Identify business problems or management objectives that can be addressed through data analysis.",
           "label": "human",
           "reason": "Framing the right problem needs business understanding.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Find business data problems",
+          "short_reason": "Understanding business needs human thinking"
         },
         {
           "id": "onet-21829",
           "text": "Deliver oral or written presentations of the results of mathematical modeling and data analysis to management or other end users.",
           "label": "human",
           "reason": "Explaining results and limits to decision makers stays with people.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Present model results",
+          "short_reason": "Explaining limits needs human touch"
         }
       ]
     },
@@ -257,42 +315,54 @@
           "text": "Modify existing software to correct errors, adapt it to new hardware, or upgrade interfaces and improve performance.",
           "label": "assist",
           "reason": "AI coding assistants propose fixes; developers review and own them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Fix software bugs",
+          "short_reason": "AI suggests fixes, you approve"
         },
         {
           "id": "onet-21669",
           "text": "Develop or direct software system testing or validation procedures, programming, or documentation.",
           "label": "assist",
           "reason": "AI writes test and documentation drafts; developers decide what must be tested.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write software tests",
+          "short_reason": "AI drafts tests, you decide needs"
         },
         {
           "id": "onet-21667",
           "text": "Design, develop and modify software systems, using scientific analysis and mathematical models to predict and measure outcomes and consequences of design.",
           "label": "assist",
           "reason": "AI generates code; design and trade-offs stay with the developer.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Design software systems",
+          "short_reason": "AI writes code, you balance trade-offs"
         },
         {
           "id": "onet-21668",
           "text": "Determine system performance standards.",
           "label": "assist",
           "reason": "Tools measure performance; setting the standard is a decision.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Set performance standards",
+          "short_reason": "Tools measure speed, you set targets"
         },
         {
           "id": "onet-21662",
           "text": "Analyze user needs and software requirements to determine feasibility of design within time and cost constraints.",
           "label": "human",
           "reason": "Understanding what users need and what is feasible needs conversation and judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Review user needs",
+          "short_reason": "Human judgement balances cost and needs"
         },
         {
           "id": "onet-21664",
           "text": "Confer with systems analysts, engineers, programmers and others to design systems and to obtain information on project limitations and capabilities, performance requirements and interfaces.",
           "label": "human",
           "reason": "Working out designs with other people is collaborative.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Collaborate on system designs",
+          "short_reason": "Teamwork and discussions need people"
         }
       ]
     },
@@ -306,42 +376,54 @@
           "text": "Monitor current reports of computer viruses to determine when to update virus protection systems.",
           "label": "automate",
           "reason": "Threat feeds and endpoint tools update protection automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Track virus reports",
+          "short_reason": "Security feeds update systems automatically"
         },
         {
           "id": "onet-5317",
           "text": "Modify computer security files to incorporate new software, correct errors, or change individual access status.",
           "label": "automate",
           "reason": "Access changes are increasingly handled by identity-management workflows.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update user access",
+          "short_reason": "Identity software updates access automatically"
         },
         {
           "id": "onet-5320",
           "text": "Perform risk assessments and execute tests of data processing system to ensure functioning of data processing activities and security measures.",
           "label": "assist",
           "reason": "Scanners find weaknesses; the analyst judges risk and impact.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Assess security risks",
+          "short_reason": "Scanners find flaws, you judge risk"
         },
         {
           "id": "onet-5322",
           "text": "Document computer security and emergency measures policies, procedures, and tests.",
           "label": "assist",
           "reason": "AI drafts policies; the analyst makes them fit the organisation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write security policies",
+          "short_reason": "AI drafts rules, you adapt them"
         },
         {
           "id": "onet-5314",
           "text": "Develop plans to safeguard computer files against accidental or unauthorized modification, destruction, or disclosure and to meet emergency data processing needs.",
           "label": "assist",
           "reason": "Planning protection uses AI analysis but needs human priorities.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Plan file protection",
+          "short_reason": "AI analyses data, you set priorities"
         },
         {
           "id": "onet-5313",
           "text": "Train users and promote security awareness to ensure system security and to improve server and network efficiency.",
           "label": "human",
           "reason": "Changing people's security habits needs trust and teaching.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Train staff on security",
+          "short_reason": "Building safe habits requires human trust"
         }
       ]
     },
@@ -355,42 +437,54 @@
           "text": "Conduct market research analysis to identify search query trends, real-time search and news media activity, popular social media topics, electronic commerce trends, market opportunities, or competitor performance.",
           "label": "automate",
           "reason": "Trend and competitor monitoring is done by analytics platforms.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Research market trends",
+          "short_reason": "Analytics platforms monitor trends automatically"
         },
         {
           "id": "onet-16185",
           "text": "Coordinate sales or other promotional strategies with merchandising, operations, or inventory control staff to ensure product catalogs are current, accurate, and organized for best findability against user intent.",
           "label": "automate",
           "reason": "Product catalogues are kept current by feeds and AI tagging.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update product catalogues",
+          "short_reason": "AI tools tag and update catalogues"
         },
         {
           "id": "onet-16187",
           "text": "Conduct financial modeling for online marketing programs or Web site revenue forecasting.",
           "label": "assist",
           "reason": "Forecasts come from tools; the specialist sets assumptions.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Forecast marketing revenue",
+          "short_reason": "Software forecasts, you set assumptions"
         },
         {
           "id": "onet-16179",
           "text": "Propose online or multiple-sales-channel campaigns to marketing executives.",
           "label": "assist",
           "reason": "AI drafts campaign ideas and copy; the specialist chooses and pitches.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Pitch marketing campaigns",
+          "short_reason": "AI drafts ideas, you pitch them"
         },
         {
           "id": "onet-16182",
           "text": "Participate in the development or implementation of online marketing strategy.",
           "label": "human",
           "reason": "Strategy depends on brand, customers and judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Develop marketing strategy",
+          "short_reason": "Brand strategy requires human judgement"
         },
         {
           "id": "onet-16188",
           "text": "Communicate and collaborate with merchants, Webmasters, bloggers, or online editors to strategically place hyperlinks.",
           "label": "human",
           "reason": "Partnerships rely on relationships.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Manage partner links",
+          "short_reason": "Partner relationships need personal connection"
         }
       ]
     },
@@ -404,42 +498,54 @@
           "text": "Create searchable indices for Web page content.",
           "label": "automate",
           "reason": "Search indexing is done by software.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Index site content",
+          "short_reason": "Search software indexes pages automatically"
         },
         {
           "id": "onet-21691",
           "text": "Create Web models or prototypes that include physical, interface, logical, or data models.",
           "label": "assist",
           "reason": "AI generates prototype drafts; the designer shapes them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Build web prototypes",
+          "short_reason": "AI builds drafts, you refine design"
         },
         {
           "id": "onet-21692",
           "text": "Design, build, or maintain Web sites, using authoring or scripting languages, content creation tools, management tools, and digital media.",
           "label": "assist",
           "reason": "Site builders and AI speed up building; quality is the designer's call.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Maintain website pages",
+          "short_reason": "Site builders help, you ensure quality"
         },
         {
           "id": "onet-21693",
           "text": "Develop and document style guidelines for Web site content.",
           "label": "assist",
           "reason": "AI can draft style guides from examples.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write web style guides",
+          "short_reason": "AI drafts guidelines from samples"
         },
         {
           "id": "onet-21688",
           "text": "Conduct user research to determine design requirements and analyze user feedback to improve design quality.",
           "label": "human",
           "reason": "Talking to users and reading their reactions needs empathy.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Research user needs",
+          "short_reason": "Understanding feelings takes human empathy"
         },
         {
           "id": "onet-21689",
           "text": "Confer with management or development teams to prioritize needs, resolve conflicts, develop content criteria, or choose solutions.",
           "label": "human",
           "reason": "Resolving conflicting needs is negotiation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Align with project teams",
+          "short_reason": "Settling disagreements needs negotiation"
         }
       ]
     },
@@ -453,42 +559,54 @@
           "text": "Determine photovoltaic (PV) system designs or configurations based on factors such as customer needs, expectations, and site conditions.",
           "label": "assist",
           "reason": "Design software proposes layouts from site data; the technician checks the site.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Design solar power systems",
+          "short_reason": "Software suggests layouts, you inspect site"
         },
         {
           "id": "onet-17750",
           "text": "Diagram layouts and locations for photovoltaic (PV) arrays and equipment, including existing building or site features.",
           "label": "assist",
           "reason": "Drones and mapping tools speed up diagrams.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Map solar equipment layouts",
+          "short_reason": "Drones and mapping tools draft maps"
         },
         {
           "id": "onet-17744",
           "text": "Activate photovoltaic (PV) systems to verify system functionality and conformity to performance expectations.",
           "label": "assist",
           "reason": "Monitoring systems test output; the technician fixes faults.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Test solar power systems",
+          "short_reason": "Monitors run tests, you fix faults"
         },
         {
           "id": "onet-17740",
           "text": "Assemble solar modules, panels, or support structures, as specified.",
           "label": "human",
           "reason": "Physical assembly on varied sites is hard to automate.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Assemble solar panel frames",
+          "short_reason": "Building structures requires manual effort"
         },
         {
           "id": "onet-17742",
           "text": "Install photovoltaic (PV) systems in accordance with codes and standards, using drawings, schematics, and instructions.",
           "label": "human",
           "reason": "Installation on roofs and sites needs hands-on skill and safety judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Install solar panel systems",
+          "short_reason": "Rooftop work demands safety judgement"
         },
         {
           "id": "onet-17745",
           "text": "Apply weather sealing to array, building, or support mechanisms.",
           "label": "human",
           "reason": "Weather sealing is manual work on each site.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Apply weather seals",
+          "short_reason": "Sealing panels is hands-on work"
         }
       ]
     },
@@ -502,42 +620,54 @@
           "text": "Research or review regulatory, technical, or market issues related to sustainability.",
           "label": "assist",
           "reason": "AI summarises regulations and reports; the analyst checks what applies.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Research green regulations",
+          "short_reason": "AI summarizes rules, you review fit"
         },
         {
           "id": "onet-15976",
           "text": "Develop reports or presentations to communicate the effectiveness of sustainability initiatives.",
           "label": "assist",
           "reason": "AI drafts reports and charts from data.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Create sustainability reports",
+          "short_reason": "AI drafts charts and report summaries"
         },
         {
           "id": "onet-15972",
           "text": "Write grant applications, rebate applications, or project proposals to secure funding for sustainability projects.",
           "label": "assist",
           "reason": "AI drafts applications; the analyst tailors and stands behind them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write green grant proposals",
+          "short_reason": "AI writes drafts, you confirm details"
         },
         {
           "id": "onet-15968",
           "text": "Review and revise sustainability proposals or policies.",
           "label": "assist",
           "reason": "AI compares policies against standards; changes need human sign-off.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Review environmental policies",
+          "short_reason": "Software checks standards, humans decide"
         },
         {
           "id": "onet-15971",
           "text": "Identify or create new sustainability indicators.",
           "label": "human",
           "reason": "Choosing what to measure reflects values and context.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Set sustainability goals",
+          "short_reason": "Choosing priorities needs human values"
         },
         {
           "id": "onet-15970",
           "text": "Identify or investigate violations of natural resources, waste management, recycling, or other environmental policies.",
           "label": "human",
           "reason": "Investigating violations needs site visits and judgement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Investigate environmental violations",
+          "short_reason": "Inspecting sites requires human judgement"
         }
       ]
     },
@@ -551,42 +681,54 @@
           "text": "Prepare and maintain records of client progress and services performed, reporting changes in client condition to manager or supervisor.",
           "label": "assist",
           "reason": "Voice notes and apps speed up care records.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update patient logs",
+          "short_reason": "Apps help write notes faster"
         },
         {
           "id": "onet-2369",
           "text": "Perform healthcare-related tasks, such as monitoring vital signs and medication, under the direction of registered nurses or physiotherapists.",
           "label": "assist",
           "reason": "Sensors and apps track vital signs; the carer acts on them.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Track patient vitals",
+          "short_reason": "Sensors record data, carers take action"
         },
         {
           "id": "onet-2370",
           "text": "Administer bedside or personal care, such as ambulation or personal hygiene assistance.",
           "label": "human",
           "reason": "Personal care needs touch, dignity and trust.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Help with personal hygiene",
+          "short_reason": "Personal care requires human touch"
         },
         {
           "id": "onet-2372",
           "text": "Perform housekeeping duties, such as cooking, cleaning, washing clothes or dishes, or running errands.",
           "label": "human",
           "reason": "Household tasks in varied homes remain manual.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Do household chores",
+          "short_reason": "Home chores need hands-on effort"
         },
         {
           "id": "onet-2373",
           "text": "Care for individuals or families during periods of incapacitation, family disruption, or convalescence, providing companionship, personal care, or help in adjusting to new lifestyles.",
           "label": "human",
           "reason": "Companionship is human by nature.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Provide patient companionship",
+          "short_reason": "Real companionship needs a person"
         },
         {
           "id": "onet-2376",
           "text": "Participate in case reviews, consulting with the team caring for the client, to evaluate the client's needs and plan for continuing services.",
           "label": "human",
           "reason": "Case reviews depend on knowing the person.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Review care plans",
+          "short_reason": "Knowing the patient needs human care"
         }
       ]
     },
@@ -600,49 +742,63 @@
           "text": "Perform quality checks on products and parts.",
           "label": "assist",
           "reason": "Automated optical inspection flags surface flaws while operators confirm complex defects.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Inspect finished parts",
+          "short_reason": "Sensors spot flaws, you confirm defects"
         },
         {
           "id": "onet-20160",
           "text": "Review work orders and blueprints to ensure work is performed according to specifications.",
           "label": "assist",
           "reason": "Digital displays and automated translation tools assist operators in reviewing assembly guidelines.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check work orders",
+          "short_reason": "Digital screens display instructions clearly"
         },
         {
           "id": "onet-8468",
           "text": "Rotate through all the tasks required in a particular production process.",
           "label": "human",
           "reason": "Physical line rotations require human dexterity, physical presence, and situational awareness.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Rotate production stations",
+          "short_reason": "Moving stations needs physical agility"
         },
         {
           "id": "onet-8472",
           "text": "Provide assistance in the production of wiring assemblies.",
           "label": "human",
           "reason": "Manual manipulation and precise routing of small wire harnesses require human motor skills.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Assemble wiring sets",
+          "short_reason": "Wiring parts needs steady hands"
         },
         {
           "id": "onet-20162",
           "text": "Maintain production equipment and machinery.",
           "label": "human",
           "reason": "Routine physical cleaning, clearing jams, and mechanical upkeep must be done manually on the line.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Maintain factory machines",
+          "short_reason": "Physical cleaning needs human hands"
         },
         {
           "id": "onet-20161",
           "text": "Complete production reports to communicate team production level to management.",
           "label": "automate",
           "reason": "IoT sensors and automated production dashboards capture and compile output numbers automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Write production reports",
+          "short_reason": "IoT sensors track output automatically"
         },
         {
           "id": "onet-20158",
           "text": "Package finished products and prepare them for shipment.",
           "label": "human",
           "reason": "Boxing, taping, and organizing finished goods across dynamic order lines remain physical human tasks.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Pack finished goods",
+          "short_reason": "Boxing items needs physical labour"
         }
       ]
     },
@@ -656,49 +812,63 @@
           "text": "Receive payment by cash, check, credit cards, vouchers, or automatic debits.",
           "label": "automate",
           "reason": "Self-checkout terminals and contactless mobile payments directly process customer transactions without human cashier involvement.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Collect customer payments",
+          "short_reason": "Self-checkout kiosks process payments directly"
         },
         {
           "id": "onet-2405",
           "text": "Establish or identify prices of goods, services, or admission, and tabulate bills, using calculators, cash registers, or optical price scanners.",
           "label": "automate",
           "reason": "Automated barcode scanners, RFID readers, and smart shopping carts tally item prices automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Scan item prices",
+          "short_reason": "Barcode scanners tally totals automatically"
         },
         {
           "id": "onet-2401",
           "text": "Issue receipts, refunds, credits, or change due to customers.",
           "label": "automate",
           "reason": "Digital POS platforms automatically generate e-receipts and issue electronic credit returns to customer accounts.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Issue receipts and refunds",
+          "short_reason": "Digital POS systems send e-receipts"
         },
         {
           "id": "onet-2403",
           "text": "Greet customers entering establishments.",
           "label": "human",
           "reason": "Offering a genuine, warm greeting to entering shoppers requires authentic human hospitality and social presence.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Greet entering customers",
+          "short_reason": "Genuine warmth needs a person"
         },
         {
           "id": "onet-18765",
           "text": "Assist customers by providing information and resolving their complaints.",
           "label": "assist",
           "reason": "Store lookup software assists staff with inventory data while the cashier exercises empathy to resolve customer complaints.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Handle customer complaints",
+          "short_reason": "Store apps help, empathy solves"
         },
         {
           "id": "onet-2402",
           "text": "Count money in cash drawers at the beginning of shifts to ensure that amounts are correct and that there is adequate change.",
           "label": "assist",
           "reason": "Smart cash recyclers and automated counting hardware help staff rapidly verify cash drawer balances before a shift.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Count shift cash",
+          "short_reason": "Cash recyclers speed up counting"
         },
         {
           "id": "onet-2417",
           "text": "Process merchandise returns and exchanges.",
           "label": "assist",
           "reason": "POS software automates return policy checks and receipt validation, while the cashier physically inspects damaged goods.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Process returned items",
+          "short_reason": "POS checks policy, you inspect"
         }
       ]
     },
@@ -712,49 +882,63 @@
           "text": "Greet, register, and assign rooms to guests of hotels or motels.",
           "label": "assist",
           "reason": "Self-service check-in kiosks and digital ID scanners speed up registration while clerks handle complex check-ins and personal greetings.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check in hotel guests",
+          "short_reason": "Kiosks register, clerks handle exceptions"
         },
         {
           "id": "onet-2620",
           "text": "Make and confirm reservations.",
           "label": "automate",
           "reason": "Direct booking engines, travel aggregator APIs, and conversational AI handle standard room bookings without human intervention.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Book room reservations",
+          "short_reason": "Online booking engines handle reservations"
         },
         {
           "id": "onet-2613",
           "text": "Compute bills, collect payments, and make change for guests.",
           "label": "automate",
           "reason": "Automated point-of-sale systems and digital payment gateways reconcile charges and process checkout transactions automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Process checkout bills",
+          "short_reason": "Payment gateways charge guests automatically"
         },
         {
           "id": "onet-2619",
           "text": "Contact housekeeping or maintenance staff when guests report problems.",
           "label": "assist",
           "reason": "AI dispatch platforms automatically route guest requests to maintenance or housekeeping staff based on location and priority.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Dispatch maintenance requests",
+          "short_reason": "AI platforms route tasks automatically"
         },
         {
           "id": "onet-2622",
           "text": "Record guest comments or complaints, referring customers to managers as necessary.",
           "label": "human",
           "reason": "De-escalating upset guests and showing genuine empathy during service failures requires nuanced human emotional intelligence.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Resolve guest complaints",
+          "short_reason": "Calming upset guests takes empathy"
         },
         {
           "id": "onet-18567",
           "text": "Answer inquiries pertaining to hotel services, guest registration, and travel directions, or make recommendations regarding shopping, dining, or entertainment.",
           "label": "assist",
           "reason": "AI translation and recommendation tools help clerks quickly suggest local dining and attractions to international travelers.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Recommend local attractions",
+          "short_reason": "AI tools suggest nearby places"
         },
         {
           "id": "onet-18566",
           "text": "Perform bookkeeping activities, such as balancing accounts and conducting nightly audits.",
           "label": "automate",
           "reason": "Property management systems with automated reconciliation algorithms perform night audits and balance ledgers with minimal oversight.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Run nightly audits",
+          "short_reason": "Hotel software balances daily accounts"
         }
       ]
     },
@@ -768,49 +952,63 @@
           "text": "Harvest fruits and vegetables by hand.",
           "label": "human",
           "reason": "Manual dexterity and navigating difficult plantation terrain require human hands.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Harvest crops by hand",
+          "short_reason": "Picking delicate produce takes human care"
         },
         {
           "id": "onet-23399",
           "text": "Plant, spray, weed, fertilize, water, and prune plants, shrubs, and trees, using gardening tools.",
           "label": "human",
           "reason": "Physical fieldwork across varied estate topography relies directly on manual physical labour.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Tend to field plants",
+          "short_reason": "Estate ground work needs physical labour"
         },
         {
           "id": "onet-23380",
           "text": "Identify plants, pests, and weeds to determine the selection and application of pesticides and fertilizers.",
           "label": "assist",
           "reason": "Mobile computer vision tools can assist workers in identifying crop diseases and pest infestations.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Spot pests and weeds",
+          "short_reason": "Phone scanner apps identify pests"
         },
         {
           "id": "onet-23392",
           "text": "Participate in the inspection, grading, sorting, storage, and post-harvest treatment of crops.",
           "label": "assist",
           "reason": "Automated optical sorting and grading scanners help workers classify produce quality faster.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Sort harvested produce",
+          "short_reason": "Optical sorters assist manual grading"
         },
         {
           "id": "onet-23387",
           "text": "Record information about crops, such as pesticide use, yields, or costs.",
           "label": "assist",
           "reason": "Digital logbooks and mobile apps streamline the recording of harvest volumes and pesticide applications.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Log crop data",
+          "short_reason": "Mobile apps speed up data entry"
         },
         {
           "id": "onet-23371",
           "text": "Operate tractors, tractor-drawn machinery, and self-propelled machinery to plow, harrow and fertilize soil, or to plant, cultivate, spray and harvest crops.",
           "label": "human",
           "reason": "Navigating rugged agricultural fields and machinery safely continues to need hands-on human control.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Drive farm tractors",
+          "short_reason": "Rough field driving needs a driver"
         },
         {
           "id": "onet-23397",
           "text": "Load agricultural products into trucks, and drive trucks to market or storage facilities.",
           "label": "human",
           "reason": "Heavy physical lifting, loading fresh fruit bunches, and transport across rural tracks require human physical effort.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Load and drive trucks",
+          "short_reason": "Heavy loading needs physical human effort"
         }
       ]
     },
@@ -824,49 +1022,63 @@
           "text": "Produce drawings, using computer-assisted drafting systems (CAD) or drafting machines, or by hand, using compasses, dividers, protractors, triangles, and other drafting devices.",
           "label": "assist",
           "reason": "Generative drafting and CAD plugins assist technicians by accelerating routine line work and auto-generating standard views.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Draft engineering drawings",
+          "short_reason": "CAD software generates technical layouts"
         },
         {
           "id": "onet-21918",
           "text": "Draft plans and detailed drawings for structures, installations, and construction projects, such as highways, sewage disposal systems, and dikes, working from sketches or notes.",
           "label": "assist",
           "reason": "Parametric AI tools speed up plan generation from sketches, but technicians must verify structural layouts.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Draft building plans",
+          "short_reason": "AI drafts plans, you verify layouts"
         },
         {
           "id": "onet-21919",
           "text": "Coordinate structural, electrical, and mechanical designs and determine a method of presentation to graphically represent building plans.",
           "label": "assist",
           "reason": "BIM tools automatically detect clashes between MEP and structural elements, while the technician coordinates the resolution.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Coordinate design plans",
+          "short_reason": "BIM flags clashes, you fix them"
         },
         {
           "id": "onet-21920",
           "text": "Analyze building codes, by-laws, space and site requirements, and other technical documents and reports to determine their effect on architectural designs.",
           "label": "assist",
           "reason": "AI document extraction tools scan building bylaws to highlight non-compliance for the technician to review.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check building bylaws",
+          "short_reason": "AI scans rules, you check compliance"
         },
         {
           "id": "onet-21928",
           "text": "Check dimensions of materials to be used and assign numbers to lists of materials.",
           "label": "automate",
           "reason": "BIM software automatically schedules and tallies dimensions and material quantities directly from digital models.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "List material quantities",
+          "short_reason": "BIM software tallies materials automatically"
         },
         {
           "id": "onet-21931",
           "text": "Explain drawings to production or construction teams and provide adjustments as necessary.",
           "label": "human",
           "reason": "Explaining designs to site engineers and local contractors requires direct interpersonal communication and contextual judgment.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Explain drawings to contractors",
+          "short_reason": "Clear communication needs a person"
         },
         {
           "id": "onet-21943",
           "text": "Represent architect or engineer on construction site, ensuring builder compliance with design specifications and advising on design corrections, under supervision.",
           "label": "human",
           "reason": "On-site inspection to verify builder compliance requires physical presence and real-time situational assessment.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Inspect construction sites",
+          "short_reason": "Site checks need physical presence"
         }
       ]
     },
@@ -880,49 +1092,63 @@
           "text": "Check figures, postings, and documents for correct entry, mathematical accuracy, and proper codes.",
           "label": "automate",
           "reason": "AI document extraction automatically verifies figures, postings, and tax codes across receipts and invoices without manual checking.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Verify financial figures",
+          "short_reason": "Software checks invoice math automatically"
         },
         {
           "id": "onet-2490",
           "text": "Classify, record, and summarize numerical and financial data to compile and keep financial records, using journals and ledgers or computers.",
           "label": "automate",
           "reason": "Cloud accounting systems automatically classify and post routine ledger entries using predefined rule sets and machine-learned patterns.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Record ledger entries",
+          "short_reason": "Accounting software logs entries automatically"
         },
         {
           "id": "onet-2509",
           "text": "Match order forms with invoices, and record the necessary information.",
           "label": "automate",
           "reason": "Automated three-way matching systems cross-reference purchase orders, delivery orders, and invoices electronically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Match orders with invoices",
+          "short_reason": "Matching software compares documents automatically"
         },
         {
           "id": "onet-18561",
           "text": "Prepare and process payroll information.",
           "label": "assist",
           "reason": "Payroll systems automate statutory rate calculations, but clerks must still review irregular allowances, medical claims, and overtime hours.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Process payroll data",
+          "short_reason": "Software calculates pay, you check claims"
         },
         {
           "id": "onet-2503",
           "text": "Reconcile records of bank transactions.",
           "label": "assist",
           "reason": "Bank feeds suggest automated matches, while the clerk manually reviews unmatched line items and payment exceptions.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Reconcile bank records",
+          "short_reason": "Bank feeds match lines, you verify"
         },
         {
           "id": "onet-2496",
           "text": "Reconcile or note and report discrepancies found in records.",
           "label": "human",
           "reason": "Investigating disputed payments, contact with suppliers, and resolving undocumented discrepancies require direct human communication and problem-solving.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Investigate payment disputes",
+          "short_reason": "Resolving supplier issues needs human tact"
         },
         {
           "id": "onet-2510",
           "text": "Complete and submit tax forms and returns, workers' compensation forms, pension contribution forms, and other government documents.",
           "label": "assist",
           "reason": "Statutory software prepares EPF, SOCSO, and tax filings, while the clerk verifies totals and handles final portal submission.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Submit statutory forms",
+          "short_reason": "Software drafts forms, you submit them"
         }
       ]
     },
@@ -936,49 +1162,63 @@
           "text": "Direct availability and allocation of materials, supplies, and finished products.",
           "label": "assist",
           "reason": "AI forecasting tools optimize inventory allocation while specialists manage real-world stock constraints and supplier lead times.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Allocate stock and materials",
+          "short_reason": "AI forecasts demand, you manage supply"
         },
         {
           "id": "onet-8949",
           "text": "Redesign the movement of goods to maximize value and minimize costs.",
           "label": "assist",
           "reason": "AI models suggest optimal freight routes and network designs, which specialists validate against local infrastructure and cost realities.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Reroute freight shipments",
+          "short_reason": "AI maps routes, you check practicality"
         },
         {
           "id": "onet-8935",
           "text": "Collaborate with other departments as necessary to meet customer requirements, to take advantage of sales opportunities or, in the case of shortages, to minimize negative impacts on a business.",
           "label": "human",
           "reason": "Cross-functional alignment and crisis negotiation during product shortages require human relationship management and judgment.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Manage stock shortages",
+          "short_reason": "Crisis negotiation needs human judgment"
         },
         {
           "id": "onet-8937",
           "text": "Review logistics performance with customers against targets, benchmarks, and service agreements.",
           "label": "assist",
           "reason": "AI dashboards monitor SLA metrics in real time while specialists handle performance discussions and client negotiations.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Review client performance",
+          "short_reason": "Dashboards track metrics, you lead reviews"
         },
         {
           "id": "onet-8950",
           "text": "Manage subcontractor activities, reviewing proposals, developing performance specifications, and serving as liaisons between subcontractors and organizations.",
           "label": "human",
           "reason": "Subcontractor selection, relationship management, and contract enforcement rely heavily on interpersonal trust and human evaluation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Manage vendor relationships",
+          "short_reason": "Building vendor trust needs people"
         },
         {
           "id": "onet-8940",
           "text": "Report project plans, progress, and results.",
           "label": "automate",
           "reason": "Automated reporting tools and workflow integrations generate logistics status reports directly from ERP systems.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Report project progress",
+          "short_reason": "ERP tools generate reports automatically"
         },
         {
           "id": "onet-8948",
           "text": "Stay informed of logistics technology advances and apply appropriate technology to improve logistics processes.",
           "label": "human",
           "reason": "Evaluating and adopting new warehouse and freight technologies requires strategic business insight and contextual assessment.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Evaluate new logistics tech",
+          "short_reason": "Strategic tech choices need human insight"
         }
       ]
     },
@@ -992,49 +1232,63 @@
           "text": "Receive checks and cash for deposit, verify amounts, and check accuracy of deposit slips.",
           "label": "automate",
           "reason": "Cash deposit machines and optical character recognition increasingly verify slips, notes, and cheque deposits automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Deposit cash and cheques",
+          "short_reason": "Deposit machines verify money automatically"
         },
         {
           "id": "onet-2550",
           "text": "Cash checks and pay out money after verifying that signatures are correct, that written and numerical amounts agree, and that accounts have sufficient funds.",
           "label": "automate",
           "reason": "Automated teller machines and digital fund transfers replace most over-the-counter cheque cashing and cash withdrawals.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Pay out cash withdrawals",
+          "short_reason": "ATMs and online transfers handle withdrawals"
         },
         {
           "id": "onet-2553",
           "text": "Enter customers' transactions into computers to record transactions and issue computer-generated receipts.",
           "label": "automate",
           "reason": "Core banking systems and digital banking platforms log transactions and generate electronic receipts automatically.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Record customer transactions",
+          "short_reason": "Banking systems log transactions automatically"
         },
         {
           "id": "onet-2549",
           "text": "Balance currency, coin, and checks in cash drawers at ends of shifts and calculate daily transactions, using computers, calculators, or adding machines.",
           "label": "assist",
           "reason": "Automated cash recyclers and smart vault software tally cash counts, while tellers handle physical sign-offs and variance reviews.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Balance cash drawer",
+          "short_reason": "Cash recyclers count, you sign off"
         },
         {
           "id": "onet-2560",
           "text": "Resolve problems or discrepancies concerning customers' accounts.",
           "label": "assist",
           "reason": "AI diagnostic tools help flag transaction errors and account holds, while tellers manage customer interaction and remediation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Resolve account issues",
+          "short_reason": "AI flags errors, you help customers"
         },
         {
           "id": "onet-2561",
           "text": "Explain, promote, or sell products or services, such as travelers' checks, savings bonds, money orders, and cashier's checks, using computerized information about customers to tailor recommendations.",
           "label": "assist",
           "reason": "Customer intelligence engines suggest relevant financial products, but tellers explain features and build rapport with clients.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Offer banking products",
+          "short_reason": "App suggests options, you build trust"
         },
         {
           "id": "onet-21076",
           "text": "Answer telephones and assist customers with their questions.",
           "label": "human",
           "reason": "Supporting branch visitors with complex queries and emotional distress relies on interpersonal tact and human empathy.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Answer customer phone calls",
+          "short_reason": "Upset callers need human empathy"
         }
       ]
     },
@@ -1048,49 +1302,63 @@
           "text": "Record patients' medical information and vital signs.",
           "label": "assist",
           "reason": "AI-connected telemetry and automated charting capture vital signs, but nurses verify readings and correlate them with patient status.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Record vital signs",
+          "short_reason": "Monitors log data, you verify status"
         },
         {
           "id": "onet-20413",
           "text": "Administer medications to patients and monitor patients for reactions or side effects.",
           "label": "human",
           "reason": "Administering medications and observing subtle clinical reactions require direct human bedside presence and sensory observation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Give medicine to patients",
+          "short_reason": "Spotting side effects needs bedside observation"
         },
         {
           "id": "onet-1839",
           "text": "Maintain accurate, detailed reports and records.",
           "label": "assist",
           "reason": "Document extraction and language tools help summarize nursing notes, though nurses must validate the record.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Update patient records",
+          "short_reason": "AI drafts notes, you check accuracy"
         },
         {
           "id": "onet-1840",
           "text": "Monitor, record, and report symptoms or changes in patients' conditions.",
           "label": "assist",
           "reason": "Clinical decision support systems flag early deterioration trends, but the nurse evaluates the patient's holistic presentation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Track patient symptoms",
+          "short_reason": "Software flags changes, you evaluate patient"
         },
         {
           "id": "onet-1843",
           "text": "Consult and coordinate with healthcare team members to assess, plan, implement, or evaluate patient care plans.",
           "label": "human",
           "reason": "Interprofessional rounds and multi-specialty care planning require collaborative dialogue, bedside context, and clinical judgment.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Plan care with team",
+          "short_reason": "Team discussions need human clinical judgment"
         },
         {
           "id": "onet-1847",
           "text": "Prepare patients for and assist with examinations or treatments.",
           "label": "human",
           "reason": "Hands-on physical preparation, positioning, and calming anxious patients during procedures require physical dexterity and empathy.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Prepare patients for treatment",
+          "short_reason": "Gentle hands and comfort need nurses"
         },
         {
           "id": "onet-1850",
           "text": "Instruct individuals, families, or other groups on topics such as health education, disease prevention, or childbirth and develop health improvement programs.",
           "label": "assist",
           "reason": "Generative tools assist in drafting accessible patient education materials, while the nurse delivers contextual guidance to families.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Teach patients about health",
+          "short_reason": "AI drafts guides, you explain details"
         }
       ]
     },
@@ -1104,49 +1372,63 @@
           "text": "Supervise and monitor students' use of tools and equipment.",
           "label": "human",
           "reason": "Physical workshop safety and direct manual supervision must be actively managed by a human instructor.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Supervise workshop tool use",
+          "short_reason": "Workshop safety needs direct eyes"
         },
         {
           "id": "onet-6446",
           "text": "Observe and evaluate students' work to determine progress, provide feedback, and make suggestions for improvement.",
           "label": "human",
           "reason": "Evaluating physical craftsmanship, manual dexterity, and practical technique requires real-time human observation.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Check student practical work",
+          "short_reason": "Judging hands-on craft needs human eyes"
         },
         {
           "id": "onet-6453",
           "text": "Conduct on-the-job training classes or training sessions to teach and demonstrate principles, techniques, procedures, or methods of designated subjects.",
           "label": "human",
           "reason": "Demonstrating tactile procedures and tool operations requires physical presence and real-time interaction.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Demonstrate practical skills",
+          "short_reason": "Showing tool use needs physical presence"
         },
         {
           "id": "onet-6447",
           "text": "Present lectures and conduct discussions to increase students' knowledge and competence using visual aids, such as graphs, charts, videotapes, and slides.",
           "label": "assist",
           "reason": "Generative media and AI presentation tools help instructors rapidly design engaging visual aids and instructional slides.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Deliver class lectures",
+          "short_reason": "AI designs slides, you teach class"
         },
         {
           "id": "onet-6448",
           "text": "Administer oral, written, or performance tests to measure progress and to evaluate training effectiveness.",
           "label": "assist",
           "reason": "AI can formulate written question banks and analyze test statistics while instructors oversee practical assessments.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Run student tests",
+          "short_reason": "AI writes questions, you assess skills"
         },
         {
           "id": "onet-6454",
           "text": "Develop curricula and plan course content and methods of instruction.",
           "label": "assist",
           "reason": "Instructors can use AI workflows to align course outlines quickly with evolving industrial competency standards.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Plan training curriculum",
+          "short_reason": "AI outlines modules, you select content"
         },
         {
           "id": "onet-6449",
           "text": "Prepare reports and maintain records, such as student grades, attendance rolls, and training activity details.",
           "label": "automate",
           "reason": "Document processing systems can automate routine attendance tracking, mark calculation, and institutional reporting.",
-          "reviewed_by": null
+          "reviewed_by": null,
+          "short": "Track attendance and grades",
+          "short_reason": "Software records marks and attendance automatically"
         }
       ]
     }

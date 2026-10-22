@@ -873,6 +873,14 @@
    "ms": "AI pembaca dokumen sudah mampu mengekstrak dan menyemak medan maklumat daripada invois dan borang.",
    "zh": "文档识别 AI 已能自动提取并核对发票及表单中的字段。"
   },
+  "Check and sort data": {
+   "ms": "Semak dan susun data",
+   "zh": "核对与整理数据"
+  },
+  "AI extracts and verifies form data": {
+   "ms": "AI mengekstrak dan mengesahkan data borang",
+   "zh": "AI 提取并核实表格数据"
+  },
   "Compare data with source documents, or re-enter data in verification format to detect errors.": {
    "ms": "Membandingkan data dengan dokumen sumber, atau memasukkan semula data dalam format pengesahan untuk mengesan ralat.",
    "zh": "将数据与原始凭证比对，或以验证格式重新录入数据以排查错误。"
@@ -880,6 +888,14 @@
   "Comparing entries with source documents is rule-based and is done by validation software.": {
    "ms": "Perbandingan data dengan dokumen sumber adalah berasaskan peraturan dan dilaksanakan oleh perisian pengesahan.",
    "zh": "与源文件的比对属于基于规则的操作，已由验证软件自动完成。"
+  },
+  "Spot data entry errors": {
+   "ms": "Kesan ralat kemasukan data",
+   "zh": "找出数据录入错误"
+  },
+  "Validation software checks documents": {
+   "ms": "Perisian pengesahan menyemak dokumen",
+   "zh": "验证软件审核文件"
   },
   "Store completed documents in appropriate locations.": {
    "ms": "Menyimpan dokumen yang telah lengkap di lokasi yang betul.",
@@ -889,6 +905,14 @@
    "ms": "Sistem pemfailan digital dan rekod menyimpan dokumen secara automatik.",
    "zh": "数字归档与档案系统会自动存储文档。"
   },
+  "File completed documents": {
+   "ms": "Failkan dokumen yang lengkap",
+   "zh": "归档已完成的文件"
+  },
+  "Digital filing systems store files automatically": {
+   "ms": "Sistem pemfailan digital menyimpan fail secara automatik",
+   "zh": "电子归档系统自动存储文件"
+  },
   "Locate and correct data entry errors, or report them to supervisors.": {
    "ms": "Mengenal pasti dan membetulkan ralat kemasukan data, atau melaporkannya kepada penyelia.",
    "zh": "找出并修正数据输入错误，或向主管汇报。"
@@ -896,6 +920,14 @@
   "Software flags likely errors, but a person decides the correction and when to escalate.": {
    "ms": "Perisian mengesan kemungkinan ralat, tetapi manusia menentukan pembetulan dan masa untuk memanjangkannya.",
    "zh": "软件会标出疑似错误，但仍需人工决定如何修正及何时上报。"
+  },
+  "Fix data mistakes": {
+   "ms": "Betulkan kesilapan data",
+   "zh": "纠正数据错误"
+  },
+  "Software flags errors, you decide corrections": {
+   "ms": "Perisian menandakan ralat, anda tentukan pembetulan",
+   "zh": "软件标记错误，由你决定如何更正"
   },
   "Select materials needed to complete work assignments.": {
    "ms": "Memilih bahan yang diperlukan untuk menyelesaikan tugasan kerja.",
@@ -905,6 +937,14 @@
    "ms": "Merancang kerja dan bahan sendiri tetap di bawah tanggungjawab individu.",
    "zh": "规划自身工作与物料仍取决于个人。"
   },
+  "Prepare work materials": {
+   "ms": "Sediakan bahan kerja",
+   "zh": "准备工作材料"
+  },
+  "Planning your work needs personal judgement": {
+   "ms": "Merancang kerja memerlukan pertimbangan kendiri",
+   "zh": "规划工作需要个人判断力"
+  },
   "Create, maintain, and enter information into databases.": {
    "ms": "Membina, menyelenggara dan memasukkan maklumat ke dalam pangkalan data.",
    "zh": "创建、维护并录入信息至数据库。"
@@ -912,6 +952,14 @@
   "Entering and updating database records is increasingly done by forms, integrations and document AI.": {
    "ms": "Memasukkan dan mengemas kini rekod pangkalan data semakin banyak dilakukan oleh borang, integrasi dan AI dokumen.",
    "zh": "数据库记录的输入和更新越来越常由表单、系统集成与文档 AI 完成。"
+  },
+  "Update database records": {
+   "ms": "Kemas kini rekod pangkalan data",
+   "zh": "更新数据库记录"
+  },
+  "Online forms and tools enter data": {
+   "ms": "Borang dan alat dalam talian memasukkan data",
+   "zh": "在线表格与工具录入数据"
   },
   "Review work done by others to check for correct spelling and grammar, ensure that company format policies are followed, and recommend revisions.": {
    "ms": "Menyemak hasil kerja orang lain untuk membetulkan ejaan dan tatabahasa, memastikan dasar format syarikat dipatuhi, serta mencadangkan pindaan.",
@@ -921,6 +969,14 @@
    "ms": "Alat tatabahasa dan gaya menyemak teks; manusia menilai nada dan konteks syarikat.",
    "zh": "语法与排版工具负责检查文本，语气与公司背景则由人工把关。"
   },
+  "Check documents for errors": {
+   "ms": "Semak dokumen untuk mengesan ralat",
+   "zh": "检查文件中的错误"
+  },
+  "Grammar tools check text, you judge tone": {
+   "ms": "Alat tatabahasa menyemak teks, anda tentukan nada",
+   "zh": "语法工具检查文本，由你把控语气"
+  },
   "Compose, type, and distribute meeting notes, routine correspondence, or reports, such as presentations or expense, statistical, or monthly reports.": {
    "ms": "Menggubal, menaip dan mengedarkan minit mesyuarat, surat-menyurat rutin atau laporan, seperti pembentangan, perbelanjaan, statistik atau laporan bulanan.",
    "zh": "撰写、打印及分发会议记录、日常信件或报告（如演示文稿、开销、统计或月度报告）。"
@@ -928,6 +984,14 @@
   "Generative AI drafts notes and reports; a person checks facts and sends them.": {
    "ms": "AI generatif mendraf nota dan laporan; manusia menyemak fakta dan menghantarnya.",
    "zh": "生成式 AI 起草记录和报告，人工核实事实并发送。"
+  },
+  "Write meeting notes": {
+   "ms": "Catat nota mesyuarat",
+   "zh": "记录会议要点"
+  },
+  "AI drafts notes, you check facts": {
+   "ms": "AI merangka nota, anda semak fakta",
+   "zh": "AI 起草笔记，由你核实事实"
   },
   "Answer telephones and give information to callers, take messages, or transfer calls to appropriate individuals.": {
    "ms": "Menjawab panggilan telefon dan memberi maklumat kepada pemanggil, mengambil pesanan, atau menyambungkan panggilan kepada individu berkenaan.",
@@ -937,6 +1001,14 @@
    "ms": "Pembantu suara mengurus panggilan rutin; selebihnya dikendalikan oleh manusia.",
    "zh": "语音助手转接日常来电，其余则由人工处理。"
   },
+  "Answer phone calls": {
+   "ms": "Jawab panggilan telefon",
+   "zh": "接听电话"
+  },
+  "Voice bots route calls, people answer": {
+   "ms": "Bot suara menghalakan panggilan, staf menjawab",
+   "zh": "语音机器人转接电话，人工接听"
+  },
   "Greet visitors or callers and handle their inquiries or direct them to the appropriate persons according to their needs.": {
    "ms": "Menyambut pelawat atau pemanggil dan mengendalikan pertanyaan mereka atau mengarahkan mereka kepada individu berkenaan mengikut keperluan.",
    "zh": "接待访客或来电者，处理其咨询或根据需求引见至相关人员。"
@@ -944,6 +1016,14 @@
   "Welcoming visitors in person depends on presence and judgement.": {
    "ms": "Menyambut pelawat secara bersemuka bergantung pada kehadiran dan pertimbangan kendiri.",
    "zh": "亲自接待访客依赖于现场沟通与应变判断。"
+  },
+  "Welcome office visitors": {
+   "ms": "Sambut pelawat pejabat",
+   "zh": "接待办公室访客"
+  },
+  "Greeting guests needs human warmth": {
+   "ms": "Menyambut tetamu memerlukan kemesraan peribadi",
+   "zh": "接待访客需要人情温度"
   },
   "Train and assist staff with computer usage.": {
    "ms": "Melatih dan membantu kakitangan mengenai penggunaan komputer.",
@@ -953,6 +1033,14 @@
    "ms": "Melatih rakan sekerja memerlukan kesabaran, kepercayaan dan pemahaman tentang pasukan.",
    "zh": "培训同事需要耐心、信任以及对团队的了解。"
   },
+  "Train staff on computers": {
+   "ms": "Latih staf menggunakan komputer",
+   "zh": "培训员工使用电脑"
+  },
+  "Teaching colleagues takes patience and trust": {
+   "ms": "Membimbing rakan sekerja memerlukan kesabaran dan kepercayaan",
+   "zh": "指导同事需要耐心与信任"
+  },
   "Keep records of customer interactions or transactions, recording details of inquiries, complaints, or comments, as well as actions taken.": {
    "ms": "Merekod interaksi atau transaksi pelanggan, mencatat butiran pertanyaan, aduan, atau maklum balas, serta tindakan yang diambil.",
    "zh": "记录客户互动或交易详情，包括咨询、投诉或意见，以及后续跟进措施。"
@@ -960,6 +1048,14 @@
   "Contact-centre software logs and summarises interactions automatically.": {
    "ms": "Perisian pusat panggilan merekod dan meringkaskan interaksi secara automatik.",
    "zh": "客服中心软件会自动记录并总结互动内容。"
+  },
+  "Log customer interactions": {
+   "ms": "Catat interaksi pelanggan",
+   "zh": "记录客户互动"
+  },
+  "Call centre software logs calls automatically": {
+   "ms": "Perisian pusat panggilan merekod panggilan secara automatik",
+   "zh": "呼叫中心软件自动记录通话"
   },
   "Determine charges for services requested, collect deposits or payments, or arrange for billing.": {
    "ms": "Menentukan caj perkhidmatan yang diminta, mengutip deposit atau bayaran, atau menguruskan pengebilan.",
@@ -969,6 +1065,14 @@
    "ms": "Caj dan pengebilan mengikut peraturan yang dilaksanakan oleh sistem.",
    "zh": "收费和开单均遵循系统设定的规则。"
   },
+  "Calculate charges and bills": {
+   "ms": "Kira caj dan bil",
+   "zh": "计算费用与账单"
+  },
+  "Billing systems apply pricing rules automatically": {
+   "ms": "Sistem pengebilan menggunakan peraturan harga secara automatik",
+   "zh": "计费系统自动应用定价规则"
+  },
   "Complete contract forms, prepare change of address records, or issue service discontinuance orders, using computers.": {
    "ms": "Melengkapkan borang kontrak, menyediakan rekod pertukaran alamat, atau mengeluarkan arahan penamatan perkhidmatan menggunakan komputer.",
    "zh": "使用电脑填写合同表格、准备地址变更记录或发出终止服务通知。"
@@ -976,6 +1080,14 @@
   "Standard forms and account changes are handled by self-service and workflow tools.": {
    "ms": "Borang standard dan pertukaran akaun dikendalikan melalui layan diri dan alatan aliran kerja.",
    "zh": "标准表单和账户变更主要由自助服务及工作流工具处理。"
+  },
+  "Process account forms": {
+   "ms": "Proses borang akaun",
+   "zh": "处理账户表格"
+  },
+  "Self-service forms handle requests automatically": {
+   "ms": "Borang layan diri mengendalikan permohonan secara automatik",
+   "zh": "自助服务表格自动处理请求"
   },
   "Confer with customers by telephone or in person to provide information about products or services, take or enter orders, cancel accounts, or obtain details of complaints.": {
    "ms": "Berhubung dengan pelanggan melalui telefon atau bersemuka untuk memberi maklumat produk atau perkhidmatan, menerima pesanan, membatalkan akaun, atau mendapatkan butiran aduan.",
@@ -985,6 +1097,14 @@
    "ms": "Bot sembang menjawab soalan lazim; manusia mengendalikan pelanggan rumit atau beremosi dengan bantuan cadangan AI.",
    "zh": "聊天机器人回答常见问题；复杂情况或情绪不满的客户则由人工借助 AI 建议来处理。"
   },
+  "Help customers with requests": {
+   "ms": "Bantu pelanggan dengan permintaan mereka",
+   "zh": "协助处理客户需求"
+  },
+  "Chatbots answer basics, you calm customers": {
+   "ms": "Bot sembang menjawab pertanyaan asas, anda menenangkan pelanggan",
+   "zh": "聊天机器人回答基础问题，由你安抚客户"
+  },
   "Contact customers to respond to inquiries or to notify them of claim investigation results or any planned adjustments.": {
    "ms": "Menghubungi pelanggan untuk menjawab pertanyaan atau memaklumkan keputusan siasatan tuntutan atau sebarang pelarasan yang dirancang.",
    "zh": "联络客户以答复咨询，或通知理赔调查结果及任何预定的调整。"
@@ -992,6 +1112,14 @@
   "Notifications can be drafted and sent by AI; sensitive news still needs a person.": {
    "ms": "Pemberitahuan boleh didraf dan dihantar oleh AI; maklumat sensitif masih memerlukan manusia.",
    "zh": "通知可由 AI 起草并发送；敏感消息仍需人工传达。"
+  },
+  "Update customers on claims": {
+   "ms": "Kemas kini status tuntutan kepada pelanggan",
+   "zh": "向客户跟进理赔进展"
+  },
+  "AI drafts updates, people handle sensitivity": {
+   "ms": "AI merangka makluman, manusia mengendalikan isu sensitif",
+   "zh": "AI拟定更新草稿，人工处理敏感细节"
   },
   "Refer unresolved customer grievances to designated departments for further investigation.": {
    "ms": "Memanjangkan aduan pelanggan yang belum selesai kepada jabatan berkaitan untuk siasatan lanjut.",
@@ -1001,6 +1129,14 @@
    "ms": "Menentukan cara menangani aduan yang belum selesai memerlukan pertimbangan dan sikap bertanggungjawab.",
    "zh": "决定如何处理未解决的投诉需要良好的判断力与责任感。"
   },
+  "Escalate complex complaints": {
+   "ms": "Eskalasi aduan kompleks",
+   "zh": "呈报复杂客诉"
+  },
+  "Handling tough disputes takes human judgement": {
+   "ms": "Menangani pertikaian rumit memerlukan pertimbangan manusia",
+   "zh": "处理棘手纠纷需要人工判断"
+  },
   "Generate standard or custom reports summarizing business, financial, or economic data for review by executives, managers, clients, and other stakeholders.": {
    "ms": "Menghasilkan laporan standard atau khusus yang merumuskan data perniagaan, kewangan, atau ekonomi untuk semakan eksekutif, pengurus, pelanggan dan pihak berkepentingan lain.",
    "zh": "生成标准或定制报告以汇总商业、财务或经济数据，供管理层、经理、客户及其他利益相关方审阅。"
@@ -1008,6 +1144,14 @@
   "Standard reports are generated on a schedule by BI tools.": {
    "ms": "Laporan standard dijana mengikut jadual oleh alatan BI.",
    "zh": "标准报告由 BI 工具按既定计划生成。"
+  },
+  "Generate data reports": {
+   "ms": "Jana laporan data",
+   "zh": "生成数据报告"
+  },
+  "Reporting software creates reports automatically": {
+   "ms": "Perisian pelaporan menghasilkan laporan secara automatik",
+   "zh": "报表软件自动生成报告"
   },
   "Collect business intelligence data from available industry reports, public information, field reports, or purchased sources.": {
    "ms": "Mengumpul data risikan perniagaan daripada laporan industri, maklumat awam, laporan lapangan atau sumber berbayar.",
@@ -1017,6 +1161,14 @@
    "ms": "AI mengumpul dan merumuskan sumber; manusia menilai kebolehpercayaannya.",
    "zh": "AI 负责收集和总结来源；人工判断其可靠性。"
   },
+  "Gather market data": {
+   "ms": "Kumpul data pasaran",
+   "zh": "收集市场数据"
+  },
+  "AI collects data, you verify sources": {
+   "ms": "AI mengumpul data, anda mengesahkan sumber",
+   "zh": "AI采集数据，你来核实来源"
+  },
   "Maintain or update business intelligence tools, databases, dashboards, systems, or methods.": {
    "ms": "Menyelenggara atau mengemas kini alat risikan perniagaan, pangkalan data, papan pemuka, sistem atau kaedah.",
    "zh": "维护或更新商业智能工具、数据库、仪表板、系统或方法。"
@@ -1024,6 +1176,14 @@
   "AI helps write queries and dashboard code; the analyst designs and maintains them.": {
    "ms": "AI membantu menulis pertanyaan (query) dan kod papan pemuka; penganalisis mereka bentuk dan menyelenggaranya.",
    "zh": "AI 协助编写查询与仪表板代码；分析师负责设计与维护。"
+  },
+  "Update data dashboards": {
+   "ms": "Kemas kini papan pemuka data",
+   "zh": "更新数据仪表板"
+  },
+  "AI writes queries, analysts maintain dashboards": {
+   "ms": "AI menulis pertanyaan data, penganalisis selia papan pemuka",
+   "zh": "AI编写查询，分析师维护仪表板"
   },
   "Create business intelligence tools or systems, including design of related databases, spreadsheets, or outputs.": {
    "ms": "Membina alat atau sistem risikan perniagaan, termasuk mereka bentuk pangkalan data, lembaran kerja atau output yang berkaitan.",
@@ -1033,6 +1193,14 @@
    "ms": "AI mempercepatkan pembinaan alat; keputusan tentang perkara yang perlu dibina kekal pada penganalisis.",
    "zh": "AI 加快工具构建；决定构建内容仍由分析师把关。"
   },
+  "Build dashboard tools": {
+   "ms": "Bina alatan papan pemuka",
+   "zh": "开发仪表板工具"
+  },
+  "AI writes code, analysts design tools": {
+   "ms": "AI menulis kod, penganalisis mereka bentuk alatan",
+   "zh": "AI编写代码，分析师设计工具"
+  },
   "Identify and analyze industry or geographic trends with business strategy implications.": {
    "ms": "Mengenal pasti dan menganalisis trend industri atau geografi yang memberi implikasi kepada strategi perniagaan.",
    "zh": "识别并分析对业务战略具有潜在影响的行业或地域趋势。"
@@ -1040,6 +1208,14 @@
   "Linking trends to business strategy needs context and accountability.": {
    "ms": "Menghubungkan trend dengan strategi perniagaan memerlukan konteks dan kebertanggungjawaban.",
    "zh": "将趋势与业务战略相结合需要充分的业务理解与问责意识。"
+  },
+  "Analyze market trends": {
+   "ms": "Analisis trend pasaran",
+   "zh": "分析市场趋势"
+  },
+  "Spotting business opportunities needs human experience": {
+   "ms": "Mengenal pasti peluang perniagaan memerlukan pengalaman manusia",
+   "zh": "洞悉商机需要人类经验"
   },
   "Synthesize current business intelligence or trend data to support recommendations for action.": {
    "ms": "Mensintesis data risikan perniagaan atau trend semasa bagi menyokong cadangan tindakan.",
@@ -1049,6 +1225,14 @@
    "ms": "Mengesyorkan tindakan adalah pertimbangan profesional di bawah tanggungjawab penganalisis.",
    "zh": "提出行动建议是分析师的核心专业判断。"
   },
+  "Recommend business actions": {
+   "ms": "Cadangkan tindakan perniagaan",
+   "zh": "提出业务行动建议"
+  },
+  "Making final decisions needs human judgement": {
+   "ms": "Membuat keputusan muktamad memerlukan pertimbangan manusia",
+   "zh": "敲定最终决策需要人工判断"
+  },
   "Clean and manipulate raw data using statistical software.": {
    "ms": "Membersih dan memanipulasi data mentah menggunakan perisian statistik.",
    "zh": "使用统计软件清洗和处理原始数据。"
@@ -1056,6 +1240,14 @@
   "AI coding tools speed up data cleaning; the engineer checks the result.": {
    "ms": "Alat pengekodan AI mempercepatkan pembersihan data; jurutera menyemak hasilnya.",
    "zh": "AI 编程工具加快数据清洗；工程师负责核查结果。"
+  },
+  "Clean raw data": {
+   "ms": "Pembersihan data mentah",
+   "zh": "清洗原始数据"
+  },
+  "AI tools clean data, engineers verify": {
+   "ms": "Alat AI membersihkan data, jurutera mengesahkan",
+   "zh": "AI工具清洗数据，工程师进行核验"
   },
   "Analyze, manipulate, or process large sets of data using statistical software.": {
    "ms": "Menganalisis, memanipulasi atau memproses set data yang besar menggunakan perisian statistik.",
@@ -1065,6 +1257,14 @@
    "ms": "Analisis menjadi lebih pantas dengan AI, namun jurutera yang mereka bentuk dan mengesahkannya.",
    "zh": "借助 AI 分析更高效，但仍需工程师进行设计与验证。"
   },
+  "Process large datasets": {
+   "ms": "Memproses set data besar",
+   "zh": "处理大型数据集"
+  },
+  "Software runs calculations, engineers check logic": {
+   "ms": "Perisian menjalankan pengiraan, jurutera menyemak logik",
+   "zh": "软件运行计算，工程师把关逻辑"
+  },
   "Apply feature selection algorithms to models predicting outcomes of interest, such as sales, attrition, and healthcare use.": {
    "ms": "Mengaplikasikan algoritma pemilihan ciri pada model ramalan hasil penting, seperti jualan, kadar henti (attrition) dan penggunaan perkhidmatan kesihatan.",
    "zh": "将特征选择算法应用于预测关键结果（如销售额、流失率和医疗使用情况）的模型中。"
@@ -1072,6 +1272,14 @@
   "AutoML tries feature sets; the engineer judges what is valid and fair.": {
    "ms": "AutoML menguji set ciri; jurutera menilai kesahihan dan keadilannya.",
    "zh": "AutoML 测试特征集；工程师判断其有效性与合理性。"
+  },
+  "Select model features": {
+   "ms": "Pilih ciri model",
+   "zh": "筛选模型特征"
+  },
+  "AutoML tests features, you judge fairness": {
+   "ms": "AutoML menguji ciri, anda menilai keadilan",
+   "zh": "AutoML测试特征，你来评估公平性"
   },
   "Compare models using statistical performance metrics, such as loss functions or proportion of explained variance.": {
    "ms": "Membandingkan model menggunakan metrik prestasi statistik, seperti fungsi kehilangan (loss function) atau nisbah varians terjelas.",
@@ -1081,6 +1289,14 @@
    "ms": "Metrik dikira secara automatik; pemilihan metrik yang tepat memerlukan pertimbangan.",
    "zh": "指标可自动计算；选择合适指标则需要人工判断。"
   },
+  "Compare model scores": {
+   "ms": "Bandingkan skor model",
+   "zh": "对比模型评分"
+  },
+  "Tools calculate scores, you pick best": {
+   "ms": "Alatan mengira skor, anda memilih yang terbaik",
+   "zh": "工具计算得分，你选出最佳方案"
+  },
   "Identify business problems or management objectives that can be addressed through data analysis.": {
    "ms": "Mengenal pasti masalah perniagaan atau objektif pengurusan yang boleh diselesaikan melalui analisis data.",
    "zh": "识别可通过数据分析解决的业务问题或管理目标。"
@@ -1088,6 +1304,14 @@
   "Framing the right problem needs business understanding.": {
    "ms": "Merangka masalah yang tepat memerlukan pemahaman terhadap perniagaan.",
    "zh": "精准定义问题需要对业务有深入了解。"
+  },
+  "Find business data problems": {
+   "ms": "Kesan isu data perniagaan",
+   "zh": "排查业务数据问题"
+  },
+  "Understanding business needs human thinking": {
+   "ms": "Memahami konteks perniagaan memerlukan pemikiran manusia",
+   "zh": "理解业务本质需要人类思考"
   },
   "Deliver oral or written presentations of the results of mathematical modeling and data analysis to management or other end users.": {
    "ms": "Membentangkan hasil pemodelan matematik dan analisis data secara lisan atau bertulis kepada pihak pengurusan atau pengguna akhir.",
@@ -1097,6 +1321,14 @@
    "ms": "Menerangkan hasil dan batasannya kepada pembuat keputusan kekal sebagai peranan manusia.",
    "zh": "向决策者解释分析结果及其局限性仍依赖于人。"
   },
+  "Present model results": {
+   "ms": "Bentangkan hasil dapatan model",
+   "zh": "汇报模型结果"
+  },
+  "Explaining limits needs human touch": {
+   "ms": "Menerangkan batas keupayaan memerlukan sentuhan manusia",
+   "zh": "解释局限性需要人情温度与沟通"
+  },
   "Modify existing software to correct errors, adapt it to new hardware, or upgrade interfaces and improve performance.": {
    "ms": "Mengubah suai perisian sedia ada untuk membetulkan ralat, menyesuaikan dengan perkakasan baharu, atau menaik taraf antara muka dan meningkatkan prestasi.",
    "zh": "修改现有软件以修复错误、适配新硬件或升级界面并提升性能。"
@@ -1104,6 +1336,14 @@
   "AI coding assistants propose fixes; developers review and own them.": {
    "ms": "Pembantu pengekodan AI mencadangkan penyelesaian; pembangun menyemak dan memikul tanggungjawabnya.",
    "zh": "AI 编程助手提出修复方案；开发人员负责审核并把关。"
+  },
+  "Fix software bugs": {
+   "ms": "Baiki pepijat perisian",
+   "zh": "修复软件Bug"
+  },
+  "AI suggests fixes, you approve": {
+   "ms": "AI mencadangkan pembaikan, anda meluluskan",
+   "zh": "AI建议修复方案，你来审核批准"
   },
   "Develop or direct software system testing or validation procedures, programming, or documentation.": {
    "ms": "Membangunkan atau mengurus prosedur pengujian atau pengesahan sistem perisian, pengaturcaraan, atau dokumentasi.",
@@ -1113,6 +1353,14 @@
    "ms": "AI merangka draf ujian dan dokumentasi; pembangun menentukan apa yang mesti diuji.",
    "zh": "AI 起草测试与文档；开发人员决定必须测试的内容。"
   },
+  "Write software tests": {
+   "ms": "Tulis ujian perisian",
+   "zh": "编写软件测试"
+  },
+  "AI drafts tests, you decide needs": {
+   "ms": "AI draf ujian, anda tentukan keperluan",
+   "zh": "AI拟定测试，你决定需求"
+  },
   "Design, develop and modify software systems, using scientific analysis and mathematical models to predict and measure outcomes and consequences of design.": {
    "ms": "Mereka bentuk, membangunkan dan mengubah suai sistem perisian, menggunakan analisis saintifik dan model matematik untuk meramal serta mengukur hasil dan impak reka bentuk.",
    "zh": "利用科学分析和数学模型预测并评估设计方案的成果与影响，从而设计、开发和修改软件系统。"
@@ -1120,6 +1368,14 @@
   "AI generates code; design and trade-offs stay with the developer.": {
    "ms": "AI menjana kod; reka bentuk dan pertimbangan tolak ansur (trade-off) kekal pada pembangun.",
    "zh": "AI 生成代码；系统架构设计与权衡取舍仍由开发人员决定。"
+  },
+  "Design software systems": {
+   "ms": "Reka bentuk sistem perisian",
+   "zh": "设计软件系统"
+  },
+  "AI writes code, you balance trade-offs": {
+   "ms": "AI tulis kod, anda buat pertimbangan",
+   "zh": "AI编写代码，你权衡取舍"
   },
   "Determine system performance standards.": {
    "ms": "Menetapkan standard prestasi sistem.",
@@ -1129,6 +1385,14 @@
    "ms": "Alat digunakan untuk mengukur prestasi; penetapan standard adalah satu keputusan manusia.",
    "zh": "工具负责衡量性能；设定标准是一项人为决策。"
   },
+  "Set performance standards": {
+   "ms": "Tetapkan standard prestasi",
+   "zh": "设定性能标准"
+  },
+  "Tools measure speed, you set targets": {
+   "ms": "Alat ukur kelajuan, anda tetapkan sasaran",
+   "zh": "工具测量速度，你设定目标"
+  },
   "Analyze user needs and software requirements to determine feasibility of design within time and cost constraints.": {
    "ms": "Menganalisis keperluan pengguna dan perisian bagi menentukan kebolehlaksanaan reka bentuk dalam kekangan masa dan kos.",
    "zh": "分析用户与软件需求，以在时间与成本限制内评估设计的可行性。"
@@ -1136,6 +1400,14 @@
   "Understanding what users need and what is feasible needs conversation and judgement.": {
    "ms": "Memahami keperluan pengguna dan perkara yang boleh dilaksanakan memerlukan perbincangan serta pertimbangan wajar.",
    "zh": "了解用户需求与可行性需要深入沟通与专业判断。"
+  },
+  "Review user needs": {
+   "ms": "Semak keperluan pengguna",
+   "zh": "评估用户需求"
+  },
+  "Human judgement balances cost and needs": {
+   "ms": "Pertimbangan manusia mengimbangi kos dan keperluan",
+   "zh": "人工判断平衡成本与需求"
   },
   "Confer with systems analysts, engineers, programmers and others to design systems and to obtain information on project limitations and capabilities, performance requirements and interfaces.": {
    "ms": "Berbincang dengan penganalisis sistem, jurutera, pengatur cara dan pihak lain untuk mereka bentuk sistem serta mendapatkan maklumat kekangan, keupayaan, prestasi dan antara muka.",
@@ -1145,6 +1417,14 @@
    "ms": "Merangka reka bentuk bersama pihak lain memerlukan kerjasama berpasukan.",
    "zh": "与团队共同敲定设计方案是一项协作过程。"
   },
+  "Collaborate on system designs": {
+   "ms": "Bekerjasama dalam reka bentuk sistem",
+   "zh": "协作进行系统设计"
+  },
+  "Teamwork and discussions need people": {
+   "ms": "Kerjasama pasukan dan perbincangan memerlukan manusia",
+   "zh": "团队协作与讨论需要人际互动"
+  },
   "Monitor current reports of computer viruses to determine when to update virus protection systems.": {
    "ms": "Memantau laporan virus komputer semasa untuk menentukan masa yang sesuai bagi mengemas kini sistem perlindungan antivirus.",
    "zh": "监测最新的计算机病毒报告，以确定何时更新防毒系统。"
@@ -1152,6 +1432,14 @@
   "Threat feeds and endpoint tools update protection automatically.": {
    "ms": "Suapan ancaman dan alatan endpoint mengemas kini perlindungan secara automatik.",
    "zh": "威胁情报源和终端工具可自动更新防护机制。"
+  },
+  "Track virus reports": {
+   "ms": "Pantau laporan virus",
+   "zh": "追踪病毒报告"
+  },
+  "Security feeds update systems automatically": {
+   "ms": "Suapan keselamatan kemas kini sistem secara automatik",
+   "zh": "安全数据源自动更新系统"
   },
   "Modify computer security files to incorporate new software, correct errors, or change individual access status.": {
    "ms": "Mengubah suai fail keselamatan komputer untuk memasukkan perisian baharu, membetulkan ralat atau menukar status akses individu.",
@@ -1161,6 +1449,14 @@
    "ms": "Perubahan akses kini semakin banyak dikendalikan melalui aliran kerja pengurusan identiti.",
    "zh": "权限变更日益由身份管理工作流自动处理。"
   },
+  "Update user access": {
+   "ms": "Kemas kini akses pengguna",
+   "zh": "更新用户访问权限"
+  },
+  "Identity software updates access automatically": {
+   "ms": "Perisian identiti kemas kini akses secara automatik",
+   "zh": "身份管理软件自动更新权限"
+  },
   "Perform risk assessments and execute tests of data processing system to ensure functioning of data processing activities and security measures.": {
    "ms": "Menjalankan penilaian risiko dan ujian sistem pemprosesan data bagi memastikan kelancaran operasi data serta langkah keselamatan.",
    "zh": "执行风险评估并测试数据处理系统，以确保数据处理运作正常且符合安全措施。"
@@ -1168,6 +1464,14 @@
   "Scanners find weaknesses; the analyst judges risk and impact.": {
    "ms": "Pengimbas mengesan kelemahan; penganalisis menilai risiko dan kesannya.",
    "zh": "扫描工具负责发现漏洞，分析师则负责评估风险与影响。"
+  },
+  "Assess security risks": {
+   "ms": "Taksir risiko keselamatan",
+   "zh": "评估安全风险"
+  },
+  "Scanners find flaws, you judge risk": {
+   "ms": "Pengimbas kesan kelemahan, anda nilai risiko",
+   "zh": "扫描器查找漏洞，你评估风险"
   },
   "Document computer security and emergency measures policies, procedures, and tests.": {
    "ms": "Mendokumentasikan dasar, prosedur dan ujian bagi keselamatan komputer serta langkah kecemasan.",
@@ -1177,6 +1481,14 @@
    "ms": "AI merangka dasar; penganalisis menyesuaikannya mengikut keperluan organisasi.",
    "zh": "AI 起草政策，分析师则使其契合组织实际需求。"
   },
+  "Write security policies": {
+   "ms": "Bina dasar keselamatan",
+   "zh": "制定安全政策"
+  },
+  "AI drafts rules, you adapt them": {
+   "ms": "AI draf peraturan, anda sesuaikannya",
+   "zh": "AI拟定规则，你调整落实"
+  },
   "Develop plans to safeguard computer files against accidental or unauthorized modification, destruction, or disclosure and to meet emergency data processing needs.": {
    "ms": "Membangunkan pelan perlindungan fail komputer daripada pengubahsuaian, pemusnahan atau pendedahan tanpa kebenaran, serta memenuhi keperluan pemprosesan data kecemasan.",
    "zh": "制定保护方案以防止计算机文件被意外或未经授权修改、销毁或泄露，并满足紧急数据处理需求。"
@@ -1184,6 +1496,14 @@
   "Planning protection uses AI analysis but needs human priorities.": {
    "ms": "Perancangan perlindungan memanfaatkan analisis AI, namun keutamaan tetap ditentukan oleh manusia.",
    "zh": "防护规划运用 AI 分析，但优先事项仍需人工把关。"
+  },
+  "Plan file protection": {
+   "ms": "Rancang perlindungan fail",
+   "zh": "规划文件保护"
+  },
+  "AI analyses data, you set priorities": {
+   "ms": "AI analisa data, anda tentukan keutamaan",
+   "zh": "AI分析数据，你设定优先级"
   },
   "Train users and promote security awareness to ensure system security and to improve server and network efficiency.": {
    "ms": "Melatih pengguna dan memupuk kesedaran keselamatan bagi memastikan keselamatan sistem serta meningkatkan kecekapan pelayan dan rangkaian.",
@@ -1193,6 +1513,14 @@
    "ms": "Mengubah tabiat keselamatan warga kerja memerlukan kepercayaan dan bimbingan.",
    "zh": "改变员工的安全习惯需要信任与持续指导。"
   },
+  "Train staff on security": {
+   "ms": "Latih staf tentang keselamatan",
+   "zh": "培训员工安全意识"
+  },
+  "Building safe habits requires human trust": {
+   "ms": "Membina tabiat selamat memerlukan kepercayaan sesama manusia",
+   "zh": "培养安全习惯需要人与人的信任"
+  },
   "Conduct market research analysis to identify search query trends, real-time search and news media activity, popular social media topics, electronic commerce trends, market opportunities, or competitor performance.": {
    "ms": "Menjalankan analisis penyelidikan pasaran untuk mengenal pasti trend carian, aktiviti carian masa nyata dan media berita, topik trending media sosial, trend e-dagang, peluang pasaran atau prestasi pesaing.",
    "zh": "进行市场调研分析，以掌握搜索趋势、即时搜索与新闻动态、社交媒体热门话题、电商趋势、市场商机及竞品表现。"
@@ -1200,6 +1528,14 @@
   "Trend and competitor monitoring is done by analytics platforms.": {
    "ms": "Pemantauan trend dan pesaing dikendalikan oleh platform analitik.",
    "zh": "趋势与竞品监控主要由分析平台完成。"
+  },
+  "Research market trends": {
+   "ms": "Kaji trend pasaran",
+   "zh": "研究市场趋势"
+  },
+  "Analytics platforms monitor trends automatically": {
+   "ms": "Platform analitik pantau trend secara automatik",
+   "zh": "分析平台自动监测趋势"
   },
   "Coordinate sales or other promotional strategies with merchandising, operations, or inventory control staff to ensure product catalogs are current, accurate, and organized for best findability against user intent.": {
    "ms": "Menyelaras strategi jualan atau promosi bersama bahagian pembarangan, operasi atau inventori bagi memastikan katalog produk sentiasa terkini, tepat dan mudah dicari mengikut niat carian pengguna.",
@@ -1209,6 +1545,14 @@
    "ms": "Katalog produk sentiasa dikemas kini secara automatik melalui suapan data dan penandaan AI.",
    "zh": "产品目录通过数据源及 AI 标签保持实时更新。"
   },
+  "Update product catalogues": {
+   "ms": "Kemas kini katalog produk",
+   "zh": "更新产品目录"
+  },
+  "AI tools tag and update catalogues": {
+   "ms": "Alat AI tag dan kemas kini katalog",
+   "zh": "AI工具自动添加标签并更新目录"
+  },
   "Conduct financial modeling for online marketing programs or Web site revenue forecasting.": {
    "ms": "Membina model kewangan untuk program pemasaran dalam talian atau ramalan hasil laman web.",
    "zh": "建立财务模型以评估线上营销活动或预测网站收益。"
@@ -1216,6 +1560,14 @@
   "Forecasts come from tools; the specialist sets assumptions.": {
    "ms": "Ramalan dijana oleh alatan; pakar menetapkan andaian dasarnya.",
    "zh": "预测数据由工具生成，业务假设则由专员设定。"
+  },
+  "Forecast marketing revenue": {
+   "ms": "Ramal hasil pemasaran",
+   "zh": "预测营销收入"
+  },
+  "Software forecasts, you set assumptions": {
+   "ms": "Perisian buat ramalan, anda tetapkan andaian",
+   "zh": "软件负责预测，你设定假设条件"
   },
   "Propose online or multiple-sales-channel campaigns to marketing executives.": {
    "ms": "Mencadangkan kempen dalam talian atau pelbagai saluran jualan kepada eksekutif pemasaran.",
@@ -1225,6 +1577,14 @@
    "ms": "AI merangka idea kempen dan teks iklan; pakar memilih serta membentangkannya.",
    "zh": "AI 起草活动创意与文案，专员负责筛选并进行提案。"
   },
+  "Pitch marketing campaigns": {
+   "ms": "Bentang kempen pemasaran",
+   "zh": "提案营销方案"
+  },
+  "AI drafts ideas, you pitch them": {
+   "ms": "AI draf idea, anda bentangkannya",
+   "zh": "AI构思创意，你负责提案"
+  },
   "Participate in the development or implementation of online marketing strategy.": {
    "ms": "Terlibat dalam pembangunan atau pelaksanaan strategi pemasaran dalam talian.",
    "zh": "参与线上营销策略的制定与执行。"
@@ -1232,6 +1592,14 @@
   "Strategy depends on brand, customers and judgement.": {
    "ms": "Keberkesanan strategi bergantung pada jenama, pelanggan dan pertimbangan tepat.",
    "zh": "策略成效取决于品牌定位、客户洞察与专业判断。"
+  },
+  "Develop marketing strategy": {
+   "ms": "Membangunkan strategi pemasaran",
+   "zh": "制定营销策略"
+  },
+  "Brand strategy requires human judgement": {
+   "ms": "Strategi jenama memerlukan pertimbangan manusia",
+   "zh": "品牌策略需要人为判断"
   },
   "Communicate and collaborate with merchants, Webmasters, bloggers, or online editors to strategically place hyperlinks.": {
    "ms": "Berhubung dan bekerjasama dengan peniaga, Webmaster, blogger atau editor dalam talian untuk penempatan pautan balik (hyperlink) secara strategik.",
@@ -1241,6 +1609,14 @@
    "ms": "Kerjasama rakan kongsi bergantung pada hubungan baik.",
    "zh": "商务合作的成功建立在良好的人脉关系上。"
   },
+  "Manage partner links": {
+   "ms": "Mengurus pautan rakan kongsi",
+   "zh": "管理合作伙伴链接"
+  },
+  "Partner relationships need personal connection": {
+   "ms": "Hubungan rakan kongsi memerlukan sentuhan peribadi",
+   "zh": "伙伴关系需要人际维系"
+  },
   "Create searchable indices for Web page content.": {
    "ms": "Membina indeks carian untuk kandungan halaman web.",
    "zh": "为网页内容建立可搜索的索引。"
@@ -1248,6 +1624,14 @@
   "Search indexing is done by software.": {
    "ms": "Pengindeksan carian dikendalikan oleh perisian.",
    "zh": "搜索索引工作由软件自动化完成。"
+  },
+  "Index site content": {
+   "ms": "Mengindeks kandungan laman web",
+   "zh": "索引网站内容"
+  },
+  "Search software indexes pages automatically": {
+   "ms": "Perisian carian mengindeks halaman secara automatik",
+   "zh": "搜索软件会自动索引页面"
   },
   "Create Web models or prototypes that include physical, interface, logical, or data models.": {
    "ms": "Membangunkan model atau prototaip Web merangkumi model fizikal, antara muka, logik atau data.",
@@ -1257,6 +1641,14 @@
    "ms": "AI menjana draf prototaip; pereka membentuknya.",
    "zh": "AI 生成原型草案，设计师负责完善定型。"
   },
+  "Build web prototypes": {
+   "ms": "Membina prototaip web",
+   "zh": "构建网页原型"
+  },
+  "AI builds drafts, you refine design": {
+   "ms": "AI membina draf, anda perhalusi rekaan",
+   "zh": "AI生成草稿，由你完善设计"
+  },
   "Design, build, or maintain Web sites, using authoring or scripting languages, content creation tools, management tools, and digital media.": {
    "ms": "Mereka bentuk, membina atau menyelenggara laman Web menggunakan bahasa pengarangan atau skrip, alat penciptaan kandungan, alat pengurusan dan media digital.",
    "zh": "利用创作或脚本语言、内容创作工具、管理工具及数码媒体，设计、构建或维护网站。"
@@ -1264,6 +1656,14 @@
   "Site builders and AI speed up building; quality is the designer's call.": {
    "ms": "Pembina laman web dan AI mempercepat pembinaan; kualiti bergantung pada pereka.",
    "zh": "建站工具和 AI 加快开发速度，最终质量仍由设计师把控。"
+  },
+  "Maintain website pages": {
+   "ms": "Menyelenggara halaman laman web",
+   "zh": "维护网站页面"
+  },
+  "Site builders help, you ensure quality": {
+   "ms": "Alat bina laman membantu, anda pastikan kualiti",
+   "zh": "建站工具有所协助，质量由你把关"
   },
   "Develop and document style guidelines for Web site content.": {
    "ms": "Membangun dan mendokumentasikan garis panduan gaya untuk kandungan laman Web.",
@@ -1273,6 +1673,14 @@
    "ms": "AI boleh merangka panduan gaya berdasarkan contoh.",
    "zh": "AI 可根据现有范例起草风格指南。"
   },
+  "Write web style guides": {
+   "ms": "Menulis panduan gaya web",
+   "zh": "编写网页设计规范指南"
+  },
+  "AI drafts guidelines from samples": {
+   "ms": "AI merangka garis panduan daripada sampel",
+   "zh": "AI根据样本起草指南"
+  },
   "Conduct user research to determine design requirements and analyze user feedback to improve design quality.": {
    "ms": "Menjalankan penyelidikan pengguna untuk menentukan keperluan reka bentuk dan menganalisis maklum balas pengguna bagi meningkatkan kualiti reka bentuk.",
    "zh": "开展用户研究以明确设计需求，并通过分析用户反馈来提升设计质量。"
@@ -1280,6 +1688,14 @@
   "Talking to users and reading their reactions needs empathy.": {
    "ms": "Berkomunikasi dengan pengguna dan memahami reaksi mereka memerlukan empati.",
    "zh": "与用户沟通并洞察其反应需要同理心。"
+  },
+  "Research user needs": {
+   "ms": "Menyelidik keperluan pengguna",
+   "zh": "调研用户需求"
+  },
+  "Understanding feelings takes human empathy": {
+   "ms": "Memahami perasaan memerlukan empati manusia",
+   "zh": "体会他人感受需要同理心"
   },
   "Confer with management or development teams to prioritize needs, resolve conflicts, develop content criteria, or choose solutions.": {
    "ms": "Berbincang dengan pihak pengurusan atau pasukan pembangunan untuk menentukan keutamaan, menyelesaikan percanggahan, menetapkan kriteria kandungan atau memilih penyelesaian.",
@@ -1289,6 +1705,14 @@
    "ms": "Menyelesaikan pertindihan keperluan memerlukan kemahiran rundingan.",
    "zh": "协调冲突需求需要谈判沟通技巧。"
   },
+  "Align with project teams": {
+   "ms": "Menyelaras dengan pasukan projek",
+   "zh": "与项目团队保持协调"
+  },
+  "Settling disagreements needs negotiation": {
+   "ms": "Menyelesaikan pertikaian memerlukan rundingan",
+   "zh": "化解分歧需要沟通协商"
+  },
   "Determine photovoltaic (PV) system designs or configurations based on factors such as customer needs, expectations, and site conditions.": {
    "ms": "Menentukan reka bentuk atau konfigurasi sistem fotovoltaik (PV) berdasarkan keperluan pelanggan, jangkaan dan keadaan tapak.",
    "zh": "根据客户需求、期望及现场环境，确定光伏（PV）系统设计或配置。"
@@ -1296,6 +1720,14 @@
   "Design software proposes layouts from site data; the technician checks the site.": {
    "ms": "Perisian reka bentuk mencadangkan susun atur daripada data tapak; juruteknik memeriksa tapak fizikal.",
    "zh": "设计软件基于现场数据提出布局建议，技术员负责实地核查。"
+  },
+  "Design solar power systems": {
+   "ms": "Mereka bentuk sistem tenaga suria",
+   "zh": "设计太阳能发电系统"
+  },
+  "Software suggests layouts, you inspect site": {
+   "ms": "Perisian mencadangkan susun atur, anda periksa tapak",
+   "zh": "软件建议布局，现场由你勘察"
   },
   "Diagram layouts and locations for photovoltaic (PV) arrays and equipment, including existing building or site features.": {
    "ms": "Melakar rajah susun atur dan kedudukan tatasusunan serta peralatan fotovoltaik (PV), termasuk ciri bangunan atau tapak sedia ada.",
@@ -1305,6 +1737,14 @@
    "ms": "Dron dan alat pemetaan mempercepat penyediaan rajah.",
    "zh": "无人机和测绘工具大幅加快绘图效率。"
   },
+  "Map solar equipment layouts": {
+   "ms": "Memeta susun atur peralatan suria",
+   "zh": "规划太阳能设备布局图"
+  },
+  "Drones and mapping tools draft maps": {
+   "ms": "Dron dan alat pemetaan merangka peta",
+   "zh": "无人机与测绘工具绘制草图"
+  },
   "Activate photovoltaic (PV) systems to verify system functionality and conformity to performance expectations.": {
    "ms": "Mengaktifkan sistem fotovoltaik (PV) untuk mengesahkan kefungsian sistem dan pematuhan piawaian prestasi.",
    "zh": "启用光伏（PV）系统，测试并验证其功能及性能是否达标。"
@@ -1312,6 +1752,14 @@
   "Monitoring systems test output; the technician fixes faults.": {
    "ms": "Sistem pemantauan menguji output; juruteknik membaiki kerosakan.",
    "zh": "监控系统测试发电输出，技术员负责排除故障。"
+  },
+  "Test solar power systems": {
+   "ms": "Menguji sistem tenaga suria",
+   "zh": "测试太阳能发电系统"
+  },
+  "Monitors run tests, you fix faults": {
+   "ms": "Sistem pemantau jalankan ujian, anda baiki kerosakan",
+   "zh": "监测设备运行测试，故障由你排查"
   },
   "Assemble solar modules, panels, or support structures, as specified.": {
    "ms": "Memasang modul suria, panel atau struktur sokongan mengikut spesifikasi.",
@@ -1321,6 +1769,14 @@
    "ms": "Pemasangan fizikal di pelbagai tapak sukar diautomatikkan.",
    "zh": "不同现场的实地组装作业难以完全自动化。"
   },
+  "Assemble solar panel frames": {
+   "ms": "Memasang rangka panel suria",
+   "zh": "组装太阳能板支架"
+  },
+  "Building structures requires manual effort": {
+   "ms": "Membina struktur memerlukan tenaga manual",
+   "zh": "搭建架构需要体力劳动"
+  },
   "Install photovoltaic (PV) systems in accordance with codes and standards, using drawings, schematics, and instructions.": {
    "ms": "Memasang sistem fotovoltaik (PV) mengikut kod dan piawaian menggunakan lukisan teknikal, skematik dan arahan.",
    "zh": "依据图纸、电路图及操作指引，按法规标准安装光伏（PV）系统。"
@@ -1328,6 +1784,14 @@
   "Installation on roofs and sites needs hands-on skill and safety judgement.": {
    "ms": "Pemasangan di atas bumbung dan tapak projek memerlukan kemahiran praktikal dan pertimbangan keselamatan.",
    "zh": "屋顶及现场安装需要扎实的实操技能和安全判断力。"
+  },
+  "Install solar panel systems": {
+   "ms": "Memasang sistem panel suria",
+   "zh": "安装太阳能板系统"
+  },
+  "Rooftop work demands safety judgement": {
+   "ms": "Kerja di atas bumbung menuntut pertimbangan keselamatan",
+   "zh": "屋顶作业需要严谨的安全意识"
   },
   "Apply weather sealing to array, building, or support mechanisms.": {
    "ms": "Memasang pengedap cuaca pada tatasusunan, bangunan atau struktur sokongan.",
@@ -1337,6 +1801,14 @@
    "ms": "Pemasangan pengedap cuaca merupakan kerja manual di setiap tapak.",
    "zh": "现场耐候密封处理属于纯手工操作。"
   },
+  "Apply weather seals": {
+   "ms": "Memasang pengedap cuaca",
+   "zh": "做好防风雨密封"
+  },
+  "Sealing panels is hands-on work": {
+   "ms": "Menutup celah panel memerlukan kerja fizikal",
+   "zh": "面板密封属于现场动手工作"
+  },
   "Research or review regulatory, technical, or market issues related to sustainability.": {
    "ms": "Menyelidik atau menyemak isu kawal selia, teknikal atau pasaran berkaitan kelestarian.",
    "zh": "调研或审查与可持续发展相关的法规、技术或市场问题。"
@@ -1344,6 +1816,14 @@
   "AI summarises regulations and reports; the analyst checks what applies.": {
    "ms": "AI meringkaskan peraturan dan laporan; penganalisis menyemak pematuhan yang berkaitan.",
    "zh": "AI 提炼法规和报告要点，分析师核查具体适用条款。"
+  },
+  "Research green regulations": {
+   "ms": "Menyelidik peraturan hijau",
+   "zh": "调研绿色环保法规"
+  },
+  "AI summarizes rules, you review fit": {
+   "ms": "AI merumus peraturan, anda semak kesesuaian",
+   "zh": "AI梳理法规，由你审核适用性"
   },
   "Develop reports or presentations to communicate the effectiveness of sustainability initiatives.": {
    "ms": "Menyediakan laporan atau pembentangan untuk menyampaikan keberkesanan inisiatif kelestarian.",
@@ -1353,6 +1833,14 @@
    "ms": "AI merangka laporan dan carta berdasarkan data.",
    "zh": "AI 可直接利用数据生成报告草案和图表。"
   },
+  "Create sustainability reports": {
+   "ms": "Menyediakan laporan kelestarian",
+   "zh": "编制可持续发展报告"
+  },
+  "AI drafts charts and report summaries": {
+   "ms": "AI merangka carta dan ringkasan laporan",
+   "zh": "AI 拟定图表和报告摘要"
+  },
   "Write grant applications, rebate applications, or project proposals to secure funding for sustainability projects.": {
    "ms": "Menulis permohonan geran, rebat atau cadangan projek bagi mendapatkan dana untuk projek kelestarian.",
    "zh": "撰写补助金申请、回扣申请或项目提案，为可持续发展项目争取资金。"
@@ -1360,6 +1848,14 @@
   "AI drafts applications; the analyst tailors and stands behind them.": {
    "ms": "AI merangka permohonan; penganalisis menyesuaikan dan mengesahkan kandungannya.",
    "zh": "AI 起草申请初稿，分析师负责针对性调整并落实定案。"
+  },
+  "Write green grant proposals": {
+   "ms": "Menulis cadangan geran hijau",
+   "zh": "撰写绿色资助提案"
+  },
+  "AI writes drafts, you confirm details": {
+   "ms": "AI menulis draf, anda sahkan butiran",
+   "zh": "AI 撰写草稿，由你确认细节"
   },
   "Review and revise sustainability proposals or policies.": {
    "ms": "Menyemak dan meminda cadangan atau dasar kelestarian.",
@@ -1369,6 +1865,14 @@
    "ms": "AI membandingkan dasar dengan piawaian; sebarang perubahan memerlukan kelulusan manusia.",
    "zh": "AI 对标标准评估政策，但修订内容仍须人工签署核准。"
   },
+  "Review environmental policies": {
+   "ms": "Menyemak dasar alam sekitar",
+   "zh": "审查环境政策"
+  },
+  "Software checks standards, humans decide": {
+   "ms": "Perisian memeriksa piawaian, manusia membuat keputusan",
+   "zh": "软件核对标准，人类做决策"
+  },
   "Identify or create new sustainability indicators.": {
    "ms": "Mengenal pasti atau mencipta penunjuk kelestarian baharu.",
    "zh": "确定或制定新的可持续发展指标。"
@@ -1376,6 +1880,14 @@
   "Choosing what to measure reflects values and context.": {
    "ms": "Pemilihan perkara untuk diukur mencerminkan nilai dan konteks.",
    "zh": "选择衡量指标反映了价值观与具体背景。"
+  },
+  "Set sustainability goals": {
+   "ms": "Menetapkan matlamat kelestarian",
+   "zh": "设定可持续发展目标"
+  },
+  "Choosing priorities needs human values": {
+   "ms": "Memilih keutamaan memerlukan nilai kemanusiaan",
+   "zh": "确定优先级需要人类价值观"
   },
   "Identify or investigate violations of natural resources, waste management, recycling, or other environmental policies.": {
    "ms": "Mengenal pasti atau menyiasat pelanggaran dasar sumber semula jadi, pengurusan sisa, kitar semula atau alam sekitar yang lain.",
@@ -1385,6 +1897,14 @@
    "ms": "Siasatan pelanggaran memerlukan lawatan tapak dan pertimbangan wajar.",
    "zh": "调查违规行为需要实地考察与专业判断。"
   },
+  "Investigate environmental violations": {
+   "ms": "Menyiasat pelanggaran undang-undang alam sekitar",
+   "zh": "调查环境违规行为"
+  },
+  "Inspecting sites requires human judgement": {
+   "ms": "Memeriksa tapak memerlukan pertimbangan manusia",
+   "zh": "现场检查需要人工判断"
+  },
   "Prepare and maintain records of client progress and services performed, reporting changes in client condition to manager or supervisor.": {
    "ms": "Menyediakan dan mengemas kini rekod kemajuan klien serta perkhidmatan yang diberikan, serta melaporkan perubahan keadaan klien kepada pengurus atau penyelia.",
    "zh": "准备并维护客户进展及服务记录，向经理或主管汇报客户状况的变化。"
@@ -1392,6 +1912,14 @@
   "Voice notes and apps speed up care records.": {
    "ms": "Nota suara dan aplikasi mempercepatkan perekodan penjagaan.",
    "zh": "语音备忘录和应用程序加快了护理记录的整理速度。"
+  },
+  "Update patient logs": {
+   "ms": "Mengemas kini log pesakit",
+   "zh": "更新病患记录"
+  },
+  "Apps help write notes faster": {
+   "ms": "Aplikasi membantu menulis nota dengan lebih pantas",
+   "zh": "应用程序协助更快完成记录"
   },
   "Perform healthcare-related tasks, such as monitoring vital signs and medication, under the direction of registered nurses or physiotherapists.": {
    "ms": "Menjalankan tugas berkaitan penjagaan kesihatan, seperti memantau tanda vital dan ubat-ubatan, di bawah arahan jururawat berdaftar atau ahli fisioterapi.",
@@ -1401,6 +1929,14 @@
    "ms": "Sensor dan aplikasi menjejaki tanda vital; penjaga mengambil tindakan susulan.",
    "zh": "传感器和应用程序追踪生命体征，护理人员据此采取行动。"
   },
+  "Track patient vitals": {
+   "ms": "Memantau tanda vital pesakit",
+   "zh": "监测病患生命体征"
+  },
+  "Sensors record data, carers take action": {
+   "ms": "Sensor merekod data, penjaga mengambil tindakan",
+   "zh": "传感器记录数据，看护人员采取行动"
+  },
   "Administer bedside or personal care, such as ambulation or personal hygiene assistance.": {
    "ms": "Memberikan penjagaan di sisi katil atau penjagaan diri, seperti bantuan pergerakan atau kebersihan diri.",
    "zh": "提供床边或个人护理，如协助走动或个人卫生护理。"
@@ -1408,6 +1944,14 @@
   "Personal care needs touch, dignity and trust.": {
    "ms": "Penjagaan diri memerlukan sentuhan, maruah dan kepercayaan.",
    "zh": "个人护理需要关怀触碰、尊严与信任。"
+  },
+  "Help with personal hygiene": {
+   "ms": "Membantu penjagaan kebersihan diri",
+   "zh": "协助个人卫生护理"
+  },
+  "Personal care requires human touch": {
+   "ms": "Penjagaan diri memerlukan sentuhan manusia",
+   "zh": "个人护理需要人性化关怀"
   },
   "Perform housekeeping duties, such as cooking, cleaning, washing clothes or dishes, or running errands.": {
    "ms": "Melaksanakan tugas pengemasan rumah, seperti memasak, membersih, mencuci pakaian atau pinggan mangkuk, atau menjalankan urusan luar.",
@@ -1417,6 +1961,14 @@
    "ms": "Tugas rumah tangga di pelbagai kediaman masih memerlukan tenaga manual.",
    "zh": "不同家庭的家务工作仍需人工完成。"
   },
+  "Do household chores": {
+   "ms": "Melakukan kerja rumah",
+   "zh": "处理日常家务"
+  },
+  "Home chores need hands-on effort": {
+   "ms": "Kerja rumah memerlukan usaha fizikal",
+   "zh": "家务活需要亲力亲为"
+  },
   "Care for individuals or families during periods of incapacitation, family disruption, or convalescence, providing companionship, personal care, or help in adjusting to new lifestyles.": {
    "ms": "Menjaga individu atau keluarga semasa tempoh hilang keupayaan, krisis keluarga atau pemulihan, dengan memberikan teman, penjagaan diri atau bantuan menyesuaikan diri dengan gaya hidup baharu.",
    "zh": "在无行为能力、家庭变故或康复期间照顾个人或家庭，提供陪伴、个人护理或协助适应新生活方式。"
@@ -1424,6 +1976,14 @@
   "Companionship is human by nature.": {
    "ms": "Pendampingan secara semula jadi memerlukan sentuhan manusia.",
    "zh": "陪伴本质上是人性化的。"
+  },
+  "Provide patient companionship": {
+   "ms": "Menemani pesakit",
+   "zh": "陪伴病患"
+  },
+  "Real companionship needs a person": {
+   "ms": "Teman sebenar memerlukan kehadiran manusia",
+   "zh": "真正的陪伴需要真人的温度"
   },
   "Participate in case reviews, consulting with the team caring for the client, to evaluate the client's needs and plan for continuing services.": {
    "ms": "Menyertai semakan kes, berbincang dengan pasukan penjagaan klien untuk menilai keperluan klien dan merancang kesinambungan perkhidmatan.",
@@ -1433,6 +1993,14 @@
    "ms": "Semakan kes bergantung pada pemahaman terhadap individu tersebut.",
    "zh": "个案研讨有赖于对个人的深入了解。"
   },
+  "Review care plans": {
+   "ms": "Menyemak pelan penjagaan",
+   "zh": "审查护理方案"
+  },
+  "Knowing the patient needs human care": {
+   "ms": "Memahami pesakit memerlukan keprihatinan manusia",
+   "zh": "了解病患需要贴心的人文关怀"
+  },
   "Perform quality checks on products and parts.": {
    "ms": "Menjalankan pemeriksaan kualiti pada produk dan komponen.",
    "zh": "对产品和零部件进行质检。"
@@ -1440,6 +2008,14 @@
   "Automated optical inspection flags surface flaws while operators confirm complex defects.": {
    "ms": "Pemeriksaan optik automatik mengesan kecacatan permukaan manakala operator mengesahkan kerosakan kompleks.",
    "zh": "自动光学检测识别表面瑕疵，操作员复核复杂缺陷。"
+  },
+  "Inspect finished parts": {
+   "ms": "Memeriksa komponen siap",
+   "zh": "检验成品零件"
+  },
+  "Sensors spot flaws, you confirm defects": {
+   "ms": "Sensor mengesan kecacatan, anda sahkan kerosakan",
+   "zh": "传感器发现瑕疵，由你确认缺陷"
   },
   "Review work orders and blueprints to ensure work is performed according to specifications.": {
    "ms": "Menyemak pesanan kerja dan pelan tindakan bagi memastikan kerja mengikut spesifikasi.",
@@ -1449,6 +2025,14 @@
    "ms": "Paparan digital dan alat terjemahan automatik membantu operator menyemak panduan pemasangan.",
    "zh": "数码显示屏和自动翻译工具有助操作员查阅组装指南。"
   },
+  "Check work orders": {
+   "ms": "Menyemak pesanan kerja",
+   "zh": "核对工单"
+  },
+  "Digital screens display instructions clearly": {
+   "ms": "Skrin digital memaparkan arahan dengan jelas",
+   "zh": "电子屏幕清晰显示操作指示"
+  },
   "Rotate through all the tasks required in a particular production process.": {
    "ms": "Menjalankan penggiliran tugas dalam proses pengeluaran tertentu.",
    "zh": "轮流完成特定生产流程中的各项任务。"
@@ -1456,6 +2040,14 @@
   "Physical line rotations require human dexterity, physical presence, and situational awareness.": {
    "ms": "Penggiliran barisan pengeluaran memerlukan ketangkasan tangan, kehadiran fizikal dan kepekaan situasi.",
    "zh": "产线轮岗需要人工灵巧度、现场操作及情境感知能力。"
+  },
+  "Rotate production stations": {
+   "ms": "Menggilirkan stesen pengeluaran",
+   "zh": "轮换生产工位"
+  },
+  "Moving stations needs physical agility": {
+   "ms": "Beralih stesen memerlukan ketangkasan fizikal",
+   "zh": "轮换工位需要身体灵活性"
   },
   "Provide assistance in the production of wiring assemblies.": {
    "ms": "Membantu dalam pengeluaran pemasangan pendawaian.",
@@ -1465,6 +2057,14 @@
    "ms": "Pengendalian manual dan penyusunan laluan abah-abah wayar kecil memerlukan kemahiran motor manusia.",
    "zh": "小型线束的手动操作与精确布线需要人工精细动作技能。"
   },
+  "Assemble wiring sets": {
+   "ms": "Memasang set pendawaian",
+   "zh": "组装线束组件"
+  },
+  "Wiring parts needs steady hands": {
+   "ms": "Memasang wayar memerlukan tangan yang mantap",
+   "zh": "线路组装需要双手稳健"
+  },
   "Maintain production equipment and machinery.": {
    "ms": "Menyelenggara mesin dan peralatan pengeluaran.",
    "zh": "维护生产设备与机械。"
@@ -1472,6 +2072,14 @@
   "Routine physical cleaning, clearing jams, and mechanical upkeep must be done manually on the line.": {
    "ms": "Pembersihan rutin, mengatasi kesesakan mesin dan penyelenggaraan mekanikal perlu dibuat secara manual di barisan pengeluaran.",
    "zh": "产线日常清洁、卡料疏通及机械保养须手动进行。"
+  },
+  "Maintain factory machines": {
+   "ms": "Menyelenggara mesin kilang",
+   "zh": "维护工厂设备"
+  },
+  "Physical cleaning needs human hands": {
+   "ms": "Pembersihan fizikal memerlukan tenaga manusia",
+   "zh": "实体清洁仍需人工"
   },
   "Complete production reports to communicate team production level to management.": {
    "ms": "Melengkapkan laporan pengeluaran bagi melaporkan tahap output pasukan kepada pihak pengurusan.",
@@ -1481,6 +2089,14 @@
    "ms": "Penderia IoT dan papan pemuka pengeluaran automatik merekod serta menyusun data output secara automatik.",
    "zh": "IoT传感器与自动化生产看板自动采集并汇总产出数据。"
   },
+  "Write production reports": {
+   "ms": "Menyediakan laporan pengeluaran",
+   "zh": "编写生产报告"
+  },
+  "IoT sensors track output automatically": {
+   "ms": "Penderia IoT menjejaki output secara automatik",
+   "zh": "IoT传感器自动追踪产量"
+  },
   "Package finished products and prepare them for shipment.": {
    "ms": "Membungkus produk siap dan menyediakannya untuk penghantaran.",
    "zh": "包装成品并备货待运。"
@@ -1488,6 +2104,14 @@
   "Boxing, taping, and organizing finished goods across dynamic order lines remain physical human tasks.": {
    "ms": "Kerja membungkus, melekatkan pita dan menyusun barang siap mengikut pesanan dinamik kekal sebagai tugas fizikal manusia.",
    "zh": "装箱、封箱及在动态订单线上整理成品仍需人工操作。"
+  },
+  "Pack finished goods": {
+   "ms": "Membungkus barangan siap",
+   "zh": "包装成品"
+  },
+  "Boxing items needs physical labour": {
+   "ms": "Kerja membungkus memerlukan tenaga fizikal",
+   "zh": "装箱打包需要体力劳动"
   },
   "Receive payment by cash, check, credit cards, vouchers, or automatic debits.": {
    "ms": "Menerima bayaran secara tunai, cek, kad kredit, baucar atau debit automatik.",
@@ -1497,6 +2121,14 @@
    "ms": "Terminal layan diri dan bayaran mudah alih tanpa sentuh memproses transaksi pelanggan secara terus tanpa bantuan juruwang.",
    "zh": "自助结账终端与无接触移动支付可直接处理交易，无需人工收银。"
   },
+  "Collect customer payments": {
+   "ms": "Menerima bayaran pelanggan",
+   "zh": "收取顾客款项"
+  },
+  "Self-checkout kiosks process payments directly": {
+   "ms": "Kios layan diri memproses bayaran secara terus",
+   "zh": "自助结账机直接处理付款"
+  },
   "Establish or identify prices of goods, services, or admission, and tabulate bills, using calculators, cash registers, or optical price scanners.": {
    "ms": "Menentukan harga barangan, perkhidmatan atau tiket masuk, serta mengira bil menggunakan kalkulator, mesin daftar tunai atau pengimbas harga.",
    "zh": "使用计算器、收银机或条码扫描器核算商品、服务或门票价格并结算账单。"
@@ -1504,6 +2136,14 @@
   "Automated barcode scanners, RFID readers, and smart shopping carts tally item prices automatically.": {
    "ms": "Pengimbas kod bar automatik, pembaca RFID dan troli pintar mengira jumlah harga barangan secara automatik.",
    "zh": "自动条码扫描仪、RFID读取器和智能购物车可自动计价。"
+  },
+  "Scan item prices": {
+   "ms": "Mengimbas harga barangan",
+   "zh": "扫描商品价格"
+  },
+  "Barcode scanners tally totals automatically": {
+   "ms": "Pengimbas kod bar mengira jumlah secara automatik",
+   "zh": "条码扫描器自动计算总额"
   },
   "Issue receipts, refunds, credits, or change due to customers.": {
    "ms": "Mengeluarkan resit, bayaran balik, kredit atau baki wang kepada pelanggan.",
@@ -1513,6 +2153,14 @@
    "ms": "Platform POS digital menjana e-resit secara automatik dan memproses pemulangan kredit ke akaun pelanggan.",
    "zh": "数码POS平台自动生成电子收据，并将退款转入客户账户。"
   },
+  "Issue receipts and refunds": {
+   "ms": "Mengeluarkan resit dan bayaran balik",
+   "zh": "开具收据及处理退款"
+  },
+  "Digital POS systems send e-receipts": {
+   "ms": "Sistem POS digital menghantar e-resit",
+   "zh": "数码POS系统发送电子收据"
+  },
   "Greet customers entering establishments.": {
    "ms": "Menyambut ketibaan pelanggan ke premis.",
    "zh": "热情迎接进店顾客。"
@@ -1520,6 +2168,14 @@
   "Offering a genuine, warm greeting to entering shoppers requires authentic human hospitality and social presence.": {
    "ms": "Memberi sambutan mesra dan ikhlas kepada pelanggan memerlukan keramahan insan dan kemahiran sosial yang tulen.",
    "zh": "向进店顾客致以真诚热情的问候，需要真实的人文关怀与社交沟通。"
+  },
+  "Greet entering customers": {
+   "ms": "Menyambut kedatangan pelanggan",
+   "zh": "迎接进店顾客"
+  },
+  "Genuine warmth needs a person": {
+   "ms": "Kemesraan tulus memerlukan sentuhan manusia",
+   "zh": "真诚关怀需要人际温情"
   },
   "Assist customers by providing information and resolving their complaints.": {
    "ms": "Membantu pelanggan dengan memberi maklumat dan menyelesaikan aduan mereka.",
@@ -1529,6 +2185,14 @@
    "ms": "Perisian carian kedai membantu staf menyemak data inventori manakala juruwang menggunakan empati untuk menyelesaikan aduan pelanggan.",
    "zh": "门店查询软件协助员工核对库存数据，收银员则以同理心妥善处理顾客投诉。"
   },
+  "Handle customer complaints": {
+   "ms": "Mengendalikan aduan pelanggan",
+   "zh": "处理顾客投诉"
+  },
+  "Store apps help, empathy solves": {
+   "ms": "Aplikasi kedai membantu, empati menyelesaikan",
+   "zh": "应用程式辅助，同理心化解难题"
+  },
   "Count money in cash drawers at the beginning of shifts to ensure that amounts are correct and that there is adequate change.": {
    "ms": "Mengira wang dalam laci tunai pada awal syif bagi memastikan jumlahnya tepat dan baki wang kecil mencukupi.",
    "zh": "在轮班开始时清点钱箱现金，确保金额准确及零钱充足。"
@@ -1536,6 +2200,14 @@
   "Smart cash recyclers and automated counting hardware help staff rapidly verify cash drawer balances before a shift.": {
    "ms": "Mesin kitar semula wang pintar dan perkakasan pengiraan automatik membantu staf mengesahkan baki laci tunai dengan pantas sebelum syif.",
    "zh": "智能现金循环机与自动点钞设备协助员工在开班前快速核验钱箱结余。"
+  },
+  "Count shift cash": {
+   "ms": "Mengira wang tunai syif",
+   "zh": "清点轮班现金"
+  },
+  "Cash recyclers speed up counting": {
+   "ms": "Mesin kitar semula tunai mempercepatkan pengiraan",
+   "zh": "现金循环机加快点钞速度"
   },
   "Process merchandise returns and exchanges.": {
    "ms": "Mengendalikan pemulangan dan pertukaran barangan.",
@@ -1545,6 +2217,14 @@
    "ms": "Perisian POS mengautomasikan semakan polisi pemulangan dan pengesahan resit, manakala juruwang memeriksa fizikal barangan yang rosak.",
    "zh": "POS软件自动核对退货政策并验证收据，收银员则负责检查破损商品实物。"
   },
+  "Process returned items": {
+   "ms": "Memproses pemulangan barang",
+   "zh": "处理退换商品"
+  },
+  "POS checks policy, you inspect": {
+   "ms": "Sistem POS menyemak polisi, anda memeriksa barang",
+   "zh": "POS核对政策，人工细致把关"
+  },
   "Greet, register, and assign rooms to guests of hotels or motels.": {
    "ms": "Menyambut, mendaftar masuk dan menetapkan bilik untuk tetamu hotel atau motel.",
    "zh": "迎接宾客、办理入住登记及分配酒店或汽车旅馆客房。"
@@ -1552,6 +2232,14 @@
   "Self-service check-in kiosks and digital ID scanners speed up registration while clerks handle complex check-ins and personal greetings.": {
    "ms": "Kios daftar masuk layan diri dan pengimbas ID digital mempercepatkan pendaftaran, manakala kerani mengendalikan pendaftaran rumit dan menyambut tetamu.",
    "zh": "自助入住机与电子身份证扫描仪可加快登记流程，前台人员则负责处理复杂入住及专属接待。"
+  },
+  "Check in hotel guests": {
+   "ms": "Mendaftar masuk tetamu hotel",
+   "zh": "办理酒店入住"
+  },
+  "Kiosks register, clerks handle exceptions": {
+   "ms": "Kios mendaftar masuk, staf urus isu khas",
+   "zh": "自助机登记，前台处理特殊需求"
   },
   "Make and confirm reservations.": {
    "ms": "Membuat dan mengesahkan tempahan.",
@@ -1561,6 +2249,14 @@
    "ms": "Enjin tempahan terus, API agregator pelancongan dan AI perbualan mengendalikan tempahan bilik biasa secara automatik tanpa penglibatan manusia.",
    "zh": "直接预订引擎、旅游聚合平台API及对话式AI可自动处理标准客房预订，无需人工介入。"
   },
+  "Book room reservations": {
+   "ms": "Membuat tempahan bilik",
+   "zh": "预订酒店客房"
+  },
+  "Online booking engines handle reservations": {
+   "ms": "Enjin tempahan dalam talian menguruskan tempahan",
+   "zh": "线上订房系统自动处理预订"
+  },
   "Compute bills, collect payments, and make change for guests.": {
    "ms": "Mengira bil, menerima bayaran dan memulangkan baki kepada tetamu.",
    "zh": "计算账单、收取款项并为宾客找零。"
@@ -1568,6 +2264,14 @@
   "Automated point-of-sale systems and digital payment gateways reconcile charges and process checkout transactions automatically.": {
    "ms": "Sistem POS automatik dan gerbang pembayaran digital menyelaraskan caj serta memproses transaksi daftar keluar secara automatik.",
    "zh": "自动POS系统与数码支付网关可自动对账并处理退房结账交易。"
+  },
+  "Process checkout bills": {
+   "ms": "Memproses bil daftar keluar",
+   "zh": "结算退房账单"
+  },
+  "Payment gateways charge guests automatically": {
+   "ms": "Gerbang pembayaran mengenakan caj secara automatik",
+   "zh": "支付网关自动扣款"
   },
   "Contact housekeeping or maintenance staff when guests report problems.": {
    "ms": "Menghubungi staf pengemasan (housekeeping) atau penyelenggaraan apabila tetamu melaporkan masalah.",
@@ -1577,6 +2281,14 @@
    "ms": "Platform agihan AI menyalurkan permintaan tetamu kepada staf penyelenggaraan atau pengemasan secara automatik mengikut lokasi dan keutamaan.",
    "zh": "AI调度平台可根据位置与优先级，自动将宾客需求分派给维修或客房清洁人员。"
   },
+  "Dispatch maintenance requests": {
+   "ms": "Mengagihkan permintaan penyelenggaraan",
+   "zh": "派发维修工单"
+  },
+  "AI platforms route tasks automatically": {
+   "ms": "Platform AI membahagikan tugasan secara automatik",
+   "zh": "AI平台自动分派任务"
+  },
   "Record guest comments or complaints, referring customers to managers as necessary.": {
    "ms": "Merekod maklum balas atau aduan tetamu, serta merujuk pelanggan kepada pengurus jika perlu.",
    "zh": "记录宾客意见或投诉，并在必要时转介予经理处理。"
@@ -1584,6 +2296,14 @@
   "De-escalating upset guests and showing genuine empathy during service failures requires nuanced human emotional intelligence.": {
    "ms": "Meredakan kemarahan tetamu dan menunjukkan empati ikhlas semasa masalah perkhidmatan memerlukan kecerdasan emosi manusia yang mendalam.",
    "zh": "平息不满宾客的情绪并在服务失误时展现真诚同理心，需要细腻的人类情商。"
+  },
+  "Resolve guest complaints": {
+   "ms": "Menyelesaikan aduan tetamu",
+   "zh": "化解住客投诉"
+  },
+  "Calming upset guests takes empathy": {
+   "ms": "Menenangkan tetamu yang kecewa memerlukan empati",
+   "zh": "安抚不满住客需要同理心"
   },
   "Answer inquiries pertaining to hotel services, guest registration, and travel directions, or make recommendations regarding shopping, dining, or entertainment.": {
    "ms": "Menjawab pertanyaan tentang perkhidmatan hotel, pendaftaran dan arah perjalanan, atau memberi cadangan tempat beli-belah, makan serta hiburan.",
@@ -1593,6 +2313,14 @@
    "ms": "Alat terjemahan dan cadangan AI membantu kerani mencadangkan tempat makan dan tarikan tempatan kepada pelancong antarabangsa dengan pantas.",
    "zh": "AI翻译与推荐工具有助前台人员迅速为国际旅客推荐当地美食与热门景点。"
   },
+  "Recommend local attractions": {
+   "ms": "Mencadangkan tempat tarikan tempatan",
+   "zh": "推荐本地景点"
+  },
+  "AI tools suggest nearby places": {
+   "ms": "Alatan AI mencadangkan tempat berdekatan",
+   "zh": "AI 工具推荐附近地点"
+  },
   "Perform bookkeeping activities, such as balancing accounts and conducting nightly audits.": {
    "ms": "Melaksanakan tugas simpan kira, seperti mengimbangi akaun dan menjalankan audit malam.",
    "zh": "执行簿记工作，如平衡账目及进行夜审。"
@@ -1600,6 +2328,14 @@
   "Property management systems with automated reconciliation algorithms perform night audits and balance ledgers with minimal oversight.": {
    "ms": "Sistem pengurusan hartanah dengan algoritma penyelarasan automatik menjalankan audit malam dan mengimbangi lejar dengan pengawasan minimum.",
    "zh": "具备自动对账算法的物业管理系统能以极少的人工干预完成夜审并平衡分类账。"
+  },
+  "Run nightly audits": {
+   "ms": "Menjalankan audit malam",
+   "zh": "执行夜间审计"
+  },
+  "Hotel software balances daily accounts": {
+   "ms": "Perisian hotel mengimbangi akaun harian",
+   "zh": "酒店软件结算每日账目"
   },
   "Harvest fruits and vegetables by hand.": {
    "ms": "Menuai buah-buahan dan sayur-sayuran menggunakan tangan.",
@@ -1609,6 +2345,14 @@
    "ms": "Ketangkasan tangan dan kebolehan mengharungi bentuk muka bumi ladang yang sukar memerlukan tenaga manusia.",
    "zh": "灵巧的手工采摘技能及应对复杂的种植园地形仍需依赖人工。"
   },
+  "Harvest crops by hand": {
+   "ms": "Menuai hasil tanaman secara manual",
+   "zh": "手工采收农作物"
+  },
+  "Picking delicate produce takes human care": {
+   "ms": "Memetik hasil tanaman mudah rosak perlukan penelitian manusia",
+   "zh": "采摘娇嫩作物需人工细心处理"
+  },
   "Plant, spray, weed, fertilize, water, and prune plants, shrubs, and trees, using gardening tools.": {
    "ms": "Menanam, menyembur racun, merumput, membaja, menyiram dan memangkas tanaman, pokok renek serta pokok menggunakan peralatan berkebun.",
    "zh": "使用园艺工具进行植物、灌木及树木的种植、喷药、除草、施肥、浇水和修剪。"
@@ -1616,6 +2360,14 @@
   "Physical fieldwork across varied estate topography relies directly on manual physical labour.": {
    "ms": "Kerja lapangan fizikal merentasi pelbagai rupa bumi ladang bergantung terus kepada tenaga buruh manual.",
    "zh": "在地形起伏的种植园内进行实地作业直接依赖体力劳动。"
+  },
+  "Tend to field plants": {
+   "ms": "Menjaga tanaman ladang",
+   "zh": "照料田间农作物"
+  },
+  "Estate ground work needs physical labour": {
+   "ms": "Kerja lapangan ladang memerlukan tenaga fizikal",
+   "zh": "种植园地面作业需要体力劳动"
   },
   "Identify plants, pests, and weeds to determine the selection and application of pesticides and fertilizers.": {
    "ms": "Mengenal pasti tanaman, perosak dan rumpai untuk menentukan pemilihan serta penggunaan racun perosak dan baja.",
@@ -1625,6 +2377,14 @@
    "ms": "Alat penglihatan komputer mudah alih boleh membantu pekerja mengenal pasti penyakit tanaman dan serangan perosak.",
    "zh": "移动端计算机视觉工具有助工人识别农作物病害和虫害。"
   },
+  "Spot pests and weeds": {
+   "ms": "Mengesan perosak dan rumpai",
+   "zh": "排查病虫害与杂草"
+  },
+  "Phone scanner apps identify pests": {
+   "ms": "Aplikasi pengimbas telefon mengenal pasti perosak",
+   "zh": "手机扫描应用可识别害虫"
+  },
   "Participate in the inspection, grading, sorting, storage, and post-harvest treatment of crops.": {
    "ms": "Terlibat dalam pemeriksaan, penggredan, pengasingan, penyimpanan dan rawatan lepas tuai tanaman.",
    "zh": "参与农作物的检验、分级、挑选、仓储及采后处理工作。"
@@ -1632,6 +2392,14 @@
   "Automated optical sorting and grading scanners help workers classify produce quality faster.": {
    "ms": "Pengimbas pengisihan dan penggredan optik automatik membantu pekerja mengelaskan kualiti hasil tanaman dengan lebih pantas.",
    "zh": "自动光学分选与分级扫描仪可协助工人更快完成农产品品质分类。"
+  },
+  "Sort harvested produce": {
+   "ms": "Mengasingkan hasil tuaian",
+   "zh": "分拣采收农产品"
+  },
+  "Optical sorters assist manual grading": {
+   "ms": "Mesin pengasing optik membantu penggredan manual",
+   "zh": "光学分选机辅助人工分级"
   },
   "Record information about crops, such as pesticide use, yields, or costs.": {
    "ms": "Merekodkan maklumat tanaman, seperti penggunaan racun perosak, hasil tuaian atau kos.",
@@ -1641,6 +2409,14 @@
    "ms": "Buku log digital dan aplikasi mudah alih melancarkan proses merekodkan jumlah tuaian dan penggunaan racun perosak.",
    "zh": "电子日志与移动应用程序简化了采收量和农药喷洒记录的流程。"
   },
+  "Log crop data": {
+   "ms": "Merekod data tanaman",
+   "zh": "记录作物数据"
+  },
+  "Mobile apps speed up data entry": {
+   "ms": "Aplikasi mudah alih mempercepat kemasukan data",
+   "zh": "移动应用加快数据录入"
+  },
   "Operate tractors, tractor-drawn machinery, and self-propelled machinery to plow, harrow and fertilize soil, or to plant, cultivate, spray and harvest crops.": {
    "ms": "Mengendalikan traktor, jentera tunda dan jentera pacuan sendiri untuk membajak, menyikat dan membaja tanah, atau menanam, memelihara, menyembur dan menuai hasil tanaman.",
    "zh": "驾驶与操作拖拉机、牵引式机械及自走式农机，进行耕地、耙地、施肥，以及播种、培土、喷洒和收割作业。"
@@ -1648,6 +2424,14 @@
   "Navigating rugged agricultural fields and machinery safely continues to need hands-on human control.": {
    "ms": "Mengendalikan jentera dan meredah ladang pertanian yang mencabar dengan selamat masih memerlukan kawalan manual manusia.",
    "zh": "在崎岖农田和机械作业中安全操控仍需要人工亲手操作。"
+  },
+  "Drive farm tractors": {
+   "ms": "Memandu traktor ladang",
+   "zh": "驾驶农用拖拉机"
+  },
+  "Rough field driving needs a driver": {
+   "ms": "Pemanduan di ladang lasak memerlukan pemandu",
+   "zh": "崎岖农田驾驶需专人操作"
   },
   "Load agricultural products into trucks, and drive trucks to market or storage facilities.": {
    "ms": "Memuatkan hasil pertanian ke dalam lori, dan memandu lori ke pasar atau fasiliti penyimpanan.",
@@ -1657,6 +2441,14 @@
    "ms": "Mengangkat beban berat, memuatkan buah tandan segar (BTS), dan pengangkutan melalui laluan pedalaman memerlukan tenaga fizikal manusia.",
    "zh": "搬运重物、装载鲜果串（FFB）以及在乡村小路运输仍需人工体力劳动。"
   },
+  "Load and drive trucks": {
+   "ms": "Memunggah muatan dan memandu lori",
+   "zh": "装货并驾驶罗里"
+  },
+  "Heavy loading needs physical human effort": {
+   "ms": "Kerja pemunggahan berat memerlukan tenaga manusia",
+   "zh": "重物搬运装卸需要人力"
+  },
   "Produce drawings, using computer-assisted drafting systems (CAD) or drafting machines, or by hand, using compasses, dividers, protractors, triangles, and other drafting devices.": {
    "ms": "Menghasilkan lukisan teknikal menggunakan sistem CAD atau mesin pelan, atau secara manual menggunakan jangka lukis, pembahagi, protraktor, sesiku dan alat lukisan lain.",
    "zh": "使用 CAD 系统、绘图机或手动使用圆规、分规、量角器、三角板等工具绘制图纸。"
@@ -1664,6 +2456,14 @@
   "Generative drafting and CAD plugins assist technicians by accelerating routine line work and auto-generating standard views.": {
    "ms": "Draf generatif dan pemalam CAD membantu juruteknik dengan mempercepat kerja garisan rutin dan menjana pandangan standard secara automatik.",
    "zh": "生成式绘图和 CAD 插件可加速日常画线工作并自动生成标准视图，辅助技术人员。"
+  },
+  "Draft engineering drawings": {
+   "ms": "Merangka lukisan kejuruteraan",
+   "zh": "绘制工程图纸"
+  },
+  "CAD software generates technical layouts": {
+   "ms": "Perisian CAD menjana susun atur teknikal",
+   "zh": "CAD 软件生成技术布局图"
   },
   "Draft plans and detailed drawings for structures, installations, and construction projects, such as highways, sewage disposal systems, and dikes, working from sketches or notes.": {
    "ms": "Merangka pelan dan lukisan terperinci untuk struktur, pemasangan dan projek pembinaan, seperti lebuh raya, sistem pembetungan dan benteng, berpandukan lakaran atau nota.",
@@ -1673,6 +2473,14 @@
    "ms": "Alat AI parametrik mempercepat penjanaan pelan daripada lakaran, namun juruteknik perlu mengesahkan susun atur struktur.",
    "zh": "参数化 AI 工具有助于根据草图快速生成平面图，但技术人员仍须核实结构布局。"
   },
+  "Draft building plans": {
+   "ms": "Melukis pelan bangunan",
+   "zh": "绘制建筑施工图"
+  },
+  "AI drafts plans, you verify layouts": {
+   "ms": "AI merangka pelan, anda mengesahkan susun atur",
+   "zh": "AI 生成设计草图，人工核实布局"
+  },
   "Coordinate structural, electrical, and mechanical designs and determine a method of presentation to graphically represent building plans.": {
    "ms": "Menyelaras reka bentuk struktur, elektrik dan mekanikal serta menentukan kaedah persembahan untuk menggambarkan pelan bangunan secara grafik.",
    "zh": "协调结构、电气和机械设计，并确定建筑图纸的图形化呈现方式。"
@@ -1680,6 +2488,14 @@
   "BIM tools automatically detect clashes between MEP and structural elements, while the technician coordinates the resolution.": {
    "ms": "Alat BIM mengesan pertembungan antara elemen MEP dan struktur secara automatik, sementara juruteknik menyelaraskan penyelesaiannya.",
    "zh": "BIM 工具有效自动检测 MEP 与结构构件之间的碰撞，技术人员则负责协调解决方案。"
+  },
+  "Coordinate design plans": {
+   "ms": "Menyelaras pelan reka bentuk",
+   "zh": "协调设计图纸方案"
+  },
+  "BIM flags clashes, you fix them": {
+   "ms": "BIM mengesan pertembungan, anda membetulkannya",
+   "zh": "BIM 标记冲突点，人工排查修正"
   },
   "Analyze building codes, by-laws, space and site requirements, and other technical documents and reports to determine their effect on architectural designs.": {
    "ms": "Menganalisis kod bangunan, undang-undang kecil, keperluan ruang dan tapak, serta dokumen dan laporan teknikal lain bagi mengenal pasti kesannya terhadap reka bentuk seni bina.",
@@ -1689,6 +2505,14 @@
    "ms": "Alat pengekstrakan dokumen AI mengimbas undang-undang kecil bangunan untuk menyerlahkan ketidakpatuhan bagi semakan juruteknik.",
    "zh": "AI 文件提取工具扫描建筑附属法令并标出违规之处，供技术人员审核。"
   },
+  "Check building bylaws": {
+   "ms": "Menyemak undang-undang kecil bangunan",
+   "zh": "审查建筑附属法规"
+  },
+  "AI scans rules, you check compliance": {
+   "ms": "AI mengimbas syarat, anda menyemak pematuhan",
+   "zh": "AI 检索规范，人工审核合规性"
+  },
   "Check dimensions of materials to be used and assign numbers to lists of materials.": {
    "ms": "Memeriksa ukuran dimensi bahan yang akan digunakan dan memperuntukkan nombor kod pada senarai bahan.",
    "zh": "核对所需材料的尺寸规格，并为材料清单编制编号。"
@@ -1696,6 +2520,14 @@
   "BIM software automatically schedules and tallies dimensions and material quantities directly from digital models.": {
    "ms": "Perisian BIM menjadualkan dan mengira dimensi serta kuantiti bahan secara automatik terus daripada model digital.",
    "zh": "BIM 软件直接从数字模型中自动生成明细表，并统计尺寸与材料工程量。"
+  },
+  "List material quantities": {
+   "ms": "Menyenaraikan kuantiti bahan",
+   "zh": "编制材料工程量清单"
+  },
+  "BIM software tallies materials automatically": {
+   "ms": "Perisian BIM mengira bahan secara automatik",
+   "zh": "BIM 软件自动统计材料用量"
   },
   "Explain drawings to production or construction teams and provide adjustments as necessary.": {
    "ms": "Menerangkan lukisan kepada pasukan pengeluaran atau pembinaan dan membuat pelarasan jika perlu.",
@@ -1705,6 +2537,14 @@
    "ms": "Menerangkan reka bentuk kepada jurutera tapak dan kontraktor tempatan memerlukan komunikasi interpersonal secara langsung dan pertimbangan kontekstual.",
    "zh": "向现场工程师和本地承包商阐述设计方案，需要面对面的人际沟通和情境判断。"
   },
+  "Explain drawings to contractors": {
+   "ms": "Menerangkan lukisan kepada kontraktor",
+   "zh": "向承包商技术交底图纸"
+  },
+  "Clear communication needs a person": {
+   "ms": "Komunikasi yang jelas memerlukan sentuhan manusia",
+   "zh": "清晰的沟通离不开人工协调"
+  },
   "Represent architect or engineer on construction site, ensuring builder compliance with design specifications and advising on design corrections, under supervision.": {
    "ms": "Mewakili arkitek atau jurutera di tapak pembinaan, memastikan pemaju mematuhi spesifikasi reka bentuk dan memberi nasihat pembetulan reka bentuk, di bawah penyeliaan.",
    "zh": "在监督下代表建筑师或工程师常驻施工现场，确保施工符合设计规范并就设计修正提出建议。"
@@ -1712,6 +2552,14 @@
   "On-site inspection to verify builder compliance requires physical presence and real-time situational assessment.": {
    "ms": "Pemeriksaan di tapak untuk mengesahkan pematuhan pembina memerlukan kehadiran fizikal dan penilaian situasi masa nyata.",
    "zh": "核实施工合规性的现场检验需要亲临现场并进行实时评估。"
+  },
+  "Inspect construction sites": {
+   "ms": "Memeriksa tapak pembinaan",
+   "zh": "视察施工现场"
+  },
+  "Site checks need physical presence": {
+   "ms": "Pemeriksaan tapak memerlukan kehadiran fizikal",
+   "zh": "现场检查需要亲自到场"
   },
   "Check figures, postings, and documents for correct entry, mathematical accuracy, and proper codes.": {
    "ms": "Memeriksa angka, catatan lejar dan dokumen untuk ketepatan kemasukan, ketepatan pengiraan dan kod yang betul.",
@@ -1721,6 +2569,14 @@
    "ms": "Pengekstrakan dokumen AI mengesahkan angka, catatan dan kod cukai merentas resit dan invois secara automatik tanpa semakan manual.",
    "zh": "AI 文件提取工具自动核实收据和发票上的数据、过账及税码，无需人工核对。"
   },
+  "Verify financial figures": {
+   "ms": "Mengesahkan angka kewangan",
+   "zh": "核实财务数据"
+  },
+  "Software checks invoice math automatically": {
+   "ms": "Perisian menyemak kira-kira invois secara automatik",
+   "zh": "软件自动核算发票金额"
+  },
   "Classify, record, and summarize numerical and financial data to compile and keep financial records, using journals and ledgers or computers.": {
    "ms": "Mengelas, merekod dan meringkaskan data kewangan untuk menyusun dan menyimpan rekod perakaunan menggunakan lejar atau komputer.",
    "zh": "利用账簿或电脑对数值与财务数据进行分类、记录和汇总，以编制并保存财务记录。"
@@ -1728,6 +2584,14 @@
   "Cloud accounting systems automatically classify and post routine ledger entries using predefined rule sets and machine-learned patterns.": {
    "ms": "Sistem perakaunan awan mengelas dan mengepos catatan lejar rutin secara automatik menggunakan set peraturan pratetap dan corak pembelajaran mesin.",
    "zh": "云端会计系统利用预设规则和机器学习模式，自动分类并录入日常分类账分录。"
+  },
+  "Record ledger entries": {
+   "ms": "Merekod catatan lejar",
+   "zh": "记录总账条目"
+  },
+  "Accounting software logs entries automatically": {
+   "ms": "Perisian perakaunan merekod catatan secara automatik",
+   "zh": "会计软件自动记账"
   },
   "Match order forms with invoices, and record the necessary information.": {
    "ms": "Memadankan borang pesanan dengan invois dan merekod maklumat berkaitan.",
@@ -1737,6 +2601,14 @@
    "ms": "Sistem pemadanan tiga hala automatik menyelaraskan pesanan pembelian (PO), nota hantaran (DO) dan invois secara elektronik.",
    "zh": "自动三方匹配系统通过电子方式交叉核对采购订单（PO）、送货单（DO）和发票。"
   },
+  "Match orders with invoices": {
+   "ms": "Memadankan pesanan dengan invois",
+   "zh": "核对订单与发票"
+  },
+  "Matching software compares documents automatically": {
+   "ms": "Perisian pemadanan membandingkan dokumen secara automatik",
+   "zh": "比对软件自动核查文件"
+  },
   "Prepare and process payroll information.": {
    "ms": "Menyedia dan memproses maklumat penggajian (payroll).",
    "zh": "编制和处理薪资（payroll）数据。"
@@ -1744,6 +2616,14 @@
   "Payroll systems automate statutory rate calculations, but clerks must still review irregular allowances, medical claims, and overtime hours.": {
    "ms": "Sistem payroll mengautomasikan pengiraan caruman statutori, namun kerani masih perlu menyemak elaun tidak tetap, tuntutan perubatan dan kerja lebih masa (OT).",
    "zh": "薪资系统能自动计算法定扣缴额，但文员仍需审核非固定津贴、医疗索赔和加班工时（OT）。"
+  },
+  "Process payroll data": {
+   "ms": "Memproses data gaji",
+   "zh": "处理薪资数据"
+  },
+  "Software calculates pay, you check claims": {
+   "ms": "Perisian mengira gaji, anda menyemak tuntutan",
+   "zh": "软件计算薪资，你负责审核报销"
   },
   "Reconcile records of bank transactions.": {
    "ms": "Menyelaras rekod transaksi bank (penyesuaian akaun bank).",
@@ -1753,6 +2633,14 @@
    "ms": "Suapan bank mencadangkan pemadanan automatik, sementara kerani menyemak item baris yang tidak sepadan dan pengecualian bayaran secara manual.",
    "zh": "银行数据流自动提示匹配项，文员则手动复核未匹配项目和异常款项。"
   },
+  "Reconcile bank records": {
+   "ms": "Menyesuaikan rekod bank",
+   "zh": "进行银行对账"
+  },
+  "Bank feeds match lines, you verify": {
+   "ms": "Suapan bank memadankan transaksi, anda mengesahkannya",
+   "zh": "银行流水自动匹配，你负责核实"
+  },
   "Reconcile or note and report discrepancies found in records.": {
    "ms": "Menyelaras atau mencatat serta melaporkan percanggahan yang ditemui dalam rekod.",
    "zh": "核对或记录并汇报账目记录中的差异。"
@@ -1760,6 +2648,14 @@
   "Investigating disputed payments, contact with suppliers, and resolving undocumented discrepancies require direct human communication and problem-solving.": {
    "ms": "Menyiasat pertikaian pembayaran, berhubung dengan pembekal, dan menyelesaikan percanggahan tanpa dokumen memerlukan komunikasi langsung manusia dan kemahiran menyelesaikan masalah.",
    "zh": "调查有争议的款项、联系供应商及处理无凭证差异，需要直接的人工沟通与问题解决能力。"
+  },
+  "Investigate payment disputes": {
+   "ms": "Menyiasat pertikaian pembayaran",
+   "zh": "调查付款争议"
+  },
+  "Resolving supplier issues needs human tact": {
+   "ms": "Menyelesaikan isu pembekal memerlukan diplomasi manusia",
+   "zh": "解决供应商纠纷需要人际沟通手腕"
   },
   "Complete and submit tax forms and returns, workers' compensation forms, pension contribution forms, and other government documents.": {
    "ms": "Melengkapkan dan mengemukakan borang cukai, borang pampasan pekerja, borang caruman KWSP/pencen, dan dokumen rasmi kerajaan yang lain.",
@@ -1769,6 +2665,14 @@
    "ms": "Perisian statutori menyediakan pemfailan KWSP, SOCSO dan cukai, manakala kerani mengesahkan jumlah dan menguruskan penghantaran akhir di portal.",
    "zh": "法定申报软件自动生成EPF、SOCSO及税务申报表，由文员核对总额并完成门户网站提交。"
   },
+  "Submit statutory forms": {
+   "ms": "Menghantar borang statutori",
+   "zh": "呈交法定表格"
+  },
+  "Software drafts forms, you submit them": {
+   "ms": "Perisian merangka borang, anda menghantarnya",
+   "zh": "软件起草表格，你负责呈交"
+  },
   "Direct availability and allocation of materials, supplies, and finished products.": {
    "ms": "Mengurus ketersediaan dan peruntukan bahan, bekalan dan produk siap.",
    "zh": "统筹调配原材料、物料及制成品供应。"
@@ -1776,6 +2680,14 @@
   "AI forecasting tools optimize inventory allocation while specialists manage real-world stock constraints and supplier lead times.": {
    "ms": "Alat ramalan AI mengoptimumkan peruntukan inventori manakala pakar mengurus kekangan stok sebenar dan tempoh masa pembekal.",
    "zh": "AI预测工具优化库存分配，专员负责协调实际库存限制及供应商交期。"
+  },
+  "Allocate stock and materials": {
+   "ms": "Mengagihkan stok dan bahan",
+   "zh": "调配库存与物料"
+  },
+  "AI forecasts demand, you manage supply": {
+   "ms": "AI meramal permintaan, anda mengurus bekalan",
+   "zh": "AI 预测需求，你统筹供应"
   },
   "Redesign the movement of goods to maximize value and minimize costs.": {
    "ms": "Mereka bentuk semula pergerakan barangan bagi memaksimumkan nilai dan meminimumkan kos.",
@@ -1785,6 +2697,14 @@
    "ms": "Model AI mencadangkan laluan kargo dan reka bentuk rangkaian optimum, yang disahkan oleh pakar berdasarkan infrastruktur tempatan dan kos sebenar.",
    "zh": "AI模型推荐最佳货运路线与网络设计，由专员结合本地基建与实际成本进行评估。"
   },
+  "Reroute freight shipments": {
+   "ms": "Mengubah laluan penghantaran kargo",
+   "zh": "调整货运路线"
+  },
+  "AI maps routes, you check practicality": {
+   "ms": "AI memetakan laluan, anda menyemak kebolehlaksanaannya",
+   "zh": "AI 规划路线，你把关可行性"
+  },
   "Collaborate with other departments as necessary to meet customer requirements, to take advantage of sales opportunities or, in the case of shortages, to minimize negative impacts on a business.": {
    "ms": "Bekerjasama dengan jabatan lain untuk memenuhi keperluan pelanggan, merebut peluang jualan, atau mengurangkan kesan negatif semasa kekurangan bekalan.",
    "zh": "与各部门协作以满足客户需求、把握销售良机，并在缺货时将业务负面影响降至最低。"
@@ -1792,6 +2712,14 @@
   "Cross-functional alignment and crisis negotiation during product shortages require human relationship management and judgment.": {
    "ms": "Penyelarasan rentas fungsi dan rundingan krisis semasa kekurangan produk memerlukan pengurusan hubungan dan pertimbangan manusia.",
    "zh": "缺货期间的跨部门协调与危机谈判，高度依赖人际沟通与专业判断。"
+  },
+  "Manage stock shortages": {
+   "ms": "Mengurus kekurangan stok",
+   "zh": "应对缺货问题"
+  },
+  "Crisis negotiation needs human judgment": {
+   "ms": "Rundingan krisis memerlukan pertimbangan manusia",
+   "zh": "危机谈判需要人为判断"
   },
   "Review logistics performance with customers against targets, benchmarks, and service agreements.": {
    "ms": "Menilai prestasi logistik bersama pelanggan berdasarkan sasaran, penanda aras dan perjanjian perkhidmatan.",
@@ -1801,6 +2729,14 @@
    "ms": "Papan pemuka AI memantau metrik SLA secara masa nyata manakala pakar mengendalikan perbincangan prestasi dan rundingan pelanggan.",
    "zh": "AI仪表板实时监控SLA指标，专员负责绩效商讨与客户谈判。"
   },
+  "Review client performance": {
+   "ms": "Menyemak prestasi pelanggan",
+   "zh": "评估客户表现"
+  },
+  "Dashboards track metrics, you lead reviews": {
+   "ms": "Papan pemuka menjejak metrik, anda mengetuai semakan",
+   "zh": "仪表板追踪指标，你主导复盘评估"
+  },
   "Manage subcontractor activities, reviewing proposals, developing performance specifications, and serving as liaisons between subcontractors and organizations.": {
    "ms": "Mengurus aktiviti subkontraktor, menyemak cadangan, menetapkan spesifikasi prestasi, dan menjadi perantara antara subkontraktor dan organisasi.",
    "zh": "管理分包商工作，审核方案、制定绩效标准，并担任分包商与机构之间的对接桥梁。"
@@ -1808,6 +2744,14 @@
   "Subcontractor selection, relationship management, and contract enforcement rely heavily on interpersonal trust and human evaluation.": {
    "ms": "Pemilihan subkontraktor, pengurusan hubungan dan penguatkuasaan kontrak sangat bergantung pada kepercayaan interpersonal dan penilaian manusia.",
    "zh": "分包商甄选、关系维护与合同执行，高度依赖人际信任与人工综合评估。"
+  },
+  "Manage vendor relationships": {
+   "ms": "Mengurus hubungan vendor",
+   "zh": "维护供应商关系"
+  },
+  "Building vendor trust needs people": {
+   "ms": "Membina kepercayaan vendor memerlukan sentuhan manusia",
+   "zh": "建立供应商信任需要人与人的连接"
   },
   "Report project plans, progress, and results.": {
    "ms": "Melaporkan pelan, kemajuan dan hasil projek.",
@@ -1817,6 +2761,14 @@
    "ms": "Alat pelaporan automatik dan integrasi aliran kerja menjana laporan status logistik terus daripada sistem ERP.",
    "zh": "自动化报告工具与工作流集成可直接从ERP系统生成物流状态报告。"
   },
+  "Report project progress": {
+   "ms": "Melaporkan kemajuan projek",
+   "zh": "汇报项目进度"
+  },
+  "ERP tools generate reports automatically": {
+   "ms": "Alat ERP menjana laporan secara automatik",
+   "zh": "ERP 工具自动生成报告"
+  },
   "Stay informed of logistics technology advances and apply appropriate technology to improve logistics processes.": {
    "ms": "Kekal peka dengan kemajuan teknologi logistik dan mengaplikasikan teknologi yang sesuai untuk menambah baik proses logistik.",
    "zh": "跟进最新物流技术动向，并引入合适技术优化物流流程。"
@@ -1824,6 +2776,14 @@
   "Evaluating and adopting new warehouse and freight technologies requires strategic business insight and contextual assessment.": {
    "ms": "Menilai dan menerima pakai teknologi pergudangan dan kargo baharu memerlukan wawasan perniagaan strategik dan penilaian situasi.",
    "zh": "评估与引进新型仓储及货运技术，需具备战略商业洞察力和实景研判能力。"
+  },
+  "Evaluate new logistics tech": {
+   "ms": "Menilai teknologi logistik baharu",
+   "zh": "评估新型物流技术"
+  },
+  "Strategic tech choices need human insight": {
+   "ms": "Keputusan strategik teknologi memerlukan wawasan manusia",
+   "zh": "战略技术抉择需要人工洞察"
   },
   "Receive checks and cash for deposit, verify amounts, and check accuracy of deposit slips.": {
    "ms": "Menerima cek dan tunai untuk deposit, mengesahkan jumlah, dan menyemak ketepatan slip deposit.",
@@ -1833,6 +2793,14 @@
    "ms": "Mesin deposit tunai dan teknologi pengecaman aksara optik (OCR) semakin banyak mengesahkan slip, wang kertas dan deposit cek secara automatik.",
    "zh": "自动存款机与光学字符识别技术正逐步实现对存款单、纸币及支票存款的自动核验。"
   },
+  "Deposit cash and cheques": {
+   "ms": "Deposit tunai dan cek",
+   "zh": "存入现金和支票"
+  },
+  "Deposit machines verify money automatically": {
+   "ms": "Mesin deposit sahkan wang secara automatik",
+   "zh": "存款机自动验钞"
+  },
   "Cash checks and pay out money after verifying that signatures are correct, that written and numerical amounts agree, and that accounts have sufficient funds.": {
    "ms": "Menunaikan cek dan membayar wang tunai selepas mengesahkan tandatangan, memastikan ketepatan jumlah perkataan dan angka, serta akaun mempunyai baki mencukupi.",
    "zh": "核实签名无误、文字与数字金额一致且账户余额充足后，办理支票兑现及现金支付。"
@@ -1840,6 +2808,14 @@
   "Automated teller machines and digital fund transfers replace most over-the-counter cheque cashing and cash withdrawals.": {
    "ms": "Mesin juruwang automatik (ATM) dan pemindahan dana digital menggantikan sebahagian besar urusan penunaian cek dan pengeluaran tunai di kaunter.",
    "zh": "自动柜员机（ATM）与线上转账已取代大部分柜台支票兑现和现金提款业务。"
+  },
+  "Pay out cash withdrawals": {
+   "ms": "Urus pengeluaran wang tunai",
+   "zh": "处理现金提款"
+  },
+  "ATMs and online transfers handle withdrawals": {
+   "ms": "ATM dan pindahan dalam talian urus pengeluaran",
+   "zh": "ATM和在线转账处理提款"
   },
   "Enter customers' transactions into computers to record transactions and issue computer-generated receipts.": {
    "ms": "Memasukkan transaksi pelanggan ke dalam komputer untuk merekodkan transaksi dan mengeluarkan resit janaan komputer.",
@@ -1849,6 +2825,14 @@
    "ms": "Sistem perbankan teras dan platform perbankan digital merekodkan transaksi dan menjana resit elektronik secara automatik.",
    "zh": "核心银行系统与数码银行平台可自动记录交易并生成电子收据。"
   },
+  "Record customer transactions": {
+   "ms": "Rekod transaksi pelanggan",
+   "zh": "记录客户交易"
+  },
+  "Banking systems log transactions automatically": {
+   "ms": "Sistem perbankan log transaksi secara automatik",
+   "zh": "银行系统自动记录交易"
+  },
   "Balance currency, coin, and checks in cash drawers at ends of shifts and calculate daily transactions, using computers, calculators, or adding machines.": {
    "ms": "Mengimbangi wang tunai, syiling dan cek dalam laci wang pada akhir syif serta mengira transaksi harian menggunakan komputer atau mesin kira.",
    "zh": "在每班交接时清点钱箱中的现金、硬币及支票，使用电脑或计算器核算当日交易总额。"
@@ -1856,6 +2840,14 @@
   "Automated cash recyclers and smart vault software tally cash counts, while tellers handle physical sign-offs and variance reviews.": {
    "ms": "Mesin kitar semula tunai automatik dan perisian bilik kebal pintar mengira wang tunai, manakala juruwang menguruskan pengesahan fizikal dan semakan percanggahan.",
    "zh": "自动存取款一体机与智能金库软件自动清点现金，柜员负责签字确认与差错核查。"
+  },
+  "Balance cash drawer": {
+   "ms": "Imbang laci tunai",
+   "zh": "核对现金抽屉"
+  },
+  "Cash recyclers count, you sign off": {
+   "ms": "Mesin kitar tunai mengira, anda sahkan",
+   "zh": "现金存取机清点，您负责确认"
   },
   "Resolve problems or discrepancies concerning customers' accounts.": {
    "ms": "Menyelesaikan masalah atau percanggahan yang berkaitan dengan akaun pelanggan.",
@@ -1865,6 +2857,14 @@
    "ms": "Alat diagnostik AI membantu mengesan ralat transaksi dan sekatan akaun, manakala juruwang menguruskan interaksi pelanggan dan penyelesaian isu.",
    "zh": "AI诊断工具协助标记交易异常与账户冻结，柜员负责与客户沟通并跟进处理。"
   },
+  "Resolve account issues": {
+   "ms": "Selesaikan isu akaun",
+   "zh": "解决账户问题"
+  },
+  "AI flags errors, you help customers": {
+   "ms": "AI kesan ralat, anda bantu pelanggan",
+   "zh": "AI标记错误，您协助客户"
+  },
   "Explain, promote, or sell products or services, such as travelers' checks, savings bonds, money orders, and cashier's checks, using computerized information about customers to tailor recommendations.": {
    "ms": "Menerangkan, mempromosikan atau menjual produk atau perkhidmatan seperti cek kembara, bon simpanan, kiriman wang dan cek jurubank, menggunakan maklumat pelanggan untuk cadangan yang sesuai.",
    "zh": "运用客户数据系统量身定制推荐，向客户介绍、推广或销售旅行支票、储蓄债券、汇票及银行本票等产品或服务。"
@@ -1872,6 +2872,14 @@
   "Customer intelligence engines suggest relevant financial products, but tellers explain features and build rapport with clients.": {
    "ms": "Enjin pintar pelanggan mencadangkan produk kewangan yang relevan, namun juruwang menerangkan ciri-ciri produk dan membina hubungan baik dengan pelanggan.",
    "zh": "客户智能分析引擎推荐匹配的金融产品，由柜员讲解产品特点并与客户建立良好关系。"
+  },
+  "Offer banking products": {
+   "ms": "Tawar produk perbankan",
+   "zh": "推荐银行产品"
+  },
+  "App suggests options, you build trust": {
+   "ms": "Aplikasi cadang pilihan, anda bina kepercayaan",
+   "zh": "应用推荐方案，您建立客户信任"
   },
   "Answer telephones and assist customers with their questions.": {
    "ms": "Menjawab panggilan telefon dan membantu pelanggan menyelesaikan pertanyaan mereka.",
@@ -1881,6 +2889,14 @@
    "ms": "Membantu pengunjung cawangan yang mempunyai pertanyaan rumit dan kegusaran memerlukan diplomasi interpersonal serta sifat empati.",
    "zh": "处理到店客户的复杂诉求并安抚其焦虑情绪，依赖娴熟的沟通技巧与同理心。"
   },
+  "Answer customer phone calls": {
+   "ms": "Jawab panggilan telefon pelanggan",
+   "zh": "接听客户电话"
+  },
+  "Upset callers need human empathy": {
+   "ms": "Pemanggil yang beremosi perlukan empati manusia",
+   "zh": "安抚不满客户需要同理心"
+  },
   "Record patients' medical information and vital signs.": {
    "ms": "Merekod maklumat perubatan dan tanda vital pesakit.",
    "zh": "记录患者的医疗信息及生命体征。"
@@ -1888,6 +2904,14 @@
   "AI-connected telemetry and automated charting capture vital signs, but nurses verify readings and correlate them with patient status.": {
    "ms": "Telemetri berkaitan AI dan pencatatan automatik merekodkan tanda vital, namun jururawat perlu mengesahkan bacaan dan memadankannya dengan keadaan pesakit.",
    "zh": "连接 AI 的遥测和自动记录系统可采集生命体征，但护士需核实读数并结合患者状况进行分析。"
+  },
+  "Record vital signs": {
+   "ms": "Rekod tanda vital",
+   "zh": "记录生命体征"
+  },
+  "Monitors log data, you verify status": {
+   "ms": "Monitor log data, anda sahkan status",
+   "zh": "监护仪记录数据，您核实状况"
   },
   "Administer medications to patients and monitor patients for reactions or side effects.": {
    "ms": "Memberikan ubat kepada pesakit serta memantau tindak balas atau kesan sampingan.",
@@ -1897,6 +2921,14 @@
    "ms": "Pemberian ubat dan pemantauan tindak balas klinikal yang ketara memerlukan kehadiran terus jururawat di sisi katil dan pemerhatian deria.",
    "zh": "给药与观察细微的临床反应需要护理人员亲临床前并进行直观观察。"
   },
+  "Give medicine to patients": {
+   "ms": "Beri ubat kepada pesakit",
+   "zh": "为病人给药"
+  },
+  "Spotting side effects needs bedside observation": {
+   "ms": "Mengesan kesan sampingan perlukan pemerhatian rapi",
+   "zh": "观察药物副作用需要床边看护"
+  },
   "Maintain accurate, detailed reports and records.": {
    "ms": "Menyenggara laporan dan rekod yang tepat serta terperinci.",
    "zh": "保持准确、详尽的报告和记录。"
@@ -1904,6 +2936,14 @@
   "Document extraction and language tools help summarize nursing notes, though nurses must validate the record.": {
    "ms": "Alat pengekstrakan dokumen dan pemprosesan bahasa membantu meringkaskan nota kejururawatan, namun jururawat tetap perlu mengesahkan rekod tersebut.",
    "zh": "文档提取和语言工具有助于总结护理记录，但护士必须核实相关记录。"
+  },
+  "Update patient records": {
+   "ms": "Kemas kini rekod pesakit",
+   "zh": "更新病人病历"
+  },
+  "AI drafts notes, you check accuracy": {
+   "ms": "AI draf nota, anda semak ketepatan",
+   "zh": "AI起草记录，您核对准确度"
   },
   "Monitor, record, and report symptoms or changes in patients' conditions.": {
    "ms": "Memantau, merekod dan melaporkan gejala atau perubahan keadaan pesakit.",
@@ -1913,6 +2953,14 @@
    "ms": "Sistem sokongan keputusan klinikal memberi amaran awal tentang kemerosotan pesakit, tetapi jururawat menilai keadaan pesakit secara menyeluruh.",
    "zh": "临床决策支持系统可提示早期恶化趋势，但仍需护士综合评估患者的整体状况。"
   },
+  "Track patient symptoms": {
+   "ms": "Pantau simptom pesakit",
+   "zh": "跟踪病人症状"
+  },
+  "Software flags changes, you evaluate patient": {
+   "ms": "Perisian tanda perubahan, anda nilai pesakit",
+   "zh": "软件提示变化，您评估病人状况"
+  },
   "Consult and coordinate with healthcare team members to assess, plan, implement, or evaluate patient care plans.": {
    "ms": "Berbincang dan menyelaras dengan ahli pasukan kesihatan untuk menilai, merancang, melaksana atau menyemak pelan penjagaan pesakit.",
    "zh": "与医疗团队成员沟通协调，以评估、规划、执行或审查患者护理计划。"
@@ -1920,6 +2968,14 @@
   "Interprofessional rounds and multi-specialty care planning require collaborative dialogue, bedside context, and clinical judgment.": {
    "ms": "Pusingan wad antara profesional dan perancangan penjagaan pelbagai kepakaran memerlukan dialog kolaboratif, konteks di sisi katil serta pertimbangan klinikal.",
    "zh": "跨专业查房和多专科护理规划需要协同沟通、床边实况了解及临床判断。"
+  },
+  "Plan care with team": {
+   "ms": "Rancang pelan rawatan bersama pasukan",
+   "zh": "与团队制定护理方案"
+  },
+  "Team discussions need human clinical judgment": {
+   "ms": "Perbincangan pasukan perlukan penilaian klinikal manusia",
+   "zh": "团队讨论需要临床专业判断"
   },
   "Prepare patients for and assist with examinations or treatments.": {
    "ms": "Menyediakan pesakit dan membantu semasa pemeriksaan atau rawatan.",
@@ -1929,6 +2985,14 @@
    "ms": "Persediaan fizikal amali, penetapan posisi dan menenangkan pesakit yang cemas semasa prosedur memerlukan ketangkasan fizikal dan empati.",
    "zh": "在诊疗过程中进行实际身体准备、体位摆放及安抚焦虑患者，需要灵活的身手与同理心。"
   },
+  "Prepare patients for treatment": {
+   "ms": "Sediakan pesakit untuk rawatan",
+   "zh": "做好病人治疗前准备"
+  },
+  "Gentle hands and comfort need nurses": {
+   "ms": "Sentuhan prihatin dan keselesaan perlukan jururawat",
+   "zh": "贴心照料与安抚离不开护士"
+  },
   "Instruct individuals, families, or other groups on topics such as health education, disease prevention, or childbirth and develop health improvement programs.": {
    "ms": "Memberi bimbingan kepada individu, keluarga atau kumpulan tentang pendidikan kesihatan, pencegahan penyakit atau kelahiran anak, serta membina program peningkatan kesihatan.",
    "zh": "向个人、家庭或团体指导健康教育、疾病预防或分娩等知识，并制定健康改善计划。"
@@ -1936,6 +3000,14 @@
   "Generative tools assist in drafting accessible patient education materials, while the nurse delivers contextual guidance to families.": {
    "ms": "Alat generatif membantu merangka bahan pendidikan pesakit yang mudah difahami, manakala jururawat memberi panduan mengikut situasi pesakit kepada keluarga.",
    "zh": "生成式工具有助于起草通俗易懂的患者宣教资料，而护士则针对具体情况向家属提供指导。"
+  },
+  "Teach patients about health": {
+   "ms": "Beri bimbingan kesihatan kepada pesakit",
+   "zh": "为病人普及健康常识"
+  },
+  "AI drafts guides, you explain details": {
+   "ms": "AI draf panduan, anda terangkan butiran",
+   "zh": "AI起草指南，您讲解细节"
   },
   "Supervise and monitor students' use of tools and equipment.": {
    "ms": "Menyelia dan memantau penggunaan alatan dan peralatan oleh pelajar.",
@@ -1945,6 +3017,14 @@
    "ms": "Keselamatan bengkel fizikal dan penyeliaan manual langsung mesti diuruskan secara aktif oleh pengajar manusia.",
    "zh": "实体车间安全和现场实操监督必须由导师亲自把关。"
   },
+  "Supervise workshop tool use": {
+   "ms": "Selia penggunaan peralatan bengkel",
+   "zh": "监督车间工具使用"
+  },
+  "Workshop safety needs direct eyes": {
+   "ms": "Keselamatan bengkel perlukan pemantauan secara langsung",
+   "zh": "车间安全需要现场时刻留意"
+  },
   "Observe and evaluate students' work to determine progress, provide feedback, and make suggestions for improvement.": {
    "ms": "Memerhati dan menilai hasil kerja pelajar untuk memantau kemajuan, memberi maklum balas serta mencadangkan penambahbaikan.",
    "zh": "观察并评估学生的作业/表现以确定进度，提供反馈并提出改进建议。"
@@ -1952,6 +3032,14 @@
   "Evaluating physical craftsmanship, manual dexterity, and practical technique requires real-time human observation.": {
    "ms": "Penilaian pertukangan fizikal, ketangkasan manual dan teknik praktikal memerlukan pemerhatian manusia secara langsung.",
    "zh": "评估工艺水准、动手灵巧度及实际操作技术需要导师的即时观察。"
+  },
+  "Check student practical work": {
+   "ms": "Semak tugasan praktikal pelajar",
+   "zh": "检查学生实作作业"
+  },
+  "Judging hands-on craft needs human eyes": {
+   "ms": "Menilai kerja tangan memerlukan mata manusia",
+   "zh": "评估手工实操仍需肉眼把关"
   },
   "Conduct on-the-job training classes or training sessions to teach and demonstrate principles, techniques, procedures, or methods of designated subjects.": {
    "ms": "Mengendalikan kelas atau sesi latihan sambil kerja bagi mengajar dan menunjukkan prinsip, teknik, prosedur atau kaedah bagi subjek yang ditetapkan.",
@@ -1961,6 +3049,14 @@
    "ms": "Menunjukkan prosedur sentuhan dan pengendalian alatan memerlukan kehadiran fizikal serta interaksi masa nyata.",
    "zh": "演示触觉操作程序与工具使用需要身在现场进行即时互动。"
   },
+  "Demonstrate practical skills": {
+   "ms": "Tunjuk cara kemahiran praktikal",
+   "zh": "示范实操技能"
+  },
+  "Showing tool use needs physical presence": {
+   "ms": "Menunjukkan penggunaan alatan memerlukan kehadiran fizikal",
+   "zh": "演示工具使用需亲自在场"
+  },
   "Present lectures and conduct discussions to increase students' knowledge and competence using visual aids, such as graphs, charts, videotapes, and slides.": {
    "ms": "Menyampaikan kuliah dan mengendalikan perbincangan untuk meningkatkan pengetahuan serta kecekapan pelajar menggunakan bahan bantu visual seperti graf, carta, pita video dan slaid.",
    "zh": "运用图表、录像和演示文稿等直观教具讲授课程并组织讨论，以提升学生的知识与能力。"
@@ -1968,6 +3064,14 @@
   "Generative media and AI presentation tools help instructors rapidly design engaging visual aids and instructional slides.": {
    "ms": "Media generatif dan alat persembahan AI membantu pengajar mereka bentuk bahan bantu visual dan slaid pengajaran yang menarik dengan pantas.",
    "zh": "生成式媒体和 AI 演示工具有助于导师快速制作生动吸引的直观教具与教学课件。"
+  },
+  "Deliver class lectures": {
+   "ms": "Menyampaikan kuliah kelas",
+   "zh": "进行课堂授课"
+  },
+  "AI designs slides, you teach class": {
+   "ms": "AI mereka bentuk slaid, anda mengajar kelas",
+   "zh": "AI 设计幻灯片，你负责讲课"
   },
   "Administer oral, written, or performance tests to measure progress and to evaluate training effectiveness.": {
    "ms": "Mengendalikan ujian lisan, bertulis atau amali bagi mengukur kemajuan dan menilai keberkesanan latihan.",
@@ -1977,6 +3081,14 @@
    "ms": "AI boleh merangka bank soalan bertulis dan menganalisis statistik ujian, manakala pengajar menyelia penilaian amali.",
    "zh": "AI 可用于生成笔试试题库并分析测试数据，而导师则统筹监督实操考核。"
   },
+  "Run student tests": {
+   "ms": "Kendalikan ujian pelajar",
+   "zh": "组织学生测验"
+  },
+  "AI writes questions, you assess skills": {
+   "ms": "AI menggubal soalan, anda menilai kemahiran",
+   "zh": "AI 出题，你评估技能"
+  },
   "Develop curricula and plan course content and methods of instruction.": {
    "ms": "Membangunkan kurikulum serta merancang kandungan kursus dan kaedah pengajaran.",
    "zh": "开发课程体系，规划课程内容与教学方法。"
@@ -1985,6 +3097,14 @@
    "ms": "Pengajar boleh menggunakan aliran kerja AI untuk menyelaraskan rangka kursus dengan cepat mengikut piawaian kompetensi industri yang sentiasa berkembang.",
    "zh": "导师可利用 AI 工作流快速调整课程大纲，以契合不断更新的行业能力标准。"
   },
+  "Plan training curriculum": {
+   "ms": "Rancang kurikulum latihan",
+   "zh": "规划培训课程"
+  },
+  "AI outlines modules, you select content": {
+   "ms": "AI merangka modul, anda pilih kandungan",
+   "zh": "AI 拟定模块，你挑选内容"
+  },
   "Prepare reports and maintain records, such as student grades, attendance rolls, and training activity details.": {
    "ms": "Menyediakan laporan dan menyenggara rekod seperti markah pelajar, kehadiran serta butiran aktiviti latihan.",
    "zh": "编制报告并维护学生成绩、出勤名册及培训活动详情等记录。"
@@ -1992,6 +3112,14 @@
   "Document processing systems can automate routine attendance tracking, mark calculation, and institutional reporting.": {
    "ms": "Sistem pemprosesan dokumen boleh mengautomasikan pengesanan kehadiran rutin, pengiraan markah dan pelaporan institusi.",
    "zh": "文档处理系统可实现日常考勤跟踪、成绩核算以及机构报告生成的自动化。无"
+  },
+  "Track attendance and grades": {
+   "ms": "Pantau kehadiran dan gred",
+   "zh": "追踪出勤与成绩"
+  },
+  "Software records marks and attendance automatically": {
+   "ms": "Perisian merekod markah dan kehadiran secara automatik",
+   "zh": "软件自动记录成绩与考勤"
   }
  }
 }

@@ -198,6 +198,7 @@ def test_tasks_come_from_onet_and_shares_follow_ticked_tasks(client):
     body = client.get("/api/roles/data_entry_clerk/tasks").json()
     assert body["onet_code"] == "43-9021.00" and "O*NET" in body["source"]
     assert all(t["label"] in {"automate", "assist", "human"} and t["reason"] for t in body["tasks"])
+    assert all(t["short"] and t["short_reason"] for t in body["tasks"])  # shown first; full text behind "Why?"
     assert round(sum(body["shares"].values()), 6) == 1.0
 
     ticked = [t["id"] for t in body["tasks"] if t["label"] == "human"]

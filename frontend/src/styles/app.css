@@ -314,19 +314,82 @@ code { font-size: .88em; background: var(--surface-2); padding: 1px 5px; border-
 .pick-fields { margin: 4px 0 2px; }
 .pick-fields .badge { margin-left: 6px; }
 .pick-group { display: grid; gap: 6px; margin-top: 4px; }
-.task-split { display: grid; gap: 10px; }
 .split-bar { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
 .split.automate, .swatch.automate { background: var(--risk); }
 .split.assist, .swatch.assist { background: var(--gold-bright); }
 .split.human, .swatch.human { background: var(--good); }
-.split-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; margin: 0; padding: 0; }
-.split-legend li { display: inline-flex; align-items: center; gap: 6px; }
 .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-.task-list { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; }
-.task-list .card { display: grid; gap: 8px; }
-.task-list .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
-.task-list .check input { margin-top: 4px; }
-.task-list .card-row { justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
+
+/* My job, task by task: verdict first, one square per task, tasks grouped into three columns. */
+.tasks-page { display: grid; gap: 22px; }
+.job-line { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--ink-soft); }
+.job-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: .35rem .85rem; border-radius: 99px; font-weight: 700; color: var(--ink); }
+.job-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; width: min(340px, 100%); padding: 8px;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow-pop); }
+.job-pop.inline { position: static; flex-basis: 100%; box-shadow: var(--shadow-card); }
+.job-pop input { width: 100%; }
+.job-pop ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.job-pop li.muted { padding: 8px 10px; }
+.job-pop li button { width: 100%; justify-content: flex-start; text-align: left; border: 0; box-shadow: none; background: none; font-weight: 500; min-height: 36px; }
+.job-pop li button:hover:not(:disabled) { background: var(--hover); }
+.job-pop li button.current { color: var(--accent); font-weight: 700; }
+.tasks-verdict { display: grid; gap: 6px; }
+.tasks-verdict h2 { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; text-wrap: balance; }
+.tasks-verdict p { margin: 0; max-width: 62ch; }
+.tasks-mine { justify-self: start; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+.task-squares { display: flex; gap: 6px; }
+.task-sq { flex: 1; max-width: 72px; min-height: 0; height: 26px; padding: 0; border: 0; border-radius: 6px; box-shadow: none; transition: opacity .3s, transform .15s; }
+.task-sq.automate, .task-sq.automate:hover:not(:disabled) { background: var(--risk); }
+.task-sq.assist, .task-sq.assist:hover:not(:disabled) { background: var(--gold-bright); }
+.task-sq.human, .task-sq.human:hover:not(:disabled) { background: var(--good); }
+.task-sq:hover:not(:disabled) { transform: translateY(-2px); }
+.task-sq.off { opacity: .2; }
+.tasks-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.tasks-min { font-weight: 500; opacity: .75; }
+.task-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.task-col { display: grid; gap: 8px; padding: 14px; border-radius: var(--radius-card); }
+.task-col.automate { background: var(--risk-bg); } .task-col.assist { background: var(--gold-bg); } .task-col.human { background: var(--good-bg); }
+.task-col-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.task-col-head h3 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 800; }
+.task-col-pct { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.task-col.automate :is(h3, .task-col-pct) { color: var(--risk); }
+.task-col.assist :is(h3, .task-col-pct) { color: var(--gold); }
+.task-col.human :is(h3, .task-col-pct) { color: var(--good); }
+.task-col-sub { margin: -4px 0 4px; font-size: .82rem; color: var(--ink-soft); }
+.task-chip { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-card); transition: opacity .3s; }
+.task-chip.off { opacity: .45; }
+.task-chip.flash { outline: 2px solid var(--accent); outline-offset: 2px; }
+.task-chip-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+.task-tick { flex: none; display: grid; place-items: center; width: 24px; height: 24px; min-height: 0; padding: 0; border-radius: 6px; border: 1.5px solid var(--line-strong); box-shadow: none; }
+.task-tick .icon { width: 15px; height: 15px; opacity: 0; }
+.task-tick[aria-pressed="true"], .task-tick[aria-pressed="true"]:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; }
+.task-tick[aria-pressed="true"] .icon { opacity: 1; }
+.task-chip-title { flex: 1; min-width: 0; font-weight: 600; }
+button.link.task-why { flex: none; font-size: .82rem; text-decoration: none; color: var(--ink-soft); }
+button.link.task-why[aria-expanded="true"] { color: var(--accent); }
+.task-detail { display: grid; gap: 6px; padding: 0 12px 12px 44px; font-size: .86rem; color: var(--ink-soft); }
+.task-detail p { margin: 0; }
+.task-onet { padding-top: 6px; border-top: 1px dashed var(--line-strong); font-size: .8rem; }
+.tasks-next { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.tasks-next h3 { margin: 0; font-size: 1rem; font-weight: 800; }
+.tasks-next-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tasks-next-grid button { display: grid; gap: 4px; justify-items: start; text-align: left; line-height: 1.35; padding: 12px 14px; border-radius: 12px; }
+.tasks-next-grid button:hover:not(:disabled) { border-color: var(--accent); }
+.tasks-next-grid span { font-weight: 400; font-size: .84rem; color: var(--ink-soft); }
+.tasks-how { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--ink-soft); }
+.card-sort { width: min(480px, 100%); display: grid; gap: 16px; }
+.card-sort-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .86rem; color: var(--ink-soft); }
+.card-sort-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+.card-sort-dots i { width: 18px; height: 4px; border-radius: 2px; background: var(--line-strong); }
+.card-sort-dots i.done { background: var(--accent); }
+.card-sort-card { display: grid; gap: 10px; align-content: center; justify-items: center; min-height: 170px; padding: 24px 18px; text-align: center; border: 1px solid var(--line); border-radius: 14px; }
+.card-sort-card strong { font-size: 1.5rem; font-weight: 800; letter-spacing: -.01em; }
+.card-sort-card .muted { font-size: .86rem; }
+.card-sort-answers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.card-sort-answers button { justify-content: center; min-height: 48px; }
+.card-sort-answers kbd { margin-left: 6px; font: 600 .7rem var(--font); opacity: .7; }
+@media (max-width: 900px) { .task-cols, .tasks-next-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .task-sq, .task-chip { transition: none; } }
 .radar-col li { flex-wrap: wrap; }
 .radar-col .radar-src { flex-basis: 100%; font-weight: 400; margin: 0; }
 
@@ -810,7 +873,6 @@ th .pick { width: 18px; height: 18px; vertical-align: middle; }
 .mys-list .bar { height: 8px; border-radius: 4px; background: var(--surface-2); position: relative; }
 .mys-list .bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--accent); }
 @media (max-width: 560px) { .mys-list li { grid-template-columns: 1fr auto; } .mys-list .bar, .mys-list small { display: none; } }
-.task-observed { display: block; color: var(--ink-soft); }
 .identity blockquote, .card-identity { margin: 8px 0; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; font-size: 1.02rem; }
 
 /* ---------- Journey: next step, progress strip, target role ---------- */

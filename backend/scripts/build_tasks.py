@@ -50,8 +50,10 @@ def main() -> None:
             task_id = f"onet-{t['task_id']}"
             old = previous.get((role_id, task_id), {})
             reviewed = old.get("reviewed_by") if old.get("label") == t["label"] else None
-            tasks.append({"id": task_id, "text": text, "label": t["label"], "reason": t["reason"],
-                          "reviewed_by": reviewed})
+            task = {"id": task_id, "text": text, "label": t["label"], "reason": t["reason"], "reviewed_by": reviewed}
+            if old.get("text") == text and old.get("reason") == t["reason"] and old.get("short"):
+                task |= {"short": old["short"], "short_reason": old["short_reason"]}  # from build_task_shorts.py
+            tasks.append(task)
         out.append({"role_id": role_id, "onet_code": code, "onet_note": entry.get("onet_note"),
                     "tasks": tasks})
 

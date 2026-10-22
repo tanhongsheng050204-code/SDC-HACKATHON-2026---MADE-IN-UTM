@@ -457,7 +457,10 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "profile" && profile && <JoinClass profile={profile} userId={userId} />}
             {screen === "admin" && <Admin />}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
-            {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
+            {screen === "tasks" && profile && (
+              <Tasks profile={profile} onNext={() => go("roles")} onPathway={() => openTarget("tree")}
+                onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
+            )}
             {screen === "roles" && profile && (
               <Roles profile={profile} scenario={scenario} year={route.year} adoption={route.adoption}
                 onScenario={(s) => { setRoute({ ...route, scenario: s, adoption: undefined }); writeRoute({ ...route, scenario: s, adoption: undefined }, "replace"); }}
