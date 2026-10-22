@@ -4,11 +4,11 @@ import datetime as dt
 import hmac
 from typing import Literal
 
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import PlainTextResponse
 from pydantic import ValidationError
 
-from app import runpod, store
+from app import ratelimit, runpod, store
 from app.auth import current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
@@ -295,8 +295,9 @@ def emerging_roles(profile_id: str | None = None, user: str | None = User):
 
 
 @router.post("/emerging/{capability_id}/search")
-def emerging_live_search(capability_id: str, body: LiveSearchRequest, user: str | None = User):
+def emerging_live_search(capability_id: str, body: LiveSearchRequest, request: Request, user: str | None = User):
     """Current job ads for an emerging title: not reviewed, never scored, limited per profile."""
+    ratelimit.check(request, "search")
     _profile_for(body.profile_id, user)
     card = store.latest_approved_evidence("emerging").get(capability_id)
     if card is None:
@@ -309,9 +310,10 @@ def emerging_live_search(capability_id: str, body: LiveSearchRequest, user: str 
         raise HTTPException(503, "The web search is unavailable right now.") from None
 
 @router.post("/roles/{role_id}/openings")
-def role_openings(role_id: str, body: LiveSearchRequest, user: str | None = User):
+def role_openings(role_id: str, body: LiveSearchRequest, request: Request, user: str | None = User):
     """Current Malaysian job ads for this role: found by a live web search, not reviewed, never
     scored; cached per role per day and limited per profile (shared with the emerging-role search)."""
+    ratelimit.check(request, "search")
     _profile_for(body.profile_id, user)
     if role_id not in get_reference().roles:
         raise HTTPException(404, "Role not found")
@@ -439,14 +441,16 @@ def import_snapshot(body: dict, x_admin_token: str = Header(default="")):
 # --- intake ----------------------------------------------------------------------------------
 
 @router.post("/intake/extract")
-def extract_skills(body: ExtractRequest):
+def extract_skills(body: ExtractRequest, request: Request):
     """CV text in, skill IDs out. The text is scrubbed and never stored."""
+    ratelimit.check(request, "cv")
     return skills.extract(body.text)
 
 
 @router.post("/intake/upload")
-async def upload_cv(file: UploadFile = File(...)):
+async def upload_cv(request: Request, file: UploadFile = File(...)):
     """A CV file in, skill IDs out. Read in memory, scrubbed before any LLM call, never stored."""
+    ratelimit.check(request, "cv")
     data = await file.read(documents.MAX_BYTES + 1)
     try:
         text = documents.read_text(file.filename or "", data)
@@ -467,8 +471,9 @@ def preview_cv(body: ExtractRequest):
 
 
 @router.post("/intake/upload/preview")
-async def preview_upload(file: UploadFile = File(...)):
+async def preview_upload(request: Request, file: UploadFile = File(...)):
     """A CV file in, its scrubbed text out. Read in memory, never stored."""
+    ratelimit.check(request, "cv")
     data = await file.read(documents.MAX_BYTES + 1)
     try:
         return _preview(documents.read_text(file.filename or "", data))
@@ -480,10 +485,11 @@ VOICE_MAX_BYTES = 5 * 1024 * 1024  # about five minutes of compressed speech
 
 
 @router.post("/voice/transcribe")
-async def transcribe(audio: UploadFile = File(...), language: str | None = Query(None, pattern="^(en|ms|zh)$")):
+async def transcribe(request: Request, audio: UploadFile = File(...), language: str | None = Query(None, pattern="^(en|ms|zh)$")):
     """Speech in, scrubbed text out. The audio is held in memory for one call and never stored or
     logged. 503 when voice is not set up or the worker is cold, so the app falls back to the
     browser's speech recognition, then typing."""
+    ratelimit.check(request, "voice")
     if not runpod.voice_available():
         raise HTTPException(503, "Voice input is not set up on this server")
     data = await audio.read(VOICE_MAX_BYTES + 1)
@@ -499,7 +505,8 @@ async def transcribe(audio: UploadFile = File(...), language: str | None = Query
 
 
 @router.post("/intake/turn")
-def intake_turn(body: IntakeTurnRequest):
+def intake_turn(body: IntakeTurnRequest, request: Request):
+    ratelimit.check(request, "intake_turn")
     return intake.turn([m.model_dump() for m in body.messages], body.language)
 
 
@@ -672,8 +679,10 @@ def get_card(card_id: str):
 
 
 @router.get("/profiles/{profile_id}/roles/{role_id}/identity")
-def role_identity(profile_id: str, role_id: str, language: Literal["en", "ms", "zh"] = "en", user: str | None = User):
+def role_identity(profile_id: str, role_id: str, request: Request, language: Literal["en", "ms", "zh"] = "en",
+                  user: str | None = User):
     """A one- or two-sentence career identity statement for this role, from your transferable skills."""
+    ratelimit.check(request, "identity", profile_id)
     ref = get_reference()
     if role_id not in ref.roles:
         raise HTTPException(404, "Role not found")
@@ -681,8 +690,9 @@ def role_identity(profile_id: str, role_id: str, language: Literal["en", "ms", "
 
 
 @router.post("/interview")
-def practise_interview(body: InterviewRequest, user: str | None = User):
+def practise_interview(body: InterviewRequest, request: Request, user: str | None = User):
     """Interview practice for one role: feedback on the last answer and the next question."""
+    ratelimit.check(request, "interview", body.profile_id)
     ref = get_reference()
     if body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
@@ -694,8 +704,9 @@ def practise_interview(body: InterviewRequest, user: str | None = User):
 
 
 @router.post("/coach")
-def ask_coach(body: CoachRequest, user: str | None = User):
+def ask_coach(body: CoachRequest, request: Request, user: str | None = User):
     """A cited answer about the person's own results, plus at most one change they can apply."""
+    ratelimit.check(request, "coach", body.profile_id)
     ref = get_reference()
     if body.role_id is not None and body.role_id not in ref.roles:
         raise HTTPException(422, "Unknown role")
@@ -726,8 +737,9 @@ def profile_tree(profile_id: str, role: str = Query(...), user: str | None = Use
 
 
 @router.post("/profiles/{profile_id}/skills/{skill_id}/checks", status_code=201)
-def start_check(profile_id: str, skill_id: str, body: CheckStart, user: str | None = User):
+def start_check(profile_id: str, skill_id: str, body: CheckStart, request: Request, user: str | None = User):
     """Three fresh questions for the next level of one skill. The answers stay on the server."""
+    ratelimit.check(request, "checks")
     ref = get_reference()
     profile = _profile_for(profile_id, user)
     if skill_id not in ref.skills:
@@ -790,8 +802,9 @@ def survey_bank():
 
 
 @router.post("/survey/interpret")
-def survey_interpret(body: InterpretRequest):
+def survey_interpret(body: InterpretRequest, request: Request):
     """How we read a free-text answer. Nothing is saved; the person confirms before it counts."""
+    ratelimit.check(request, "survey")
     return survey.interpret(get_reference(), body.text, body.language)
 
 

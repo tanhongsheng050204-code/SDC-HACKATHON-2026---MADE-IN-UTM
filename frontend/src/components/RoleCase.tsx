@@ -1,5 +1,5 @@
 import type { RoleCase as RoleCaseData } from "../lib/api";
-import { t, tr, tv } from "../lib/i18n";
+import { t, tv } from "../lib/i18n";
 
 // "Why this could work" vs "What could go wrong": two honest columns, each point with its source.
 export function RoleCase({ data }: { data: RoleCaseData }) {

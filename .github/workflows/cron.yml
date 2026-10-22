@@ -1,0 +1,65 @@
+name: Scheduled jobs
+
+# Times are UTC. Malaysia is UTC+8, so 07:00-23:00 Malaysia time is 23:00-15:00 UTC.
+# GitHub may start a scheduled run a few minutes late, and only runs schedules on the default branch.
+on:
+  schedule:
+    - cron: "*/10 23 * * *"   # keep-awake, 07:00-07:50 Malaysia time
+    - cron: "*/10 0-14 * * *" # keep-awake, 08:00-22:50
+    - cron: "0 15 * * *"      # keep-awake, 23:00
+    - cron: "0 0 * * 1"       # weekly digest, Monday 08:00 Malaysia time
+    - cron: "0 1 * * *"       # job alerts, daily 09:00 Malaysia time
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Which job to run now"
+        type: choice
+        options: [ping, weekly, alerts]
+        default: ping
+
+permissions:
+  contents: read
+
+env:
+  # Repository secret API_URL, e.g. https://laluan-api.onrender.com (no /api at the end).
+  API_URL: ${{ secrets.API_URL || 'https://laluan-api.onrender.com' }}
+
+jobs:
+  keep-awake:
+    # Render's free plan sleeps after 15 idle minutes; a ping every 10 minutes keeps it awake by day.
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule != '0 0 * * 1' && github.event.schedule != '0 1 * * *')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'ping')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping /api/health
+        run: curl -fsS --max-time 90 --retry 2 "$API_URL/api/health" -o /dev/null || echo "::warning::API did not answer"
+
+  weekly-digest:
+    # Switched on in phase 6, once POST /api/cron/weekly exists. Needs the CRON_SECRET repository secret.
+    if: >-
+      false && ((github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'weekly'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Send the weekly digest
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS --max-time 600 -X POST -H "X-Cron-Secret: $CRON_SECRET" "$API_URL/api/cron/weekly"
+
+  job-alerts:
+    # Switched on in phase 6, once POST /api/cron/alerts exists.
+    if: >-
+      false && ((github.event_name == 'schedule' && github.event.schedule == '0 1 * * *')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'alerts'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Send job alerts
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS --max-time 600 -X POST -H "X-Cron-Secret: $CRON_SECRET" "$API_URL/api/cron/alerts"

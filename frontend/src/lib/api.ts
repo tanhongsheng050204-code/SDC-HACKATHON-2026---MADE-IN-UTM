@@ -329,6 +329,14 @@ export function onAuthExpired(listener: ExpiredListener) {
   return () => { expiredListeners.delete(listener); };
 }
 
+// Too many AI requests in a short time: the API answers 429 and the shell shows a calm notice.
+type LimitListener = (retryAfterSeconds: number) => void;
+const limitListeners = new Set<LimitListener>();
+export function onRateLimited(listener: LimitListener) {
+  limitListeners.add(listener);
+  return () => { limitListeners.delete(listener); };
+}
+
 function withToken(init: RequestInit | undefined, token: string | null): RequestInit | undefined {
   if (!token) return init;
   const headers = new Headers(init?.headers);
@@ -357,6 +365,10 @@ async function fetchAwake(url: string, original?: RequestInit): Promise<Response
       // The API's own errors are JSON (e.g. 503 "proof checks are unavailable"); a sleeping host
       // answers with an HTML page. Only the latter means "wait and retry".
       const ownError = (response.headers.get("content-type") ?? "").includes("application/json");
+      if (response.status === 429) {
+        const wait = Number(response.headers.get("Retry-After"));
+        limitListeners.forEach((l) => l(Number.isFinite(wait) && wait > 0 ? wait : 60));
+      }
       if (!WAKE_STATUSES.has(response.status) || ownError || Date.now() - started > WAKE_LIMIT_MS) {
         if (attempt > 0) setWaking(false);
         return response;

@@ -42,7 +42,7 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
     const index = turns.length;
     setTurns((all) => [...all, { question: text, reply: null }]);
     try { mark(index, { reply: await api.coach(profile.id, text, scenario, roleId) }); }
-    catch { mark(index, { error: t("coach.offline") }); }
+    catch (e) { mark(index, { error: String(e).includes("429") ? t("shell.slowDown") : t("coach.offline") }); }
     finally { setBusy(false); }
   }
 

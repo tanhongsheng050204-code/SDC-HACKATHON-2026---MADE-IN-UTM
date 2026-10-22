@@ -1301,6 +1301,8 @@ const STRINGS = {
   "changes.routeSame": { en: "Your route is unchanged.", ms: "Laluan anda tidak berubah.", zh: "你的路线没有变化。" },
   "changes.source": { en: "Source: {source}, snapshot {id}. Estimates, not predictions.", ms: "Sumber: {source}, petikan {id}. Anggaran, bukan ramalan.", zh: "来源：{source}，快照 {id}。仅为估计，并非预言。" },
   "changes.gotIt": { en: "Got it", ms: "Faham", zh: "知道了" },
+  "shell.slowDown": { en: "You're going a bit fast. Please wait a few minutes before asking the AI again. Everything else still works.", ms: "Anda bergerak agak pantas. Sila tunggu beberapa minit sebelum bertanya kepada AI lagi. Semua yang lain masih berfungsi.", zh: "你的操作有点快。请等几分钟再向 AI 提问。其他功能仍可正常使用。" },
+  "shell.dismiss": { en: "Dismiss", ms: "Tutup", zh: "关闭" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

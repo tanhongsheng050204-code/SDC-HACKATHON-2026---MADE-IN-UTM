@@ -406,3 +406,7 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .forecast-changes .btn { justify-self: start; }
 @media (prefers-reduced-motion: reduce) { .forecast-changes { animation: none; } }
 :root[data-lite="1"] .forecast-changes { animation: none; }
+
+/* ---------- Rate-limit notice (429 from an AI endpoint) ---------- */
+.banner.slow-down { display: flex; gap: 12px; align-items: center; justify-content: space-between; border-radius: 22px; background: var(--sun); color: var(--ink); }
+.banner.slow-down .icon-btn { min-width: 44px; min-height: 44px; flex: none; }

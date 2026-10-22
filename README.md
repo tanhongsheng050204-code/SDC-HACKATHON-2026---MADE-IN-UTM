@@ -139,6 +139,7 @@ The **frontend is on Vercel** ([laluan-psi.vercel.app](https://laluan-psi.vercel
 | `RUNPOD_LLM_MODEL` | Only if changed | Default `Qwen/Qwen2.5-7B-Instruct`; must match the model the worker loaded |
 | `CONTACT_EMAIL` | Optional | Sent to OpenAlex with research-trend requests |
 | `OPENALEX_API_KEY` | Optional | Free key from [openalex.org](https://openalex.org). Without one, OpenAlex searches share a small daily budget per IP address (Render's addresses are shared); it is only used when arXiv refuses |
+| `SENTRY_DSN` | Optional | Error tracking: a free [Sentry](https://sentry.io) project → Project Settings → Client Keys. Events carry no request body, headers, user or local variables |
 
 Not needed: `SUPABASE_JWT_SECRET` (legacy projects only), `DATABASE_PATH`, `DATA_DIR`, `FRONTEND_DIST`.
 
@@ -149,10 +150,15 @@ Not needed: `SUPABASE_JWT_SECRET` (legacy projects only), `DATABASE_PATH`, `DATA
 | `VITE_API_URL` | The Render address without `/api`, e.g. `https://laluan-api.onrender.com` |
 | `VITE_SUPABASE_URL` | Same as `SUPABASE_URL` |
 | `VITE_SUPABASE_ANON_KEY` | Supabase → Project Settings → API Keys → Legacy API keys → `anon` (public by design; row-level security keeps the tables closed to it) |
+| `VITE_SENTRY_DSN` | Optional: the same Sentry DSN, for errors in the browser. Empty = the Sentry code is never loaded |
+
+Security headers (a Content Security Policy that allows only this site, the Render API, Supabase and Sentry; HSTS; no framing) are in [`frontend/vercel.json`](frontend/vercel.json). If the API moves to another address, update its `connect-src` too.
 
 **3. Supabase and Google login.** Enable the **Google** provider (Authentication → Sign In / Providers) with a Google Cloud OAuth client whose only authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback` (no JavaScript origins needed). Under Authentication → URL Configuration, set the Vercel address as the **Site URL** and add `https://laluan-psi.vercel.app/**` and `http://localhost:5173/**` to **Redirect URLs**. Publish the Google consent screen to production, or only listed test users can sign in. Tables are created on the API's first start.
 
 **4. After the first deploy.** On the **Admin** page (Sources → *Admin: review new data*, needs `ADMIN_TOKEN`), run **Refresh trend data** and approve it, then **Refresh skill evidence** and **Find emerging roles** and approve what checks out. Try a proof check, a CV upload and a voice clip to confirm the Gemini and RunPod keys.
+
+**5. Scheduled jobs (GitHub Actions).** [`cron.yml`](.github/workflows/cron.yml) pings `/api/health` every 10 minutes from 07:00 to 23:00 Malaysia time so the free Render service stays awake by day (about 500 of Render's 750 free hours a month). Add the repository secret `API_URL` (Settings → Secrets and variables → Actions), e.g. `https://laluan-api.onrender.com`. GitHub can start scheduled runs a few minutes late.
 
 **Before a live demo:** Render's free plan sleeps after about 15 minutes without visitors and takes up to a minute to wake (the app shows "Waking up the server…"), so open the site a minute before. Wake the RunPod workers the same way (one CV and one voice clip), or set the endpoints' active workers to 1 for the session and back to 0 afterwards.
 
@@ -180,6 +186,7 @@ The backend reads environment variables and `backend/.env` (real environment var
 | `SUPABASE_URL` | Supabase project URL; login tokens are verified against its public keys. |
 | `SUPABASE_JWT_SECRET` | Only for Supabase projects still on the legacy shared JWT secret. |
 | `FRONTEND_DIST` | Built frontend to serve at `/`, default `frontend/dist` when it exists. |
+| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Optional error tracking; empty means off. Personal data is stripped before sending. |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Build-time, for the frontend's Google login. Without them the login button is hidden. |
 | `DATA_DIR` | Reference data, default `backend/data`. |
 
@@ -257,10 +264,12 @@ Every role's growth figure is its WEF Future of Jobs 2025 category (Figure 2.3);
 
 ```powershell
 cd backend; .\.venv\Scripts\python.exe -m pytest     # 337 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
-cd frontend; npm run build                           # type check + production build
+cd frontend; npm test; npm run lint; npm run build   # Vitest component tests, ESLint, type check + production build
 ```
 
-GitHub Actions runs both on every push and pull request ([ci.yml](.github/workflows/ci.yml)).
+GitHub Actions runs all of these on every push and pull request ([ci.yml](.github/workflows/ci.yml)), and the store tests again on Postgres.
+
+AI endpoints (coach, interview practice, CV reading, voice, chat questionnaire, survey reading, proof-check questions, identity statement, live job-ad searches) are rate-limited per IP address and per profile in a 10-minute window (`backend/app/ratelimit.py`); over the limit the app shows "You're going a bit fast". Each request is logged as one JSON line (method, route template, status, milliseconds) with no IP, IDs, query string or body.
 
 Scripts in `backend/scripts/`: `check_links.py` (opens every course link and records the date), `eval_extraction.py` (skill-extraction recall on the five synthetic CVs in `backend/data/eval/`), `cleanup.py` (deletes profiles untouched for 30 days), `build_snapshot.py`, `build_tasks.py` and `build_day_in_job.py` (rebuild reference data; the last needs `GEMINI_API_KEY`), `extract_wef_figure.py` (reads WEF Figure 2.3; needs `pip install pymupdf`).
 

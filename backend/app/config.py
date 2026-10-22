@@ -42,6 +42,8 @@ class Settings:
     runpod_whisper_endpoint: str  # Serverless endpoint ID of a faster-whisper worker; empty = browser speech only
     runpod_whisper_model: str
     runpod_timeout_seconds: int
+    sentry_dsn: str  # error tracking; empty = off
+    sentry_environment: str
 
     @property
     def llm_mode(self) -> str:
@@ -85,6 +87,8 @@ def get_settings() -> Settings:
         runpod_whisper_endpoint=os.environ.get("RUNPOD_WHISPER_ENDPOINT", ""),
         runpod_whisper_model=os.environ.get("RUNPOD_WHISPER_MODEL", "small"),
         runpod_timeout_seconds=int(os.environ.get("RUNPOD_TIMEOUT_SECONDS", "20")),
+        sentry_dsn=os.environ.get("SENTRY_DSN", ""),
+        sentry_environment=os.environ.get("SENTRY_ENVIRONMENT") or "production",
         cors_origins=tuple(
             o.strip()
             for o in os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")

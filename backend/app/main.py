@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import store
+from app import observability, store
 from app.api import router
 from app.config import get_settings
 from app.reference import get_reference
@@ -27,7 +27,9 @@ async def lifespan(_: FastAPI):
     store.close_pools()
 
 
+observability.init_sentry(get_settings())  # only when SENTRY_DSN is set
 app = FastAPI(title="Laluan API", version="0.1.0", lifespan=lifespan)
+observability.install(app)  # request log without personal data, security headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(get_settings().cors_origins),

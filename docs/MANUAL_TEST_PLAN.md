@@ -298,6 +298,7 @@ Notes: ______
 - [ ] 23.3 Opening a demo while the backend is down: "Couldn't open the demo profile…" with **Dismiss**.
 - [ ] 23.4 A screen error shows "Something went wrong on this screen" with **Reload**; the sidebar still works.
 - [ ] 23.5 An expired login says to log in again and does not lose the anonymous profile.
+- [ ] 23.6 Asking the coach more than 30 times in 10 minutes: a sun-coloured notice "You're going a bit fast…" appears at the top and hides itself after about 15 seconds (or press ×); the coach panel says the same, not "offline". Other screens keep working.
 
 Notes: ______
 
@@ -308,13 +309,17 @@ Notes: ______
 - [ ] 24.3 After a CV upload, `GET /api/profiles/{id}` contains no CV text, name, email or phone.
 - [ ] 24.4 Admin endpoints (e.g. `GET /api/signals/pending`) without `X-Admin-Token` return 401.
 - [ ] 24.5 A profile owned by an account cannot be read or changed by another account or anonymously.
+- [ ] 24.6 Response headers: the site (laluan-psi.vercel.app) sends `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options: DENY` and `Permissions-Policy` with `microphone=(self)`; the browser console shows no "Refused to load/connect" errors on Today, Pathway, login and voice input. API responses under `/api` send `Content-Security-Policy: default-src 'none'…`.
+- [ ] 24.7 Render's log shows one JSON line per request (`{"method": "GET", "route": "/api/profiles/{profile_id}/matches", "status": 200, "ms": …}`) with no profile ID, IP address or question text.
+- [ ] 24.8 With `SENTRY_DSN` / `VITE_SENTRY_DSN` set: a test error appears in Sentry without the request body, headers, user, query string or IDs in the URL. Without them, no request goes to sentry.io.
 
 Notes: ______
 
 ## 25. For developers (local)
 
 - [ ] 25.1 `cd backend` → `.\.venv\Scripts\python.exe -m pytest` → all pass (352 passed, 1 skipped on 22 Oct).
-- [ ] 25.2 `cd frontend` → `npm run build` → no errors.
+- [ ] 25.2 `cd frontend` → `npm test` (Vitest), `npm run lint` (ESLint, warnings allowed) and `npm run build` → no errors.
+- [ ] 25.5 GitHub → Actions → **Scheduled jobs** → Run workflow → `ping` succeeds; scheduled pings appear every ~10 minutes between 07:00 and 23:00 Malaysia time.
 - [ ] 25.3 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.
 - [ ] 25.4 `python scripts/eval_extraction.py` prints the recall table; `python scripts/check_links.py` checks every course link.
 

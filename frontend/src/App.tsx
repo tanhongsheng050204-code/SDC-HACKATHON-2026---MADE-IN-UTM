@@ -8,7 +8,7 @@ import { Icon } from "./components/Icon";
 import { LangPicker, LiteToggle, ThemeButton, useLang, useLite, useTheme } from "./components/Preferences";
 import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
-import { api, onAuthExpired, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
+import { api, onAuthExpired, onRateLimited, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
 import { setDataText, t } from "./lib/i18n";
 import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
@@ -56,6 +56,17 @@ function MainApp({ demo }: { demo: string | null }) {
   const [offline, setOffline] = useState(false);
   const [waking, setWaking] = useState(false);
   useEffect(() => onServerWaking(setWaking), []);
+  // A 429 from an AI endpoint: one calm notice that hides itself, whatever screen asked.
+  const [slowDown, setSlowDown] = useState(false);
+  useEffect(() => {
+    let timer: number | undefined;
+    const off = onRateLimited(() => {
+      setSlowDown(true);
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => setSlowDown(false), 15_000);
+    });
+    return () => { off(); window.clearTimeout(timer); };
+  }, []);
   // BM / 中文 for role titles, skill names and other data text; redraw once they arrive.
   const [, setDataLoaded] = useState(false);
   useEffect(() => { api.translations().then((m) => { setDataText(m); setDataLoaded(true); }).catch(() => undefined); }, []);
@@ -305,6 +316,12 @@ function MainApp({ demo }: { demo: string | null }) {
   const banners = (
     <>
       {waking && <div className="banner info" role="status">{t("shell.waking")}</div>}
+      {slowDown && (
+        <div className="banner info slow-down" role="status">
+          <span>{t("shell.slowDown")}</span>
+          <button className="icon-btn" onClick={() => setSlowDown(false)} aria-label={t("shell.dismiss")}>×</button>
+        </div>
+      )}
       {offline && !waking && <div className="banner error" role="alert">{t("shell.offline")} <button className="link" onClick={checkServer}>{t("shell.retry")}</button></div>}
       {error && <div className="banner error" role="alert">{error} <button className="link" onClick={() => setError(null)}>{t("a.dismiss")}</button></div>}
     </>

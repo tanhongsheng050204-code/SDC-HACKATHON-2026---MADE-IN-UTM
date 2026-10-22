@@ -15,6 +15,7 @@ os.environ["SUPABASE_URL"] = ""
 os.environ["RUNPOD_API_KEY"] = ""
 os.environ["RUNPOD_LLM_ENDPOINT"] = ""
 os.environ["RUNPOD_WHISPER_ENDPOINT"] = ""
+os.environ["SENTRY_DSN"] = ""
 
 
 @pytest.fixture
@@ -64,3 +65,10 @@ def fresh_pathway_summaries():
     """Each test starts without cached plan summaries, so a patched Gemini is always called."""
     from app.services import pathway
     pathway._summaries.clear()
+
+
+@pytest.fixture(autouse=True)
+def fresh_rate_limits():
+    """Each test starts with empty rate-limit counters."""
+    from app import ratelimit
+    ratelimit.reset()
