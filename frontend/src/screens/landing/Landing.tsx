@@ -3,6 +3,7 @@ import { LogoMark, Rosette, WalkingGirl } from "../../components/Brand";
 import { t, tf, tr, type StringKey } from "../../lib/i18n";
 import { OUTLOOK_TEXT } from "../../lib/labels";
 import { api } from "../../lib/api";
+import { useDemoLoop } from "../../lib/demoLoop";
 import "../../styles/landing.css";
 import { HeroPreview } from "./HeroPreview";
 import { Journey } from "./Journey";
@@ -134,6 +135,38 @@ function RouteWalker({ track, stopsX }: { track: RefObject<SVGPathElement>; stop
   return <div ref={box} className="rb-walker"><WalkingGirl /></div>;
 }
 
+// "Starts from what you already have", played live: the CV shows a (synthetic) name, email and
+// phone, a scan line blacks each one out, then the skills pop in one by one. Loops while on screen.
+const REDACT_PHASES = [1300, 700, 700, 700, 500, 450, 450, 450, 3000];
+const PII = ["Aisyah binti Ahmad", "aisyah.ahmad@mail.my", "012-345 6789"];
+
+function RedactDemo() {
+  const box = useRef<HTMLDivElement>(null);
+  const phase = useDemoLoop(box, REDACT_PHASES);
+  const skills = [t("lp.sk1"), t("lp.sk2"), t("lp.sk3"), t("lp.sk4")];
+  const scanning = phase >= 1 && phase <= 3;
+  return (
+    <div className="lp-redact is-live" ref={box} aria-hidden="true">
+      <div className={`lp-doc ${scanning ? "is-scanning" : ""}`}>
+        <p className="jp-label">cv_aisyah.pdf</p>
+        <p className="lp-pii">{PII.map((v, i) => (
+          <span key={v}>{i > 0 && " · "}<mark className={phase >= i + 1 ? "is-hidden" : ""}>{v}</mark></span>
+        ))}</p>
+        <p>{t("lp.cvLine1")}</p>
+        <p>{t("lp.cvLine2")}</p>
+        <p className={`lp-removed ${phase >= 4 ? "is-on" : ""}`}>{t("jy.removed")}</p>
+      </div>
+      <span className={`lp-arrow ${phase >= 4 ? "is-on" : ""}`}>→</span>
+      <div className="lp-doc">
+        <p className="jp-label">{t("lp.confirm")}</p>
+        <div className="chips">
+          {skills.map((s, i) => <span key={s} className={`chip covered lp-pop ${phase >= 5 + i ? "is-on" : ""}`}>✓ {s}</span>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Live numbers from the API; if the server is asleep the tiles keep fixed text instead of waiting.
 function LiveStats() {
   const [roles, setRoles] = useState<number | null>(null);
@@ -213,21 +246,7 @@ export function Landing({ nav, banners, model, prefs, onStart, onDemo, onHr, onS
 
         <section className="lp-frame lp-split">
           <h2 className="lp-two-tone"><span>{t("lp.startH")}</span> {t("lp.startSub")}</h2>
-          <div className="lp-redact" aria-hidden="true">
-            <div className="lp-doc">
-              <p className="jp-label">cv_aisyah.pdf</p>
-              <p><mark>████████ ██████</mark> · <mark>████@█████.com</mark> · <mark>01█-███ ████</mark></p>
-              <p>{t("lp.cvLine1")}</p>
-              <p>{t("lp.cvLine2")}</p>
-            </div>
-            <span className="lp-arrow">→</span>
-            <div className="lp-doc">
-              <p className="jp-label">{t("lp.confirm")}</p>
-              <div className="chips">
-                {[t("lp.sk1"), t("lp.sk2"), t("lp.sk3"), t("lp.sk4")].map((s) => <span key={s} className="chip covered">✓ {s}</span>)}
-              </div>
-            </div>
-          </div>
+          <RedactDemo />
         </section>
 
         <section className="lp-frame lp-flush" id="journey">

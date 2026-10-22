@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { stillMode } from "../../lib/demoLoop";
 import { t, tr } from "../../lib/i18n";
 import { TASK_LABEL, TREND_TEXT } from "../../lib/labels";
 
@@ -83,24 +84,46 @@ const steps = (): Step[] => [
   },
 ];
 
+// Plays by itself like a demo: each step for STEP_MS while the section is on screen. Clicking a step
+// takes over (auto-play stops). A thin bar under the current step shows the time left.
+const STEP_MS = 4500;
+
 export function Journey() {
   const [active, setActive] = useState(0);
+  const [auto, setAuto] = useState(() => !stillMode());
+  const [visible, setVisible] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
   const all = steps();
   const step = all[active];
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setVisible(true); return; }
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!auto || !visible) return;
+    const id = window.setTimeout(() => setActive((a) => (a + 1) % all.length), STEP_MS);
+    return () => window.clearTimeout(id);
+  }, [auto, visible, active, all.length]);
+
   return (
-    <div className="lp-journey">
+    <div className={`lp-journey ${auto && visible ? "is-auto" : ""}`} ref={box}>
       <ol className="lp-times" role="tablist" aria-label={t("jy.steps")}>
         {all.map((s, i) => (
           <li key={s.title}>
-            <button role="tab" aria-selected={i === active} aria-controls="journey-panel" onClick={() => setActive(i)}>
+            <button role="tab" aria-selected={i === active} aria-controls="journey-panel" onClick={() => { setAuto(false); setActive(i); }}>
               <small>{s.time}</small>{s.title}
+              {i === active && auto && visible && <span className="lp-time-bar" key={active} style={{ animationDuration: `${STEP_MS}ms` }} />}
             </button>
           </li>
         ))}
       </ol>
       <div className="lp-journey-body" id="journey-panel" role="tabpanel">
-        <p className="lp-two-tone small"><span>{step.title}.</span> {step.text}</p>
-        <div className="lp-dots">{step.panel}</div>
+        <p className="lp-two-tone small" key={`t${active}`}><span>{step.title}.</span> {step.text}</p>
+        <div className="lp-dots"><div className="lp-panel-in" key={`p${active}`}>{step.panel}</div></div>
       </div>
     </div>
   );
