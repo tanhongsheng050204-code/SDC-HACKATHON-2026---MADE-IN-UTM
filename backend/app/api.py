@@ -14,7 +14,7 @@ from app.auth import current_claims, current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
 from app.schemas import (ActionAnswer, ActionIn, ApplicationIn, ApplicationPatch, CardRequest, DecisionReasonsIn, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
-                         Scenario, SnapshotIn, WorkforceRequest)
+                         Scenario, SnapshotIn, WorkforceRequest, WorkforceSave)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
 from app.services import (alerts, cards, checkins, classes, decisions, plancheck, fairness, region, replan, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
@@ -1207,6 +1207,41 @@ def workforce_analyse(body: WorkforceRequest):
         return workforce.analyse(get_reference(), body.csv, body.scenario)
     except workforce.WorkforceError as error:
         raise HTTPException(422, str(error)) from error
+
+
+MAX_HR_REPORTS = 50
+
+
+@router.get("/workforce/saved")
+def workforce_saved(user: str | None = User):
+    """This HR person's saved analyses, newest first (summaries only)."""
+    return store.list_hr_reports(_require_user(user))
+
+
+@router.post("/workforce/saved", status_code=201)
+def workforce_save(body: WorkforceSave, user: str | None = User):
+    user_id = _require_user(user)
+    if len(store.list_hr_reports(user_id)) >= MAX_HR_REPORTS:
+        raise HTTPException(422, f"At most {MAX_HR_REPORTS} saved analyses. Delete an old one first.")
+    try:
+        result = workforce.analyse(get_reference(), body.csv, body.scenario)
+    except workforce.WorkforceError as error:
+        raise HTTPException(422, str(error)) from error
+    return store.save_hr_report(user_id, body.name.strip(), body.scenario, result)
+
+
+@router.get("/workforce/saved/{report_id}")
+def workforce_saved_one(report_id: str, user: str | None = User):
+    report = store.get_hr_report(_require_user(user), report_id)
+    if report is None:
+        raise HTTPException(404, "Not found")
+    return report
+
+
+@router.delete("/workforce/saved/{report_id}", status_code=204)
+def workforce_saved_delete(report_id: str, user: str | None = User):
+    if not store.delete_hr_report(_require_user(user), report_id):
+        raise HTTPException(404, "Not found")
 
 
 @router.get("/profiles/{profile_id}/tree")

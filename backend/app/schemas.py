@@ -150,6 +150,12 @@ class WorkforceRequest(BaseModel):
     scenario: Scenario = "baseline"
 
 
+class WorkforceSave(WorkforceRequest):
+    """Save an analysis to the HR person's account: the server re-analyses the CSV and keeps only
+    the aggregate result, never the CSV."""
+    name: str = Field(min_length=1, max_length=80)
+
+
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(max_length=1_000)

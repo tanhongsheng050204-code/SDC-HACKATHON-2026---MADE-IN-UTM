@@ -694,3 +694,11 @@ html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[dat
 .sw-grid dt { font-weight: 700; font-size: .9rem; color: var(--ink-2); }
 .sw-grid dd { margin: 0; font-size: 1.05rem; }
 .sw-grid small { color: var(--ink-soft); }
+
+/* Saved HR analyses */
+.hr-save-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 10px 0; }
+.hr-save-row label { display: grid; gap: 4px; font-weight: 700; font-size: .9rem; flex: 1 1 220px; }
+.hr-save-row input { min-height: 44px; }
+.hr-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.hr-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 10px 14px; }
+.hr-login { margin: 8px 0; }

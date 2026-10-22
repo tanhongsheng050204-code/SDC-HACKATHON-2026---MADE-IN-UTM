@@ -183,6 +183,9 @@ export interface Workforce {
   problems: string[];
   signal_source: { snapshot_id: string; imported: string; illustrative: boolean };
 }
+export interface SavedReport {
+  id: string; name: string; scenario: Scenario; snapshot_id: string; employees: number; at_risk: number; created_at: string;
+}
 export interface GrantRow {
   course_id: string; title: string; provider: string; url: string; cost: string; hrd_corp: "claimable" | "check" | "not_needed";
   checked: string | null; people: number; hours_each: number; hours_total: number;
@@ -627,6 +630,11 @@ export const api = {
     if (!response.ok) throw new Error(typeof body.detail === "string" ? body.detail : "Upload failed");
     return body as { skills: string[]; unmatched: string[]; mode: string; characters: number };
   },
+  savedReports: () => request<SavedReport[]>("/workforce/saved"),
+  savedReport: (reportId: string) => request<SavedReport & { result: Workforce }>(`/workforce/saved/${encodeURIComponent(reportId)}`),
+  saveReport: (csv: string, scenario: Scenario, name: string) =>
+    requestDetail<SavedReport>("/workforce/saved", { method: "POST", body: JSON.stringify({ csv, scenario, name }) }),
+  deleteReport: (reportId: string) => requestDetail<void>(`/workforce/saved/${encodeURIComponent(reportId)}`, { method: "DELETE" }),
   workforceSample: async () => (await fetchAwake(`${BASE}/api/workforce/sample`)).text(),
   workforce: async (csv: string, scenario: Scenario) => {
     const response = await fetchAwake(`${BASE}/api/workforce/analyse`, {

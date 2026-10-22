@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { ExportBar } from "../components/ExportBar";
 import type { Cell } from "../lib/exportFile";
@@ -6,7 +5,9 @@ import { InfoTip } from "../components/InfoTip";
 import { ClassView } from "./ClassView";
 import { CounsellorClasses } from "../components/CounsellorClasses";
 import { SdgTile, Sdgs } from "../components/Sdgs";
-import { api, GrantRow, Scenario, Workforce as WorkforceData } from "../lib/api";
+import { api, GrantRow, SavedReport, Scenario, Workforce as WorkforceData } from "../lib/api";
+import { shortDate } from "../lib/format";
+import { useEffect, useState } from "react";
 import { percent, signed } from "../lib/format";
 import { t, tf, tr } from "../lib/i18n";
 import { HEAT, SCENARIOS } from "../lib/labels";
@@ -26,20 +27,21 @@ export function Workforce({ initialTab = "company", userId = null }: { initialTa
         <button role="tab" aria-selected={tab === "class"} onClick={() => setTab("class")}>{t("class.tabClass")}</button>
         <button role="tab" aria-selected={tab === "classes"} onClick={() => setTab("classes")}>{t("cls.tab")}</button>
       </div>
-      {tab === "company" ? <Company /> : tab === "class" ? <ClassView loadSample={initialTab === "class"} /> : <CounsellorClasses userId={userId} />}
+      {tab === "company" ? <Company userId={userId} /> : tab === "class" ? <ClassView loadSample={initialTab === "class"} /> : <CounsellorClasses userId={userId} />}
     </section>
   );
 }
 
-function Company() {
+function Company({ userId }: { userId: string | null }) {
   const [csv, setCsv] = useState("");
   const [scenario, setScenario] = useState<Scenario>("baseline");
   const [result, setResult] = useState<WorkforceData | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [viewing, setViewing] = useState<SavedReport | null>(null);  // a saved analysis, not a live one
 
   async function analyse(text = csv, s = scenario) {
-    setBusy(true); setError(null);
+    setBusy(true); setError(null); setViewing(null);
     try { setResult(await api.workforce(text, s)); }
     catch (e) { setError(e instanceof Error ? e.message : "Couldn't read that file"); setResult(null); }
     finally { setBusy(false); }
@@ -77,10 +79,13 @@ function Company() {
         {busy && <div className="progress" role="progressbar" aria-label={t("wf.analysing")}><span /></div>}
         {error && <p className="error" role="alert">{error}</p>}
       </div>
+      <SavedReports userId={userId} csv={result && !viewing ? csv : null} scenario={scenario}
+        onOpen={(r, data) => { setViewing(r); setScenario(r.scenario); setResult(data); setError(null); }} />
       {!result && !busy && !error && (
         <div className="empty-state"><p>{t("wf.empty")}</p></div>
       )}
-      {result && <Results result={result} scenario={scenario} onScenario={(s) => { setScenario(s); analyse(csv, s); }} />}
+      {viewing && <p className="banner info" role="note">{tf("hr.viewing", { name: viewing.name, date: shortDate(viewing.created_at) })}</p>}
+      {result && <Results result={result} scenario={scenario} onScenario={viewing ? undefined : (s) => { setScenario(s); analyse(csv, s); }} />}
     </>
   );
 }
@@ -198,7 +203,60 @@ function GrantPlan({ plan }: { plan: GrantRow[] }) {
   );
 }
 
-function Results({ result, scenario, onScenario }: { result: WorkforceData; scenario: Scenario; onScenario: (s: Scenario) => void }) {
+// Saved analyses for a logged-in HR person: save the one on screen under a name, reopen or delete
+// earlier ones. Only the aggregate result is kept on the server, never the CSV.
+function SavedReports({ userId, csv, scenario, onOpen }: {
+  userId: string | null; csv: string | null; scenario: Scenario; onOpen: (r: SavedReport, data: WorkforceData) => void;
+}) {
+  const [list, setList] = useState<SavedReport[] | null>(null);
+  const [name, setName] = useState("");
+  const [msg, setMsg] = useState<{ text: string; error?: boolean } | null>(null);
+  useEffect(() => { if (userId) api.savedReports().then(setList).catch(() => setList([])); else setList(null); }, [userId]);
+  if (!userId) return <p className="muted hr-login">{t("hr.loginToSave")}</p>;
+  async function save() {
+    if (!csv) return;
+    try {
+      const made = await api.saveReport(csv, scenario, name.trim() || t("hr.defaultName"));
+      setList((l) => [made, ...(l ?? [])]); setName(""); setMsg({ text: t("hr.saved") });
+    } catch (e) { setMsg({ text: e instanceof Error ? e.message : t("app.failed"), error: true }); }
+  }
+  async function open(r: SavedReport) {
+    try { const full = await api.savedReport(r.id); onOpen(r, full.result); }
+    catch { setMsg({ text: t("app.failed"), error: true }); }
+  }
+  async function remove(r: SavedReport) {
+    if (!window.confirm(tf("app.removeConfirm", { title: r.name }))) return;
+    try { await api.deleteReport(r.id); setList((l) => (l ?? []).filter((x) => x.id !== r.id)); }
+    catch { setMsg({ text: t("app.failed"), error: true }); }
+  }
+  return (
+    <div className="card hr-saved">
+      <h2>{t("hr.title")}</h2>
+      <p className="muted">{t("hr.sub")}</p>
+      {csv && (
+        <div className="hr-save-row">
+          <label>{t("hr.name")}<input maxLength={80} value={name} placeholder={t("hr.defaultName")} onChange={(e) => setName(e.target.value)} /></label>
+          <button className="btn ink" onClick={save}>{t("hr.save")}</button>
+        </div>
+      )}
+      {list && list.length > 0 && (
+        <ul className="hr-list">{list.map((r) => (
+          <li key={r.id}>
+            <span><strong>{r.name}</strong> · {shortDate(r.created_at)} · {t(`sc.${r.scenario}`)} · {tf("hr.counts", { n: r.employees, risk: r.at_risk })}</span>
+            <span className="export-bar">
+              <button className="btn sm" onClick={() => open(r)}>{t("hr.open")}</button>
+              <button className="btn quiet sm" onClick={() => remove(r)}>{t("app.remove")}</button>
+            </span>
+          </li>
+        ))}</ul>
+      )}
+      {list && list.length === 0 && !csv && <p className="muted">{t("hr.none")}</p>}
+      {msg && <p className={msg.error ? "error" : "muted"} role={msg.error ? "alert" : "status"}>{msg.text}</p>}
+    </div>
+  );
+}
+
+function Results({ result, scenario, onScenario }: { result: WorkforceData; scenario: Scenario; onScenario?: (s: Scenario) => void }) {
   const src = result.signal_source;
   return (
     <>
@@ -206,11 +264,13 @@ function Results({ result, scenario, onScenario }: { result: WorkforceData; scen
         <p className="print-only"><strong>{t("exp.hrTitle")}</strong> · {new Date().toISOString().slice(0, 10)} · {t(`sc.${scenario}`)} · {src.snapshot_id}</p>
         <ExportBar name="laluan-hr-report" rows={() => reportRows(result, scenario)} />
       </div>
-      <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
-        {SCENARIOS.map((s) => (
-          <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
-        ))}
-      </div>
+      {onScenario && (
+        <div className="segmented" role="radiogroup" aria-label={t("home.scenarioAria")}>
+          {SCENARIOS.map((s) => (
+            <button key={s.id} role="radio" aria-checked={scenario === s.id} onClick={() => onScenario(s.id)}>{t(`sc.${s.id}`)}</button>
+          ))}
+        </div>
+      )}
       <DataBanner illustrative={src.illustrative} imported={src.imported} />
       <div className="kpis">
         <div className="kpi"><span className="kpi-label">{t("wf.people")}</span><strong>{result.employees}</strong><span className="badge">{tf("wf.roles", { n: result.roles.length })}</span></div>

@@ -260,6 +260,7 @@ Open **HR teams and career centres** in the sidebar.
   - stable roles that AI will still change a lot
   - SDG totals
 - Switch scenarios to re-analyse.
+- **Saved analyses** (log in with Google): **Save this analysis** under a name, then **Open** it later to compare with newer ones. Only the totals by role are kept, never your file.
 - **Download CSV** saves the whole report for a spreadsheet; **Print or save as PDF** gives a clean copy for management.
 - **HRD Corp training-grant plan:** each course in the moves with who takes it, hours, fees and HRD Corp status, with its own CSV, to prepare the company's own HRD Corp application. Laluan does not submit claims.
 

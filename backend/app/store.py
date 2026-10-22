@@ -15,11 +15,11 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 18
+SCHEMA_VERSION = 19
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence", "progress_events", "consents", "feedback", "usage_counts",
               "email_settings", "sent_jobs", "counsellors", "classes", "class_members", "decisions",
-              "checkin_actions", "applications")
+              "checkin_actions", "applications", "hr_reports")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -260,6 +260,23 @@ _MIGRATIONS = {
         updated_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS applications_profile ON applications(profile_id, created_at);
+    """,
+    # An HR person's saved workforce analyses: the aggregate result only (totals by role, moves,
+    # budget, grant plan), never the uploaded CSV or anything about a person. Kept with the Google
+    # account until deleted.
+    19: """
+    CREATE TABLE IF NOT EXISTS hr_reports (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        scenario TEXT NOT NULL,
+        snapshot_id TEXT NOT NULL,
+        employees INTEGER NOT NULL,
+        at_risk INTEGER NOT NULL,
+        result TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS hr_reports_user ON hr_reports(user_id, created_at);
     """,
 }
 
@@ -1057,4 +1074,39 @@ def update_application(profile_id: str, app_id: str, fields: dict) -> dict | Non
 def delete_application(profile_id: str, app_id: str) -> bool:
     with _connect() as conn:
         return conn.execute("DELETE FROM applications WHERE id=? AND profile_id=?", (app_id, profile_id)).rowcount > 0
+
+
+# --- saved HR analyses ---------------------------------------------------------------------------
+
+def save_hr_report(user_id: str, name: str, scenario: str, result: dict) -> dict:
+    report_id, now = secrets.token_urlsafe(9), _now()
+    with _connect() as conn:
+        conn.execute("INSERT INTO hr_reports (id, user_id, name, scenario, snapshot_id, employees, at_risk, result, created_at) "
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                     (report_id, user_id, name, scenario, result["signal_source"]["snapshot_id"], result["employees"],
+                      result["at_risk"], json.dumps(result), now))
+    return {"id": report_id, "name": name, "scenario": scenario, "snapshot_id": result["signal_source"]["snapshot_id"],
+            "employees": result["employees"], "at_risk": result["at_risk"], "created_at": now}
+
+
+def list_hr_reports(user_id: str) -> list[dict]:
+    """Newest first, without the full results."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT id, name, scenario, snapshot_id, employees, at_risk, created_at FROM hr_reports "
+                            "WHERE user_id=? ORDER BY created_at DESC, id", (user_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_hr_report(user_id: str, report_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM hr_reports WHERE id=? AND user_id=?", (report_id, user_id)).fetchone()
+    if row is None:
+        return None
+    out = {k: row[k] for k in ("id", "name", "scenario", "snapshot_id", "employees", "at_risk", "created_at")}
+    return {**out, "result": json.loads(row["result"])}
+
+
+def delete_hr_report(user_id: str, report_id: str) -> bool:
+    with _connect() as conn:
+        return conn.execute("DELETE FROM hr_reports WHERE id=? AND user_id=?", (report_id, user_id)).rowcount > 0
 

@@ -254,6 +254,7 @@ Notes: ______
 - [ ] 17.6 **Get ahead: stable roles AI will change a lot**; SDG totals.
 - [ ] 17.9 **Download CSV** saves `laluan-hr-report-YYYY-MM-DD.csv` (opens in Excel with BM / 中文 intact): date, scenario, forecast id, totals, heatmap, moves, upskill in place, budget, the HRD Corp plan and SDG totals. **Print or save as PDF** prints the report without the sidebar or buttons.
 - [ ] 17.10 **HRD Corp training-grant plan**: one row per course in the moves (link, provider, the roles it is for, people, learning hours, fees, HRD Corp status), totals, and the line that Laluan does not submit claims; its own **Download CSV**.
+- [ ] 17.11 Logged out: "Log in with Google to save analyses…". Logged in: after an analysis, **Save this analysis** (with a name) adds it to **Saved analyses** with the date, scenario, people and people in declining roles. **Open** shows it again with a note that it uses the forecast it was made on (no scenario switch); **Remove** asks first. Another account never sees it. The CSV itself is never stored.
 - [ ] 17.7 Scenario switch re-analyses; **Upload CSV** and **Analyse** work with a `role,skills` file.
 - [ ] 17.8 A CSV with `name`, `email`, `ic` or `staff_id` columns is refused: "Remove columns that identify people…". Unknown roles appear under **Rows skipped**.
 
