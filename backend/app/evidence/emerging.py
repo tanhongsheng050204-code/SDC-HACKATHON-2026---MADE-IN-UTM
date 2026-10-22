@@ -7,20 +7,27 @@ refresh has measured research momentum; before that, all of them are searched an
 momentum has not been measured yet.
 
 Each answer must name a stepping-stone role that is in our catalogue, skills from our catalogue,
-and at least one source with a quote; otherwise it is refused. A person approves each card before
+and at least one source with a quote on a site Google actually read; otherwise it is refused. Source
+links are Google's own addresses for those pages, never the address the model wrote, and each
+records whether its quote was found on the page. A person approves each card before
 anyone sees it (app/evidence/review.py), at most MAX_SHOWN are shown, and none is ranked: there is
 no published growth figure for a job title this new, and the brief forbids inventing one.
 
-The live "Search the web" button on a card runs the job-ad search for its title, labelled "not yet
-reviewed", cached per title per day and limited per profile, and never feeds any score. The role
-page's "Find current openings" (openings()) uses the same search, cache and limit for catalogue roles.
+The live "Search current job ads" button on a card reads real Malaysian job ads for its title
+(app/evidence/ads.py), labelled "not yet reviewed", cached per title per day and limited per
+profile, and never feeds any score. The role page's "Find current openings" (openings()) reads the
+same way, with the same cache and limit, for catalogue roles.
 """
 
 import datetime as dt
+import html
+import re
 import threading
 import time
 
-from app.evidence import search
+import httpx
+
+from app.evidence import ads, search
 from app.llm import generate_grounded_json
 
 MAX_SHOWN = 6
@@ -44,6 +51,8 @@ Return JSON only:
 
 Skill ids: {skills}
 Role ids: {role_ids}
+Give up to 4 sources. For each "url", copy the source link exactly as your search results give it
+(a vertexaisearch.cloud.google.com link is fine); never type a page address yourself.
 Use only pages and sentences that exist. Do not invent job titles, URLs or quotes."""
 
 
@@ -64,9 +73,45 @@ def _texts(raw, limit: int) -> dict[str, str]:
     return {lang: str(raw.get(lang) or "").strip()[:limit] for lang in LANGS}
 
 
+def _google_link(url: str, chunks: list[dict], used: set[int], resolve) -> str | None:
+    """The real address of a page Google read on the same site as the model's link, or None.
+
+    Google lists its sources by site (title = domain) with a redirect to the page; the redirect is
+    resolved, reading only its header. A model link that is itself such a redirect is resolved too."""
+    if any(search._on(search._host(url), h) for h in search.REDIRECT_HOSTS):
+        return resolve(url)
+    host = search._host(url)
+    for i, chunk in enumerate(chunks):
+        domain = re.sub(r"^www\.", "", (chunk.get("title") or "").lower().strip())
+        if i not in used and host and domain and search._on(host, domain):
+            used.add(i)
+            return resolve(chunk["uri"])
+    return None
+
+
+def _page_text(url: str) -> str | None:
+    try:
+        response = httpx.get(url, follow_redirects=True, timeout=10, headers={"User-Agent": "Mozilla/5.0 (Laluan source check)"})
+    except httpx.HTTPError:
+        return None
+    return response.text if response.status_code == 200 else None
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"\W+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text))).lower().strip()
+
+
+def quote_on_page(url: str, quote: str, *, fetch=None) -> bool | None:
+    """Whether the quoted sentence is on the page (its first 80 characters, ignoring markup and
+    punctuation), or None when the page cannot be read (many job boards refuse automated visits)."""
+    page = (fetch or _page_text)(url)
+    return None if page is None else _norm(quote)[:80] in _norm(page)
+
+
 def search_capability(cap: dict, momentum: float | None, ref, *, grounded=generate_grounded_json,
-                      resolve=search.resolve_redirect, today: dt.date | None = None) -> dict:
+                      resolve=None, today: dt.date | None = None) -> dict:
     """One grounded search for one capability. Raises Unusable (or on any search failure)."""
+    resolve = resolve or search.resolve_redirect  # looked up here, so tests can stand in for the network
     prompt = PROMPT.format(name=cap["name"], roles=", ".join(r["title"] for r in ref.roles.values()),
                            skills=", ".join(ref.skills), role_ids=", ".join(ref.roles))
     raw, google_sources = grounded(prompt)
@@ -81,19 +126,21 @@ def search_capability(cap: dict, momentum: float | None, ref, *, grounded=genera
     skills = list(dict.fromkeys(s for s in (raw.get("skills") or []) if s in ref.skills))
     if not skills:
         raise Unusable("no catalogue skill")
+    # Links come from Google's own sources, never from the address the model wrote: the model rebuilds
+    # addresses from memory and most did not open (REVIEW_LOG). A source on a site Google did not
+    # read is dropped; its link becomes Google's real address for that site's page.
+    chunks = [c for c in google_sources if c.get("uri")]
+    used: set[int] = set()
     sources = []
     for item in (raw.get("sources") or [])[:5]:
         if not isinstance(item, dict) or not str(item.get("quote") or "").strip():
             continue
-        url = str(item.get("url") or "").strip()
-        via_google = any(search._on(search._host(url), h) for h in search.REDIRECT_HOSTS)
-        if via_google:
-            url = resolve(url) or ""
-        if not url.startswith(("http://", "https://")):
+        url = _google_link(str(item.get("url") or "").strip(), chunks, used, resolve)
+        if not url or not url.startswith(("http://", "https://")):
             continue
-        sources.append({"url": url[:500], "title": str(item.get("title") or "")[:200],
-                        "kind": search.page_kind(url), "grounded": via_google or search._grounded(url, google_sources),
-                        "quote": str(item["quote"]).strip()[:400]})
+        quote = str(item["quote"]).strip()[:400]
+        sources.append({"url": url[:500], "title": str(item.get("title") or "")[:200], "kind": search.page_kind(url),
+                        "grounded": True, "quote": quote, "quote_on_page": quote_on_page(url, quote)})
     if not sources:
         raise Unusable("no source with a quote")
     number = raw.get("sdg")
@@ -151,7 +198,9 @@ def _live(key: tuple[str, str], role: dict, profile_id: str, ref) -> dict:
         if len(recent) >= LIVE_PER_HOUR:
             raise RateLimited()
         _live_calls[profile_id] = [*recent, time.time()]
-    found = search.search_role(role, ref.skills)
+    # Real ads (app/evidence/ads.py): a catalogue role by its usual search terms, an emerging title by its words.
+    fetch = None if role["id"] in ref.roles else (lambda _id, n: ads.for_title(role["title"], n))
+    found = search.search_role(role, ref.skills, **({"fetch": fetch} if fetch else {}))
     result = {"reviewed": False, "searched": str(dt.date.today()),
               "sources": [{k: p[k] for k in ("url", "title", "employer", "kind", "grounded")}
                           | {"quote": p["quotes"][0]["quote"] if p["quotes"] else ""} for p in found["sources"]]}

@@ -91,7 +91,7 @@ def approve(evidence_id: str, reviewer: str, drop_sources: list[str], drop_added
         return {"id": evidence_id, "role_id": item["subject"]}
     ref = get_reference()
     body["summary"] = aggregate(_base_role(ref.roles[item["subject"]]), body["sources"], ref.skills,
-                                set(drop_sources), set(drop_added))
+                                set(drop_sources), set(drop_added), ads_read=body.get("ads_read"))
     dropped = set(drop_sources)
     body["sources"] = [{**p, "quotes": [q for q in p["quotes"] if f"{p['url']}#{q['skill_id']}" not in dropped]}
                        for p in body["sources"] if p["url"] not in dropped]

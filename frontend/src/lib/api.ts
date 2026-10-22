@@ -68,7 +68,8 @@ export type Texts = { en: string; ms: string; zh: string };
 export interface DayInJob { role_id: string; text: Texts; basis: "data" | "job_ads"; drafted: string; reviewed_by: string | null }
 export interface DayPending { id: string; kind: "day"; role_id: string; title: string; drafted: string; basis: "data" | "job_ads" }
 export interface DayDetail extends DayPending { text: Texts; current: Texts | null; facts: { from_malaysian_job_ads?: string[] } }
-export interface EmergingSource { url: string; title: string; kind: "job_ad" | "web"; grounded: boolean; quote: string; employer?: string }
+export interface EmergingSource { url: string; title: string; kind: "job_ad" | "web"; grounded: boolean; quote: string; employer?: string;
+  quote_on_page?: boolean | null }
 export interface EmergingCard {
   capability_id: string; capability_name: string; momentum: number | null; snapshot_id: string; searched: string;
   title: Texts; summary: Texts; sources: EmergingSource[]; reviewed_by: string | null; reviewed_at: string | null;

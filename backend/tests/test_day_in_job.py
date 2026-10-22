@@ -5,7 +5,7 @@ import pytest
 from app import store
 from app.evidence import day, search
 from app.reference import get_reference
-from tests.test_evidence import ADS, FakeSearch
+from tests.test_evidence import ADS, FakeAds
 
 ADMIN = {"X-Admin-Token": "test-admin-token"}
 TEXT = {"en": "You check records all day.", "ms": "Anda menyemak rekod.", "zh": "你整天核对记录。"}
@@ -58,7 +58,7 @@ def test_approving_evidence_drafts_a_richer_version_for_review(client, monkeypat
     generate = fake_generate({"en": "Ads ask for SQL daily.", "ms": "Iklan minta SQL.", "zh": "招聘广告要求SQL。"})
     monkeypatch.setattr(day, "queue_in_background", lambda role_id, body: day.queue_for(role_id, body, generate=generate))
     role = get_reference().roles["data_analyst"]
-    store.save_evidence("ev-1", "role", "data_analyst", search.search_role(role, get_reference().skills, grounded=FakeSearch(ADS)))
+    store.save_evidence("ev-1", "role", "data_analyst", search.search_role(role, get_reference().skills, fetch=FakeAds(ADS)))
     before = client.get("/api/roles/data_analyst/day").json()["text"]
 
     client.post("/api/evidence/pending/ev-1/approve", json={"reviewer": "Team Reviewer"}, headers=ADMIN)
@@ -80,7 +80,7 @@ def test_a_failed_draft_does_not_undo_the_evidence_approval(client, monkeypatch)
         raise TimeoutError("slow")
     monkeypatch.setattr(day, "queue_in_background", lambda role_id, body: day.queue_for(role_id, body, generate=broken))
     role = get_reference().roles["data_analyst"]
-    store.save_evidence("ev-2", "role", "data_analyst", search.search_role(role, get_reference().skills, grounded=FakeSearch(ADS)))
+    store.save_evidence("ev-2", "role", "data_analyst", search.search_role(role, get_reference().skills, fetch=FakeAds(ADS)))
     assert client.post("/api/evidence/pending/ev-2/approve", json={"reviewer": "Team Reviewer"}, headers=ADMIN).status_code == 200
     assert client.get("/api/evidence/pending?kind=day", headers=ADMIN).json() == []
     assert client.get("/api/roles/data_analyst").json()["evidence"]["reviewed_by"] == "Team Reviewer"

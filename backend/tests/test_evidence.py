@@ -1,4 +1,4 @@
-"""Cited skill evidence: Malaysian job ads found by grounded web search, reviewed by a person."""
+"""Cited skill evidence: real Malaysian job ads (freehire), matched to our skills, reviewed by a person."""
 
 import pytest
 
@@ -6,84 +6,106 @@ from app.evidence import search
 from app.reference import get_reference
 
 
-def _page(url: str, *quotes: tuple[str, str], title: str = "Data Analyst", employer: str = "Acme Sdn Bhd") -> dict:
-    return {"url": url, "title": title, "employer": employer,
-            "quotes": [{"skill_id": sid, "skill_name": name, "quote": f"Must have {name}."} for sid, name in quotes]}
+def _ad(url: str, *sentences: str, tags: tuple[str, ...] = (), title: str = "Data Analyst",
+        company: str = "Acme Sdn Bhd") -> dict:
+    """A posting as app/evidence/ads.py returns it."""
+    return {"url": url, "title": title, "company": company, "posted": "2026-10-20",
+            "description": "<ul>" + "".join(f"<li>{s}</li>" for s in sentences) + "</ul>", "tags": list(tags)}
 
 
-class FakeSearch:
-    """Answers the job-ad prompt with `ads` and the wider prompt with `pages`; records each prompt."""
+class FakeAds:
+    """Stands in for app/evidence/ads.for_role: returns `ads` for any role, records each call."""
 
-    def __init__(self, ads: list[dict], pages: list[dict] | None = None, grounded=("hiredly.com", "jobstreet.com")):
-        self.ads, self.pages, self.prompts = ads, pages or [], []
-        self.grounded = [{"title": d, "uri": f"https://vertexaisearch.cloud.google.com/{d}"} for d in grounded]
+    def __init__(self, ads: list[dict]):
+        self.ads, self.calls = ads, []
 
-    def __call__(self, prompt: str):
-        self.prompts.append(prompt)
-        return {"pages": self.ads if len(self.prompts) == 1 else self.pages}, self.grounded
+    def __call__(self, role_id: str, max_ads: int) -> list[dict]:
+        self.calls.append((role_id, max_ads))
+        return self.ads[:max_ads]
 
 
 ADS = [
-    _page("https://my.hiredly.com/jobs/acme-data-analyst", ("sql", "SQL"), ("cloud_computing", "GCP"),
-          ("other", "Looker Studio")),
-    _page("https://www.jobstreet.com.my/job/111", ("sql", "SQL"), ("cloud_computing", "AWS"),
-          ("machine_learning", "machine learning")),
-    _page("https://www.jobstreet.com.my/job/222", ("python", "Python"), ("excel_skills", "Excel"),
-          ("other", "Looker Studio")),
+    _ad("https://www.jobstreet.com.my/job/111", "Strong SQL skills are required.", "Experience with AWS or GCP.",
+        tags=("Looker Studio",)),  # Acme
+    _ad("https://www.jobstreet.com.my/job/222", "Write SQL queries daily.", "Cloud computing knowledge (AWS).",
+        "Machine learning is a plus.", company="Beta Bhd"),
+    _ad("https://www.jobstreet.com.my/job/333", "Python for data cleaning.", "Familiar with Microsoft Excel.",
+        "Exposure to cloud computing on Azure.", tags=("looker studio", "SQL"), company="Gamma Sdn Bhd"),
+    _ad("https://www.jobstreet.com.my/job/444", "Good communication skills.",
+        "A paragraph that runs on " + "and on " * 60 + "with SQL", company="Delta Sdn Bhd"),
 ]
 
 
-def _run(fake: FakeSearch) -> dict:
+def _run(fake: FakeAds) -> dict:
     ref = get_reference()
-    return search.search_role(ref.roles["data_analyst"], ref.skills, grounded=fake)
+    return search.search_role(ref.roles["data_analyst"], ref.skills, fetch=fake)
 
 
-def test_job_ads_confirm_role_skills_and_add_catalogue_skills():
-    fake = FakeSearch(ADS)
+def test_real_ads_confirm_role_skills_with_their_own_sentences_and_links():
+    fake = FakeAds(ADS)
     result = _run(fake)
     summary = result["summary"]
-    assert len(fake.prompts) == 1 and result["widened"] is False  # enough ads: no wider search
-    assert "Malaysia" in fake.prompts[0] and "cloud_computing" in fake.prompts[0]  # catalogue in prompt
-    assert summary["skills"]["sql"]["status"] == "confirmed"
+    assert fake.calls == [("data_analyst", search.MAX_ADS)] and result["ads_read"] == 4 and result["widened"] is False
+    assert summary["skills"]["sql"]["status"] == "confirmed" and summary["skills"]["sql"]["sources"] == 3
     assert summary["skills"]["python"]["status"] == "single"
-    assert summary["skills"]["excel"]["status"] == "single"  # unknown id mapped through the alias "Excel"
+    assert summary["skills"]["excel"]["status"] == "single"
     assert summary["skills"]["statistics"]["status"] == "none"
-    assert [a["skill_id"] for a in summary["added"]] == ["cloud_computing"]  # 2 job ads
-    assert summary["skills"]["cloud_computing"]["status"] == "confirmed"
-    assert "machine_learning" not in [a["skill_id"] for a in summary["added"]]  # only 1 ad
-    assert summary["not_in_catalogue"] == [{"name": "Looker Studio", "count": 2}]
     cite = summary["skills"]["sql"]["citations"][0]
-    assert cite["kind"] == "job_ad" and cite["grounded"] is True and cite["quote"] == "Must have SQL."
+    assert cite == {"url": "https://www.jobstreet.com.my/job/111", "title": "Data Analyst", "employer": "Acme Sdn Bhd",
+                    "kind": "job_ad", "grounded": True, "quote": "Strong SQL skills are required."}
+    # Every quote is a sentence from the ad itself (or names a tag the site put on it): nothing is written by a model.
+    texts = " ".join(a["description"] for a in ADS)
+    assert all(c["quote"] in texts or c["quote"].startswith("Skill listed on the ad")
+               for s in summary["skills"].values() for c in s["citations"])
 
 
-def test_too_few_ads_widen_to_any_page_and_web_pages_never_add_skills():
-    web = [_page("https://www.talentcorp.com.my/career-guide", ("cloud_computing", "cloud")),
-           _page("https://example.org/data-careers", ("cloud_computing", "cloud"))]
-    fake = FakeSearch(ADS[:1], web, grounded=("hiredly.com", "talentcorp.com.my"))
-    result = _run(fake)
-    assert len(fake.prompts) == 2 and result["widened"] is True
-    summary = result["summary"]
-    assert summary["skills"]["cloud_computing"]["status"] == "confirmed"  # 3 sources of any kind...
-    assert summary["added"] == []  # ...but only one is a job ad
-    kinds = {c["url"]: (c["kind"], c["grounded"]) for c in summary["skills"]["cloud_computing"]["citations"]}
-    assert kinds["https://www.talentcorp.com.my/career-guide"] == ("web", True)
-    assert kinds["https://example.org/data-careers"] == ("web", False)  # not among Google's sources
+def test_a_catalogue_skill_joins_the_role_only_when_enough_ads_ask_for_it():
+    summary = _run(FakeAds(ADS))["summary"]
+    assert [a["skill_id"] for a in summary["added"]] == ["cloud_computing"]  # 3 of 4 ads
+    assert "machine_learning" not in [a["skill_id"] for a in summary["added"]]  # 1 ad
+    many = ADS + [_ad(f"https://www.jobstreet.com.my/job/{n}", "Good communication skills.", company=f"Firm {n}")
+                  for n in range(500, 520)]
+    assert _run(FakeAds(many))["summary"]["added"] == []  # 3 of 24 ads is under the 20% share
 
 
-def test_same_page_twice_counts_once():
-    duplicate = [ADS[0], {**ADS[0], "quotes": [{"skill_id": "sql", "skill_name": "SQL", "quote": "SQL again."}]}, ADS[1]]
-    summary = _run(FakeSearch(duplicate))["summary"]
-    assert len(summary["skills"]["sql"]["citations"]) == 2
+def test_site_tags_outside_the_catalogue_are_listed_for_the_team():
+    summary = _run(FakeAds(ADS))["summary"]
+    assert summary["not_in_catalogue"] == [{"name": "looker studio", "count": 2}]  # one entry, any capitals
+
+
+def test_overlong_paragraphs_are_not_quoted():
+    summary = _run(FakeAds(ADS))["summary"]
+    assert "https://www.jobstreet.com.my/job/444" not in {c["url"] for c in summary["skills"]["sql"]["citations"]}
+
+
+def test_same_ad_twice_counts_once():
+    summary = _run(FakeAds([ADS[0], ADS[0], ADS[1]]))["summary"]
+    assert summary["skills"]["sql"]["sources"] == 2
+    repost = {**ADS[1], "url": "https://www.jobstreet.com.my/job/999"}  # the same ad posted again, new link
+    assert _run(FakeAds([ADS[0], ADS[1], repost]))["summary"]["skills"]["sql"]["sources"] == 2
+
+
+def test_generic_words_in_ads_do_not_count_as_skills():
+    assert search.skills_in("Ensure compliance with cash-handling procedures and audit requirements.") == []
+    assert search.skills_in("Proficient in writing and conversing in English.") == []
+    assert search.skills_in("Administer 5 ml doses as prescribed.") == []
+    assert search.skills_in("Experience in risk assessment and SQL.") == ["risk_assessment", "sql"]
 
 
 def test_aggregate_drops_unticked_sources_and_added_skills():
-    result = _run(FakeSearch(ADS))
-    again = search.aggregate(get_reference().roles["data_analyst"], result["sources"], get_reference().skills,
-                             drop_sources={"https://www.jobstreet.com.my/job/111"})
-    assert again["skills"]["sql"]["status"] == "single" and again["added"] == []
-    kept = search.aggregate(get_reference().roles["data_analyst"], result["sources"], get_reference().skills,
-                            drop_added={"cloud_computing"})
+    result = _run(FakeAds(ADS))
+    role, skills = get_reference().roles["data_analyst"], get_reference().skills
+    again = search.aggregate(role, result["sources"], skills, drop_sources={"https://www.jobstreet.com.my/job/111"},
+                             ads_read=result["ads_read"])
+    assert again["skills"]["sql"]["status"] == "confirmed" and again["added"] == []  # cloud now in 2 of 4
+    kept = search.aggregate(role, result["sources"], skills, drop_added={"cloud_computing"}, ads_read=result["ads_read"])
     assert kept["added"] == [] and kept["skills"]["cloud_computing"]["status"] == "confirmed"
+
+
+def test_ad_sentences_are_split_from_html():
+    from app.evidence import ads
+    parts = ads.sentences("<p>About us.</p><ul><li>SQL &amp; Python</li><li>Excel</li></ul><p>We pay well. Apply now.</p>")
+    assert parts == ["About us.", "SQL & Python", "Excel", "We pay well.", "Apply now."]
 
 
 @pytest.mark.parametrize("url,kind", [
@@ -102,14 +124,14 @@ ADMIN = {"X-Admin-Token": "test-admin-token"}
 
 @pytest.fixture
 def searched(client, monkeypatch):
-    """A finished evidence run: data_analyst finds ADS, ux_designer's search fails, the rest find nothing."""
+    """A finished evidence run: data_analyst reads ADS, ux_designer's ads cannot be fetched, the rest find none."""
     from app.evidence import refresh
     real = search.search_role
 
     def fake_search_role(role, skills, **_):
         if role["id"] == "ux_designer":
             raise TimeoutError("search took too long at https://example.org/?q=secret")
-        return real(role, skills, grounded=FakeSearch(ADS if role["id"] == "data_analyst" else []))
+        return real(role, skills, fetch=FakeAds(ADS if role["id"] == "data_analyst" else []))
 
     monkeypatch.setattr(search, "search_role", fake_search_role)
     monkeypatch.setitem(refresh._status, "state", "idle")
@@ -133,7 +155,7 @@ def test_failed_role_does_not_stop_the_run(client, searched):
     pending = client.get("/api/evidence/pending", headers=ADMIN).json()
     assert len(pending) == len(searched["saved"]) == len(get_reference().roles) - 1
     analyst = next(p for p in pending if p["role_id"] == "data_analyst")
-    assert analyst["job_ads"] == 3 and analyst["added"] == ["cloud_computing"]
+    assert analyst["job_ads"] == 4 and analyst["added"] == ["cloud_computing"]  # every ad quoted a skill
     assert client.get("/api/evidence/pending").status_code == 401
 
 
@@ -158,7 +180,7 @@ def test_approved_evidence_adds_skill_to_matching(client, searched):
     assert fit() > before
     tree = client.get(f"/api/profiles/{pid}/tree", params={"role": "data_analyst"}).json()
     cloud = next(n for n in tree["nodes"] if n["skill_id"] == "cloud_computing")
-    assert cloud["added_from_ads"] is True and cloud["evidence"]["job_ads"] == 2
+    assert cloud["added_from_ads"] is True and cloud["evidence"]["job_ads"] == 3
     analyst = next(r for r in client.get(f"/api/profiles/{pid}/matches").json()["roles"] if r["role_id"] == "data_analyst")
     assert analyst["evidence"]["skills"]["sql"]["status"] == "confirmed"
     assert client.post(f"/api/evidence/pending/{evidence_id}/approve", json=decision, headers=ADMIN).status_code == 404
@@ -166,7 +188,8 @@ def test_approved_evidence_adds_skill_to_matching(client, searched):
 
 def test_unticked_sources_are_dropped_before_statuses_are_recomputed(client, searched):
     evidence_id = _pending_for(client, "data_analyst")
-    decision = {"reviewer": "Team Reviewer", "drop_sources": ["https://www.jobstreet.com.my/job/111"]}
+    decision = {"reviewer": "Team Reviewer", "drop_sources": ["https://www.jobstreet.com.my/job/111",
+                                                              "https://www.jobstreet.com.my/job/222"]}
     assert client.post(f"/api/evidence/pending/{evidence_id}/approve", json=decision, headers=ADMIN).json()["added"] == []
     role = client.get("/api/roles/data_analyst").json()
     assert role["evidence"]["skills"]["sql"]["status"] == "single"
@@ -197,34 +220,19 @@ def test_odd_evidence_ids_are_not_found(client):
         assert client.get(f"/api/evidence/pending/{bad}", headers=ADMIN).status_code == 404
 
 
-def test_google_redirect_links_are_resolved_to_the_real_page():
-    redirect = "https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc"
-    ads = [_page(redirect, ("sql", "SQL")), _page("https://vertexaisearch.cloud.google.com/grounding-api-redirect/dead", ("sql", "SQL")),
-           ADS[1]]
-    real = {redirect: "https://my.hiredly.com/jobs/acme-data-analyst"}
-    ref = get_reference()
-    result = search.search_role(ref.roles["data_analyst"], ref.skills, grounded=FakeSearch(ads, grounded=()),
-                                resolve=real.get)
-    urls = [p["url"] for p in result["sources"]]
-    assert urls == ["https://my.hiredly.com/jobs/acme-data-analyst", "https://www.jobstreet.com.my/job/111"]
-    assert result["sources"][0]["kind"] == "job_ad" and result["sources"][0]["grounded"] is True  # it came from Google
-    assert result["widened"] is False
-
-
 @pytest.mark.parametrize("url", ["https://careers.shopee.com.my/job-detail/1", "https://jobs.bytedance.com/en/position/2",
                                  "https://apply.workable.com/acme/j/3", "https://boards.greenhouse.io/acme/jobs/4"])
 def test_employer_career_sites_are_job_ads(url):
     assert search.page_kind(url) == "job_ad"
 
 
-def test_one_wrongly_tagged_quote_can_be_unticked_without_dropping_its_page():
-    result = _run(FakeSearch(ADS))
+def test_one_wrongly_matched_quote_can_be_unticked_without_dropping_its_ad():
+    result = _run(FakeAds(ADS))
     role, skills = get_reference().roles["data_analyst"], get_reference().skills
     drop = {"https://www.jobstreet.com.my/job/111#cloud_computing"}
-    summary = search.aggregate(role, result["sources"], skills, drop_sources=drop)
-    assert summary["skills"]["cloud_computing"]["status"] == "single" and summary["added"] == []
-    assert summary["skills"]["sql"]["status"] == "confirmed"  # the page's other quote still counts
-
+    summary = search.aggregate(role, result["sources"], skills, drop_sources=drop, ads_read=result["ads_read"])
+    assert summary["skills"]["cloud_computing"]["sources"] == 2 and summary["added"] == []
+    assert summary["skills"]["sql"]["status"] == "confirmed"  # the ad's other quote still counts
 
 
 @pytest.mark.parametrize("url,kind", [
@@ -249,7 +257,7 @@ def test_stop_cancels_searches_not_started_and_keeps_what_was_found(client, monk
         if len(calls) == 1:
             assert client.post("/api/evidence/refresh/stop").status_code == 401
             assert client.post("/api/evidence/refresh/stop", headers=ADMIN).status_code == 200
-        return real(role, skills, grounded=FakeSearch(ADS))
+        return real(role, skills, fetch=FakeAds(ADS))
 
     monkeypatch.setattr(search, "search_role", fake_search_role)
     monkeypatch.setattr(refresh, "PARALLEL", 1)  # one at a time, so the others are still queued
