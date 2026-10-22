@@ -313,6 +313,9 @@ Notes: ______
 - [ ] 24.3 After a CV upload, `GET /api/profiles/{id}` contains no CV text, name, email or phone.
 - [ ] 24.4 Admin endpoints (e.g. `GET /api/signals/pending`) without `X-Admin-Token` return 401.
 - [ ] 24.5 A profile owned by an account cannot be read or changed by another account or anonymously.
+- [ ] 24.9 **Download my data** (sidebar, above Delete my profile) saves `laluan-my-data-xxxxxxxx.json` with the profile, Future Cards, proven skills, proof-check results, survey answers, progress events and consent records (one `profile_storage` row dated when the profile was made).
+- [ ] 24.10 After **Delete my profile**, `GET /api/profiles/{id}/export` returns 404 and nothing of the profile is left in any table.
+- [ ] 24.11 Sources → **Your data** shows the **Your rights** card, and its lists match what the download contains.
 - [ ] 24.6 Response headers: the site (laluan-psi.vercel.app) sends `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options: DENY` and `Permissions-Policy` with `microphone=(self)`; the browser console shows no "Refused to load/connect" errors on Today, Pathway, login and voice input. API responses under `/api` send `Content-Security-Policy: default-src 'none'…`.
 - [ ] 24.7 Render's log shows one JSON line per request (`{"method": "GET", "route": "/api/profiles/{profile_id}/matches", "status": 200, "ms": …}`) with no profile ID, IP address or question text.
 - [ ] 24.8 With `SENTRY_DSN` / `VITE_SENTRY_DSN` set: a test error appears in Sentry without the request body, headers, user, query string or IDs in the URL. Without them, no request goes to sentry.io.

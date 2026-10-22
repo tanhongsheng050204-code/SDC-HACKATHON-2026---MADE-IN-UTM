@@ -8,6 +8,7 @@ const BLOCKS = [
   { key: "never", tone: "sand" },
   { key: "ai", tone: "sky" },
   { key: "who", tone: "mint" },
+  { key: "rights", tone: "sky" },
   { key: "delete", tone: "sand" },
 ] as const;
 

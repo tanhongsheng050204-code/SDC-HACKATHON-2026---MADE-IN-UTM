@@ -1281,7 +1281,7 @@ const STRINGS = {
   "priv.who": { en: "Who can see it", ms: "Siapa yang boleh melihatnya", zh: "谁能看到" },
   "priv.whoText": { en: "Only you, or your Google account if you log in. A Future Card shows the role, readiness and plan, never your skill list or current job. HR files with names or staff IDs are refused, and class results hide groups smaller than 3.", ms: "Hanya anda, atau akaun Google anda jika anda log masuk. Kad Masa Depan menunjukkan peranan, kesediaan dan pelan, tidak pernah senarai kemahiran atau pekerjaan semasa anda. Fail HR yang mengandungi nama atau ID kakitangan ditolak, dan keputusan kelas menyembunyikan kumpulan kurang daripada 3.", zh: "只有您本人，或登录后您的 Google 账户。未来卡片只显示职位、准备度和计划，从不显示您的技能清单或目前工作。含姓名或员工编号的 HR 文件会被拒绝，班级结果会隐藏少于 3 人的组别。" },
   "priv.delete": { en: "How to remove it", ms: "Cara membuangnya", zh: "如何删除" },
-  "priv.deleteText": { en: "Delete my profile (at the bottom of the sidebar) removes your profile, Future Cards, proven skills and survey answers at once. Shared card links stop working.", ms: "Padam profil saya (di bahagian bawah bar sisi) membuang profil, Kad Masa Depan, kemahiran yang dibuktikan dan jawapan tinjauan anda serta-merta. Pautan kad yang dikongsi berhenti berfungsi.", zh: "侧边栏底部的“删除我的资料”会立即删除您的资料、未来卡片、已证明的技能和问卷回答。已分享的卡片链接将失效。" },
+  "priv.deleteText": { en: "Delete my profile (at the bottom of the sidebar) removes your profile, Future Cards, proven skills, survey answers, progress history and consent records at once. Shared card links stop working.", ms: "Padam profil saya (di bahagian bawah bar sisi) membuang profil, Kad Masa Depan, kemahiran yang dibuktikan, jawapan tinjauan, sejarah kemajuan dan rekod persetujuan anda serta-merta. Pautan kad yang dikongsi berhenti berfungsi.", zh: "侧边栏底部的“删除我的资料”会立即删除您的资料、未来卡片、已证明的技能、问卷回答、进度记录和同意记录。已分享的卡片链接将失效。" },
   "priv.link": { en: "Your data", ms: "Data anda", zh: "您的数据" },
   "pii1.NAME": { en: "name", ms: "nama", zh: "姓名" },
   "pii1.EMAIL": { en: "email", ms: "e-mel", zh: "电邮" },
@@ -1331,6 +1331,10 @@ const STRINGS = {
   "cal.useTarget": { en: "Use {n} hours a week as my target", ms: "Gunakan {n} jam seminggu sebagai sasaran saya", zh: "把每周 {n} 小时设为我的目标" },
   "home.progress": { en: "{n}% ready · target date {date}", ms: "{n}% bersedia · tarikh sasaran {date}", zh: "已准备 {n}% · 目标日期 {date}" },
   "home.progressNoDate": { en: "{n}% ready. Set a target date on your route to see if you're on track.", ms: "{n}% bersedia. Tetapkan tarikh sasaran pada laluan anda untuk melihat sama ada anda di landasan.", zh: "已准备 {n}%。在你的路线上设定目标日期，看看是否按计划进行。" },
+  "shell.download": { en: "Download my data", ms: "Muat turun data saya", zh: "下载我的数据" },
+  "shell.downloadFailed": { en: "Couldn't download your data. Try again.", ms: "Tidak dapat memuat turun data anda. Cuba lagi.", zh: "无法下载你的数据，请重试。" },
+  "priv.rights": { en: "Your rights", ms: "Hak anda", zh: "你的权利" },
+  "priv.rightsText": { en: "Download my data (at the bottom of the sidebar) saves everything we keep about you as one file, including when you agreed to what. We record the date you agreed to us keeping your profile, and any later choice about email or sharing with a class.", ms: "Muat turun data saya (di bahagian bawah bar sisi) menyimpan semua yang kami simpan tentang anda dalam satu fail, termasuk bila anda bersetuju dengan apa. Kami merekod tarikh anda bersetuju kami menyimpan profil anda, dan sebarang pilihan kemudian tentang e-mel atau perkongsian dengan kelas.", zh: "侧边栏底部的“下载我的数据”会把我们保存的关于你的一切存为一个文件，包括你何时同意了什么。我们会记录你同意我们保存资料的日期，以及之后关于电邮或与班级分享的任何选择。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

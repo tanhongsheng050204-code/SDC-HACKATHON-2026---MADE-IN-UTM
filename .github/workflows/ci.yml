@@ -46,7 +46,7 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements-dev.txt
       - run: pip install -r requirements-dev.txt
-      - run: python -m pytest tests/test_store.py -v
+      - run: python -m pytest tests/test_store.py tests/test_store_features.py -v
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
 

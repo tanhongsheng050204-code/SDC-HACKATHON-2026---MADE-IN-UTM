@@ -5,7 +5,7 @@ import hmac
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, UploadFile
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 
 from app import ratelimit, runpod, store
@@ -551,10 +551,15 @@ def claim_profile(body: ClaimRequest, user: str | None = User):
 
 # --- profiles --------------------------------------------------------------------------------
 
+PRIVACY_VERSION = "2026-10-22"  # the "Your data" notice a new profile agrees to; bump when it changes
+
+
 @router.post("/profiles", status_code=201)
 def create_profile(body: ProfileIn):
-    return store.create_profile(body.display_name, body.current_role_id, body.skills, body.experience_years,
-                                audience=body.audience)
+    profile = store.create_profile(body.display_name, body.current_role_id, body.skills, body.experience_years,
+                                   audience=body.audience)
+    store.add_consent(profile["id"], "profile_storage", PRIVACY_VERSION)
+    return profile
 
 
 @router.post("/profiles/demo/{key}", status_code=201)
@@ -565,6 +570,7 @@ def create_demo_profile(key: str):
     profile = store.create_profile(demo["display_name"], demo["current_role_id"],
                                    demo["skills"], demo.get("experience_years"),
                                    is_demo=True, audience=demo.get("audience"))
+    store.add_consent(profile["id"], "profile_storage", PRIVACY_VERSION)
     answers = demo.get("survey_answers") or []
     if answers:  # demos arrive with the survey done, so the preference line shows for judges
         store.save_survey(profile["id"], answers)
@@ -593,6 +599,17 @@ def delete_profile(profile_id: str, user: str | None = User):
     _profile_for(profile_id, user)
     if not store.delete_profile(profile_id):
         raise HTTPException(404, "Profile not found")
+
+
+@router.get("/profiles/{profile_id}/export")
+def export_profile(profile_id: str, user: str | None = User):
+    """Everything stored about this profile, as one JSON file (data rights: access and portability)."""
+    profile = _profile_for(profile_id, user)
+    body = {"exported_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
+            "about": "Everything Laluan stores about this profile. CV text, chats, voice and interview answers "
+                     "are never stored, so they are not here.",
+            "profile": profile, **store.export_rows(profile_id)}
+    return JSONResponse(body, headers={"Content-Disposition": f'attachment; filename="laluan-my-data-{profile_id[:8]}.json"'})
 
 
 @router.put("/profiles/{profile_id}/target")

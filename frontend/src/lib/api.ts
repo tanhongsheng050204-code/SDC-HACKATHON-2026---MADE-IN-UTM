@@ -441,6 +441,7 @@ export const api = {
   setPlan: (id: string, targetDate: string | null, weeklyHours: number | null) =>
     requestDetail<Profile>(`/profiles/${id}/plan`, { method: "PUT", body: JSON.stringify({ target_date: targetDate, weekly_hours: weeklyHours }) }),
   deleteProfile: (id: string) => request<void>(`/profiles/${id}`, { method: "DELETE" }),
+  exportData: (id: string) => request<Record<string, unknown>>(`/profiles/${id}/export`),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),
   tipping: (id: string, year?: number) => request<Tipping>(`/profiles/${id}/tipping${year ? `?year=${year}` : ""}`),

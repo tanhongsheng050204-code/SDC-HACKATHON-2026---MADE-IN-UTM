@@ -15,9 +15,9 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 12
+SCHEMA_VERSION = 13
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
-              "evidence", "progress_events")
+              "evidence", "progress_events", "consents")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -125,6 +125,19 @@ _MIGRATIONS = {
         created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS progress_events_profile ON progress_events(profile_id, created_at);
+    """,
+    # What a person agreed to, and when: storing a profile (at creation), and later email and
+    # class sharing. A withdrawn consent is a new row with given = 0, so the history stays.
+    13: """
+    CREATE TABLE IF NOT EXISTS consents (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        version TEXT NOT NULL,
+        given INTEGER NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS consents_profile ON consents(profile_id, created_at);
     """,
 }
 
@@ -331,6 +344,39 @@ def list_events(profile_id: str) -> list[dict]:
         rows = conn.execute("SELECT kind, subject, detail, role_id, readiness, created_at FROM progress_events "
                             "WHERE profile_id=? ORDER BY created_at, id", (profile_id,)).fetchall()
     return [dict(r) for r in rows]
+
+
+def add_consent(profile_id: str, kind: str, version: str, given: bool = True) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO consents (id, profile_id, kind, version, given, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                     (secrets.token_urlsafe(9), profile_id, kind, version, int(given),
+                      dt.datetime.now(dt.UTC).isoformat(timespec="microseconds")))
+
+
+def list_consents(profile_id: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT kind, version, given, created_at FROM consents WHERE profile_id=? "
+                            "ORDER BY created_at, id", (profile_id,)).fetchall()
+    return [{**dict(r), "given": bool(r["given"])} for r in rows]
+
+
+def export_rows(profile_id: str) -> dict[str, list[dict]]:
+    """Every stored row that belongs to this profile, table by table, for "Download my data"."""
+    queries = {
+        "future_cards": "SELECT id, role_id, created_at FROM cards WHERE profile_id=? ORDER BY created_at",
+        "proven_skills": "SELECT skill_id, level, proven_at FROM skill_progress WHERE profile_id=? ORDER BY skill_id",
+        "proof_checks": "SELECT skill_id, level, created_at, submitted_at, correct, passed FROM skill_checks "
+                        "WHERE profile_id=? ORDER BY created_at",
+        "survey_answers": "SELECT card_id, answer, note, created_at FROM survey_responses WHERE profile_id=? ORDER BY card_id",
+        "progress_events": "SELECT kind, subject, detail, role_id, readiness, created_at FROM progress_events "
+                           "WHERE profile_id=? ORDER BY created_at, id",
+    }
+    with _connect() as conn:
+        out = {name: [dict(r) for r in conn.execute(sql, (profile_id,)).fetchall()] for name, sql in queries.items()}
+    for row in out["proof_checks"]:
+        row["passed"] = None if row["passed"] is None else bool(row["passed"])
+    out["consents"] = list_consents(profile_id)
+    return out
 
 
 def mark_practised(profile_id: str) -> None:

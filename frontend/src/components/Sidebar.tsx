@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import type { Journey, JourneyStep, Profile } from "../lib/api";
+import { ReactNode, useState } from "react";
+import { api, type Journey, type JourneyStep, type Profile } from "../lib/api";
 import { t } from "../lib/i18n";
 import type { Screen } from "../lib/route";
 import { AccountButton } from "./AccountButton";
@@ -75,8 +75,34 @@ export function Sidebar({ current, roleId, profile, journey, model, prefs, userI
         <p className="side-note">{t("shell.estimates")}</p>
         <div className="side-prefs">{prefs}</div>
         <AccountButton userId={userId} className="side-link" />
+        {profile && <DownloadData profileId={profile.id} />}
         {profile && <button className="side-link danger" onClick={onDelete}><Icon name="trash" />{t("shell.delete")}</button>}
       </div>
     </aside>
+  );
+}
+
+// Data rights: everything stored about this profile as one JSON file, saved in the browser.
+function DownloadData({ profileId }: { profileId: string }) {
+  const [state, setState] = useState<"idle" | "busy" | "failed">("idle");
+  async function download() {
+    setState("busy");
+    try {
+      const data = await api.exportData(profileId);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const a = document.createElement("a");
+      a.href = url; a.download = `laluan-my-data-${profileId.slice(0, 8)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      setState("idle");
+    } catch { setState("failed"); }
+  }
+  return (
+    <>
+      <button className="side-link" onClick={download} disabled={state === "busy"} aria-busy={state === "busy"}>
+        <Icon name="download" />{t("shell.download")}
+      </button>
+      {state === "failed" && <p className="side-note error" role="alert">{t("shell.downloadFailed")}</p>}
+    </>
   );
 }
