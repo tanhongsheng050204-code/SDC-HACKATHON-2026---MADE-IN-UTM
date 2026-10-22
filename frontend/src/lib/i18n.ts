@@ -1261,7 +1261,7 @@ const STRINGS = {
   "v3.statFuturesSub": { en: "Every number shows a range", ms: "Setiap nombor menunjukkan julat", zh: "每个数字都给出范围" },
   "v3.statCv": { en: "CVs stored", ms: "CV disimpan", zh: "存储的简历" },
   "v3.statCvSub": { en: "Names and IC numbers removed first", ms: "Nama dan nombor IC dibuang dahulu", zh: "先去除姓名与身份证号码" },
-  "v3.clerkBig": { en: "from data entry clerk to AI operations specialist, with two free courses", ms: "daripada kerani kemasukan data kepada pakar operasi AI, dengan dua kursus percuma", zh: "从数据录入员到 AI 运营专家，只需两门免费课程" },
+  "v3.clerkBig": { en: "from data entry clerk to AI operations specialist, with three free courses", ms: "daripada kerani kemasukan data kepada pakar operasi AI, dengan tiga kursus percuma", zh: "从数据录入员到 AI 运营专家，只需三门免费课程" },
   "v3.studentBig": { en: "to digital marketing specialist, all free", ms: "ke pakar pemasaran digital, semuanya percuma", zh: "成为数字营销专员，全部免费" },
   "v3.hrBig": { en: "staff in roles at risk, and the cheapest moves for each group", ms: "kakitangan dalam peranan berisiko, dan langkah termurah bagi setiap kumpulan", zh: "名员工处于高风险职位，并给出每组最省钱的转岗方式" },
   "v3.bandEm": { en: "Not without a plan.", ms: "Bukan tanpa pelan.", zh: "有计划就不怕。" },

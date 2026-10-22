@@ -13,7 +13,7 @@ const PHASES = [700, 1900, 1300, 900, 1700, 1700, 2800];
 const TYPED = 1, ANSWER = 2, PRESS = 3, DONE = 4, MOVED = 5;
 
 const ROLES = [
-  { title: "AI operations specialist", fit: 50, after: 71 },
+  { title: "AI operations specialist", fit: 47, after: 67 },
   { title: "Engineering drafting and BIM technician", fit: 40, after: 40 },
   { title: "Supply chain and logistics specialist", fit: 38, after: 38 },
 ];
@@ -50,9 +50,9 @@ export function HeroPreview() {
                 ? tf("v3.nextCourse", { course: tr("Prompt engineering"), h: 2, cost: t("v3.free") })
                 : tf("v3.nextCourse", { course: tr("Critical thinking"), h: 9, cost: t("v3.freeAudit") })}
             </b>
-            <span className="lp-next-bar"><span style={{ width: done ? "71%" : "50%" }} /></span>
+            <span className="lp-next-bar"><span style={{ width: done ? "67%" : "47%" }} /></span>
             <em ref={start} className={phase === PRESS ? "is-pressed" : ""}>{t("v3.startCourse")}</em>
-            {done && <span className="lp-toast">✓ {tr("Critical thinking")} · {tf("v3.ready", { n: 71 })}</span>}
+            {done && <span className="lp-toast">✓ {tr("Critical thinking")} · {tf("v3.ready", { n: 67 })}</span>}
           </div>
           <div className="lp-legs">
             <i className="done">✓</i><s className="done" />
@@ -76,13 +76,13 @@ export function HeroPreview() {
             <div className="lp-step lp-answer">
               <span className="lp-tag">{t("shell.coach")}</span>
               <b>{tr("AI operations specialist")}</b>
-              <span className="lp-meta">{tf("card.fit", { n: 50 })} · {OUTLOOK_TEXT.growing}</span>
+              <span className="lp-meta">{tf("card.fit", { n: 47 })} · {OUTLOOK_TEXT.growing}</span>
             </div>
           )}
           <div className="lp-step">
             <span className="lp-tag"><LogoMark size={16} /> {t("fc.storyReady")}</span>
             <b>{tr("AI operations specialist")}</b>
-            <span className="lp-meta">≈ {done ? 2 : 11} h · {done ? 71 : 50}% → 100%</span>
+            <span className="lp-meta">≈ {done ? 62 : 71} h · {done ? 67 : 47}% → 100%</span>
           </div>
         </div>
         {pointer && <span className={`lp-pointer ${phase === PRESS ? "is-click" : ""}`} style={{ left: pointer.x, top: pointer.y }} />}
@@ -108,14 +108,14 @@ function Side({ on }: { on: Nav }) {
   );
 }
 
-// Job outlook to 2030 under the Baseline scenario: WEF Future of Jobs Report 2025, Figure 2.3, as in
-// backend/data/signals/2026-10-22-wef-foj-2025.json.
+// Job outlook to 2030 under the Baseline scenario, as the live app shows it with the approved
+// forecast 2026-10-22-trend-092120 (WEF Future of Jobs Report 2025, Figure 2.3, adjusted by live signals).
 const OUTLOOK = [
-  { title: "Data analyst", pct: 41.5, label: "growing" },
-  { title: "AI operations specialist", pct: 35.0, label: "growing" },
-  { title: "Digital marketing specialist", pct: 29.2, label: "growing" },
+  { title: "AI operations specialist", pct: 43.5, label: "growing" },
+  { title: "Data analyst", pct: 34.6, label: "growing" },
+  { title: "Digital marketing specialist", pct: 30.1, label: "growing" },
   { title: "Customer service representative", pct: -2.8, label: "stable" },
-  { title: "Data entry clerk", pct: -25.9, label: "declining", mine: true },
+  { title: "Data entry clerk", pct: -31.8, label: "declining", mine: true },
 ];
 
 function RadarScene() {

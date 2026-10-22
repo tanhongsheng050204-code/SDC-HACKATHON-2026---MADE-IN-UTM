@@ -19,10 +19,10 @@ Tester: ______ · Date: ______ · Browser / device: ______
 - [ ] 1.3 **Continue** appears only after you have opened a profile in this browser, and reopens it.
 - [ ] 1.4 Hero: big headline with **"before AI changes it."** in teal; **Open the demo profile** opens Aisyah; **Start with my skills** opens the onboarding.
 - [ ] 1.5 Route ribbon: the route draws itself from **You are here** through the course stops to the **Destination** card.
-- [ ] 1.6 **Try a route**: **Clerk** (≈ 11 hours, 2 free courses), **Student** (≈ 190 hours, 1 course), **Career switcher** (≈ 215 hours, 2 courses, to digital marketing) each redraw the route, stop cards and the hours line.
+- [ ] 1.6 **Try a route**: **Clerk** (≈ 71 hours, 3 free courses), **Student** (≈ 190 hours, 1 course), **Career switcher** (≈ 215 hours, 2 courses, to digital marketing) each redraw the route, stop cards and the hours line.
 - [ ] 1.7 Four number tiles: roles tracked (live count from the server), RM 0 courses, 3 futures, 0 CVs stored; the forecast line shows the update date.
 - [ ] 1.8 App preview below plays three screens in turn — **Today** (Aisyah, next course card, four steps, three role cards), **Future Skills Radar** (job outlook to 2030 from WEF) and **My job, task by task** (O*NET tasks with AI labels); clicking a screen's button holds it.
-- [ ] 1.9 **Made for the people AI is changing first**: three colour cards with photos, a big number (11 h, 190 h, 73 / 160) and tags; **Open Aisyah's demo**, **Open the student demo**, **Open the workforce view** go to the right place.
+- [ ] 1.9 **Made for the people AI is changing first**: three colour cards with photos, a big number (71 h, 190 h, 89 / 190) and tags; **Open Aisyah's demo**, **Open the student demo**, **Open the workforce view** go to the right place.
 - [ ] 1.10 **Changing careers?** link opens Farid's demo; **Open the class view** opens the class view; photo credit line names the photographers.
 - [ ] 1.11 **Starts from what you already have**: a one-page CV (photo, name, contact line, work experience, education, skills); the photo, name, email and phone black out, then the confirmed skills appear.
 - [ ] 1.12 **One afternoon with Laluan**: clicking each time (14:00 … 14:40) changes the text and the picture.
