@@ -12,6 +12,8 @@ Built by team **Made in UTM** for **Domain 1: Aiversecity Future-Ready Workforce
 >
 > **Data:** each role's net job growth to 2030 comes from the **WEF Future of Jobs Report 2025, Figure 2.3** (a global employer survey), read from the chart by [`extract_wef_figure.py`](backend/scripts/extract_wef_figure.py). Each role's AI-exposure settings are the team's own estimates, and every note says so. Pay figures are **DOSM Salaries & Wages Survey Report 2025**, Appendix table A10: monthly medians for Malaysian citizens by occupation group, shown as group medians, never as job offers. The demo people are synthetic. Use synthetic CVs and anonymous workforce files when trying it.
 
+New to Laluan? The **[user manual](docs/USER_MANUAL.md)** explains every feature and how to use it.
+
 ## For judges: five clicks, three minutes
 
 1. Open **[Aisyah's demo](https://laluan-psi.vercel.app/?demo=clerk)**. She is a data-entry clerk; **Today** shows her job is estimated to shrink by about 32% by 2030 (Baseline: WEF Future of Jobs 2025 plus approved live signals).
