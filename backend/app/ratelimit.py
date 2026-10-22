@@ -27,6 +27,7 @@ LIMITS: dict[str, tuple[int, int | None]] = {
     "search": (30, None),        # live job-ad and emerging-role web searches
     "feedback": (30, None),      # helpful buttons and problem reports
     "usage": (120, None),        # anonymous usage counts sent by the app
+    "join": (20, None),          # class codes looked up or joined, so codes can't be guessed
 }
 
 MESSAGE = "You're going a bit fast. Please wait a few minutes and try again."

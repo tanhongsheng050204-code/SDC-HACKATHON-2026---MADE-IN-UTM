@@ -253,3 +253,26 @@ class EmailSettingsIn(BaseModel):
         if self.alerts == "weekly" and not self.digest:
             raise ValueError("Job ads in the weekly email need the weekly email turned on")
         return self
+
+
+class CounsellorRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=2, max_length=80)
+    organisation: str = Field(min_length=2, max_length=120)  # the school, college or university
+
+
+class CounsellorDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    approve: bool
+    decided_by: str = Field(min_length=2, max_length=80)
+
+
+class ClassIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=2, max_length=80)
+
+
+class JoinRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    code: str = Field(min_length=6, max_length=12)
+    profile_id: str = Field(min_length=1, max_length=64)

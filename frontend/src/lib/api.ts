@@ -230,6 +230,24 @@ export interface CoachReply {
   removed?: Record<string, number>;  // personal details taken out of the question before any AI read it
   revised?: boolean; dropped?: number;  // the AI answer was checked against the sources and corrected
 }
+export interface ClassPreview { name: string; counsellor: string; organisation: string; shared: string[] }
+export interface Membership { id: string; name: string; code: string; joined_at: string; counsellor: string; organisation: string }
+export interface CounsellorMe {
+  status: "pending" | "approved" | "revoked" | null; name: string | null; organisation: string | null;
+  classes: { id: string; name: string; code: string; created_at: string; members: number }[];
+}
+export interface ClassStudent {
+  display_name: string | null; destination: string | null; readiness: number | null; courses_finished: number;
+  skills_proven: { name: string; level: number }[]; last_active: string; target_date: string | null; status: ProgressStatus | null;
+}
+export interface ClassDashboard {
+  id: string; name: string; code: string; created_at: string; students: ClassStudent[];
+  counts: Record<ProgressStatus | "no_date", number>; shared: string[];
+}
+export interface Counsellor {
+  user_id: string; email: string | null; name: string; organisation: string; status: "pending" | "approved" | "revoked";
+  requested_at: string; decided_at: string | null; decided_by: string | null;
+}
 export type EmailAlerts = "off" | "weekly" | "instant";
 export type EmailState = "anywhere" | "johor" | "kedah" | "kelantan" | "melaka" | "negeri_sembilan" | "pahang" | "perak" | "perlis"
   | "pulau_pinang" | "sabah" | "sarawak" | "selangor" | "terengganu" | "kuala_lumpur" | "labuan" | "putrajaya";
@@ -468,6 +486,21 @@ export const api = {
     request<EmailSettingsReply>(`/profiles/${id}/email`, { method: "PUT", body: JSON.stringify(body) }),
   unsubscribe: (token: string) =>
     request<{ done: "all" | "alerts" }>(`/email/unsubscribe?token=${encodeURIComponent(token)}`, { method: "POST" }),
+  myClasses: (id: string) => request<Membership[]>(`/profiles/${id}/classes`),
+  leaveClass: (id: string, classId: string) => request<Membership[]>(`/profiles/${id}/classes/${classId}`, { method: "DELETE" }),
+  classPreview: (code: string) => request<ClassPreview>(`/class-codes/${encodeURIComponent(code)}`),
+  joinClass: (code: string, profileId: string) =>
+    request<Membership[]>("/classes/join", { method: "POST", body: JSON.stringify({ code, profile_id: profileId }) }),
+  counsellorMe: () => request<CounsellorMe>("/counsellor/me"),
+  counsellorRequest: (name: string, organisation: string) =>
+    request<CounsellorMe>("/counsellor/request", { method: "POST", body: JSON.stringify({ name, organisation }) }),
+  createClass: (name: string) => request<{ id: string; code: string }>("/classes", { method: "POST", body: JSON.stringify({ name }) }),
+  classDashboard: (classId: string) => request<ClassDashboard>(`/classes/${classId}`),
+  deleteClass: (classId: string) => request<void>(`/classes/${classId}`, { method: "DELETE" }),
+  adminCounsellors: (token: string) => request<Counsellor[]>("/admin/counsellors", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
+  decideCounsellor: (token: string, userId: string, approve: boolean, decidedBy: string) =>
+    request<Counsellor>(`/admin/counsellors/${encodeURIComponent(userId)}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },
+      body: JSON.stringify({ approve, decided_by: decidedBy }) }),
   exportData: (id: string) => request<Record<string, unknown>>(`/profiles/${id}/export`),
   matches: (id: string, scenario: Scenario, year?: number, adoption?: number, extra: string[] = []) =>
     request<Matches>(`/profiles/${id}/matches?scenario=${scenario}${year ? `&year=${year}` : ""}${adoption !== undefined ? `&adoption=${adoption}` : ""}${extra.length ? `&extra=${encodeURIComponent(extra.join(","))}` : ""}`),

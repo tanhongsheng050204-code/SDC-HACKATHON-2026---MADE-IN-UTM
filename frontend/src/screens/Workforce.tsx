@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataBanner } from "../components/DataBanner";
 import { InfoTip } from "../components/InfoTip";
 import { ClassView } from "./ClassView";
+import { CounsellorClasses } from "../components/CounsellorClasses";
 import { SdgTile, Sdgs } from "../components/Sdgs";
 import { api, Scenario, Workforce as WorkforceData } from "../lib/api";
 import { percent, signed } from "../lib/format";
@@ -11,8 +12,8 @@ import { HEAT, SCENARIOS } from "../lib/labels";
 // H1: aggregate view for HR teams. The backend refuses files with personal columns; this screen
 // only ever shows totals by role.
 // Two audiences share this screen: HR teams (a company) and career centres (a class).
-export function Workforce({ initialTab = "company" }: { initialTab?: "company" | "class" }) {
-  const [tab, setTab] = useState<"company" | "class">(initialTab);
+export function Workforce({ initialTab = "company", userId = null }: { initialTab?: "company" | "class" | "classes"; userId?: string | null }) {
+  const [tab, setTab] = useState<"company" | "class" | "classes">(initialTab);
   return (
     <section>
       <div className="page-head">
@@ -21,8 +22,9 @@ export function Workforce({ initialTab = "company" }: { initialTab?: "company" |
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === "company"} onClick={() => setTab("company")}>{t("class.tabCompany")}</button>
         <button role="tab" aria-selected={tab === "class"} onClick={() => setTab("class")}>{t("class.tabClass")}</button>
+        <button role="tab" aria-selected={tab === "classes"} onClick={() => setTab("classes")}>{t("cls.tab")}</button>
       </div>
-      {tab === "company" ? <Company /> : <ClassView loadSample={initialTab === "class"} />}
+      {tab === "company" ? <Company /> : tab === "class" ? <ClassView loadSample={initialTab === "class"} /> : <CounsellorClasses userId={userId} />}
     </section>
   );
 }

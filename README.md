@@ -272,7 +272,7 @@ Every role's growth figure is its WEF Future of Jobs 2025 category (Figure 2.3);
 ## Tests and checks
 
 ```powershell
-cd backend; .\.venv\Scripts\python.exe -m pytest     # 337 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
+cd backend; .\.venv\Scripts\python.exe -m pytest     # about 410 tests: API, services, trends, forecasts, review, guardrails, openings, interview, exposure, data integrity, privacy
 cd frontend; npm test; npm run lint; npm run build   # Vitest component tests, ESLint, type check + production build
 ```
 

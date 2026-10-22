@@ -15,10 +15,10 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 15
+SCHEMA_VERSION = 16
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence", "progress_events", "consents", "feedback", "usage_counts",
-              "email_settings", "sent_jobs")
+              "email_settings", "sent_jobs", "counsellors", "classes", "class_members")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -184,6 +184,36 @@ _MIGRATIONS = {
         sent_at TEXT NOT NULL,
         PRIMARY KEY (profile_id, job_key)
     );
+    """,
+    # Career-centre classes: an admin approves a counsellor (a Google login); the counsellor makes a
+    # class with a join code; a logged-in student joins after seeing what is shared, and leaving
+    # deletes the membership row, so access ends at once.
+    16: """
+    CREATE TABLE IF NOT EXISTS counsellors (
+        user_id TEXT PRIMARY KEY,
+        email TEXT,
+        name TEXT NOT NULL,
+        organisation TEXT NOT NULL,
+        status TEXT NOT NULL,
+        requested_at TEXT NOT NULL,
+        decided_at TEXT,
+        decided_by TEXT
+    );
+    CREATE TABLE IF NOT EXISTS classes (
+        id TEXT PRIMARY KEY,
+        code TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        counsellor_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS classes_counsellor ON classes(counsellor_user_id);
+    CREATE TABLE IF NOT EXISTS class_members (
+        class_id TEXT NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        joined_at TEXT NOT NULL,
+        PRIMARY KEY (class_id, profile_id)
+    );
+    CREATE INDEX IF NOT EXISTS class_members_profile ON class_members(profile_id);
     """,
 }
 
@@ -424,6 +454,7 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
     out["consents"] = list_consents(profile_id)
     settings = get_email_settings(profile_id)
     out["email_settings"] = [settings] if settings else []
+    out["classes"] = [{k: m[k] for k in ("name", "counsellor", "organisation", "joined_at")} for m in memberships(profile_id)]
     with _connect() as conn:
         out["emailed_job_ads"] = [dict(r) for r in conn.execute(
             "SELECT job_key, sent_at FROM sent_jobs WHERE profile_id=? ORDER BY sent_at", (profile_id,)).fetchall()]
@@ -756,4 +787,106 @@ def usage_since(day: str) -> list[dict]:
     with _connect() as conn:
         rows = conn.execute("SELECT event, day, count FROM usage_counts WHERE day >= ? ORDER BY day, event",
                             (day,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+# --- career-centre classes ------------------------------------------------------------------------
+
+CODE_LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O or 1/I, so a code read aloud is typed right
+
+
+def request_counsellor(user_id: str, email: str | None, name: str, organisation: str) -> dict:
+    """Ask to be a counsellor (or update the name). An approved or revoked status is kept."""
+    with _connect() as conn:
+        updated = conn.execute("UPDATE counsellors SET email=?, name=?, organisation=? WHERE user_id=?",
+                               (email, name, organisation, user_id)).rowcount
+        if not updated:
+            conn.execute("INSERT INTO counsellors (user_id, email, name, organisation, status, requested_at) "
+                         "VALUES (?, ?, ?, ?, 'pending', ?)", (user_id, email, name, organisation, _now()))
+    return get_counsellor(user_id)
+
+
+def get_counsellor(user_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM counsellors WHERE user_id=?", (user_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def list_counsellors() -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT * FROM counsellors ORDER BY requested_at DESC").fetchall()
+    return [dict(r) for r in rows]
+
+
+def decide_counsellor(user_id: str, status: str, decided_by: str) -> bool:
+    with _connect() as conn:
+        return conn.execute("UPDATE counsellors SET status=?, decided_at=?, decided_by=? WHERE user_id=?",
+                            (status, _now(), decided_by, user_id)).rowcount == 1
+
+
+def create_class(counsellor_user_id: str, name: str) -> dict:
+    class_id = str(uuid.uuid4())
+    for _ in range(10):
+        code = "".join(secrets.choice(CODE_LETTERS) for _ in range(8))
+        try:
+            with _connect() as conn:
+                conn.execute("INSERT INTO classes (id, code, name, counsellor_user_id, created_at) VALUES (?, ?, ?, ?, ?)",
+                             (class_id, code, name, counsellor_user_id, _now()))
+            return get_class(class_id)
+        except Exception as error:  # a code already in use: try another
+            if "unique" not in str(error).lower() and "duplicate" not in str(error).lower():
+                raise
+    raise RuntimeError("Could not find a free class code")
+
+
+def get_class(class_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM classes WHERE id=?", (class_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def class_by_code(code: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM classes WHERE code=?", (code.strip().upper(),)).fetchone()
+    return dict(row) if row else None
+
+
+def classes_for(counsellor_user_id: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT c.*, (SELECT COUNT(*) FROM class_members m WHERE m.class_id = c.id) AS members "
+                            "FROM classes c WHERE counsellor_user_id=? ORDER BY created_at DESC",
+                            (counsellor_user_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def delete_class(class_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM class_members WHERE class_id=?", (class_id,))
+        conn.execute("DELETE FROM classes WHERE id=?", (class_id,))
+
+
+def join_class(class_id: str, profile_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO class_members (class_id, profile_id, joined_at) VALUES (?, ?, ?) "
+                     "ON CONFLICT (class_id, profile_id) DO NOTHING", (class_id, profile_id, _now()))
+
+
+def leave_class(class_id: str, profile_id: str) -> bool:
+    with _connect() as conn:
+        return conn.execute("DELETE FROM class_members WHERE class_id=? AND profile_id=?",
+                            (class_id, profile_id)).rowcount > 0
+
+
+def member_ids(class_id: str) -> list[str]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT profile_id FROM class_members WHERE class_id=? ORDER BY joined_at", (class_id,)).fetchall()
+    return [r["profile_id"] for r in rows]
+
+
+def memberships(profile_id: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT c.id, c.name, c.code, m.joined_at, k.name AS counsellor, k.organisation "
+                            "FROM class_members m JOIN classes c ON c.id = m.class_id "
+                            "LEFT JOIN counsellors k ON k.user_id = c.counsellor_user_id "
+                            "WHERE m.profile_id=? ORDER BY m.joined_at", (profile_id,)).fetchall()
     return [dict(r) for r in rows]

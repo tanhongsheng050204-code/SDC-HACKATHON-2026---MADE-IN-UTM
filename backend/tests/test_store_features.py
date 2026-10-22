@@ -91,3 +91,25 @@ def test_email_settings_and_sent_jobs(anydb):
     assert rows["email_settings"][0]["email"] == "a@b.my" and len(rows["emailed_job_ads"]) == 3
     store.delete_profile(pid)
     assert store.get_email_settings(pid) is None and store.sent_job_keys(pid) == set()
+
+
+def test_counsellors_classes_and_members(anydb):
+    import uuid
+    teacher = f"teacher-{uuid.uuid4().hex[:8]}"  # the Postgres database is shared between runs
+    store.request_counsellor(teacher, "t@school.my", "Puan Aminah", "KV Shah Alam")
+    assert store.get_counsellor(teacher)["status"] == "pending"
+    assert store.decide_counsellor(teacher, "approved", "Admin")
+    klass = store.create_class(teacher, "DKM 2")
+    assert store.class_by_code(klass["code"].lower())["id"] == klass["id"]
+    pid = _profile()
+    store.join_class(klass["id"], pid)
+    store.join_class(klass["id"], pid)  # joining twice changes nothing
+    assert store.member_ids(klass["id"]) == [pid]
+    assert store.classes_for(teacher)[0]["members"] == 1
+    assert store.memberships(pid)[0]["organisation"] == "KV Shah Alam"
+    assert store.leave_class(klass["id"], pid) and not store.leave_class(klass["id"], pid)
+    store.join_class(klass["id"], pid)
+    store.delete_profile(pid)
+    assert store.member_ids(klass["id"]) == []
+    store.delete_class(klass["id"])
+    assert store.get_class(klass["id"]) is None

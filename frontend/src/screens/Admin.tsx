@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { EvidencePanel } from "../components/EvidencePanel";
 import { FeedbackPanel } from "../components/FeedbackPanel";
+import { CounsellorPanel } from "../components/CounsellorPanel";
 import { RefreshPanel } from "../components/RefreshPanel";
 
 // The human check on new data, in one place: trend refreshes, skill evidence from job ads,
@@ -19,6 +20,7 @@ export function Admin() {
       <RefreshPanel onDone={approved} />
       <EvidencePanel onDone={approved} />
       <FeedbackPanel />
+      <CounsellorPanel />
     </section>
   );
 }

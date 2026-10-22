@@ -12,11 +12,11 @@ from app import ratelimit, runpod, store
 from app.auth import current_claims, current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, EmailSettingsIn, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (CardRequest, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (alerts, cards, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
+from app.services import (alerts, cards, classes, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
                           openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
 from app.trends import refresh, review
@@ -900,6 +900,129 @@ def cron_alerts(x_cron_secret: str = Header(default="")):
     if not get_settings().email_available:
         return {"email": "not set up", "sent": 0, "skipped": 0, "failed": 0}
     return {"email": "ok", **alerts.run_alerts(get_reference())}
+
+
+# --- career-centre classes ------------------------------------------------------------------------
+
+CLASS_VERSION = "2026-10-22"  # the "what your counsellor will see" wording a join consent refers to
+
+
+def _logged_in(claims: dict | None) -> str:
+    if not claims:
+        raise HTTPException(401, "Log in with Google first")
+    return str(claims["sub"])
+
+
+def _approved_counsellor(claims: dict | None) -> str:
+    user = _logged_in(claims)
+    counsellor = store.get_counsellor(user)
+    if counsellor is None or counsellor["status"] != "approved":
+        raise HTTPException(403, "Only approved counsellors can do this")
+    return user
+
+
+def _own_class(class_id: str, user: str) -> dict:
+    klass = store.get_class(class_id)
+    if klass is None or klass["counsellor_user_id"] != user:
+        raise HTTPException(404, "Class not found")
+    return klass
+
+
+@router.get("/counsellor/me")
+def counsellor_me(claims: dict | None = Claims):
+    """Am I a counsellor, and my classes (approved counsellors only)."""
+    user = _logged_in(claims)
+    counsellor = store.get_counsellor(user)
+    status = counsellor["status"] if counsellor else None
+    return {"status": status, "name": counsellor and counsellor["name"], "organisation": counsellor and counsellor["organisation"],
+            "classes": store.classes_for(user) if status == "approved" else []}
+
+
+@router.post("/counsellor/request")
+def counsellor_request(body: CounsellorRequest, claims: dict | None = Claims):
+    """Ask to be a counsellor. An admin approves it on the Admin page."""
+    user = _logged_in(claims)
+    store.request_counsellor(user, claims.get("email"), body.name.strip(), body.organisation.strip())
+    return counsellor_me(claims)
+
+
+@router.get("/admin/counsellors")
+def admin_counsellors(x_admin_token: str = Header(default="")):
+    _require_admin(x_admin_token)
+    return store.list_counsellors()
+
+
+@router.post("/admin/counsellors/{user_id}")
+def admin_decide_counsellor(user_id: str, body: CounsellorDecision, x_admin_token: str = Header(default="")):
+    """Approve or revoke. Revoking stops dashboards at once; the classes and memberships stay."""
+    _require_admin(x_admin_token)
+    if not store.decide_counsellor(user_id, "approved" if body.approve else "revoked", body.decided_by.strip()):
+        raise HTTPException(404, "No such counsellor request")
+    return store.get_counsellor(user_id)
+
+
+@router.post("/classes", status_code=201)
+def create_class(body: ClassIn, claims: dict | None = Claims):
+    user = _approved_counsellor(claims)
+    return store.create_class(user, body.name.strip())
+
+
+@router.get("/classes/{class_id}")
+def class_dashboard(class_id: str, claims: dict | None = Claims):
+    """Per student, only: name, destination, readiness, courses finished, skills proven, last active,
+    target date and on-track status."""
+    user = _approved_counsellor(claims)
+    return classes.dashboard(get_reference(), _own_class(class_id, user))
+
+
+@router.delete("/classes/{class_id}", status_code=204)
+def delete_class(class_id: str, claims: dict | None = Claims):
+    user = _approved_counsellor(claims)
+    _own_class(class_id, user)
+    store.delete_class(class_id)
+
+
+@router.get("/class-codes/{code}")
+def class_preview(code: str, request: Request, claims: dict | None = Claims):
+    """Before joining: the class, who runs it, and exactly what they will see."""
+    ratelimit.check(request, "join")
+    _logged_in(claims)
+    klass = store.class_by_code(code)
+    counsellor = store.get_counsellor(klass["counsellor_user_id"]) if klass else None
+    if klass is None or counsellor is None or counsellor["status"] != "approved":
+        raise HTTPException(404, "No class with that code")
+    return {"name": klass["name"], "counsellor": counsellor["name"], "organisation": counsellor["organisation"],
+            "shared": list(classes.SHARED)}
+
+
+@router.post("/classes/join")
+def join_class(body: JoinRequest, request: Request, claims: dict | None = Claims):
+    ratelimit.check(request, "join")
+    user = _logged_in(claims)
+    profile = _owned_by(body.profile_id, claims)
+    klass = store.class_by_code(body.code)
+    counsellor = store.get_counsellor(klass["counsellor_user_id"]) if klass else None
+    if klass is None or counsellor is None or counsellor["status"] != "approved":
+        raise HTTPException(404, "No class with that code")
+    if klass["counsellor_user_id"] == user:
+        raise HTTPException(422, "You run this class")
+    store.join_class(klass["id"], profile["id"])
+    store.add_consent(profile["id"], "class_share", CLASS_VERSION, True)
+    return store.memberships(profile["id"])
+
+
+@router.get("/profiles/{profile_id}/classes")
+def my_classes(profile_id: str, user: str | None = User):
+    return store.memberships(_profile_for(profile_id, user)["id"])
+
+
+@router.delete("/profiles/{profile_id}/classes/{class_id}")
+def leave_class(profile_id: str, class_id: str, user: str | None = User):
+    """Leave a class: the counsellor loses access at once."""
+    profile = _profile_for(profile_id, user)
+    if store.leave_class(class_id, profile["id"]):
+        store.add_consent(profile["id"], "class_share", CLASS_VERSION, False)
+    return store.memberships(profile["id"])
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

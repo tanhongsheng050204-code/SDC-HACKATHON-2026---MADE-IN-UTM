@@ -18,6 +18,7 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CardPage } from "./screens/CardPage";
 import { Unsubscribe } from "./screens/Unsubscribe";
 import { EmailSettings } from "./components/EmailSettings";
+import { JoinClass } from "./components/JoinClass";
 import { Impact } from "./screens/Impact";
 import { Intake } from "./screens/Intake";
 import { Admin } from "./screens/Admin";
@@ -40,6 +41,11 @@ export default function App() {
   const params = new URLSearchParams(window.location.search);
   const cardId = params.get("card");
   const unsubscribe = params.get("unsubscribe");
+  const join = params.get("join");
+  if (join && /^[A-Za-z0-9]{6,12}$/.test(join)) {  // a class join link: keep the code for My profile
+    save(KEYS.joinCode, join.toUpperCase(), "session");
+    window.history.replaceState(null, "", `${window.location.pathname}?view=profile`);
+  }
   if (unsubscribe) return <Unsubscribe token={unsubscribe} />;
   return cardId ? <CardPage cardId={cardId} /> : <MainApp demo={params.get("demo")} />;
 }
@@ -414,6 +420,7 @@ function MainApp({ demo }: { demo: string | null }) {
                 onBack={() => go("home")} onSaved={profileEdited} onAddMore={() => go("intake")} onStartOver={deleteProfile} />
             )}
             {screen === "profile" && profile && <EmailSettings profile={profile} userId={userId} />}
+            {screen === "profile" && profile && <JoinClass profile={profile} userId={userId} />}
             {screen === "admin" && <Admin />}
             {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
             {screen === "tasks" && profile && <Tasks profile={profile} onNext={() => go("roles")} />}
@@ -437,7 +444,7 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
             {screen === "review-kit" && <ReviewKit />}
-            {screen === "workforce" && <Workforce initialTab={workforceTab} />}
+            {screen === "workforce" && <Workforce initialTab={workforceTab} userId={userId} />}
           </ScreenBoundary>
         </main>
       </div>

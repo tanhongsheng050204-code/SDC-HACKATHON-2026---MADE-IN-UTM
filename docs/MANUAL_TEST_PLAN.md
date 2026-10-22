@@ -261,6 +261,12 @@ Notes: ______
 - [ ] 18.2 Roles the class fits best, the skills most students still need, and the courses that help the most students.
 - [ ] 18.3 Results split by programme when the CSV has a programme column; groups smaller than 3 are hidden ("Totals only").
 - [ ] 18.4 Upload CSV and Analyse work; identifying columns are refused as in 17.8.
+- [ ] 18.5 The anonymous CSV class view (tab **Class (career centre)**) works as before.
+- [ ] 18.6 Tab **My classes (counsellors)**: logged out → "Log in with Google to run a class". Logged in → name and school form → **Ask to be a counsellor** → "A Laluan admin will check…".
+- [ ] 18.7 Admin → **Career-centre counsellors** (admin token + your name) → **Approve**. Back on My classes: **Create class** gives an 8-letter join code (no 0/O/1/I) and **Copy join link** copies `…/?join=CODE`.
+- [ ] 18.8 Student (another Google account, profile saved to it): the join link opens My profile with the code filled in; **Find class** shows the class, counsellor and school, the 8 shared fields and "Never shared: your skill list, survey answers, CV, chats…"; **Join and share** → "You joined …".
+- [ ] 18.9 Counsellor → **Open**: one row per student with only name, destination, readiness, courses finished, skills proven (level), target date, On track/Behind badge and last active; the filter chips (All, On track, Ahead, Behind, Ready, No target date) show counts and filter the table.
+- [ ] 18.10 Student → **Leave** (confirm) → the row disappears from the counsellor's table on the next **Open**. Admin **Revoke** → the counsellor's Open fails and new joins are refused. **Delete class** removes memberships; students keep their profiles.
 
 Notes: ______
 
@@ -337,7 +343,7 @@ Notes: ______
 
 ## 25. For developers (local)
 
-- [ ] 25.1 `cd backend` → `.\.venv\Scripts\python.exe -m pytest` → all pass (352 passed, 1 skipped on 22 Oct).
+- [ ] 25.1 `cd backend` → `.\.venv\Scripts\python.exe -m pytest` → all pass (410 passed, 6 skipped on 22 Oct; the skips need TEST_DATABASE_URL for Postgres).
 - [ ] 25.2 `cd frontend` → `npm test` (Vitest), `npm run lint` (ESLint, warnings allowed) and `npm run build` → no errors.
 - [ ] 25.5 GitHub → Actions → **Scheduled jobs** → Run workflow → `ping` succeeds; scheduled pings appear every ~10 minutes between 07:00 and 23:00 Malaysia time.
 - [ ] 25.3 `python scripts/refresh_trends.py` saves a snapshot for review; `--approve-as "Name"` publishes it.
