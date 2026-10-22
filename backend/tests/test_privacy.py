@@ -51,3 +51,21 @@ def test_only_cv_extraction_sees_cv_text(client, prompts):
         if module != "app.services.skills":
             assert "Kampung Baru" not in prompt, module
     assert any("Kampung Baru" in p for m, p in prompts if m == "app.services.skills")
+
+
+def test_a_heading_first_cv_keeps_the_heading_and_loses_the_split_name():
+    """A sidebar CV: the name broken over two lines after a heading, a referee with a title, a profile link."""
+    from app.services.deid import scrub_cv
+    cv = ("PROFILE\nNurul Aina\nbinti Hassan\nnurul.aina.hassan@example.com\nlinkedin.com/in/nurulaina-example\n"
+          "SKILLS\nExcel (pivot tables)\nPower BI\nEXPERIENCE\nEngineering Intern, built dashboards for Nurul's team\n"
+          "REFEREE\nDr. Tan Wei Ming\nSenior Lecturer, UTM\ntan.weiming@example.com\n")
+    clean = scrub_cv(cv)
+    for leak in ("Nurul", "Aina", "Hassan", "Tan Wei", "Ming", "linkedin", "nurulaina"):
+        assert leak.lower() not in clean.lower(), leak
+    assert clean.startswith("PROFILE\n[NAME]\n[NAME]") and "Excel (pivot tables)" in clean and "Power BI" in clean
+    assert "[LINK]" in clean
+
+
+def test_titled_names_are_removed_anywhere():
+    from app.services.deid import scrub
+    assert scrub("Reported to Puan Siti Aminah and Ir. Lim Chee Keong weekly.") == "Reported to [NAME] and [NAME] weekly."

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, Audience, Profile, RoleOption, Skill } from "../lib/api";
-import { t, tf, tr } from "../lib/i18n";
+import { api, Audience, Profile, RoleOption, SendPreview, Skill } from "../lib/api";
+import { t, tf, tr, type StringKey } from "../lib/i18n";
+import { takeSent } from "../lib/sent";
 
 const AUDIENCES: { id: Audience; label: "aud.worker" | "aud.graduate" | "aud.switcher" }[] = [
   { id: "worker", label: "aud.worker" }, { id: "graduate", label: "aud.graduate" }, { id: "switcher", label: "aud.switcher" },
@@ -23,6 +24,7 @@ export function Review({ initial, audience: startAudience, existing, onSaved, on
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [sent] = useState(takeSent);  // an uploaded CV's scrubbed text, shown once
 
   useEffect(() => {
     setListsFailed(false);
@@ -51,6 +53,7 @@ export function Review({ initial, audience: startAudience, existing, onSaved, on
     <section>
       <div className="page-head"><h1>{editing ? t("nav.profile") : t("h.check")}</h1>
         <p className="muted">{editing ? t("review.editSub") : t("rv.sub")}</p></div>
+      {sent && <SentNote sent={sent} />}
       {listsFailed && (
         <p className="error" role="alert">{t("review.listsFailed")} <button className="link" onClick={() => setAttempt((n) => n + 1)}>{t("shell.retry")}</button></p>
       )}
@@ -110,5 +113,19 @@ export function Review({ initial, audience: startAudience, existing, onSaved, on
       </div>
       {error && <p className="error" role="alert">{error} <button className="link" onClick={save}>{t("shell.retry")}</button></p>}
     </section>
+  );
+}
+
+/** What the uploaded CV sent to the AI, after names, contact details and links were removed. */
+function SentNote({ sent }: { sent: SendPreview }) {
+  const removed = Object.entries(sent.removed);
+  return (
+    <>
+      {sent.from_scan && <p className="banner warning">{t("rv.fromScan")}</p>}
+      <details className="card sent-note">
+        <summary>{t("rv.sentTitle")}{removed.length > 0 && ` · ${t("send.removed")}: ${removed.map(([k, n]) => `${t(`pii.${k}` as StringKey)} (${n})`).join(", ")}`}</summary>
+        <pre className="sent-text">{sent.text}</pre>
+      </details>
+    </>
   );
 }

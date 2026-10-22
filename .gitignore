@@ -19,3 +19,4 @@ backend/data/signals/pending/
 
 # Vite dependency cache
 .vite/
+backend/models/

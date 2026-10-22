@@ -5,6 +5,7 @@ import hmac
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 
@@ -452,16 +453,16 @@ async def upload_cv(request: Request, file: UploadFile = File(...)):
     """A CV file in, skill IDs out. Read in memory, scrubbed before any LLM call, never stored."""
     ratelimit.check(request, "cv")
     data = await file.read(documents.MAX_BYTES + 1)
-    try:
-        text = documents.read_text(file.filename or "", data)
+    try:  # OCR of a scan takes seconds of CPU: off the event loop
+        text, from_scan = await run_in_threadpool(documents.read, file.filename or "", data)
     except documents.UnreadableDocument as error:
         raise HTTPException(422, str(error)) from error
-    return {**skills.extract(text), "characters": len(text)}
+    return {**skills.extract(text), "characters": len(text), "from_scan": from_scan}
 
 
-def _preview(text: str) -> dict:
+def _preview(text: str, from_scan: bool = False) -> dict:
     clean = scrub_cv(text)
-    return {"text": clean, "removed": removed_counts(clean), "characters": len(clean)}
+    return {"text": clean, "removed": removed_counts(clean), "characters": len(clean), "from_scan": from_scan}
 
 
 @router.post("/intake/preview")
@@ -475,8 +476,8 @@ async def preview_upload(request: Request, file: UploadFile = File(...)):
     """A CV file in, its scrubbed text out. Read in memory, never stored."""
     ratelimit.check(request, "cv")
     data = await file.read(documents.MAX_BYTES + 1)
-    try:
-        return _preview(documents.read_text(file.filename or "", data))
+    try:  # OCR of a scan takes seconds of CPU: off the event loop
+        return _preview(*await run_in_threadpool(documents.read, file.filename or "", data))
     except documents.UnreadableDocument as error:
         raise HTTPException(422, str(error)) from error
 
