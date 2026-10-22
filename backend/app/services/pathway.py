@@ -55,6 +55,9 @@ Steps: {steps}
 Total hours: {hours}"""
 
 
+_summaries: dict[str, str] = {}  # summary per plan prompt, for this process
+
+
 def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None, free_only: bool = False) -> dict:
     """The plan is built from the skills the person reported, so finished steps stay visible
     (marked done) and readiness shows the progress since the plan was made. `role_override` is the
@@ -95,12 +98,16 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
     try:
         if not summarize:
             raise RuntimeError("summary not requested")
-        result = generate_json(SUMMARY_PROMPT.format(
+        prompt = SUMMARY_PROMPT.format(
             role=role["title"],
             steps=[(s["course"]["title"], s["course"]["provider"], s["course"]["hours"]) for s in steps],
             hours=total_hours,
-        ))
-        summary, mode = str(result["summary"]), "gemini"
+        )
+        # The same plan always gets the same summary, so ask once: ticking a course or switching
+        # "Free courses only" back would otherwise wait on Gemini (about 14 s) every time.
+        if prompt not in _summaries:
+            _summaries[prompt] = str(generate_json(prompt)["summary"])
+        summary, mode = _summaries[prompt], "gemini"
     except Exception:
         pass  # offline: the template summary stands
 

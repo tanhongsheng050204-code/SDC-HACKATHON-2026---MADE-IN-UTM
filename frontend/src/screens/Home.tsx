@@ -38,7 +38,7 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
   const current = data?.roles.find((r) => r.is_current_role) ?? data?.current_role ?? null;
   const audience = profile.audience ?? "worker";
   const entryRoles = data?.roles.filter((r) => r.why.entry_points > 0).slice(0, 3) ?? [];
-  const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+  const today = new Date().toLocaleDateString(document.documentElement.lang || undefined, { weekday: "long", day: "numeric", month: "short", year: "numeric" });
 
   function openStep(step: JourneyStep) {
     if (step === "stand") onGo("intake");

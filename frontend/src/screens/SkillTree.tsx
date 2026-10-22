@@ -115,11 +115,14 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
   async function setCourse(courseId: string, done: boolean, anchor?: HTMLElement) {
     if (saving) return;
     setSaving(true); setError(null);
+    // Tick the box straight away; the refreshed plan (hours, readiness) follows from the server.
+    const before = plan;
+    setPlan(p => p && { ...p, steps: p.steps.map(s => s.course.id === courseId ? { ...s, done } : s) });
     try {
       onProfile(await api.complete(profile.id, courseId, done));
       if (done && anchor) spawnConfetti(anchor);
       setOpen(previous => previous?.course?.id === courseId ? { ...previous, course_done: done } : previous);
-    } catch { setError(t("target.failed")); }
+    } catch { setPlan(before); setError(t("target.failed")); }
     finally { setSaving(false); }
   }
 

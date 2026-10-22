@@ -64,7 +64,7 @@ button.card:hover:not(:disabled) { border-color: transparent; box-shadow: 0 16px
 .tabs, .segmented { background: var(--surface); border: none; border-radius: 16px; padding: 5px; gap: 4px; }
 .tabs button, .segmented button { min-height: 40px; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; color: var(--ink-2); }
 .tabs [aria-selected="true"], .segmented [aria-checked="true"] { background: var(--ink); color: var(--page); box-shadow: none; }
-.tabs [aria-selected="true"]:hover:not(:disabled), .segmented [aria-checked="true"]:hover:not(:disabled) { background: var(--ink); }
+.tabs [aria-selected="true"]:hover:not(:disabled), .segmented [aria-checked="true"]:hover:not(:disabled) { background: var(--ink); color: var(--page); }
 textarea, select, input[type="number"], input[type="password"], input[type="text"], input[type="search"] { border: 2px solid var(--line-strong); border-radius: 14px; min-height: 48px; padding: 10px 14px; }
 .banner { border-radius: 16px; }
 
@@ -127,7 +127,7 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .home-card-tags .badge { background: var(--surface); }
 .home-card-title { font-size: 1.05rem; font-weight: 800; line-height: 1.25; }
 .home-card-big { font-size: 2.6rem; font-weight: 900; letter-spacing: -.05em; line-height: 1; }
-.home-card-meta { font-size: .86rem; font-weight: 650; color: var(--ink-2); }
+.home-card-meta { font-size: .86rem; font-weight: 650; line-height: 1.45; color: var(--ink-2); }
 @media (max-width: 640px) {
   .journey { padding: 16px 6px; }
   .journey::before { top: 37px; }
@@ -309,3 +309,11 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .split-bar .split { border-radius: 99px; }
 .heatmap td, .heatmap th { border-top-color: var(--line); }
 .hm-good, .hm-stable, .hm-risk { border-radius: 8px; }
+
+/* Buttons that are not meant to look like buttons (the global pressable style must not reach them). */
+.story-dash, .story-tap, .intake-back { min-height: 0; border: none; box-shadow: none; padding: 0; border-radius: 99px; }
+.story-dash { height: 5px; background: var(--line-strong); }
+.story-dash.done, .story-dash.active { background: var(--accent); }
+.story-tap, .story-tap:hover:not(:disabled), .story-tap:active:not(:disabled) { background: transparent; transform: none; }
+.story-dash:active:not(:disabled), .intake-back:active:not(:disabled) { transform: none; box-shadow: none; }
+.intake-back, .intake-back:hover:not(:disabled) { background: none; min-height: 44px; }

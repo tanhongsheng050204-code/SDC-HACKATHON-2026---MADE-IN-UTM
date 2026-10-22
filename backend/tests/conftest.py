@@ -57,3 +57,10 @@ def offline_my_postings(monkeypatch):
         raise ValueError("no network in tests")
 
     monkeypatch.setattr(mypostings, "collect", offline)
+
+
+@pytest.fixture(autouse=True)
+def fresh_pathway_summaries():
+    """Each test starts without cached plan summaries, so a patched Gemini is always called."""
+    from app.services import pathway
+    pathway._summaries.clear()
