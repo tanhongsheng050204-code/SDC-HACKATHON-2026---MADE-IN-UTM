@@ -37,13 +37,13 @@ Aisyah, a data-entry clerk, learns her team has adopted an AI invoice reader. La
 2. **Forecasts, not lists.** A re-runnable pipeline collects three years of job-ad mentions, AI-research papers (arXiv) and Malaysian employment (OpenDOSM). Each series becomes a damped trend to 2030 with an 80% range, flagged *emerging* when growth speeds up. A backtest on the last year is shown in the app. Every refresh is dated and **only goes live after a person approves it**.
 3. **Three futures.** Slow, baseline and accelerated AI adoption change the forecasts and her ranked roles: 0.6 × skill fit + 0.4 × outlook. “Why this rank?”, a step-by-step forecast x-ray and **tipping points** (the adoption speed at which her job turns declining) explain every number.
 4. **A plan she can start this week.** Ordered courses for missing skills, with hours, RM price and HRD Corp status from a curated catalogue; AI summaries are checked against it, so nothing is invented.
-5. **SDG links with reasons** for every role and skill, an **AI coach** that only suggests, **automatic re-planning** when forecasts change, a public **fairness check**, and an **HR workforce view**.
+5. **SDG links with reasons** for every role and skill, and an **SDG lens** showing what choosing for a goal costs in hours and fit; an **AI coach** that only suggests, **automatic re-planning**, a public **fairness check** and an **HR view**.
 
 Hardest risk: reliable, updatable trend data. Fallbacks: noisy trends shrink towards no change, ranges stay visible, arXiv falls back to OpenAlex, and the last approved snapshot stays live.
 
 Workshops used: **GenAI APIs** (Gemini; Qwen2.5 and Whisper on RunPod; offline fallback), **database architecture** (Supabase Postgres) and **cloud deployment** (Vercel, Docker on Render, GitHub Actions).
 
-*Word count: 289*
+*Word count: 300*
 
 ## 3. Technical architecture and implementation plan
 

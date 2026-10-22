@@ -5,6 +5,7 @@ import { Kpis } from "../components/Kpis";
 import { EmergingRoles } from "../components/EmergingRoles";
 import { ExposureMap } from "../components/ExposureMap";
 import { RoleCard } from "../components/RoleCard";
+import { SdgLens } from "../components/SdgLens";
 import { RoleGraph } from "../components/RoleGraph";
 import { percent } from "../lib/format";
 import { AiAssisted } from "../components/AiAssisted";
@@ -22,6 +23,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
   onYear: (y: number) => void; onOpen: (r: RoleMatch) => void; onSurvey: () => void;
 }) {
   const [data, setData] = useState<Matches | null>(null);
+  const [onlyGoal, setOnlyGoal] = useState<number | null>(null);  // SDG lens: show only roles serving this goal
   const [extra, setExtra] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +124,7 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
           <span className="muted">{tf("route.text", { h: shortest.plan_hours ?? 0, n: percent(shortest.fit), top: tr(data.roles[0].title), topH: data.roles[0].plan_hours ?? 0 })}</span>
         </button>
       )}
+      {data && <SdgLens roles={data.roles} scenario={scenario} onOpen={onOpen} onlyGoal={onlyGoal} onOnlyGoal={setOnlyGoal} />}
       {data && (
         <div className="segmented view-switch" role="radiogroup" aria-label={t("graph.title")}>
           <button role="radio" aria-checked={view === "list"} onClick={() => changeView("list")}>{t("graph.list")}</button>
@@ -135,7 +138,8 @@ export function Roles({ profile, scenario, year, adoption, onScenario, onAdoptio
         </div>
       ) : data && view === "exposure" ? <ExposureMap data={data} scenario={scenario} onOpen={onOpen} /> : (
         <div className={loading && data ? "grid is-updating" : "grid"} aria-busy={loading}>
-          {data?.roles.map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
+          {data?.roles.filter((r) => onlyGoal === null || r.sdgs.some((g) => g.number === onlyGoal))
+            .map((r) => <RoleCard key={r.role_id} role={r} scenario={scenario} onOpen={() => onOpen(r)} />)}
         </div>
       )}
       {data && (

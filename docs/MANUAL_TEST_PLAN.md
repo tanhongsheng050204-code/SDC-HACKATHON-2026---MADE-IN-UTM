@@ -168,6 +168,8 @@ Notes: ______
 - [ ] 11.10 AI exposure: exposure against outlook; points open their role.
 - [ ] 11.11 **Emerging roles**: "A prediction" cards with what you already have, what to learn, best place to start, sources and **Search current job ads**.
 - [ ] 11.12 A profile with unrelated skills shows "None of these roles is a close match yet…".
+- [ ] 11.13 **Choose with a goal in mind** (sky card): pick an SDG chip, e.g. Climate Action → "N of your top 10 roles serve SDG 13", the best role for it with its rank, and the trade-off against your best match (study hours, fit now, outlook to 2030). **Open …** opens it; **Show only roles that serve this goal** filters the cards. The ranking itself does not change.
+- [ ] 11.14 Admin: when the forecast in use is over 14 days old, a yellow banner says to refresh and approve before a demo.
 
 Notes: ______
 

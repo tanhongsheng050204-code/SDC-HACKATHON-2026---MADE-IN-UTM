@@ -40,7 +40,7 @@ and keeps updating as AI moves.
 
 **Why this is more than "upload a CV and ask a chatbot":** the forecast is built from identifiable,
 dated signals that anyone can re-run; the scenarios and the year slider make uncertainty visible; and
-each SDG link names a UN target and the reason the role or skill serves it, so it explains rather than decorates. ✍️ *Add your own angle.*
+each SDG link names a UN target and the reason the role or skill serves it, and the SDG lens shows what choosing for a goal would cost or gain (study hours, fit, outlook) against the best match, so the goal changes the decision without bending the ranking. ✍️ *Add your own angle.*
 
 **Humans stay in charge:** Laluan shows estimates and reasons, never decisions. Trend refreshes need
 an admin; course steps and goal choices stay with the user; the employer view never ranks individuals.

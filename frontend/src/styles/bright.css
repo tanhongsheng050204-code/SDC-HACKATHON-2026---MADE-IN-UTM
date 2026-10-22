@@ -511,3 +511,16 @@ textarea, select, input[type="number"], input[type="password"], input[type="text
 .region-goals li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .region-goals li span { display: grid; }
 .region-n { font-variant-numeric: tabular-nums; font-size: 1.1rem; }
+
+/* ---------- SDG lens on Future roles ---------- */
+.sdg-lens { border: 0; border-radius: 26px; background: var(--sky); box-shadow: none; gap: 10px; }
+.sdg-lens h2 { font-size: 1.3rem; font-weight: 900; margin: 0; }
+.lens-goals { display: flex; flex-wrap: wrap; gap: 8px; }
+.lens-goal { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; padding: 6px 12px 6px 6px; border-radius: 99px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: .86rem; cursor: pointer; }
+.lens-goal.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); font-weight: 700; }
+.lens-goal:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lens-result { display: grid; gap: 6px; padding: 14px 16px; border-radius: 22px; background: var(--surface); }
+.lens-result p { margin: 0; }
+.lens-trade { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+.lens-result .btn { min-height: 44px; }

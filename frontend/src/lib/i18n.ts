@@ -1481,6 +1481,18 @@ const STRINGS = {
   "region.empty": { en: "Not enough people have chosen a destination yet to show totals for Malaysia.", ms: "Belum cukup orang memilih destinasi untuk menunjukkan jumlah bagi Malaysia.", zh: "选择目标的人数还不够，暂无法显示全马来西亚的统计。" },
   "region.few": { en: "fewer than 3", ms: "kurang daripada 3", zh: "少于 3" },
   "region.note": { en: "Counts of Laluan profiles with a destination; demo copies excluded; groups under 3 hidden. No names or IDs.", ms: "Kiraan profil Laluan yang mempunyai destinasi; salinan demo tidak dikira; kumpulan kurang daripada 3 disembunyikan. Tiada nama atau ID.", zh: "统计已选择目标的 Laluan 资料；不含演示副本；少于 3 人的组别会被隐藏。不含姓名或 ID。" },
+  "lens.title": { en: "Choose with a goal in mind", ms: "Pilih dengan matlamat dalam fikiran", zh: "带着目标去选择" },
+  "lens.sub": { en: "Pick a Sustainable Development Goal you care about. Laluan shows which of your roles serve it and what choosing for it would cost or gain against your best match. Your ranking stays the same; the choice is yours.", ms: "Pilih Matlamat Pembangunan Mampan yang anda pedulikan. Laluan menunjukkan peranan anda yang menyokongnya dan apa kos atau manfaat memilihnya berbanding padanan terbaik anda. Kedudukan anda kekal sama; pilihan di tangan anda.", zh: "选择一个你关心的可持续发展目标。Laluan 会显示你的哪些职位服务于它，以及与最佳匹配相比，为它而选择的代价或收获。你的排名不变；由你决定。" },
+  "lens.none": { en: "None of your roles serve {goal} yet.", ms: "Belum ada peranan anda yang menyokong {goal}.", zh: "你的职位暂时没有服务于{goal}的。" },
+  "lens.count": { en: "{n} of your top 10 roles serve {goal}.", ms: "{n} daripada 10 peranan teratas anda menyokong {goal}.", zh: "你排名前 10 的职位中有 {n} 个服务于{goal}。" },
+  "lens.topServes": { en: "Your best match, {role}, already serves this goal: no trade-off.", ms: "Padanan terbaik anda, {role}, sudah menyokong matlamat ini: tiada pertukaran.", zh: "你的最佳匹配{role}已经服务于这个目标：无需取舍。" },
+  "lens.best": { en: "The best role for this goal is {role} (#{rank}). Compared with your best match:", ms: "Peranan terbaik untuk matlamat ini ialah {role} (#{rank}). Berbanding padanan terbaik anda:", zh: "服务这个目标的最佳职位是{role}（第 {rank}）。与你的最佳匹配相比：" },
+  "lens.hours": { en: "Study: {a} hours instead of {b} for {top}", ms: "Belajar: {a} jam berbanding {b} untuk {top}", zh: "学习：{a} 小时，而{top}需要 {b} 小时" },
+  "lens.fit": { en: "Skill fit now: {a}% instead of {b}%", ms: "Kesesuaian kemahiran kini: {a}% berbanding {b}%", zh: "目前技能匹配：{a}%，而不是 {b}%" },
+  "lens.outlook": { en: "Outlook to 2030: {a}% instead of {b}% (estimate)", ms: "Prospek hingga 2030: {a}% berbanding {b}% (anggaran)", zh: "到 2030 年前景：{a}%，而不是 {b}%（估计）" },
+  "lens.open": { en: "Open {role}", ms: "Buka {role}", zh: "打开{role}" },
+  "lens.only": { en: "Show only roles that serve this goal", ms: "Tunjukkan hanya peranan yang menyokong matlamat ini", zh: "只显示服务于此目标的职位" },
+  "lens.note": { en: "Each role's goals come with a UN target and a reason on its page. Hours, fit and outlook are the same estimates as the role cards.", ms: "Matlamat setiap peranan disertakan sasaran PBB dan sebab pada halamannya. Jam, kesesuaian dan prospek ialah anggaran yang sama seperti kad peranan.", zh: "每个职位的目标在其页面上都附有联合国具体目标和理由。时数、匹配度和前景与职位卡片上的估计相同。" },
 } satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;
