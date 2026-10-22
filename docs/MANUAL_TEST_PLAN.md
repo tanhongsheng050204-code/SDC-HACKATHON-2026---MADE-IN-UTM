@@ -275,7 +275,19 @@ Notes: ______
 - [ ] 18.9 Counsellor → **Open**: one row per student with only name, destination, readiness, courses finished, skills proven (level), target date, On track/Behind badge and last active; the filter chips (All, On track, Ahead, Behind, Ready, No target date) show counts and filter the table.
 - [ ] 18.10 Student → **Leave** (confirm) → the row disappears from the counsellor's table on the next **Open**. Admin **Revoke** → the counsellor's Open fails and new joins are refused. **Delete class** removes memberships; students keep their profiles.
 
+- [ ] 18.11 Counsellor → **Open** → **Check-in** on a student: agenda with 1. where they are (readiness and status), 2. courses finished and skills proven in the last two weeks (or since your last proposals), 3. plan checks with the "Written by rules (no AI)" badge, 4. the next course, 5. agree what's next. The note says nothing said in the check-in is stored.
+- [ ] 18.12 **Download calendar invite** saves a `.ics` for the chosen time (30 minutes) titled "Laluan check-in: {name}".
+- [ ] 18.13 Propose each kind: a new target date, study hours a week, the next course and a skill to prove (both chosen only from the student's own pathway), interview practice. Each shows under Proposals as "Waiting for the student"; **Withdraw** removes one. An 11th waiting proposal is refused.
+- [ ] 18.14 Student → Today → **From your counsellor**: **Accept** on hours or a date changes the plan at once (Pathway progress shows it); a course, skill or practice becomes a to-do with **Mark done**; **No, thanks** declines. The counsellor's list shows each answer. Leaving the class removes the unanswered proposals.
 Notes: ______
+
+## 18b. Today: plan checks and why you chose
+
+- [ ] 18b.1 Choose a destination, then on Today **Why you chose {role}** shows the date and the figures then: skill fit, outlook to 2030, course hours, rank. "Nothing has changed since" until a new forecast is approved.
+- [ ] 18b.2 Tick reasons (It fits my skills, Jobs are growing, …) → **Save my reasons** → they show as ticks; **Change my reasons** reopens them. No free text can be typed.
+- [ ] 18b.3 After an admin approves a new forecast that moves the role, the card turns sand-coloured: "The forecast has changed. Now: …" and asks whether your reasons are still true.
+- [ ] 18b.4 **Check your plan**: set a target date two months away and 3 h a week → "you need about N h a week for the X course hours left. You set 3 h." A date with no hours, a passed date, a Declining destination, a licensed role (Registered nurse) and a long shot each give their own line with their numbers.
+- [ ] 18b.5 **Download my data** includes `destination_decisions` and `checkin_actions`; **Delete my profile** removes them.
 
 ## 19. Sources and Review kit
 

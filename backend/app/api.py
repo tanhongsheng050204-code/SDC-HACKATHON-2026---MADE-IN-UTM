@@ -13,11 +13,11 @@ from app import ratelimit, runpod, store
 from app.auth import current_claims, current_user
 from app.config import get_settings
 from app.reference import get_reference, reload_reference
-from app.schemas import (CardRequest, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
+from app.schemas import (ActionAnswer, ActionIn, CardRequest, DecisionReasonsIn, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest)
 from app.services.scenario import outlook, signals_from_snapshot
 from app.services.deid import removed_counts, scrub, scrub_cv
-from app.services import (alerts, cards, classes, fairness, region, replan, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
+from app.services import (alerts, cards, checkins, classes, decisions, plancheck, fairness, region, replan, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
                           openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
 from app.trends import refresh, review
@@ -624,8 +624,34 @@ def set_target(profile_id: str, body: TargetRequest, user: str | None = User):
     profile = store.set_target(profile_id, body.role_id)
     if body.role_id is not None and body.role_id != before.get("target_role_id"):  # the same choice again is not a restart
         progress.record(get_reference(), profile_id, "destination_set", body.role_id)
+        decisions.record(get_reference(), profile_id, body.role_id)
         store.count_usage("destination_set")
     return profile
+
+
+@router.get("/profiles/{profile_id}/decision")
+def profile_decision(profile_id: str, user: str | None = User):
+    """Why the destination was chosen (the facts shown then and the reasons ticked), and the same
+    facts under the newest forecast. Null before a destination is chosen."""
+    return decisions.compare(get_reference(), _profile_for(profile_id, user))
+
+
+@router.put("/profiles/{profile_id}/decision/reasons")
+def set_decision_reasons(profile_id: str, body: DecisionReasonsIn, user: str | None = User):
+    profile = _profile_for(profile_id, user)
+    if any(r not in decisions.REASONS for r in body.reasons):
+        raise HTTPException(422, "Unknown reason")
+    latest = decisions.latest(profile)
+    if latest is None:
+        raise HTTPException(404, "No destination chosen yet")
+    store.set_decision_reasons(latest["id"], list(dict.fromkeys(body.reasons)))
+    return decisions.compare(get_reference(), profile)
+
+
+@router.get("/profiles/{profile_id}/plan-check")
+def profile_plan_check(profile_id: str, user: str | None = User):
+    """Rules that spot a plan that cannot work as set (hours, dates, outlook, licence). No AI."""
+    return plancheck.check(get_reference(), _profile_for(profile_id, user))
 
 
 @router.put("/profiles/{profile_id}/plan")
@@ -1044,6 +1070,81 @@ def leave_class(profile_id: str, class_id: str, user: str | None = User):
     if store.leave_class(class_id, profile["id"]):
         store.add_consent(profile["id"], "class_share", CLASS_VERSION, False)
     return store.memberships(profile["id"])
+
+
+def _own_student(class_id: str, member_key: str, user: str) -> tuple[dict, dict]:
+    klass = _own_class(class_id, user)
+    profile = checkins.member(class_id, member_key)
+    if profile is None:
+        raise HTTPException(404, "Student not found")
+    return klass, profile
+
+
+@router.get("/classes/{class_id}/students/{member_key}/checkin")
+def checkin_agenda(class_id: str, member_key: str, claims: dict | None = Claims):
+    """A check-in agenda from what the student shares: progress since the last check-in, the next
+    course, plan checks, and the actions already proposed. Nothing about the talk is stored."""
+    user = _approved_counsellor(claims)
+    klass, profile = _own_student(class_id, member_key, user)
+    return checkins.agenda(get_reference(), klass, profile)
+
+
+@router.post("/classes/{class_id}/students/{member_key}/actions", status_code=201)
+def propose_action(class_id: str, member_key: str, body: ActionIn, claims: dict | None = Claims):
+    """Propose a change; the student accepts or declines it on their Today screen."""
+    user = _approved_counsellor(claims)
+    klass, profile = _own_student(class_id, member_key, user)
+    try:
+        value = checkins.validate(get_reference(), profile, body.kind, body.value)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    if checkins.open_count(class_id, profile["id"]) >= checkins.MAX_OPEN:
+        raise HTTPException(422, "The student has 10 proposals waiting. Let them answer those first")
+    store.add_action(klass["id"], profile["id"], body.kind, value)
+    return checkins.agenda(get_reference(), klass, profile)
+
+
+@router.delete("/classes/{class_id}/students/{member_key}/actions/{action_id}")
+def withdraw_action(class_id: str, member_key: str, action_id: str, claims: dict | None = Claims):
+    user = _approved_counsellor(claims)
+    klass, profile = _own_student(class_id, member_key, user)
+    action = store.get_action(action_id)
+    if action is None or action["class_id"] != klass["id"] or action["profile_id"] != profile["id"]:
+        raise HTTPException(404, "Action not found")
+    if action["status"] != "proposed":
+        raise HTTPException(422, "The student has already answered this")
+    store.delete_action(action_id)
+    return checkins.agenda(get_reference(), klass, profile)
+
+
+@router.get("/profiles/{profile_id}/actions")
+def my_actions(profile_id: str, user: str | None = User):
+    """What counsellors proposed to this student, and the answers."""
+    return checkins.for_student(get_reference(), _profile_for(profile_id, user)["id"])
+
+
+@router.post("/profiles/{profile_id}/actions/{action_id}")
+def answer_action(profile_id: str, action_id: str, body: ActionAnswer, user: str | None = User):
+    """Accept (a date or weekly hours change the plan at once), decline, or mark a to-do done."""
+    profile = _profile_for(profile_id, user)
+    action = store.get_action(action_id)
+    if action is None or action["profile_id"] != profile["id"]:
+        raise HTTPException(404, "Action not found")
+    allowed = {"proposed": ("accept", "decline"), "accepted": ("done",)}.get(action["status"], ())
+    if body.answer not in allowed:
+        raise HTTPException(422, "This proposal has already been answered")
+    if body.answer == "accept" and action["kind"] in ("target_date", "weekly_hours"):
+        date = action["value"] if action["kind"] == "target_date" else profile.get("target_date")
+        hours = int(action["value"]) if action["kind"] == "weekly_hours" else profile.get("weekly_hours")
+        if action["kind"] == "target_date" and dt.date.fromisoformat(date) <= progress.today():
+            raise HTTPException(422, "That date has passed. Ask your counsellor for a new one")
+        store.set_plan(profile["id"], date, hours)
+        if action["kind"] == "target_date" and date != profile.get("target_date"):
+            progress.record(get_reference(), profile["id"], "plan_set", date)
+        store.decide_action(action_id, "done")  # applied: nothing left to do
+    else:
+        store.decide_action(action_id, {"accept": "accepted", "decline": "declined", "done": "done"}[body.answer])
+    return checkins.for_student(get_reference(), profile["id"])
 
 
 @router.get("/workforce/sample", response_class=PlainTextResponse)

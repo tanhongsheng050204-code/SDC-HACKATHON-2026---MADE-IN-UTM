@@ -42,7 +42,7 @@ def test_join_shows_what_is_shared_then_dashboard_shows_only_those_fields(client
     assert store.list_consents(pid)[-1]["kind"] == "class_share"
     board = client.get(f"/api/classes/{klass['id']}", headers=teacher).json()
     student = board["students"][0]
-    assert set(student) == set(classes.SHARED)
+    assert set(student) == set(classes.SHARED) | {"key"}
     assert student["display_name"] == "Siti" and student["destination"] == "Data analyst"
     assert student["skills_proven"] == [{"name": "SQL", "level": 2}] and student["status"] in ("on_track", "ahead", "behind")
     assert "skills" not in student and board["counts"]["no_date"] == 0

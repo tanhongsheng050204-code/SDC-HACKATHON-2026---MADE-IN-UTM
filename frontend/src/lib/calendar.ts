@@ -76,3 +76,13 @@ export function icsFile(input: StudyPlanInput, words: { count: (i: number, n: nu
   lines.push("END:VCALENDAR");
   return lines.map(fold).join("\r\n") + "\r\n";
 }
+
+/** One meeting as an .ics file: a counsellor check-in. Built in the browser; nothing is sent. */
+export function meetingIcs(title: string, start: Date, minutes: number, description: string): string {
+  const end = new Date(start.getTime() + minutes * 60_000);
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Laluan//Check-in//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    "BEGIN:VEVENT", `UID:checkin-${local(start)}-${Math.random().toString(36).slice(2, 8)}@laluan`, `DTSTAMP:${utc(new Date())}`,
+    `DTSTART:${local(start)}`, `DTEND:${local(end)}`, `SUMMARY:${escape(title)}`, `DESCRIPTION:${escape(description)}`,
+    "END:VEVENT", "END:VCALENDAR"];
+  return lines.map(fold).join("\r\n") + "\r\n";
+}

@@ -3,6 +3,7 @@ import { api, ClassDashboard, CounsellorMe, ProgressStatus } from "../lib/api";
 import { percent, shortDate } from "../lib/format";
 import { t, tf, tr } from "../lib/i18n";
 import { AccountButton } from "./AccountButton";
+import { CheckinPanel } from "./CheckinPanel";
 import { STATUS_KEY, STATUS_TONE } from "./ProgressPanel";
 
 type Filter = "all" | ProgressStatus | "no_date";
@@ -18,6 +19,7 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [checkin, setCheckin] = useState<string | null>(null);
   const id = useId();
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
   }
   async function show(classId: string) {
     setError(null);
-    try { setOpen(await api.classDashboard(classId)); setFilter("all"); } catch { setError(t("cls.loadFailed")); }
+    try { setOpen(await api.classDashboard(classId)); setFilter("all"); setCheckin(null); } catch { setError(t("cls.loadFailed")); }
   }
   async function remove(classId: string, label: string) {
     if (!window.confirm(tf("cls.deleteConfirm", { name: label }))) return;
@@ -110,6 +112,7 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
                   <th scope="col">{t("cls.f.display_name")}</th><th scope="col">{t("cls.f.destination")}</th><th scope="col">{t("cls.f.readiness")}</th>
                   <th scope="col">{t("cls.f.courses_finished")}</th><th scope="col">{t("cls.f.skills_proven")}</th>
                   <th scope="col">{t("cls.f.target_date")}</th><th scope="col">{t("cls.f.status")}</th><th scope="col">{t("cls.f.last_active")}</th>
+                  <th scope="col"><span className="sr-only">{t("ci.open")}</span></th>
                 </tr></thead>
                 <tbody>{students.map((s, i) => (
                   <tr key={i}>
@@ -121,11 +124,13 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
                     <td>{s.target_date ? shortDate(s.target_date) : "—"}</td>
                     <td>{s.status ? <span className={`badge ${STATUS_TONE[s.status]}`}>{t(STATUS_KEY[s.status])}</span> : t("cls.noDate")}</td>
                     <td>{shortDate(s.last_active)}</td>
+                    <td>{s.key && <button className="btn sm" aria-pressed={checkin === s.key} onClick={() => setCheckin(checkin === s.key ? null : s.key!)}>{t("ci.open")}</button>}</td>
                   </tr>
                 ))}</tbody>
               </table>
             </div>
           )}
+          {checkin && <CheckinPanel classId={open.id} memberKey={checkin} onClose={() => setCheckin(null)} />}
         </div>
       )}
     </div>

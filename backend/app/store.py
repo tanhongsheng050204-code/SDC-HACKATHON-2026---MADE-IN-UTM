@@ -15,10 +15,11 @@ from contextlib import contextmanager
 
 from app.config import get_settings
 
-SCHEMA_VERSION = 16
+SCHEMA_VERSION = 17
 APP_TABLES = ("schema_version", "profiles", "cards", "skill_progress", "skill_checks", "survey_responses", "snapshots",
               "evidence", "progress_events", "consents", "feedback", "usage_counts",
-              "email_settings", "sent_jobs", "counsellors", "classes", "class_members")
+              "email_settings", "sent_jobs", "counsellors", "classes", "class_members", "decisions",
+              "checkin_actions")
 _MIGRATIONS = {
     1: """
     CREATE TABLE IF NOT EXISTS profiles (
@@ -214,6 +215,33 @@ _MIGRATIONS = {
         PRIMARY KEY (class_id, profile_id)
     );
     CREATE INDEX IF NOT EXISTS class_members_profile ON class_members(profile_id);
+    """,
+    # Why a destination was chosen: the reasons the person ticked (fixed codes, never free text) and
+    # the facts Laluan showed at that moment (fit, outlook, plan hours, snapshot), so a later forecast
+    # can be compared with the one the choice was made on. Check-in actions are what a counsellor
+    # proposes after a check-in (a target date, weekly hours, a course, a skill to prove, practice);
+    # nothing changes until the student accepts. No notes, recordings or transcripts are stored.
+    17: """
+    CREATE TABLE IF NOT EXISTS decisions (
+        id TEXT PRIMARY KEY,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        role_id TEXT NOT NULL,
+        reasons TEXT NOT NULL,
+        facts TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS decisions_profile ON decisions(profile_id, created_at);
+    CREATE TABLE IF NOT EXISTS checkin_actions (
+        id TEXT PRIMARY KEY,
+        class_id TEXT NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+        profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        value TEXT,
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        decided_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS checkin_actions_profile ON checkin_actions(profile_id, created_at);
     """,
 }
 
@@ -458,6 +486,10 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
     with _connect() as conn:
         out["emailed_job_ads"] = [dict(r) for r in conn.execute(
             "SELECT job_key, sent_at FROM sent_jobs WHERE profile_id=? ORDER BY sent_at", (profile_id,)).fetchall()]
+    out["destination_decisions"] = [{k: d[k] for k in ("role_id", "reasons", "facts", "created_at")}
+                                    for d in list_decisions(profile_id)]
+    out["checkin_actions"] = [{k: a[k] for k in ("class_name", "kind", "value", "status", "created_at", "decided_at")}
+                              for a in actions_for_profile(profile_id)]
     return out
 
 
@@ -861,6 +893,7 @@ def classes_for(counsellor_user_id: str) -> list[dict]:
 
 def delete_class(class_id: str) -> None:
     with _connect() as conn:
+        conn.execute("DELETE FROM checkin_actions WHERE class_id=?", (class_id,))
         conn.execute("DELETE FROM class_members WHERE class_id=?", (class_id,))
         conn.execute("DELETE FROM classes WHERE id=?", (class_id,))
 
@@ -872,7 +905,10 @@ def join_class(class_id: str, profile_id: str) -> None:
 
 
 def leave_class(class_id: str, profile_id: str) -> bool:
+    """Leaving also withdraws the counsellor's proposals the student had not answered yet."""
     with _connect() as conn:
+        conn.execute("DELETE FROM checkin_actions WHERE class_id=? AND profile_id=? AND status='proposed'",
+                     (class_id, profile_id))
         return conn.execute("DELETE FROM class_members WHERE class_id=? AND profile_id=?",
                             (class_id, profile_id)).rowcount > 0
 
@@ -898,3 +934,70 @@ def destination_counts() -> dict[str, int]:
         rows = conn.execute("SELECT target_role_id AS role, COUNT(*) AS n FROM profiles WHERE is_demo = 0 "
                             "AND target_role_id IS NOT NULL GROUP BY target_role_id").fetchall()
     return {r["role"]: r["n"] for r in rows}
+
+
+# --- destination decisions and check-in actions ---------------------------------------------------
+
+def add_decision(profile_id: str, role_id: str, facts: dict, reasons: list[str] | None = None) -> None:
+    with _connect() as conn:
+        conn.execute("INSERT INTO decisions (id, profile_id, role_id, reasons, facts, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                     (secrets.token_urlsafe(9), profile_id, role_id, json.dumps(reasons or []), json.dumps(facts),
+                      dt.datetime.now(dt.UTC).isoformat(timespec="microseconds")))
+
+
+def _decision(row) -> dict:
+    return {**dict(row), "reasons": json.loads(row["reasons"]), "facts": json.loads(row["facts"])}
+
+
+def list_decisions(profile_id: str) -> list[dict]:
+    """Oldest first."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT * FROM decisions WHERE profile_id=? ORDER BY created_at, id", (profile_id,)).fetchall()
+    return [_decision(r) for r in rows]
+
+
+def set_decision_reasons(decision_id: str, reasons: list[str]) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE decisions SET reasons=? WHERE id=?", (json.dumps(reasons), decision_id))
+
+
+def add_action(class_id: str, profile_id: str, kind: str, value: str | None) -> dict:
+    action_id = secrets.token_urlsafe(9)
+    with _connect() as conn:
+        conn.execute("INSERT INTO checkin_actions (id, class_id, profile_id, kind, value, status, created_at) "
+                     "VALUES (?, ?, ?, ?, ?, 'proposed', ?)",
+                     (action_id, class_id, profile_id, kind, value, dt.datetime.now(dt.UTC).isoformat(timespec="microseconds")))
+    return get_action(action_id)
+
+
+def get_action(action_id: str) -> dict | None:
+    with _connect() as conn:
+        row = conn.execute("SELECT * FROM checkin_actions WHERE id=?", (action_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def decide_action(action_id: str, status: str) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE checkin_actions SET status=?, decided_at=? WHERE id=?", (status, _now(), action_id))
+
+
+def delete_action(action_id: str) -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM checkin_actions WHERE id=?", (action_id,))
+
+
+def actions_for(class_id: str, profile_id: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute("SELECT * FROM checkin_actions WHERE class_id=? AND profile_id=? ORDER BY created_at, id",
+                            (class_id, profile_id)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def actions_for_profile(profile_id: str) -> list[dict]:
+    """Every proposal to this student, with the class and counsellor it came from. Oldest first."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT a.*, c.name AS class_name, k.name AS counsellor FROM checkin_actions a "
+                            "JOIN classes c ON c.id = a.class_id LEFT JOIN counsellors k ON k.user_id = c.counsellor_user_id "
+                            "WHERE a.profile_id=? ORDER BY a.created_at, a.id", (profile_id,)).fetchall()
+    return [dict(r) for r in rows]
+

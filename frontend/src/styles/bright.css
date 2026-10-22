@@ -612,9 +612,43 @@ html[data-lite="1"] .restoring svg { animation: none; }
 html[data-lite="1"] .lp-scene-swap, html[data-lite="1"] .lp-outlook li, html[data-lite="1"] .lp-tasks li { animation: none; }
 
 /* Try it in five clicks (landing) */
-.lp-try { padding: 40px clamp(20px, 4vw, 48px); background: var(--mint); border-radius: 28px; text-align: center; }
-.lp-try h2 { font-size: clamp(2rem, 4.4vw, 3.2rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.05; color: var(--ink); }
+.lp-frame.lp-try { padding: 40px clamp(20px, 4vw, 48px); background: var(--mint); border-radius: 28px; text-align: center; }
+.lp-frame.lp-try h2 { font-size: clamp(2rem, 4.4vw, 3.2rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.05; color: var(--ink); }
 .lp-try-sub { color: var(--ink-2); margin: 10px auto 22px; max-width: 60ch; }
-.lp-try ol { list-style: none; counter-reset: trystep; display: grid; gap: 12px; padding: 0; margin: 0 auto 26px; max-width: 720px; text-align: left; }
-.lp-try li { counter-increment: trystep; display: flex; gap: 14px; align-items: center; background: var(--surface); border-radius: 18px; padding: 14px 18px; font-weight: 600; color: var(--ink); }
-.lp-try li::before { content: counter(trystep); flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--page); font-weight: 900; }
+.lp-frame.lp-try ol { list-style: none; counter-reset: trystep; display: grid; gap: 12px; padding: 0; margin: 0 auto 26px; max-width: 720px; text-align: left; }
+.lp-frame.lp-try li { counter-increment: trystep; display: flex; gap: 14px; align-items: center; background: var(--surface); border-radius: 18px; padding: 14px 18px; font-weight: 600; color: var(--ink); }
+.lp-frame.lp-try li::before { content: counter(trystep); flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--page); font-weight: 900; }
+
+/* ---------- Today: decision, plan checks, counsellor proposals ---------- */
+.decision-card, .plan-checks, .counsellor-actions { display: grid; gap: 10px; }
+.decision-card { background: var(--sky); border: 0; }
+.decision-card.is-moved { background: var(--sand); }
+.decision-card p { margin: 0; }
+.decision-reasons { display: grid; gap: 8px; justify-items: start; border: 0; padding: 0; margin: 0; }
+.decision-reasons legend { font-weight: 700; margin-bottom: 6px; }
+.decision-reasons .chip { min-height: 40px; }
+.plan-checks { background: var(--surface); }
+.plan-checks ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.plan-checks li { padding: 10px 14px; border-radius: 14px; line-height: 1.5; }
+.plan-checks li.warn { background: var(--risk-bg); color: var(--ink); }
+.plan-checks li.info { background: var(--surface-2); }
+.counsellor-actions { background: var(--mint); border: 0; }
+.counsellor-actions > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.counsellor-actions > ul > li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; background: var(--surface); }
+.counsellor-actions > ul > li > div:first-child { display: grid; gap: 2px; }
+.counsellor-actions .btn { min-height: 44px; }
+
+/* ---------- Counsellor check-in ---------- */
+.checkin { display: grid; gap: 12px; margin-top: 16px; background: var(--surface-2); border: 0; }
+.checkin h3, .checkin h4 { margin: 0; }
+.checkin h4 { font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-top: 6px; }
+.checkin-agenda { display: grid; gap: 8px; margin: 0; padding-left: 0; list-style: none; }
+.checkin-agenda > li { padding: 10px 14px; border-radius: 14px; background: var(--surface); line-height: 1.5; }
+.checkin-agenda ul { margin: 6px 0 0; padding-left: 18px; }
+.checkin-invite, .checkin-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.checkin-form label { display: grid; gap: 4px; font-weight: 600; }
+.checkin-invite input, .checkin-form select, .checkin-form input { min-height: 44px; border-radius: 12px; }
+.checkin-form .btn, .checkin-invite .btn { min-height: 44px; }
+.checkin-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.checkin-actions li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--surface); }
+.decision-card .decision-reasons { background: transparent; } .decision-reasons legend { padding: 0; }

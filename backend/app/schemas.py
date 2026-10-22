@@ -276,3 +276,21 @@ class JoinRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     code: str = Field(min_length=6, max_length=12)
     profile_id: str = Field(min_length=1, max_length=64)
+
+
+class DecisionReasonsIn(BaseModel):
+    """Why the person chose their destination: codes from app.services.decisions.REASONS only."""
+    model_config = ConfigDict(extra="forbid")
+    reasons: list[str] = Field(default_factory=list, max_length=6)
+
+
+class ActionIn(BaseModel):
+    """A counsellor's proposal after a check-in. Structured only: no free-text notes are stored."""
+    model_config = ConfigDict(extra="forbid")
+    kind: str = Field(min_length=1, max_length=20)
+    value: str | None = Field(default=None, max_length=80)
+
+
+class ActionAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    answer: Literal["accept", "decline", "done"]

@@ -257,6 +257,33 @@ export interface CounsellorMe {
 export interface ClassStudent {
   display_name: string | null; destination: string | null; readiness: number | null; courses_finished: number;
   skills_proven: { name: string; level: number }[]; last_active: string; target_date: string | null; status: ProgressStatus | null;
+  key?: string;
+}
+export type DecisionReason = "fits_skills" | "growing" | "short_plan" | "enjoy" | "pay" | "robust";
+export interface DecisionFacts {
+  fit: number; outlook_index: number; outlook_label: string; plan_hours: number; rank: number; long_shot: boolean;
+  robust_pick: boolean; snapshot_id: string;
+}
+export interface Decision {
+  id: string; role_id: string; title: string; chosen_at: string; reasons: DecisionReason[]; then: DecisionFacts; now: DecisionFacts;
+  changed: (keyof DecisionFacts)[]; options: DecisionReason[];
+}
+export type PlanCheckKind = "hours_short" | "no_hours" | "date_passed" | "declining" | "declining_fast" | "licence" | "long_shot";
+export interface PlanCheck {
+  kind: PlanCheckKind; level: "warn" | "info"; need?: number; weekly_hours?: number; hours_left?: number; target_date?: string;
+  index?: number; licence?: string; months?: number | null; fit?: number; stepping_stone?: string | null;
+}
+export type ActionKind = "target_date" | "weekly_hours" | "next_course" | "prove_skill" | "practise";
+export interface CheckinAction {
+  id: string; kind: ActionKind; value: string | null; status: "proposed" | "accepted" | "declined" | "done";
+  created_at: string; decided_at: string | null; class_name?: string; counsellor?: string | null; label: string | null;
+}
+export interface CheckinAgenda {
+  key: string; student: ClassStudent; since: string; since_last_checkin: boolean;
+  recent: { courses_finished: number; skills_proven: number };
+  next_course: { id: string; title: string; hours: number } | null; checks: PlanCheck[];
+  options: { courses: { id: string; title: string; hours: number }[]; skills: { id: string; name: string }[] };
+  actions: CheckinAction[];
 }
 export interface ClassDashboard {
   id: string; name: string; code: string; created_at: string; students: ClassStudent[];
@@ -531,6 +558,18 @@ export const api = {
   createClass: (name: string) => request<{ id: string; code: string }>("/classes", { method: "POST", body: JSON.stringify({ name }) }),
   classDashboard: (classId: string) => request<ClassDashboard>(`/classes/${classId}`),
   deleteClass: (classId: string) => request<void>(`/classes/${classId}`, { method: "DELETE" }),
+  checkin: (classId: string, key: string) => request<CheckinAgenda>(`/classes/${classId}/students/${key}/checkin`),
+  proposeAction: (classId: string, key: string, kind: ActionKind, value: string | null) =>
+    requestDetail<CheckinAgenda>(`/classes/${classId}/students/${key}/actions`, { method: "POST", body: JSON.stringify({ kind, value }) }),
+  withdrawAction: (classId: string, key: string, actionId: string) =>
+    requestDetail<CheckinAgenda>(`/classes/${classId}/students/${key}/actions/${actionId}`, { method: "DELETE" }),
+  myActions: (id: string) => request<CheckinAction[]>(`/profiles/${id}/actions`),
+  answerAction: (id: string, actionId: string, answer: "accept" | "decline" | "done") =>
+    requestDetail<CheckinAction[]>(`/profiles/${id}/actions/${actionId}`, { method: "POST", body: JSON.stringify({ answer }) }),
+  decision: (id: string) => request<Decision | null>(`/profiles/${id}/decision`),
+  setDecisionReasons: (id: string, reasons: DecisionReason[]) =>
+    request<Decision>(`/profiles/${id}/decision/reasons`, { method: "PUT", body: JSON.stringify({ reasons }) }),
+  planCheck: (id: string) => request<PlanCheck[]>(`/profiles/${id}/plan-check`),
   adminCounsellors: (token: string) => request<Counsellor[]>("/admin/counsellors", { headers: { "Content-Type": "application/json", "X-Admin-Token": token } }),
   decideCounsellor: (token: string, userId: string, approve: boolean, decidedBy: string) =>
     request<Counsellor>(`/admin/counsellors/${encodeURIComponent(userId)}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Token": token },

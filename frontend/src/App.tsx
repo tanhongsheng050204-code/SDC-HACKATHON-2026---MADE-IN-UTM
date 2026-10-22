@@ -435,7 +435,8 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "home" && profile && <InstallPrompt />}
             {screen === "home" && profile && (
               <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => (s === "intake" ? goProfile() : go(s))}
-                onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
+                onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }}
+                onProfileChanged={() => api.getProfile(profile.id).then(setProfile).catch(() => undefined)} />
             )}
             {screen === "intake" && (
               <Intake audience={profile?.audience ?? audience} onAudience={setAudience}

@@ -4,6 +4,7 @@ import { Icon } from "../components/Icon";
 import { api, Journey, JourneyStep, Matches, Pathway, Profile, Progress, RoleHistory, RoleMatch, Scenario } from "../lib/api";
 import { STATUS_KEY, STATUS_TONE } from "../components/ProgressPanel";
 import { ReplanCard } from "../components/ReplanCard";
+import { CounsellorActions, DecisionCard, PlanChecks } from "../components/PlanGuard";
 import { percent, shortDate, signed } from "../lib/format";
 import { StringKey, t, tf, tr } from "../lib/i18n";
 import { OUTLOOK_TEXT, OUTLOOK_TONE, priceText } from "../lib/labels";
@@ -22,8 +23,8 @@ const STEP_LABEL: Record<JourneyStep, StringKey> = {
 
 // Today: one next step, the four-step journey, the coach, and your best roles. Scenario tools,
 // KPIs and tipping points live on Future roles, so nothing here repeats that screen.
-export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTarget }: {
-  profile: Profile; scenario: Scenario; journey: Journey | null;
+export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTarget, onProfileChanged }: {
+  profile: Profile; scenario: Scenario; journey: Journey | null; onProfileChanged?: () => void;
   onAsk: (q: string) => void; onOpenRole: (r: RoleMatch) => void;
   onGo: (s: "intake" | "tasks" | "roles") => void; onTarget: (s: TargetScreen) => void;
 }) {
@@ -75,6 +76,9 @@ export function Home({ profile, scenario, journey, onAsk, onOpenRole, onGo, onTa
 
       <ForecastChanges profile={profile} />
       {data && <ReplanCard profile={profile} roles={data.roles} onOpenRole={onOpenRole} />}
+      <CounsellorActions profile={profile} onChanged={() => onProfileChanged?.()} />
+      {target && <PlanChecks profile={profile} roleTitle={target.title} />}
+      {target && <DecisionCard profile={profile} />}
 
       <WhereTo roles={data?.roles ?? []} onOpenRole={onOpenRole} onAsk={onAsk} />
 

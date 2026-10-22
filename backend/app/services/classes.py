@@ -6,7 +6,7 @@ import datetime as dt
 
 from app import store
 from app.reference import Reference
-from app.services import progress
+from app.services import checkins, progress
 
 SHARED = ("display_name", "destination", "readiness", "courses_finished", "skills_proven", "last_active", "target_date",
           "status")
@@ -38,7 +38,7 @@ def dashboard(ref: Reference, klass: dict) -> dict:
     for profile_id in store.member_ids(klass["id"]):
         profile = store.get_profile(profile_id)
         if profile is not None:
-            rows.append(student_row(ref, profile))
+            rows.append({**student_row(ref, profile), "key": checkins.key(klass["id"], profile_id)})
     counts = {s: sum(1 for r in rows if r["status"] == s) for s in ("on_track", "ahead", "behind", "done")}
     counts["no_date"] = sum(1 for r in rows if r["status"] is None)
     return {"id": klass["id"], "name": klass["name"], "code": klass["code"], "created_at": klass["created_at"],
