@@ -47,6 +47,7 @@ Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
 | google-genai 1.75.0 | Gemini API client | Apache-2.0 |
 | HTTPX 0.28.1 | Calls to arXiv, OpenAlex, HN Algolia | BSD-3 |
 | pypdf 6.21.1 | Reading uploaded PDF CVs in memory | BSD-3 |
+| RapidOCR 2.1, ONNX Runtime, pypdfium2, PaddleOCR PP-OCRv4 English recogniser | Reading scanned CVs and photos on our own server, before scrubbing | Apache-2.0 / MIT / Apache-2.0 |
 | python-multipart 0.0.32 | CV file uploads | Apache-2.0 |
 | pytest 8.4.2 | Backend tests (development only) | MIT |
 | PyMuPDF | One-off script that reads WEF Figure 2.3 from the report PDF; not part of the app | AGPL-3.0 |
