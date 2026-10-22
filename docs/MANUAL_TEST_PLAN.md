@@ -266,7 +266,7 @@ Notes: ______
 ## 13. For organisations (HR teams and career centres)
 
 - [ ] 13.1 Empty state shows until a team is loaded.
-- [ ] 13.2 **Use the sample company (synthetic, 160 people)** → KPIs (160 people, people in declining roles, learning hours, forecast date).
+- [ ] 13.2 **Use the sample company (synthetic, 190 people)** → KPIs (190 people, people in declining roles, learning hours, forecast date).
 - [ ] 13.3 Risk heatmap by role with Slow / Baseline / Accelerated columns coloured by outlook.
 - [ ] 13.4 **Cheapest reskilling moves** table with from → to, people, hours each, fit, SDG tiles.
 - [ ] 13.5 SDG totals cards.

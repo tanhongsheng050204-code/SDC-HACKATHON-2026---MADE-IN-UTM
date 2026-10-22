@@ -103,10 +103,10 @@ No model is trained or fine-tuned by the team. The model in use is shown in the 
 | OpenAI “GPTs are GPTs” occupation exposure scores (2023) | <https://github.com/openai/GPTs-are-GPTs> | Public | N | MIT |
 | ILO Working Paper 140, Annex Table A1 (exposure by ISCO-08 occupation) | <https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure> | Public | N | CC BY 4.0 |
 | MyCOL 2024/2025 (TalentCorp critical occupations list) | <https://www.talentcorp.com.my/mycol/> | Public report (matches by job title, linked) | N | Cited with link |
-| Course catalogue (29 courses, prices and HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | N | Facts with links to the providers |
+| Course catalogue (38 courses, prices and HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | N | Facts with links to the providers |
 | Roles, skills and SDG map | `backend/data/` | Self-created | N | Apache-2.0 (this repository) |
 | Demo personas (Aisyah, Wei Jie) and 5 evaluation CVs | `backend/data/demo_profiles.json`, `backend/data/eval/` | Synthetic | N (all invented) | Apache-2.0 (this repository) |
-| Sample company for the workforce view (160 people) | `backend/data/sample_workforce.csv` | Synthetic | N (roles and skills only) | Apache-2.0 (this repository) |
+| Sample company for the workforce view (190 people) | `backend/data/sample_workforce.csv` | Synthetic | N (roles and skills only) | Apache-2.0 (this repository) |
 | Landing-page photos (3) | Unsplash: Gema Saputera, Mimi Thian, Vitaly Gariev | Public | Shows people; not linked to any data | Unsplash License |
 
 ### 4.3 AI-assisted development tools
