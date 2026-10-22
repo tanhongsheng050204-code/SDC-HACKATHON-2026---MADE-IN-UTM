@@ -1,10 +1,11 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { api, Membership, Profile } from "../lib/api";
 import { downloadMyData } from "../lib/exportFile";
 import { t, type StringKey } from "../lib/i18n";
 import { EmailSettings } from "./EmailSettings";
 import { Icon, type IconName } from "./Icon";
 import { JoinClass } from "./JoinClass";
+import { Sheet } from "./Sheet";
 
 type Open = "email" | "class" | "delete" | null;
 type EmailInfo = Awaited<ReturnType<typeof api.emailSettings>>;
@@ -86,26 +87,5 @@ function Row({ icon, label, state, on, danger, onClick }: {
       <span className={`prof-row-state${on ? " on" : ""}`}>{state}</span>
       <span className="prof-row-chev" aria-hidden="true">›</span>
     </button>
-  );
-}
-
-// A panel from the right (from the bottom on a phone) that closes on Escape or a click outside.
-function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  const id = useId();
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", key);
-    return () => document.removeEventListener("keydown", key);
-  }, [onClose]);
-  return (
-    <div className="sheet-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-labelledby={id}>
-        <div className="sheet-head">
-          <h2 id={id}>{title}</h2>
-          <button className="sheet-x" aria-label={t("prof.close")} onClick={onClose}>×</button>
-        </div>
-        {children}
-      </div>
-    </div>
   );
 }

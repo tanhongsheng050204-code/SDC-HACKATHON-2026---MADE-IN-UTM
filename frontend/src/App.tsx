@@ -454,7 +454,9 @@ function MainApp({ demo }: { demo: string | null }) {
                 settings={<ProfileSettings profile={profile} userId={userId} onDelete={() => deleteProfile(true)} />} />
             )}
             {screen === "admin" && <Admin />}
-            {screen === "radar" && profile && <Radar profile={profile} onNext={() => go("roles")} />}
+            {screen === "radar" && profile && (
+              <Radar profile={profile} onNext={() => go("roles")} onPathway={() => openTarget("tree")} onProfile={setProfile} onFlash={flash} />
+            )}
             {screen === "tasks" && profile && (
               <Tasks profile={profile} onNext={() => go("roles")} onPathway={() => openTarget("tree")}
                 onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }} />
