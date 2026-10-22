@@ -1,6 +1,6 @@
 {
  "_note": "Built by scripts/build_ai_exposure.py. Scores are each source's own; percentiles are among all occupations in that source.",
- "built": "2026-10-21",
+ "built": "2026-10-22",
  "sources": {
   "anthropic": {
    "name": "Anthropic Economic Index",
@@ -279,6 +279,210 @@
     "occupation": "Home-based Personal Care Workers",
     "score": 0.25,
     "percentile": 45.9,
+    "gradient": "Minimal Exposure"
+   }
+  },
+  "production_operator": {
+   "openai": {
+    "code": "51-2092.00",
+    "occupation": "Team Assemblers",
+    "score": 0.23529411764705882,
+    "percentile": 34.4
+   },
+   "ilo": {
+    "code": "8212",
+    "occupation": "Electrical and Electronic Equipment Assemblers",
+    "score": 0.28,
+    "percentile": 52.0,
+    "gradient": "Minimal Exposure"
+   }
+  },
+  "cashier": {
+   "anthropic": {
+    "code": "41-2011",
+    "occupation": "Cashiers",
+    "score": 0.0846,
+    "percentile": 73.6
+   },
+   "openai": {
+    "code": "41-2011.00",
+    "occupation": "Cashiers",
+    "score": 0.20930232558139533,
+    "percentile": 31.9
+   },
+   "ilo": {
+    "code": "5230",
+    "occupation": "Cashiers and Ticket Clerks",
+    "score": 0.39,
+    "percentile": 75.5,
+    "gradient": "Gradient 1"
+   }
+  },
+  "hotel_front_desk_clerk": {
+   "anthropic": {
+    "code": "43-4081",
+    "occupation": "Hotel, Motel, and Resort Desk Clerks",
+    "score": 0.1725,
+    "percentile": 82.2
+   },
+   "openai": {
+    "code": "43-4081.00",
+    "occupation": "Hotel, Motel, and Resort Desk Clerks",
+    "score": 0.5,
+    "percentile": 75.0
+   },
+   "ilo": {
+    "code": "4224",
+    "occupation": "Hotel Receptionists",
+    "score": 0.51,
+    "percentile": 89.0,
+    "gradient": "Gradient 3"
+   }
+  },
+  "farm_worker": {
+   "anthropic": {
+    "code": "45-2092",
+    "occupation": "Farmworkers and Laborers, Crop, Nursery, and Greenhouse",
+    "score": 0.0203,
+    "percentile": 57.5
+   },
+   "openai": {
+    "code": "45-2092.00",
+    "occupation": "Farmworkers and Laborers, Crop, Nursery, and Greenhouse",
+    "score": 0.14285714285714285,
+    "percentile": 24.5
+   },
+   "ilo": {
+    "code": "9211",
+    "occupation": "Crop Farm Labourers",
+    "score": 0.09,
+    "percentile": 1.3,
+    "gradient": "Not Exposed"
+   }
+  },
+  "engineering_technician": {
+   "anthropic": {
+    "code": "17-3011",
+    "occupation": "Architectural and Civil Drafters",
+    "score": 0.0,
+    "percentile": 27.2
+   },
+   "openai": {
+    "code": "17-3011.00",
+    "occupation": "Architectural and Civil Drafters",
+    "score": 0.54,
+    "percentile": 83.8
+   },
+   "ilo": {
+    "code": "3118",
+    "occupation": "Draughtspersons",
+    "score": 0.35,
+    "percentile": 64.1,
+    "gradient": "Minimal Exposure"
+   }
+  },
+  "accounts_clerk": {
+   "anthropic": {
+    "code": "43-3031",
+    "occupation": "Bookkeeping, Accounting, and Auditing Clerks",
+    "score": 0.3104,
+    "percentile": 91.9
+   },
+   "openai": {
+    "code": "43-3031.00",
+    "occupation": "Bookkeeping, Accounting, and Auditing Clerks",
+    "score": 0.8023255813953488,
+    "percentile": 97.1
+   },
+   "ilo": {
+    "code": "4311",
+    "occupation": "Accounting and Bookkeeping Clerks",
+    "score": 0.64,
+    "percentile": 99.3,
+    "gradient": "Gradient 4"
+   }
+  },
+  "supply_chain_specialist": {
+   "anthropic": {
+    "code": "13-1081",
+    "occupation": "Logisticians",
+    "score": 0.1571,
+    "percentile": 81.2
+   },
+   "openai": {
+    "code": "13-1081.00",
+    "occupation": "Logisticians",
+    "score": 0.5,
+    "percentile": 75.0
+   },
+   "ilo": {
+    "code": "2421",
+    "occupation": "Management and Organization Analysts",
+    "score": 0.46,
+    "percentile": 83.9,
+    "gradient": "Gradient 2"
+   }
+  },
+  "bank_teller": {
+   "anthropic": {
+    "code": "43-3071",
+    "occupation": "Tellers",
+    "score": 0.0231,
+    "percentile": 58.5
+   },
+   "openai": {
+    "code": "43-3071.00",
+    "occupation": "Tellers",
+    "score": 0.5416666666666666,
+    "percentile": 84.0
+   },
+   "ilo": {
+    "code": "4211",
+    "occupation": "Bank Tellers and Related Clerks",
+    "score": 0.58,
+    "percentile": 96.2,
+    "gradient": "Gradient 3"
+   }
+  },
+  "registered_nurse": {
+   "anthropic": {
+    "code": "29-1141",
+    "occupation": "Registered Nurses",
+    "score": 0.0595,
+    "percentile": 68.7
+   },
+   "openai": {
+    "code": "29-1141.00",
+    "occupation": "Registered Nurses",
+    "score": 0.3333333333333333,
+    "percentile": 46.7
+   },
+   "ilo": {
+    "code": "2221",
+    "occupation": "Nursing Professionals",
+    "score": 0.25,
+    "percentile": 45.9,
+    "gradient": "Not Exposed"
+   }
+  },
+  "tvet_instructor": {
+   "anthropic": {
+    "code": "25-1194",
+    "occupation": "Career/Technical Education Teachers, Postsecondary",
+    "score": 0.1563,
+    "percentile": 80.9
+   },
+   "openai": {
+    "code": "25-1194.00",
+    "occupation": "Career/Technical Education Teachers, Postsecondary",
+    "score": 0.48717948717948717,
+    "percentile": 71.3
+   },
+   "ilo": {
+    "code": "2320",
+    "occupation": "Vocational Education Teachers",
+    "score": 0.35,
+    "percentile": 64.1,
     "gradient": "Minimal Exposure"
    }
   }

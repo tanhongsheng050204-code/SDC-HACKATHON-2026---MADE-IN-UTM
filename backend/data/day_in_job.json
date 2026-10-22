@@ -529,6 +529,424 @@
         "pay": "DOSM 2025 median monthly pay for Service and sales workers (the whole occupation group): RM2,035"
       },
       "reviewed_by": null
+    },
+    "production_operator": {
+      "role_id": "production_operator",
+      "text": {
+        "en": "You spend your day working on site in a team, assembling components, operating machinery, and inspecting electronic products along manufacturing lines. Following structured and predictable days, you review work orders, rotate through production process tasks, maintain equipment, and package finished products for shipment. Your work supplies the essential frontline operational workforce powering Malaysia's vital electrical and electronics export manufacturing. The DOSM 2025 median monthly pay for plant and machine-operators and assemblers is RM2,083, which reflects the whole occupation group and is not a job offer.",
+        "ms": "Anda menghabiskan hari bekerja di tapak dalam sebuah pasukan, memasang komponen, mengendalikan jentera, dan memeriksa produk elektronik di sepanjang barisan pembuatan. Melalui hari kerja yang berstruktur dan boleh dijangka, anda menyemak pesanan kerja, bergilir-gilir menjalankan tugas proses pengeluaran, menyelenggara peralatan, dan membungkus produk siap untuk penghantaran. Usaha anda membekalkan tenaga kerja operasi barisan hadapan penting yang memacu pembuatan eksport elektrik dan elektronik utama Malaysia. Gaji bulanan median DOSM 2025 bagi operator loji dan mesin serta pemasang ialah RM2,083, iaitu untuk keseluruhan kumpulan pekerjaan dan bukannya tawaran kerja.",
+        "zh": "您在现场以团队形式开展工作，在制造流水线上组装组件、操作机械并检查电子产品。在结构化且规律的日常工作中，您查阅工单、轮流完成各项生产工艺任务、维护设备并包装成品以备发运。您的工作提供了关键的一线运营劳动力，助力马来西亚重要的电气和电子出口制造业。2025年马来西亚统计局（DOSM）公布的工厂和机器操作员及装配工月薪中位数为 RM2,083，这是整个职业组别的中位数，并非工作要约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Production operator",
+        "summary": "Assembles components, operates machinery, and inspects electronic products along manufacturing lines.",
+        "tasks": [
+          "Perform quality checks on products and parts.",
+          "Review work orders and blueprints to ensure work is performed according to specifications.",
+          "Rotate through all the tasks required in a particular production process.",
+          "Provide assistance in the production of wiring assemblies.",
+          "Maintain production equipment and machinery.",
+          "Complete production reports to communicate team production level to management.",
+          "Package finished products and prepare them for shipment."
+        ],
+        "work_setting": [
+          "structured, predictable days",
+          "working on site or out and about",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Electronic component assembly",
+          "Workplace safety and compliance",
+          "Electrical systems",
+          "Resilience, flexibility and agility",
+          "Analytical thinking and problem solving"
+        ],
+        "sdg_reasons": [
+          "Provides accessible formal manufacturing employment and foundational technical skills in Malaysia's industrial sector.",
+          "Supplies the essential frontline operational workforce powering Malaysia's vital electrical and electronics export manufacturing."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Plant and machine-operators and assemblers (the whole occupation group): RM2,083"
+      },
+      "reviewed_by": null
+    },
+    "cashier": {
+      "role_id": "cashier",
+      "text": {
+        "en": "You start your shift counting money in cash drawers, then spend your day greeting retail customers, scanning merchandise, tabulating bills, and processing payments or returns. Working on site with people during shift or flexible hours, your days are structured and predictable as you assist customers with information and resolve their complaints. Your work helps others because cashier positions provide crucial first-job entry and youth employment opportunities across Malaysia's service economy. The DOSM 2025 median monthly pay for service and sales workers is RM2,035, which is for the whole occupation group and not a job offer.",
+        "ms": "Anda memulakan syif dengan mengira wang di dalam laci tunai, kemudian meluangkan hari menyapa pelanggan runcit, mengimbas barangan, mengira bil, serta memproses bayaran atau pemulangan. Bekerja di lokasi bersama orang ramai mengikut syif atau waktu fleksibel, hari anda adalah berstruktur dan dapat diramal sambil anda membantu pelanggan dengan maklumat serta menyelesaikan aduan mereka. Kerja anda membantu orang ramai kerana jawatan juruwang menyediakan kemasukan kerja pertama yang penting dan peluang pekerjaan belia di seluruh ekonomi perkhidmatan Malaysia. Gaji bulanan median DOSM 2025 bagi pekerja perkhidmatan dan jualan ialah RM2,035, iaitu untuk keseluruhan kumpulan pekerjaan dan bukannya tawaran kerja.",
+        "zh": "你在轮班开始时清点钱箱中的现金，随后一整天迎接零售顾客、扫描商品、计算账单并处理付款或退换货。你在轮班或灵活工时内于现场与人共事，在结构化且可预测的工作日中为顾客提供信息并解决投诉。这份工作能帮助他人，因为收银员职位为整个马来西亚服务经济提供了关键的第一份工作起点和青年就业机会。2025年马来西亚统计局（DOSM）公布的服务和销售人员月薪中位数为RM2,035，这是整个职业组的中位数，而非具体的工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Cashier",
+        "summary": "Scans merchandise, processes payments, balances cash drawers, and assists retail customers during checkout.",
+        "tasks": [
+          "Receive payment by cash, check, credit cards, vouchers, or automatic debits.",
+          "Establish or identify prices of goods, services, or admission, and tabulate bills, using calculators, cash registers, or optical price scanners.",
+          "Issue receipts, refunds, credits, or change due to customers.",
+          "Greet customers entering establishments.",
+          "Assist customers by providing information and resolving their complaints.",
+          "Count money in cash drawers at the beginning of shifts to ensure that amounts are correct and that there is adequate change.",
+          "Process merchandise returns and exchanges."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working on site or out and about",
+          "shift or flexible hours"
+        ],
+        "main_skills": [
+          "Customer service",
+          "Point of Sale (POS) Operations",
+          "Communication",
+          "Resilience, flexibility and agility",
+          "Analytical thinking and problem solving"
+        ],
+        "sdg_reasons": [
+          "Cashier positions provide crucial first-job entry and youth employment opportunities across Malaysia's service economy."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Service and sales workers (the whole occupation group): RM2,035"
+      },
+      "reviewed_by": null
+    },
+    "hotel_front_desk_clerk": {
+      "role_id": "hotel_front_desk_clerk",
+      "text": {
+        "en": "You spend your day greeting hotel guests, managing reservations and check-ins, answering inquiries, and computing bills at a desk. Working with people in a team during shift or flexible hours, you also contact housekeeping or maintenance staff when guests report problems. Through this work, you act as a frontline ambassador in sustainable tourism, driving local hospitality and guest engagement in Malaysia. The DOSM 2025 median monthly pay for clerical support workers is RM2,693, which represents the entire occupation group and is not a job offer.",
+        "ms": "Anda memulakan hari dengan menyambut tetamu hotel, menguruskan tempahan dan daftar masuk, menjawab pertanyaan, serta mengira bil di meja kerja. Bekerja bersama orang ramai dalam sebuah pasukan mengikut waktu syif atau waktu fleksibel, anda juga menghubungi kakitangan pengemasan atau penyelenggaraan apabila tetamu melaporkan masalah. Menerusi tugasan ini, anda bertindak sebagai duta barisan hadapan dalam pelancongan mampan yang memacu hospitaliti tempatan serta penglibatan tetamu di Malaysia. Gaji bulanan penengah DOSM 2025 untuk pekerja sokongan perkeranian ialah RM2,693, iaitu penengah bagi seluruh kumpulan pekerjaan dan bukannya satu tawaran kerja.",
+        "zh": "你在办公桌前度过工作日，负责迎接酒店客人、处理预订与入住登记、解答问询并结算账单。在轮班或灵活工时下与团队和大众一起工作，你还会在客人报告问题时联系客房保洁或维修人员。通过这项工作，你将成为可持续旅游的前线大使，推动马来西亚的本地待客之道与客人互动。DOSM 2025年文书支持人员的月薪中位数为RM2,693，该数据反映的是整个职业群体的中位数，而非一份具体的工作录用待遇。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Hotel front-desk clerk",
+        "summary": "Welcomes hotel guests, manages reservations and check-ins, and resolves frontline guest inquiries.",
+        "tasks": [
+          "Greet, register, and assign rooms to guests of hotels or motels.",
+          "Make and confirm reservations.",
+          "Compute bills, collect payments, and make change for guests.",
+          "Contact housekeeping or maintenance staff when guests report problems.",
+          "Record guest comments or complaints, referring customers to managers as necessary.",
+          "Answer inquiries pertaining to hotel services, guest registration, and travel directions, or make recommendations regarding shopping, dining, or entertainment.",
+          "Perform bookkeeping activities, such as balancing accounts and conducting nightly audits."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working at a desk",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Customer service",
+          "Communication",
+          "Empathy and active listening",
+          "Analytical thinking and problem solving",
+          "Scheduling and coordination"
+        ],
+        "sdg_reasons": [
+          "Front-desk personnel act as frontline ambassadors in sustainable tourism, driving local hospitality and guest engagement in Malaysia."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "farm_worker": {
+      "role_id": "farm_worker",
+      "text": {
+        "en": "You spend your day working in a team on site or out and about, planting, caring for crops, and harvesting fruits and vegetables by hand. You may also operate machinery to plow and fertilize soil, inspect and sort produce, or load agricultural products into trucks. Your work maintains productive agricultural estates and food crops vital for national and global food security. The DOSM 2025 median monthly pay for Elementary occupations is RM1,758, which is the median for the whole occupation group and not a job offer.",
+        "ms": "Anda meluangkan hari bekerja dalam pasukan di tapak atau di luar, menanam, menjaga tanaman, serta menuai buah-buahan dan sayur-sayuran dengan tangan. Anda juga mengendalikan jentera untuk membajak dan membaja tanah, memeriksa dan mengasingkan hasil, atau memuatkan produk pertanian ke dalam trak. Usaha anda mengekalkan ladang pertanian dan tanaman makanan produktif yang penting bagi keterjaminan makanan negara dan global. Gaji bulanan penengah DOSM 2025 bagi Pekerja asas ialah RM1,758, iaitu penengah bagi keseluruhan kumpulan pekerjaan dan bukan tawaran kerja.",
+        "zh": "你作为团队的一员在现场或户外展开工作，亲手采摘水果和蔬菜，并负责农作物的种植与养护。你还可以操作机械进行耕作和土壤施肥，参与农作物的检验与分级，或将农产品装载到卡车上。你的付出维护了高产的农业庄园和粮食作物，对国家及全球的粮食安全至关重要。2025年马来西亚统计局（DOSM）初级职位组别的每月工资中位数为RM1,758，这是该职业组别的中位数，并非工作录用薪酬。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Plantation and farm worker",
+        "summary": "Plants, maintains, and harvests crops or produce on agricultural plantations and farms.",
+        "tasks": [
+          "Harvest fruits and vegetables by hand.",
+          "Plant, spray, weed, fertilize, water, and prune plants, shrubs, and trees, using gardening tools.",
+          "Identify plants, pests, and weeds to determine the selection and application of pesticides and fertilizers.",
+          "Participate in the inspection, grading, sorting, storage, and post-harvest treatment of crops.",
+          "Record information about crops, such as pesticide use, yields, or costs.",
+          "Operate tractors, tractor-drawn machinery, and self-propelled machinery to plow, harrow and fertilize soil, or to plant, cultivate, spray and harvest crops.",
+          "Load agricultural products into trucks, and drive trucks to market or storage facilities."
+        ],
+        "work_setting": [
+          "structured, predictable days",
+          "working on site or out and about",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Crop harvesting and post-harvest handling",
+          "Workplace safety and compliance",
+          "Crop care and pest control application",
+          "Resilience, flexibility and agility",
+          "Communication"
+        ],
+        "sdg_reasons": [
+          "Maintains productive agricultural estates and food crops vital for national and global food security.",
+          "Provides essential employment opportunities in rural agricultural and plantation sectors."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Elementary occupations (the whole occupation group): RM1,758"
+      },
+      "reviewed_by": null
+    },
+    "engineering_technician": {
+      "role_id": "engineering_technician",
+      "text": {
+        "en": "You spend your structured, predictable days with fixed office hours working with data and systems to prepare detailed engineering drawings and BIM models for construction projects. Working in a team, you coordinate designs and explain drawings to production or construction teams. Your work supports the development of quality and resilient infrastructure through accurate digital modeling and construction planning. The DOSM 2025 median monthly pay for Technicians and associate professionals across the whole occupation group is RM3,852, which is not a job offer.",
+        "ms": "Anda menghabiskan hari-hari yang berstruktur dan boleh dijangka dengan waktu pejabat yang tetap untuk bekerja dengan data dan sistem bagi menyediakan lukisan kejuruteraan terperinci serta model BIM untuk projek pembinaan. Bekerja dalam pasukan, anda menyelaras reka bentuk dan menerangkan lukisan kepada pasukan pengeluaran atau pembinaan. Usaha anda menyokong pembangunan infrastruktur yang berkualiti dan berdaya tahan melalui pemodelan digital dan perancangan pembinaan yang tepat. Gaji bulanan penengah DOSM 2025 bagi Juruteknik dan profesional bersekutu untuk keseluruhan kumpulan pekerjaan ini ialah RM3,852, dan ini bukan tawaran pekerjaan.",
+        "zh": "你在固定办公时间内度过结构化且可预测的工作日，运用数据和系统为建筑项目准备详细的工程图纸与 BIM 模型。你在团队中工作，负责协调各项设计，并向生产或施工团队解释图纸。你的工作通过精确的数字化建模和施工规划，支持优质且具韧性的基础设施建设。2025年马来西亚统计局（DOSM）公布的技术人员及助理专业人员整个职业组的月薪中位数为 RM3,852，这并非工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Engineering drafting and BIM technician",
+        "summary": "Prepares detailed engineering drawings, BIM models, and technical documentation for construction projects.",
+        "tasks": [
+          "Produce drawings, using computer-assisted drafting systems (CAD) or drafting machines, or by hand, using compasses, dividers, protractors, triangles, and other drafting devices.",
+          "Draft plans and detailed drawings for structures, installations, and construction projects, such as highways, sewage disposal systems, and dikes, working from sketches or notes.",
+          "Coordinate structural, electrical, and mechanical designs and determine a method of presentation to graphically represent building plans.",
+          "Analyze building codes, by-laws, space and site requirements, and other technical documents and reports to determine their effect on architectural designs.",
+          "Check dimensions of materials to be used and assign numbers to lists of materials.",
+          "Explain drawings to production or construction teams and provide adjustments as necessary.",
+          "Represent architect or engineer on construction site, ensuring builder compliance with design specifications and advising on design corrections, under supervision."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "structured, predictable days",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "CAD and BIM Modelling",
+          "Analytical thinking and problem solving",
+          "Communication",
+          "Spreadsheets (Excel / Google Sheets)",
+          "Workplace safety and compliance"
+        ],
+        "sdg_reasons": [
+          "Supports the development of quality and resilient infrastructure through accurate digital modeling and construction planning."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Technicians and associate professionals (the whole occupation group): RM3,852"
+      },
+      "reviewed_by": null
+    },
+    "accounts_clerk": {
+      "role_id": "accounts_clerk",
+      "text": {
+        "en": "You start the day working at a desk with data and systems, following a structured and predictable routine during fixed office hours. You spend your time checking figures for mathematical accuracy, matching order forms with invoices, reconciling bank transaction records, and processing payroll information. Your effort maintains accurate wage delivery and statutory contributions that safeguard formal worker protections. The DOSM 2025 median monthly pay for clerical support workers is RM2,693 for the whole occupation group, not a job offer.",
+        "ms": "Anda memulakan hari dengan bekerja di meja bersama data dan sistem mengikut rutin yang berstruktur pada waktu pejabat yang tetap. Anda meluangkan masa menyemak ketepatan matematik pada angka, memadankan borang pesanan dengan invois, mengimbangi rekod transaksi bank, serta memproses maklumat gaji. Usaha anda mengekalkan pembayaran gaji yang tepat dan caruman berkanun yang melindungi hak perlindungan rasmi pekerja. Gaji bulanan penengah DOSM 2025 bagi pekerja sokongan perkeranian ialah RM2,693 untuk keseluruhan kumpulan pekerjaan, bukannya tawaran pekerjaan.",
+        "zh": "你在固定的办公时间内坐在办公桌前开始一天，在结构化且规律的安排中与数据和系统打交道。你花时间检查数字的准确性、核对订单与发票、核对银行交易记录并处理薪资信息。你的工作保持了准确的工资发放和法定缴款，从而维护了正规员工的保障。2025年马来西亚统计局（DOSM）文书支持人员整个职业组别的月薪中位数为RM2,693，这并不是工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Accounts and payroll clerk",
+        "summary": "Processes routine payroll, records financial transactions, and reconciles invoices and bank statements.",
+        "tasks": [
+          "Check figures, postings, and documents for correct entry, mathematical accuracy, and proper codes.",
+          "Classify, record, and summarize numerical and financial data to compile and keep financial records, using journals and ledgers or computers.",
+          "Match order forms with invoices, and record the necessary information.",
+          "Prepare and process payroll information.",
+          "Reconcile records of bank transactions.",
+          "Reconcile or note and report discrepancies found in records.",
+          "Complete and submit tax forms and returns, workers' compensation forms, pension contribution forms, and other government documents."
+        ],
+        "work_setting": [
+          "working with data and systems",
+          "structured, predictable days",
+          "working at a desk",
+          "fixed office hours"
+        ],
+        "main_skills": [
+          "Spreadsheets (Excel / Google Sheets)",
+          "Data entry",
+          "Bookkeeping and ledger maintenance",
+          "Payroll processing and statutory compliance",
+          "Office administration",
+          "Analytical thinking and problem solving"
+        ],
+        "sdg_reasons": [
+          "Maintains accurate wage delivery and statutory contributions that safeguard formal worker protections."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "supply_chain_specialist": {
+      "role_id": "supply_chain_specialist",
+      "text": {
+        "en": "You spend your fixed office hours working at a desk in a team, directing the allocation of materials and planning the movement of goods across supply chains. Throughout the day, you collaborate with other departments to meet customer requirements and manage subcontractor activities. Your work helps minimise inventory obsolescence and material waste while optimising freight transport networks to build resilient logistics infrastructure. The DOSM 2025 median monthly pay for Professionals is RM6,124, which is for the whole occupation group and not a job offer.",
+        "ms": "Anda menghabiskan waktu pejabat yang tetap dengan bekerja di meja bersama pasukan, mengurus pengagihan bahan dan merancang pergerakan barangan merentasi rantaian bekalan. Sepanjang hari, anda bekerjasama dengan jabatan lain untuk memenuhi keperluan pelanggan serta mengurus aktiviti subkontraktor. Usaha anda membantu meminimumkan keusangan inventori dan pembaziran bahan di samping mengoptimumkan rangkaian pengangkutan kargo untuk membina infrastruktur logistik yang berdaya tahan. Gaji bulanan penengah DOSM 2025 bagi Profesional ialah RM6,124, iaitu untuk keseluruhan kumpulan pekerjaan dan bukannya tawaran kerja.",
+        "zh": "您在固定的办公时间内伏案工作并与团队配合，负责指导物料分配并规划整个供应链中的货物流动。在这一天里，您与其他部门协作以满足客户需求，并管理分包商的各项活动。您的工作通过优化货运网络来构建具韧性的物流基础设施，同时尽量减少库存陈旧与物料浪费。2025年马来西亚统计局（DOSM）专业人员的月薪中位数为RM6,124，该数据代表该职业组别的整体中位数，并非工作录用待遇。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Supply chain and logistics specialist",
+        "summary": "Plans and coordinates the movement of goods, materials, and inventory across supply chains.",
+        "tasks": [
+          "Direct availability and allocation of materials, supplies, and finished products.",
+          "Redesign the movement of goods to maximize value and minimize costs.",
+          "Collaborate with other departments as necessary to meet customer requirements, to take advantage of sales opportunities or, in the case of shortages, to minimize negative impacts on a business.",
+          "Review logistics performance with customers against targets, benchmarks, and service agreements.",
+          "Manage subcontractor activities, reviewing proposals, developing performance specifications, and serving as liaisons between subcontractors and organizations.",
+          "Report project plans, progress, and results.",
+          "Stay informed of logistics technology advances and apply appropriate technology to improve logistics processes."
+        ],
+        "work_setting": [
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Spreadsheets (Excel / Google Sheets)",
+          "Inventory management",
+          "Project management",
+          "Scheduling and coordination",
+          "Analytical thinking and problem solving",
+          "Risk assessment"
+        ],
+        "sdg_reasons": [
+          "Optimises freight transport networks and trade operations to build resilient logistics infrastructure.",
+          "Minimises inventory obsolescence and material waste through efficient supply chain planning."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "bank_teller": {
+      "role_id": "bank_teller",
+      "text": {
+        "en": "You spend structured, predictable days working at a desk during fixed office hours, collaborating in a team and working with people. Throughout the day, you process routine counter transactions, manage cash deposits, cash checks, and assist customers with their accounts. Your work strengthens the capacity of domestic financial institutions to encourage and expand access to banking services for all. The DOSM 2025 median monthly pay for clerical support workers is RM2,693 for the whole occupation group, not a job offer.",
+        "ms": "Anda menghabiskan hari yang berstruktur dan mudah dijangka dengan bekerja di meja sepanjang waktu pejabat yang tetap, bekerjasama dalam pasukan dan berurusan dengan orang ramai. Sepanjang hari, anda memproses transaksi kaunter rutin, mengurus deposit tunai, menunaikan cek, serta membantu pelanggan menguruskan akaun mereka. Usaha anda mengukuhkan kapasiti institusi kewangan domestik untuk menggalakkan dan memperluas akses kepada perkhidmatan perbankan untuk semua. Gaji bulanan penengah DOSM 2025 bagi pekerja sokongan perkeranian ialah RM2,693 untuk keseluruhan kumpulan pekerjaan ini, bukannya tawaran pekerjaan.",
+        "zh": "您在固定的办公时间内在办公桌前度过有规律、可预测的日常，与团队紧密合作并与人们打交道。在日常工作中，您处理常规柜台交易，管理现金存款，兑现支票，并协助客户办理账户业务。您的工作有助于增强国内金融机构的能力，以鼓励并扩大所有人获得银行服务的机会。DOSM 2025年文职支持人员整个职业组别的每月薪资中位数为RM2,693，这并不是一份工作邀约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Bank teller",
+        "summary": "Processes routine counter transactions, manages cash deposits, and assists bank customers with accounts.",
+        "tasks": [
+          "Receive checks and cash for deposit, verify amounts, and check accuracy of deposit slips.",
+          "Cash checks and pay out money after verifying that signatures are correct, that written and numerical amounts agree, and that accounts have sufficient funds.",
+          "Enter customers' transactions into computers to record transactions and issue computer-generated receipts.",
+          "Balance currency, coin, and checks in cash drawers at ends of shifts and calculate daily transactions, using computers, calculators, or adding machines.",
+          "Resolve problems or discrepancies concerning customers' accounts.",
+          "Explain, promote, or sell products or services, such as travelers' checks, savings bonds, money orders, and cashier's checks, using computerized information about customers to tailor recommendations.",
+          "Answer telephones and assist customers with their questions."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working at a desk",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Customer service",
+          "Communication",
+          "Data entry",
+          "Analytical thinking and problem solving",
+          "Risk assessment"
+        ],
+        "sdg_reasons": [
+          "Strengthens the capacity of domestic financial institutions to encourage and expand access to banking services for all."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Clerical support workers (the whole occupation group): RM2,693"
+      },
+      "reviewed_by": null
+    },
+    "registered_nurse": {
+      "role_id": "registered_nurse",
+      "text": {
+        "en": "You spend your day recording patients' vital signs, administering medications, monitoring reactions, and assisting with examinations. Working on site or out and about with shift or flexible hours, you collaborate in a team with healthcare colleagues to coordinate care plans and educate families. Your work forms the core frontline health workforce vital for hospital operations, preventive healthcare, and patient recovery. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda menghabiskan hari dengan merekodkan tanda vital pesakit, memberikan ubat-ubatan, memantau tindak balas, dan membantu dalam rawatan atau pemeriksaan. Bekerja di tapak atau di luar dengan waktu syif atau anjal, anda bekerjasama dalam pasukan bersama ahli penjagaan kesihatan untuk merancang penjagaan dan mendidik keluarga. Tugas anda membentuk tenaga kerja barisan hadapan utama yang penting untuk operasi hospital, penjagaan kesihatan pencegahan, dan pemulihan pesakit. Gaji bulanan median DOSM 2025 untuk Profesional bagi keseluruhan kumpulan pekerjaan ini ialah RM6,124, dan ini bukan satu tawaran pekerjaan.",
+        "zh": "你一天的日常包括记录患者的生命体征、给药、监测反应并协助进行检查或治疗。在现场或外出工作且实行轮班或弹性工时，你与医疗团队成员协作评估护理计划，并向家属普及疾病预防知识。作为核心前线卫生工作者，你的工作对医院运营、预防性医疗保健及患者康复至关重要。2025年马来西亚统计局（DOSM）公布的专业人员整个职业组月薪中位数为RM6,124，此数据并非招聘要约。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "Registered nurse",
+        "summary": "Assesses patient health, administers medications, and provides direct clinical care across healthcare settings.",
+        "tasks": [
+          "Record patients' medical information and vital signs.",
+          "Administer medications to patients and monitor patients for reactions or side effects.",
+          "Maintain accurate, detailed reports and records.",
+          "Monitor, record, and report symptoms or changes in patients' conditions.",
+          "Consult and coordinate with healthcare team members to assess, plan, implement, or evaluate patient care plans.",
+          "Prepare patients for and assist with examinations or treatments.",
+          "Instruct individuals, families, or other groups on topics such as health education, disease prevention, or childbirth and develop health improvement programs."
+        ],
+        "work_setting": [
+          "working with people",
+          "working on site or out and about",
+          "shift or flexible hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Patient and elderly care",
+          "Empathy and active listening",
+          "Workplace safety and compliance",
+          "Critical thinking",
+          "Communication"
+        ],
+        "sdg_reasons": [
+          "Registered nurses form the core frontline health workforce vital for hospital operations, preventive healthcare, and patient recovery."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
+    },
+    "tvet_instructor": {
+      "role_id": "tvet_instructor",
+      "text": {
+        "en": "You spend your structured, predictable days working with people on site and in a team, presenting lectures and conducting on-the-job training sessions to demonstrate technical procedures. During fixed office hours, you supervise students' use of tools and equipment, observe their work to provide feedback, and administer tests to measure their progress. Your role directly develops technical competencies in learners and equips youth with market-driven trade skills for employment and decent work. The DOSM 2025 median monthly pay for Professionals across the whole occupation group is RM6,124, which is not a job offer.",
+        "ms": "Anda memulakan hari yang berstruktur dan boleh dijangka dengan bekerja bersama orang ramai di tapak serta dalam pasukan, menyampaikan kuliah dan mengendalikan sesi latihan amali untuk menunjukkan teknik kemahiran. Sepanjang waktu pejabat yang tetap, anda menyelia penggunaan alatan dan peralatan oleh pelajar, menilai kerja mereka untuk memberi maklum balas, serta mentadbir ujian bagi mengukur kemajuan. Usaha anda secara langsung membina kecekapan teknikal pelajar dan melengkapkan belia dengan kemahiran pertukangan yang dipacu pasaran demi memperoleh pekerjaan yang wajar. Gaji bulanan penengah DOSM 2025 bagi Profesional untuk seluruh kumpulan pekerjaan ialah RM6,124, dan ini bukan tawaran pekerjaan.",
+        "zh": "你在结构化且规律的工作日中，在现场与团队及众人协作，通过讲授课程和开展在职培训来演示各项技术与操作方法。在固定的办公时间内，你监督学生使用工具和设备，观察他们的实操以提供反馈，并主持测验以评估培训效果。你的工作直接培养学员的职业与技术能力，为青年赋予适应市场需求的技能以获得体面工作。2025年马来西亚统计局（DOSM）公布的专业人员整个职业组月入中位数为RM6,124，这并非工作录用待遇。"
+      },
+      "basis": "data",
+      "drafted": "2026-10-22",
+      "facts": {
+        "role": "TVET instructor",
+        "summary": "Teaches technical and vocational skills through hands-on practical training and classroom instruction.",
+        "tasks": [
+          "Supervise and monitor students' use of tools and equipment.",
+          "Observe and evaluate students' work to determine progress, provide feedback, and make suggestions for improvement.",
+          "Conduct on-the-job training classes or training sessions to teach and demonstrate principles, techniques, procedures, or methods of designated subjects.",
+          "Present lectures and conduct discussions to increase students' knowledge and competence using visual aids, such as graphs, charts, videotapes, and slides.",
+          "Administer oral, written, or performance tests to measure progress and to evaluate training effectiveness.",
+          "Develop curricula and plan course content and methods of instruction.",
+          "Prepare reports and maintain records, such as student grades, attendance rolls, and training activity details."
+        ],
+        "work_setting": [
+          "working with people",
+          "structured, predictable days",
+          "working on site or out and about",
+          "fixed office hours",
+          "working in a team"
+        ],
+        "main_skills": [
+          "Vocational pedagogy and training",
+          "Workplace safety and compliance",
+          "Communication",
+          "Analytical thinking and problem solving",
+          "Using generative AI tools"
+        ],
+        "sdg_reasons": [
+          "Directly develops vocational and technical competencies in learners for employment and decent work.",
+          "Equips youth with market-driven trade skills to substantially reduce the proportion of youth not in employment or training."
+        ],
+        "pay": "DOSM 2025 median monthly pay for Professionals (the whole occupation group): RM6,124"
+      },
+      "reviewed_by": null
     }
   }
 }

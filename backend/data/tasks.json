@@ -589,6 +589,566 @@
           "reviewed_by": null
         }
       ]
+    },
+    {
+      "role_id": "production_operator",
+      "onet_code": "51-2092.00",
+      "onet_note": "ISCO 8212 Electrical and electronic equipment assemblers; O*NET Team Assemblers.",
+      "tasks": [
+        {
+          "id": "onet-20157",
+          "text": "Perform quality checks on products and parts.",
+          "label": "assist",
+          "reason": "Automated optical inspection flags surface flaws while operators confirm complex defects.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20160",
+          "text": "Review work orders and blueprints to ensure work is performed according to specifications.",
+          "label": "assist",
+          "reason": "Digital displays and automated translation tools assist operators in reviewing assembly guidelines.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8468",
+          "text": "Rotate through all the tasks required in a particular production process.",
+          "label": "human",
+          "reason": "Physical line rotations require human dexterity, physical presence, and situational awareness.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8472",
+          "text": "Provide assistance in the production of wiring assemblies.",
+          "label": "human",
+          "reason": "Manual manipulation and precise routing of small wire harnesses require human motor skills.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20162",
+          "text": "Maintain production equipment and machinery.",
+          "label": "human",
+          "reason": "Routine physical cleaning, clearing jams, and mechanical upkeep must be done manually on the line.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20161",
+          "text": "Complete production reports to communicate team production level to management.",
+          "label": "automate",
+          "reason": "IoT sensors and automated production dashboards capture and compile output numbers automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20158",
+          "text": "Package finished products and prepare them for shipment.",
+          "label": "human",
+          "reason": "Boxing, taping, and organizing finished goods across dynamic order lines remain physical human tasks.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "cashier",
+      "onet_code": "41-2011.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-2400",
+          "text": "Receive payment by cash, check, credit cards, vouchers, or automatic debits.",
+          "label": "automate",
+          "reason": "Self-checkout terminals and contactless mobile payments directly process customer transactions without human cashier involvement.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2405",
+          "text": "Establish or identify prices of goods, services, or admission, and tabulate bills, using calculators, cash registers, or optical price scanners.",
+          "label": "automate",
+          "reason": "Automated barcode scanners, RFID readers, and smart shopping carts tally item prices automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2401",
+          "text": "Issue receipts, refunds, credits, or change due to customers.",
+          "label": "automate",
+          "reason": "Digital POS platforms automatically generate e-receipts and issue electronic credit returns to customer accounts.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2403",
+          "text": "Greet customers entering establishments.",
+          "label": "human",
+          "reason": "Offering a genuine, warm greeting to entering shoppers requires authentic human hospitality and social presence.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-18765",
+          "text": "Assist customers by providing information and resolving their complaints.",
+          "label": "assist",
+          "reason": "Store lookup software assists staff with inventory data while the cashier exercises empathy to resolve customer complaints.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2402",
+          "text": "Count money in cash drawers at the beginning of shifts to ensure that amounts are correct and that there is adequate change.",
+          "label": "assist",
+          "reason": "Smart cash recyclers and automated counting hardware help staff rapidly verify cash drawer balances before a shift.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2417",
+          "text": "Process merchandise returns and exchanges.",
+          "label": "assist",
+          "reason": "POS software automates return policy checks and receipt validation, while the cashier physically inspects damaged goods.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "hotel_front_desk_clerk",
+      "onet_code": "43-4081.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-2610",
+          "text": "Greet, register, and assign rooms to guests of hotels or motels.",
+          "label": "assist",
+          "reason": "Self-service check-in kiosks and digital ID scanners speed up registration while clerks handle complex check-ins and personal greetings.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2620",
+          "text": "Make and confirm reservations.",
+          "label": "automate",
+          "reason": "Direct booking engines, travel aggregator APIs, and conversational AI handle standard room bookings without human intervention.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2613",
+          "text": "Compute bills, collect payments, and make change for guests.",
+          "label": "automate",
+          "reason": "Automated point-of-sale systems and digital payment gateways reconcile charges and process checkout transactions automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2619",
+          "text": "Contact housekeeping or maintenance staff when guests report problems.",
+          "label": "assist",
+          "reason": "AI dispatch platforms automatically route guest requests to maintenance or housekeeping staff based on location and priority.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2622",
+          "text": "Record guest comments or complaints, referring customers to managers as necessary.",
+          "label": "human",
+          "reason": "De-escalating upset guests and showing genuine empathy during service failures requires nuanced human emotional intelligence.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-18567",
+          "text": "Answer inquiries pertaining to hotel services, guest registration, and travel directions, or make recommendations regarding shopping, dining, or entertainment.",
+          "label": "assist",
+          "reason": "AI translation and recommendation tools help clerks quickly suggest local dining and attractions to international travelers.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-18566",
+          "text": "Perform bookkeeping activities, such as balancing accounts and conducting nightly audits.",
+          "label": "automate",
+          "reason": "Property management systems with automated reconciliation algorithms perform night audits and balance ledgers with minimal oversight.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "farm_worker",
+      "onet_code": "45-2092.00",
+      "onet_note": "ISCO 9211 Crop farm labourers; O*NET Farmworkers and Laborers, Crop, Nursery, and Greenhouse.",
+      "tasks": [
+        {
+          "id": "onet-23374",
+          "text": "Harvest fruits and vegetables by hand.",
+          "label": "human",
+          "reason": "Manual dexterity and navigating difficult plantation terrain require human hands.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23399",
+          "text": "Plant, spray, weed, fertilize, water, and prune plants, shrubs, and trees, using gardening tools.",
+          "label": "human",
+          "reason": "Physical fieldwork across varied estate topography relies directly on manual physical labour.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23380",
+          "text": "Identify plants, pests, and weeds to determine the selection and application of pesticides and fertilizers.",
+          "label": "assist",
+          "reason": "Mobile computer vision tools can assist workers in identifying crop diseases and pest infestations.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23392",
+          "text": "Participate in the inspection, grading, sorting, storage, and post-harvest treatment of crops.",
+          "label": "assist",
+          "reason": "Automated optical sorting and grading scanners help workers classify produce quality faster.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23387",
+          "text": "Record information about crops, such as pesticide use, yields, or costs.",
+          "label": "assist",
+          "reason": "Digital logbooks and mobile apps streamline the recording of harvest volumes and pesticide applications.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23371",
+          "text": "Operate tractors, tractor-drawn machinery, and self-propelled machinery to plow, harrow and fertilize soil, or to plant, cultivate, spray and harvest crops.",
+          "label": "human",
+          "reason": "Navigating rugged agricultural fields and machinery safely continues to need hands-on human control.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-23397",
+          "text": "Load agricultural products into trucks, and drive trucks to market or storage facilities.",
+          "label": "human",
+          "reason": "Heavy physical lifting, loading fresh fruit bunches, and transport across rural tracks require human physical effort.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "engineering_technician",
+      "onet_code": "17-3011.00",
+      "onet_note": "O*NET Architectural and Civil Drafters; ISCO 3118 Draughtspersons.",
+      "tasks": [
+        {
+          "id": "onet-21917",
+          "text": "Produce drawings, using computer-assisted drafting systems (CAD) or drafting machines, or by hand, using compasses, dividers, protractors, triangles, and other drafting devices.",
+          "label": "assist",
+          "reason": "Generative drafting and CAD plugins assist technicians by accelerating routine line work and auto-generating standard views.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21918",
+          "text": "Draft plans and detailed drawings for structures, installations, and construction projects, such as highways, sewage disposal systems, and dikes, working from sketches or notes.",
+          "label": "assist",
+          "reason": "Parametric AI tools speed up plan generation from sketches, but technicians must verify structural layouts.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21919",
+          "text": "Coordinate structural, electrical, and mechanical designs and determine a method of presentation to graphically represent building plans.",
+          "label": "assist",
+          "reason": "BIM tools automatically detect clashes between MEP and structural elements, while the technician coordinates the resolution.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21920",
+          "text": "Analyze building codes, by-laws, space and site requirements, and other technical documents and reports to determine their effect on architectural designs.",
+          "label": "assist",
+          "reason": "AI document extraction tools scan building bylaws to highlight non-compliance for the technician to review.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21928",
+          "text": "Check dimensions of materials to be used and assign numbers to lists of materials.",
+          "label": "automate",
+          "reason": "BIM software automatically schedules and tallies dimensions and material quantities directly from digital models.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21931",
+          "text": "Explain drawings to production or construction teams and provide adjustments as necessary.",
+          "label": "human",
+          "reason": "Explaining designs to site engineers and local contractors requires direct interpersonal communication and contextual judgment.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21943",
+          "text": "Represent architect or engineer on construction site, ensuring builder compliance with design specifications and advising on design corrections, under supervision.",
+          "label": "human",
+          "reason": "On-site inspection to verify builder compliance requires physical presence and real-time situational assessment.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "accounts_clerk",
+      "onet_code": "43-3031.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-2486",
+          "text": "Check figures, postings, and documents for correct entry, mathematical accuracy, and proper codes.",
+          "label": "automate",
+          "reason": "AI document extraction automatically verifies figures, postings, and tax codes across receipts and invoices without manual checking.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2490",
+          "text": "Classify, record, and summarize numerical and financial data to compile and keep financial records, using journals and ledgers or computers.",
+          "label": "automate",
+          "reason": "Cloud accounting systems automatically classify and post routine ledger entries using predefined rule sets and machine-learned patterns.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2509",
+          "text": "Match order forms with invoices, and record the necessary information.",
+          "label": "automate",
+          "reason": "Automated three-way matching systems cross-reference purchase orders, delivery orders, and invoices electronically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-18561",
+          "text": "Prepare and process payroll information.",
+          "label": "assist",
+          "reason": "Payroll systems automate statutory rate calculations, but clerks must still review irregular allowances, medical claims, and overtime hours.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2503",
+          "text": "Reconcile records of bank transactions.",
+          "label": "assist",
+          "reason": "Bank feeds suggest automated matches, while the clerk manually reviews unmatched line items and payment exceptions.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2496",
+          "text": "Reconcile or note and report discrepancies found in records.",
+          "label": "human",
+          "reason": "Investigating disputed payments, contact with suppliers, and resolving undocumented discrepancies require direct human communication and problem-solving.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2510",
+          "text": "Complete and submit tax forms and returns, workers' compensation forms, pension contribution forms, and other government documents.",
+          "label": "assist",
+          "reason": "Statutory software prepares EPF, SOCSO, and tax filings, while the clerk verifies totals and handles final portal submission.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "supply_chain_specialist",
+      "onet_code": "13-1081.00",
+      "onet_note": "O*NET Logisticians; ISCO has no logistician code, closest is 2421 Management and organization analysts.",
+      "tasks": [
+        {
+          "id": "onet-8934",
+          "text": "Direct availability and allocation of materials, supplies, and finished products.",
+          "label": "assist",
+          "reason": "AI forecasting tools optimize inventory allocation while specialists manage real-world stock constraints and supplier lead times.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8949",
+          "text": "Redesign the movement of goods to maximize value and minimize costs.",
+          "label": "assist",
+          "reason": "AI models suggest optimal freight routes and network designs, which specialists validate against local infrastructure and cost realities.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8935",
+          "text": "Collaborate with other departments as necessary to meet customer requirements, to take advantage of sales opportunities or, in the case of shortages, to minimize negative impacts on a business.",
+          "label": "human",
+          "reason": "Cross-functional alignment and crisis negotiation during product shortages require human relationship management and judgment.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8937",
+          "text": "Review logistics performance with customers against targets, benchmarks, and service agreements.",
+          "label": "assist",
+          "reason": "AI dashboards monitor SLA metrics in real time while specialists handle performance discussions and client negotiations.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8950",
+          "text": "Manage subcontractor activities, reviewing proposals, developing performance specifications, and serving as liaisons between subcontractors and organizations.",
+          "label": "human",
+          "reason": "Subcontractor selection, relationship management, and contract enforcement rely heavily on interpersonal trust and human evaluation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8940",
+          "text": "Report project plans, progress, and results.",
+          "label": "automate",
+          "reason": "Automated reporting tools and workflow integrations generate logistics status reports directly from ERP systems.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-8948",
+          "text": "Stay informed of logistics technology advances and apply appropriate technology to improve logistics processes.",
+          "label": "human",
+          "reason": "Evaluating and adopting new warehouse and freight technologies requires strategic business insight and contextual assessment.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "bank_teller",
+      "onet_code": "43-3071.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-2551",
+          "text": "Receive checks and cash for deposit, verify amounts, and check accuracy of deposit slips.",
+          "label": "automate",
+          "reason": "Cash deposit machines and optical character recognition increasingly verify slips, notes, and cheque deposits automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2550",
+          "text": "Cash checks and pay out money after verifying that signatures are correct, that written and numerical amounts agree, and that accounts have sufficient funds.",
+          "label": "automate",
+          "reason": "Automated teller machines and digital fund transfers replace most over-the-counter cheque cashing and cash withdrawals.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2553",
+          "text": "Enter customers' transactions into computers to record transactions and issue computer-generated receipts.",
+          "label": "automate",
+          "reason": "Core banking systems and digital banking platforms log transactions and generate electronic receipts automatically.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2549",
+          "text": "Balance currency, coin, and checks in cash drawers at ends of shifts and calculate daily transactions, using computers, calculators, or adding machines.",
+          "label": "assist",
+          "reason": "Automated cash recyclers and smart vault software tally cash counts, while tellers handle physical sign-offs and variance reviews.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2560",
+          "text": "Resolve problems or discrepancies concerning customers' accounts.",
+          "label": "assist",
+          "reason": "AI diagnostic tools help flag transaction errors and account holds, while tellers manage customer interaction and remediation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-2561",
+          "text": "Explain, promote, or sell products or services, such as travelers' checks, savings bonds, money orders, and cashier's checks, using computerized information about customers to tailor recommendations.",
+          "label": "assist",
+          "reason": "Customer intelligence engines suggest relevant financial products, but tellers explain features and build rapport with clients.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-21076",
+          "text": "Answer telephones and assist customers with their questions.",
+          "label": "human",
+          "reason": "Supporting branch visitors with complex queries and emotional distress relies on interpersonal tact and human empathy.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "registered_nurse",
+      "onet_code": "29-1141.00",
+      "onet_note": null,
+      "tasks": [
+        {
+          "id": "onet-1841",
+          "text": "Record patients' medical information and vital signs.",
+          "label": "assist",
+          "reason": "AI-connected telemetry and automated charting capture vital signs, but nurses verify readings and correlate them with patient status.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-20413",
+          "text": "Administer medications to patients and monitor patients for reactions or side effects.",
+          "label": "human",
+          "reason": "Administering medications and observing subtle clinical reactions require direct human bedside presence and sensory observation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-1839",
+          "text": "Maintain accurate, detailed reports and records.",
+          "label": "assist",
+          "reason": "Document extraction and language tools help summarize nursing notes, though nurses must validate the record.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-1840",
+          "text": "Monitor, record, and report symptoms or changes in patients' conditions.",
+          "label": "assist",
+          "reason": "Clinical decision support systems flag early deterioration trends, but the nurse evaluates the patient's holistic presentation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-1843",
+          "text": "Consult and coordinate with healthcare team members to assess, plan, implement, or evaluate patient care plans.",
+          "label": "human",
+          "reason": "Interprofessional rounds and multi-specialty care planning require collaborative dialogue, bedside context, and clinical judgment.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-1847",
+          "text": "Prepare patients for and assist with examinations or treatments.",
+          "label": "human",
+          "reason": "Hands-on physical preparation, positioning, and calming anxious patients during procedures require physical dexterity and empathy.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-1850",
+          "text": "Instruct individuals, families, or other groups on topics such as health education, disease prevention, or childbirth and develop health improvement programs.",
+          "label": "assist",
+          "reason": "Generative tools assist in drafting accessible patient education materials, while the nurse delivers contextual guidance to families.",
+          "reviewed_by": null
+        }
+      ]
+    },
+    {
+      "role_id": "tvet_instructor",
+      "onet_code": "25-1194.00",
+      "onet_note": "O*NET Career/Technical Education Teachers, Postsecondary.",
+      "tasks": [
+        {
+          "id": "onet-6445",
+          "text": "Supervise and monitor students' use of tools and equipment.",
+          "label": "human",
+          "reason": "Physical workshop safety and direct manual supervision must be actively managed by a human instructor.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6446",
+          "text": "Observe and evaluate students' work to determine progress, provide feedback, and make suggestions for improvement.",
+          "label": "human",
+          "reason": "Evaluating physical craftsmanship, manual dexterity, and practical technique requires real-time human observation.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6453",
+          "text": "Conduct on-the-job training classes or training sessions to teach and demonstrate principles, techniques, procedures, or methods of designated subjects.",
+          "label": "human",
+          "reason": "Demonstrating tactile procedures and tool operations requires physical presence and real-time interaction.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6447",
+          "text": "Present lectures and conduct discussions to increase students' knowledge and competence using visual aids, such as graphs, charts, videotapes, and slides.",
+          "label": "assist",
+          "reason": "Generative media and AI presentation tools help instructors rapidly design engaging visual aids and instructional slides.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6448",
+          "text": "Administer oral, written, or performance tests to measure progress and to evaluate training effectiveness.",
+          "label": "assist",
+          "reason": "AI can formulate written question banks and analyze test statistics while instructors oversee practical assessments.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6454",
+          "text": "Develop curricula and plan course content and methods of instruction.",
+          "label": "assist",
+          "reason": "Instructors can use AI workflows to align course outlines quickly with evolving industrial competency standards.",
+          "reviewed_by": null
+        },
+        {
+          "id": "onet-6449",
+          "text": "Prepare reports and maintain records, such as student grades, attendance rolls, and training activity details.",
+          "label": "automate",
+          "reason": "Document processing systems can automate routine attendance tracking, mark calculation, and institutional reporting.",
+          "reviewed_by": null
+        }
+      ]
     }
   ]
 }

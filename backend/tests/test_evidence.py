@@ -131,7 +131,7 @@ def test_failed_role_does_not_stop_the_run(client, searched):
     assert searched["failed"] == ["ux_designer"]
     assert any("UX / UI designer: search failed" in s and "example.org" not in s for s in searched["steps"])
     pending = client.get("/api/evidence/pending", headers=ADMIN).json()
-    assert len(pending) == len(searched["saved"]) == 12
+    assert len(pending) == len(searched["saved"]) == len(get_reference().roles) - 1
     analyst = next(p for p in pending if p["role_id"] == "data_analyst")
     assert analyst["job_ads"] == 3 and analyst["added"] == ["cloud_computing"]
     assert client.get("/api/evidence/pending").status_code == 401
@@ -252,7 +252,7 @@ def test_stop_cancels_searches_not_started_and_keeps_what_was_found(client, monk
         return real(role, skills, grounded=FakeSearch(ADS))
 
     monkeypatch.setattr(search, "search_role", fake_search_role)
-    monkeypatch.setattr(refresh, "PARALLEL", 1)  # one at a time, so the other 12 are still queued
+    monkeypatch.setattr(refresh, "PARALLEL", 1)  # one at a time, so the others are still queued
     monkeypatch.setitem(refresh._status, "state", "idle")
     assert client.post("/api/evidence/refresh", headers=ADMIN).status_code == 202
     for _ in range(500):
@@ -261,5 +261,5 @@ def test_stop_cancels_searches_not_started_and_keeps_what_was_found(client, monk
             break
     assert state["state"] == "stopped" and state["stopping"] is False
     assert len(calls) == 1 and len(state["saved"]) == 1  # the running search finished and was kept
-    assert any("12 not searched" in s for s in state["steps"])
+    assert any(f"{len(get_reference().roles) - 1} not searched" in s for s in state["steps"])
     assert client.post("/api/evidence/refresh/stop", headers=ADMIN).status_code == 409  # nothing running now

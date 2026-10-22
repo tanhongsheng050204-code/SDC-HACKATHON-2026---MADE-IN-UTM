@@ -26,6 +26,10 @@ def _read(name: str):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
+# Skills every hands-on job lists; they do not make a nurse or a farm worker a "technical" worker.
+CROSS_CUTTING = {"safety_compliance"}
+
+
 def main() -> None:
     roles = _read("roles.json")
     capabilities = _read("capabilities.json")["capabilities"]
@@ -37,7 +41,7 @@ def main() -> None:
     out = {}
     for role in roles:
         own = {rs["skill_id"] for rs in role["skills"]}
-        fields = {category[s] for s in own}
+        fields = {category[s] for s in own - CROSS_CUTTING}
         picked: list[tuple[str, str]] = []
         if any(category[rs["skill_id"]] == "ai" and rs["weight"] == 3 for rs in role["skills"]):
             out[role["id"]] = {"ai_skills": [], "reviewed_by": None, "note": "Already an AI job."}

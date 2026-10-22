@@ -149,6 +149,152 @@
         }
       ],
       "reviewed_by": null
+    },
+    "production_operator": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "Writing clear instructions and simple AI workflows for your own tasks."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "cashier": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "critical_thinking",
+          "why": "AI is likely to automate a good share of these tasks, so checking and correcting its output becomes part of the job."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "hotel_front_desk_clerk": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "Conversational AI and chat agents changes this work; this skill lets you run it."
+        },
+        {
+          "skill_id": "critical_thinking",
+          "why": "AI is likely to automate a good share of these tasks, so checking and correcting its output becomes part of the job."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "farm_worker": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "Writing clear instructions and simple AI workflows for your own tasks."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "engineering_technician": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "LLM agents and workflow automation supports this work; this skill lets you run it."
+        },
+        {
+          "skill_id": "api_design",
+          "why": "LLM agents and workflow automation supports this work; this skill lets you run it."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "accounts_clerk": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "LLM agents and workflow automation changes this work; this skill lets you run it."
+        },
+        {
+          "skill_id": "critical_thinking",
+          "why": "Automated data analysis (text-to-SQL) changes this work; this skill lets you run it."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "supply_chain_specialist": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "LLM agents and workflow automation supports this work; this skill lets you run it."
+        },
+        {
+          "skill_id": "critical_thinking",
+          "why": "Automated data analysis (text-to-SQL) supports this work; this skill lets you run it."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "bank_teller": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "Conversational AI and chat agents changes this work; this skill lets you run it."
+        },
+        {
+          "skill_id": "critical_thinking",
+          "why": "AI is likely to automate a good share of these tasks, so checking and correcting its output becomes part of the job."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "registered_nurse": {
+      "ai_skills": [
+        {
+          "skill_id": "genai_tools",
+          "why": "Every role uses generative AI tools for drafting, summarising and searching."
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "why": "LLM agents and workflow automation supports this work; this skill lets you run it."
+        }
+      ],
+      "reviewed_by": null
+    },
+    "tvet_instructor": {
+      "ai_skills": [
+        {
+          "skill_id": "prompt_engineering",
+          "why": "LLM agents and workflow automation supports this work; this skill lets you run it."
+        }
+      ],
+      "reviewed_by": null
     }
   }
 }

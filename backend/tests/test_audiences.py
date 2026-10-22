@@ -97,7 +97,7 @@ def test_group_switcher(client):
 def test_group_hr(client):
     sample = client.get("/api/workforce/sample").text
     result = client.post("/api/workforce/analyse", json={"csv": sample}).json()
-    assert result["employees"] == 160 and len(result["roles"]) < 160
+    assert result["employees"] == 190 and len(result["roles"]) < 190
     assert all("name" not in r and "person" not in r for r in result["roles"])
     assert result["moves"] and all(m["people"] >= 1 and m["avg_hours"] >= 0 for m in result["moves"])
 
@@ -105,5 +105,5 @@ def test_group_hr(client):
 def test_group_career_centre(client):
     sample = client.get("/api/class/sample").text
     result = client.post("/api/class/analyse", json={"csv": sample}).json()
-    assert result["students"] == 40 and len(result["best_fit"]) < 40
+    assert result["students"] == 52 and len(result["best_fit"]) < 52
     assert len(result["top_gaps"]) >= 3 and all(g["course"] for g in result["top_gaps"])

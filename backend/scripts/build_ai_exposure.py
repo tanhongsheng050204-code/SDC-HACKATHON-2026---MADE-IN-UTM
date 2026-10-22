@@ -2,6 +2,7 @@
 for each O*NET task, and how Malaysians use AI, from three public sources.
 
     python scripts/build_ai_exposure.py path/to/aei_claude_ai_2026-06-26.csv
+    python scripts/build_ai_exposure.py --keep-usage   # after adding roles: rescore roles, keep usage
 
 Sources (all free; licences in the output):
 - Anthropic Economic Index (CC BY): labor_market_impacts/job_exposure.csv (observed exposure by
@@ -127,8 +128,15 @@ def main(release_path: str) -> None:
     tasks = json.loads((DATA / "tasks.json").read_text(encoding="utf-8"))
     task_ids = {t["id"].removeprefix("onet-") for r in tasks["roles"] for t in r["tasks"]}
     roles, counts = role_scores(codes)
-    usage = release(release_path, task_ids)
-    name = Path(release_path).name
+    if release_path == "--keep-usage":
+        # Roles added without the 220 MB release file: rescore every role, keep the task usage and
+        # Malaysia's usage from the last full build (new roles' tasks show no usage until then).
+        old = json.loads((DATA / "ai_exposure.json").read_text(encoding="utf-8"))
+        usage = {"month": old["sources"]["usage"]["month"], "tasks": old["tasks"], "malaysia": old["malaysia"]}
+        name = old["sources"]["usage"]["file"]
+    else:
+        usage = release(release_path, task_ids)
+        name = Path(release_path).name
     out = {
         "_note": "Built by scripts/build_ai_exposure.py. Scores are each source's own; percentiles are among all occupations in that source.",
         "built": dt.date.today().isoformat(),

@@ -17,9 +17,9 @@ def _lists_of_people(value) -> bool:
 
 def test_class_view_is_totals_only(client):
     result = client.post("/api/class/analyse", json={"csv": client.get("/api/class/sample").text}).json()
-    assert result["students"] == 40
+    assert result["students"] == 52
     assert not _lists_of_people(result)
-    assert sum(p["students"] for p in result["programmes"] if isinstance(p["students"], int)) <= 40
+    assert sum(p["students"] for p in result["programmes"] if isinstance(p["students"], int)) <= 52
     assert result["best_fit"] and result["courses"]
 
 

@@ -31,7 +31,8 @@ def _depth(ref: Reference, skill_id: str, memo: dict[str, int]) -> int:
 
 
 def course_for(ref: Reference, skill_id: str) -> dict | None:
-    course = next((c for c in ref.courses if skill_id in c["skills"]), None)
+    teaching = [c for c in ref.courses if skill_id in c["skills"]]
+    course = next((c for c in teaching if c.get("url")), teaching[0] if teaching else None)  # one people can open first
     return {k: course[k] for k in ("id", "title", "url", "hours", "cost")} if course else None
 
 

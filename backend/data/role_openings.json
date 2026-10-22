@@ -13,6 +13,16 @@
     "ux_designer": {"query": "\"UX designer\" OR \"UI/UX\" OR \"product designer\"", "titles": ["ux", "ui/ux", "product designer", "ui designer"]},
     "renewable_energy_technician": {"query": "\"solar\" OR \"renewable energy\"", "titles": ["solar", "renewable", "pv", "energy technician"]},
     "sustainability_analyst": {"query": "\"ESG\" OR \"sustainability analyst\" OR \"sustainability executive\"", "titles": ["esg", "sustainability"]},
-    "care_worker": {"query": "\"caregiver\" OR \"care assistant\" OR \"nursing aide\"", "titles": ["caregiver", "care assistant", "nursing aide", "nurse aide"]}
+    "care_worker": {"query": "\"caregiver\" OR \"care assistant\" OR \"nursing aide\"", "titles": ["caregiver", "care assistant", "nursing aide", "nurse aide"]},
+    "production_operator": {"query": "\"production operator\" OR \"operator pengeluaran\" OR \"assembly operator\" OR \"operator kilang\"", "titles": ["operator", "production", "assembler"]},
+    "cashier": {"query": "\"cashier\" OR \"juruwang\" OR \"retail cashier\"", "titles": ["cashier", "juruwang"]},
+    "hotel_front_desk_clerk": {"query": "\"front desk\" OR \"hotel receptionist\" OR \"guest service agent\"", "titles": ["front desk", "receptionist", "guest service agent"]},
+    "farm_worker": {"query": "\"plantation worker\" OR \"pekerja ladang\" OR \"farm worker\" OR \"general worker ladang\"", "titles": ["plantation", "ladang", "farm"]},
+    "engineering_technician": {"query": "\"BIM Modeller\" OR \"BIM Coordinator\" OR \"Drafter\" OR \"Pelukis Pelan\" OR \"CAD Drafter\"", "titles": ["bim", "drafter", "technician"]},
+    "accounts_clerk": {"query": "\"accounts clerk\" OR \"payroll clerk\" OR \"kerani akaun\" OR \"accounts assistant\"", "titles": ["accounts", "payroll", "clerk"]},
+    "supply_chain_specialist": {"query": "\"Supply Chain Specialist\" OR \"Logistics Specialist\" OR \"Supply Chain Executive\" OR \"Logistics Executive\"", "titles": ["supply", "logistics", "specialist"]},
+    "bank_teller": {"query": "\"bank teller\" OR \"bank cashier\" OR \"customer service teller\" OR \"pegawai kaunter bank\"", "titles": ["teller", "cashier", "counter"]},
+    "registered_nurse": {"query": "\"registered nurse\" OR \"staff nurse\" OR \"jururawat\"", "titles": ["nurse", "jururawat", "staff nurse"]},
+    "tvet_instructor": {"query": "\"TVET instructor\" OR \"tenaga pengajar TVET\" OR \"vocational teacher\" OR \"vocational training officer\"", "titles": ["tvet", "instructor", "vocational"]}
   }
 }

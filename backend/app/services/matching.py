@@ -28,6 +28,11 @@ ENTRY_BOOST = 0.05  # for graduates, on roles open to people without experience;
 ROBUST_TOP_N = 5
 
 
+def being_checked(role: dict) -> bool:
+    """A role added to the catalogue whose drafted data the team has not signed off yet."""
+    return bool(role.get("added")) and not role.get("reviewed_by")
+
+
 def effective_skills(ref: Reference, profile: dict) -> set[str]:
     """Skills the person reported, skills taught by courses they marked as finished, and skills
     proven at Basic level or above in the skill tree."""
@@ -124,7 +129,7 @@ def _current_role_card(ref: Reference, role_id: str, skills: set[str], all_outlo
     fit, covered, missing = fit_and_gap(role, skills)
     return {
         "role_id": role_id, "title": role["title"], "family": role["family"], "summary": role["summary"],
-        "fit": fit, "is_current_role": True,
+        "fit": fit, "is_current_role": True, "being_checked": being_checked(role),
         "outlook": {sid: {"index": o[role_id].index, "label": o[role_id].label} for sid, o in all_outlooks.items()},
         "at_risk": all_outlooks[scenario_id][role_id].label == "declining",
         "covered": [_skill_view(ref, rs) for rs in covered], "missing": [_skill_view(ref, rs) for rs in missing],
@@ -176,6 +181,7 @@ def match(ref: Reference, profile: dict, scenario_id: str, year: int | None = No
             "title": role["title"],
             "family": role["family"],
             "summary": role["summary"],
+            "being_checked": being_checked(role),
             "rank": ranks[scenario_id][role_id],
             "rank_change_vs_baseline": ranks["baseline"][role_id] - ranks[scenario_id][role_id],
             "score": why["score"],

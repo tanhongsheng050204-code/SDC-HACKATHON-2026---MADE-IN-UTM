@@ -189,7 +189,7 @@ def test_workforce_rejects_files_that_identify_people(client):
 def test_workforce_sample_runs(client):
     sample = client.get("/api/workforce/sample").text
     result = client.post("/api/workforce/analyse", json={"csv": sample, "scenario": "accelerated"}).json()
-    assert result["employees"] == 160 and result["moves"]
+    assert result["employees"] == 190 and result["moves"]
 
 
 # ---------- your job, task by task ----------

@@ -144,6 +144,136 @@
         {"task_id": 2373, "label": "human", "reason": "Companionship is human by nature."},
         {"task_id": 2376, "label": "human", "reason": "Case reviews depend on knowing the person."}
       ]
+    },
+    "production_operator": {
+      "onet_code": "51-2092.00",
+      "onet_note": "ISCO 8212 Electrical and electronic equipment assemblers; O*NET Team Assemblers.",
+      "tasks": [
+        {"task_id": 20157, "label": "assist", "reason": "Automated optical inspection flags surface flaws while operators confirm complex defects."},
+        {"task_id": 20160, "label": "assist", "reason": "Digital displays and automated translation tools assist operators in reviewing assembly guidelines."},
+        {"task_id": 8468, "label": "human", "reason": "Physical line rotations require human dexterity, physical presence, and situational awareness."},
+        {"task_id": 8472, "label": "human", "reason": "Manual manipulation and precise routing of small wire harnesses require human motor skills."},
+        {"task_id": 20162, "label": "human", "reason": "Routine physical cleaning, clearing jams, and mechanical upkeep must be done manually on the line."},
+        {"task_id": 20161, "label": "automate", "reason": "IoT sensors and automated production dashboards capture and compile output numbers automatically."},
+        {"task_id": 20158, "label": "human", "reason": "Boxing, taping, and organizing finished goods across dynamic order lines remain physical human tasks."}
+      ]
+    },
+    "cashier": {
+      "onet_code": "41-2011.00",
+      "onet_note": null,
+      "tasks": [
+        {"task_id": 2400, "label": "automate", "reason": "Self-checkout terminals and contactless mobile payments directly process customer transactions without human cashier involvement."},
+        {"task_id": 2405, "label": "automate", "reason": "Automated barcode scanners, RFID readers, and smart shopping carts tally item prices automatically."},
+        {"task_id": 2401, "label": "automate", "reason": "Digital POS platforms automatically generate e-receipts and issue electronic credit returns to customer accounts."},
+        {"task_id": 2403, "label": "human", "reason": "Offering a genuine, warm greeting to entering shoppers requires authentic human hospitality and social presence."},
+        {"task_id": 18765, "label": "assist", "reason": "Store lookup software assists staff with inventory data while the cashier exercises empathy to resolve customer complaints."},
+        {"task_id": 2402, "label": "assist", "reason": "Smart cash recyclers and automated counting hardware help staff rapidly verify cash drawer balances before a shift."},
+        {"task_id": 2417, "label": "assist", "reason": "POS software automates return policy checks and receipt validation, while the cashier physically inspects damaged goods."}
+      ]
+    },
+    "hotel_front_desk_clerk": {
+      "onet_code": "43-4081.00",
+      "onet_note": null,
+      "tasks": [
+        {"task_id": 2610, "label": "assist", "reason": "Self-service check-in kiosks and digital ID scanners speed up registration while clerks handle complex check-ins and personal greetings."},
+        {"task_id": 2620, "label": "automate", "reason": "Direct booking engines, travel aggregator APIs, and conversational AI handle standard room bookings without human intervention."},
+        {"task_id": 2613, "label": "automate", "reason": "Automated point-of-sale systems and digital payment gateways reconcile charges and process checkout transactions automatically."},
+        {"task_id": 2619, "label": "assist", "reason": "AI dispatch platforms automatically route guest requests to maintenance or housekeeping staff based on location and priority."},
+        {"task_id": 2622, "label": "human", "reason": "De-escalating upset guests and showing genuine empathy during service failures requires nuanced human emotional intelligence."},
+        {"task_id": 18567, "label": "assist", "reason": "AI translation and recommendation tools help clerks quickly suggest local dining and attractions to international travelers."},
+        {"task_id": 18566, "label": "automate", "reason": "Property management systems with automated reconciliation algorithms perform night audits and balance ledgers with minimal oversight."}
+      ]
+    },
+    "farm_worker": {
+      "onet_code": "45-2092.00",
+      "onet_note": "ISCO 9211 Crop farm labourers; O*NET Farmworkers and Laborers, Crop, Nursery, and Greenhouse.",
+      "tasks": [
+        {"task_id": 23374, "label": "human", "reason": "Manual dexterity and navigating difficult plantation terrain require human hands."},
+        {"task_id": 23399, "label": "human", "reason": "Physical fieldwork across varied estate topography relies directly on manual physical labour."},
+        {"task_id": 23380, "label": "assist", "reason": "Mobile computer vision tools can assist workers in identifying crop diseases and pest infestations."},
+        {"task_id": 23392, "label": "assist", "reason": "Automated optical sorting and grading scanners help workers classify produce quality faster."},
+        {"task_id": 23387, "label": "assist", "reason": "Digital logbooks and mobile apps streamline the recording of harvest volumes and pesticide applications."},
+        {"task_id": 23371, "label": "human", "reason": "Navigating rugged agricultural fields and machinery safely continues to need hands-on human control."},
+        {"task_id": 23397, "label": "human", "reason": "Heavy physical lifting, loading fresh fruit bunches, and transport across rural tracks require human physical effort."}
+      ]
+    },
+    "engineering_technician": {
+      "onet_code": "17-3011.00",
+      "onet_note": "O*NET Architectural and Civil Drafters; ISCO 3118 Draughtspersons.",
+      "tasks": [
+        {"task_id": 21917, "label": "assist", "reason": "Generative drafting and CAD plugins assist technicians by accelerating routine line work and auto-generating standard views."},
+        {"task_id": 21918, "label": "assist", "reason": "Parametric AI tools speed up plan generation from sketches, but technicians must verify structural layouts."},
+        {"task_id": 21919, "label": "assist", "reason": "BIM tools automatically detect clashes between MEP and structural elements, while the technician coordinates the resolution."},
+        {"task_id": 21920, "label": "assist", "reason": "AI document extraction tools scan building bylaws to highlight non-compliance for the technician to review."},
+        {"task_id": 21928, "label": "automate", "reason": "BIM software automatically schedules and tallies dimensions and material quantities directly from digital models."},
+        {"task_id": 21931, "label": "human", "reason": "Explaining designs to site engineers and local contractors requires direct interpersonal communication and contextual judgment."},
+        {"task_id": 21943, "label": "human", "reason": "On-site inspection to verify builder compliance requires physical presence and real-time situational assessment."}
+      ]
+    },
+    "accounts_clerk": {
+      "onet_code": "43-3031.00",
+      "onet_note": null,
+      "tasks": [
+        {"task_id": 2486, "label": "automate", "reason": "AI document extraction automatically verifies figures, postings, and tax codes across receipts and invoices without manual checking."},
+        {"task_id": 2490, "label": "automate", "reason": "Cloud accounting systems automatically classify and post routine ledger entries using predefined rule sets and machine-learned patterns."},
+        {"task_id": 2509, "label": "automate", "reason": "Automated three-way matching systems cross-reference purchase orders, delivery orders, and invoices electronically."},
+        {"task_id": 18561, "label": "assist", "reason": "Payroll systems automate statutory rate calculations, but clerks must still review irregular allowances, medical claims, and overtime hours."},
+        {"task_id": 2503, "label": "assist", "reason": "Bank feeds suggest automated matches, while the clerk manually reviews unmatched line items and payment exceptions."},
+        {"task_id": 2496, "label": "human", "reason": "Investigating disputed payments, contact with suppliers, and resolving undocumented discrepancies require direct human communication and problem-solving."},
+        {"task_id": 2510, "label": "assist", "reason": "Statutory software prepares EPF, SOCSO, and tax filings, while the clerk verifies totals and handles final portal submission."}
+      ]
+    },
+    "supply_chain_specialist": {
+      "onet_code": "13-1081.00",
+      "onet_note": "O*NET Logisticians; ISCO has no logistician code, closest is 2421 Management and organization analysts.",
+      "tasks": [
+        {"task_id": 8934, "label": "assist", "reason": "AI forecasting tools optimize inventory allocation while specialists manage real-world stock constraints and supplier lead times."},
+        {"task_id": 8949, "label": "assist", "reason": "AI models suggest optimal freight routes and network designs, which specialists validate against local infrastructure and cost realities."},
+        {"task_id": 8935, "label": "human", "reason": "Cross-functional alignment and crisis negotiation during product shortages require human relationship management and judgment."},
+        {"task_id": 8937, "label": "assist", "reason": "AI dashboards monitor SLA metrics in real time while specialists handle performance discussions and client negotiations."},
+        {"task_id": 8950, "label": "human", "reason": "Subcontractor selection, relationship management, and contract enforcement rely heavily on interpersonal trust and human evaluation."},
+        {"task_id": 8940, "label": "automate", "reason": "Automated reporting tools and workflow integrations generate logistics status reports directly from ERP systems."},
+        {"task_id": 8948, "label": "human", "reason": "Evaluating and adopting new warehouse and freight technologies requires strategic business insight and contextual assessment."}
+      ]
+    },
+    "bank_teller": {
+      "onet_code": "43-3071.00",
+      "onet_note": null,
+      "tasks": [
+        {"task_id": 2551, "label": "automate", "reason": "Cash deposit machines and optical character recognition increasingly verify slips, notes, and cheque deposits automatically."},
+        {"task_id": 2550, "label": "automate", "reason": "Automated teller machines and digital fund transfers replace most over-the-counter cheque cashing and cash withdrawals."},
+        {"task_id": 2553, "label": "automate", "reason": "Core banking systems and digital banking platforms log transactions and generate electronic receipts automatically."},
+        {"task_id": 2549, "label": "assist", "reason": "Automated cash recyclers and smart vault software tally cash counts, while tellers handle physical sign-offs and variance reviews."},
+        {"task_id": 2560, "label": "assist", "reason": "AI diagnostic tools help flag transaction errors and account holds, while tellers manage customer interaction and remediation."},
+        {"task_id": 2561, "label": "assist", "reason": "Customer intelligence engines suggest relevant financial products, but tellers explain features and build rapport with clients."},
+        {"task_id": 21076, "label": "human", "reason": "Supporting branch visitors with complex queries and emotional distress relies on interpersonal tact and human empathy."}
+      ]
+    },
+    "registered_nurse": {
+      "onet_code": "29-1141.00",
+      "onet_note": null,
+      "tasks": [
+        {"task_id": 1841, "label": "assist", "reason": "AI-connected telemetry and automated charting capture vital signs, but nurses verify readings and correlate them with patient status."},
+        {"task_id": 20413, "label": "human", "reason": "Administering medications and observing subtle clinical reactions require direct human bedside presence and sensory observation."},
+        {"task_id": 1839, "label": "assist", "reason": "Document extraction and language tools help summarize nursing notes, though nurses must validate the record."},
+        {"task_id": 1840, "label": "assist", "reason": "Clinical decision support systems flag early deterioration trends, but the nurse evaluates the patient's holistic presentation."},
+        {"task_id": 1843, "label": "human", "reason": "Interprofessional rounds and multi-specialty care planning require collaborative dialogue, bedside context, and clinical judgment."},
+        {"task_id": 1847, "label": "human", "reason": "Hands-on physical preparation, positioning, and calming anxious patients during procedures require physical dexterity and empathy."},
+        {"task_id": 1850, "label": "assist", "reason": "Generative tools assist in drafting accessible patient education materials, while the nurse delivers contextual guidance to families."}
+      ]
+    },
+    "tvet_instructor": {
+      "onet_code": "25-1194.00",
+      "onet_note": "O*NET Career/Technical Education Teachers, Postsecondary.",
+      "tasks": [
+        {"task_id": 6445, "label": "human", "reason": "Physical workshop safety and direct manual supervision must be actively managed by a human instructor."},
+        {"task_id": 6446, "label": "human", "reason": "Evaluating physical craftsmanship, manual dexterity, and practical technique requires real-time human observation."},
+        {"task_id": 6453, "label": "human", "reason": "Demonstrating tactile procedures and tool operations requires physical presence and real-time interaction."},
+        {"task_id": 6447, "label": "assist", "reason": "Generative media and AI presentation tools help instructors rapidly design engaging visual aids and instructional slides."},
+        {"task_id": 6448, "label": "assist", "reason": "AI can formulate written question banks and analyze test statistics while instructors oversee practical assessments."},
+        {"task_id": 6454, "label": "assist", "reason": "Instructors can use AI workflows to align course outlines quickly with evolving industrial competency standards."},
+        {"task_id": 6449, "label": "automate", "reason": "Document processing systems can automate routine attendance tracking, mark calculation, and institutional reporting."}
+      ]
     }
   }
 }
