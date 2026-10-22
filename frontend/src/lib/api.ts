@@ -402,6 +402,19 @@ function withToken(init: RequestInit | undefined, token: string | null): Request
   return { ...init, headers };
 }
 
+// Only this answer means the login itself was refused (app/auth.py). Other 401s, such as "Admin token
+// required" from the admin panel, are about something else and must not sign the person out.
+const LOGIN_REFUSED = "Please log in again";
+
+async function loginRefused(response: Response): Promise<boolean> {
+  if (response.status !== 401) return false;
+  try {
+    return (await response.clone().json())?.detail === LOGIN_REFUSED;
+  } catch {
+    return false;
+  }
+}
+
 async function fetchAwake(url: string, original?: RequestInit): Promise<Response> {
   const started = Date.now();
   let token = await freshToken();
@@ -410,13 +423,13 @@ async function fetchAwake(url: string, original?: RequestInit): Promise<Response
   for (let attempt = 0; ; attempt++) {
     try {
       let response = await fetch(url, init);
-      if (response.status === 401 && token && !refreshed) {
+      if (token && !refreshed && await loginRefused(response)) {
         // Refused login: refresh once and retry before deciding the session is really over.
         refreshed = true;
         token = await refreshToken().catch(() => null);
         if (token) { init = withToken(original, token); response = await fetch(url, init); }
       }
-      if (response.status === 401 && refreshed) {
+      if (refreshed && await loginRefused(response)) {
         await signOut();
         expiredListeners.forEach((l) => l());
       }
