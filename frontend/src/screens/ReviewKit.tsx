@@ -191,7 +191,7 @@ function CvMarking({ reviewer }: { reviewer: string }) {
 const PERSONAS = [{ key: "clerk", label: "Aisyah (working adult)" }, { key: "student", label: "Wei Jie (graduate)" },
   { key: "switcher", label: "Farid (career switcher)" }];
 // The two group views, reviewed from their synthetic samples.
-const GROUPS = [{ key: "hr", label: "HR sample company (160 people)" }, { key: "class", label: "Career-centre sample class (40 students)" }];
+const GROUPS = [{ key: "hr", label: "HR sample company (190 people)" }, { key: "class", label: "Career-centre sample class (52 students)" }];
 type Answer = { roles?: string; pathway?: string; comment?: string };
 
 function PathwayReview({ reviewer }: { reviewer: string }) {

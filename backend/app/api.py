@@ -84,6 +84,7 @@ def role_detail(role_id: str):
     role = ref.roles[role_id]
     return {
         **role,
+        "being_checked": matching.being_checked(role),
         "sdgs": ref.sdg_view(ref.role_sdgs(role_id)),
         "skill_sdgs": {
             rs["skill_id"]: ref.sdg_view(ref.skill_sdgs(rs["skill_id"]))

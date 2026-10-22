@@ -50,6 +50,9 @@ def texts() -> list[str]:
     for lv in _read("skill_levels.json"):
         out += [lv["name"], lv["description"]]
     out += [p["name"]["en"] for p in _read("programmes.json")["programmes"]]
+    req = _read("entry_requirements.json")
+    out += [g["text"] for g in req["usual_by_group"].values()]
+    out += [x for lic in req["licences"].values() for x in (lic["name"], lic["route"])]
     for role in _read("tasks.json")["roles"]:
         for task in role["tasks"]:
             out += [task["text"], task["reason"]]

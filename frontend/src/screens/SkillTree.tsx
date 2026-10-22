@@ -1,3 +1,4 @@
+import { EntryRequirements, years } from "../components/EntryRequirements";
 import { useEffect, useRef, useState } from "react";
 import { Tabs } from "../components/Tabs";
 import { LoginToKeep } from "../components/AccountButton";
@@ -173,6 +174,11 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
           <div className="eta-item">
             <span className="eta-value"><EtaNumber value={plan.hours_left} format={h => tf("path.etaHours", { h })} /></span>
           </div>
+          {plan.requirements?.needs_licence && plan.requirements.licence && (
+            <><div className="eta-divider" /><div className="eta-item">
+              <span className="eta-value">{tf("req.etaPlus", { time: years(plan.requirements.licence.route_months) })}</span>
+            </div></>
+          )}
           {(
             <>
               <div className="eta-divider" />
@@ -205,6 +211,9 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
         <p className="source">{t("path.etaSource")} {Array.from(new Set(plan.steps.map(s => s.course.checked).filter(Boolean))).map(date => tf("pl.checked", { date: date! })).join(" · ")}</p>
         {plan.uncovered_skills.length > 0 && <p className="banner">{tf("pl.uncovered", { list: plan.uncovered_skills.map(id => tr([...role.covered, ...role.missing].find(s => s.skill_id === id)?.name ?? id)).join(", ") })}</p>}
       </div>}
+
+      {/* A licensed job: its qualification route comes before any course */}
+      {plan?.requirements?.needs_licence && <EntryRequirements req={plan.requirements} />}
 
       {/* Route map + free-only toggle */}
       <div className="pathway-layout">

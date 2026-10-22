@@ -1,3 +1,4 @@
+import { EntryRequirements } from "../components/EntryRequirements";
 import { useEffect, useState } from "react";
 import { ShareCard } from "../components/ShareCard";
 import { PayLine } from "../components/PayLine";
@@ -39,7 +40,8 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
     <section>
       <button className="link back-link" onClick={onBack}>← {t("nav.roles")}</button>
       <div className="page-head role-head">
-        <div><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p></div>
+        <div><h1>{tr(role.title)}</h1><p className="muted">{tr(role.summary)}</p>
+          {role.being_checked && <p className="badge" title={t("card.newRoleHelp")}>{t("card.newRole")}</p>}</div>
         <div className="role-actions">
           <TargetButton profile={profile} roleId={role.role_id} onProfile={onProfile} />
           {role.missing.length > 0 && <button className="btn" onClick={onTree}>{t("a.build")}</button>}
@@ -49,6 +51,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
         <strong>{percent(role.fit)}%</strong> {t("k.fit")} · <span className={`outlook ${role.outlook[scenario].label}`}>{OUTLOOK_TEXT[role.outlook[scenario].label]}</span>{" "}
         {role.outlook[scenario].index > 0 ? "+" : ""}{role.outlook[scenario].index}% · {role.missing.length} {t("role.toLearn")}
       </p>
+      {role.requirements?.needs_licence && <EntryRequirements req={role.requirements} />}
 
       <Tabs id="role" label={tr(role.title)} tabs={tabs} value={tab} onChange={onTab}>
         {tab === "overview" && (
@@ -87,6 +90,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
             <ForecastHistory roleId={role.role_id} scenario={scenario} />
             <ExposureLine roleId={role.role_id} onOpen={() => onTab("market")} />
             <PayLine pay={role.pay} change={role.pay_change_rm} />
+            {role.requirements && !role.requirements.needs_licence && <EntryRequirements req={role.requirements} />}
             {roleCase && <RoleCase data={roleCase} />}
           </>
         )}

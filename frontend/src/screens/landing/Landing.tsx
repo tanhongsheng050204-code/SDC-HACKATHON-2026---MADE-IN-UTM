@@ -103,7 +103,7 @@ function LiveStats() {
 const people = () => [
   { key: "clerk", photo: "worker", alt: t("lp.clerkAlt"), who: t("lp.clerkWho"), text: t("lp.clerkText"), cta: t("lp.clerkCta"), big: "11 h", chips: [t("lp.clerkChip1"), t("lp.clerkChip2"), t("lp.clerkChip3")] },
   { key: "student", photo: "student", alt: t("lp.studentAlt"), who: t("lp.studentWho"), text: t("lp.studentText"), cta: t("lp.studentCta"), big: "190 h", chips: [t("card.robust"), t("lead.openToGrads"), t("lp.studentChip3")] },
-  { key: "hr", photo: "hr-team", alt: t("lp.hrAlt"), who: t("lp.hrWho"), text: t("lp.hrText"), cta: t("lp.hrCta"), big: "73 / 160", chips: [t("lp.hrChip1"), t("lp.hrChip2"), t("lp.hrChip3")] },
+  { key: "hr", photo: "hr-team", alt: t("lp.hrAlt"), who: t("lp.hrWho"), text: t("lp.hrText"), cta: t("lp.hrCta"), big: "89 / 190", chips: [t("lp.hrChip1"), t("lp.hrChip2"), t("lp.hrChip3")] },
 ];
 
 const principles = () => [1, 2, 3, 4].map((i) => ({ title: t(`lp.p${i}` as StringKey), text: t(`lp.p${i}Text` as StringKey) }));

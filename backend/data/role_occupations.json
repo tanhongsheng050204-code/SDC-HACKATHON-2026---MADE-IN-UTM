@@ -13,6 +13,16 @@
     "ux_designer": {"soc": "15-1255", "onet": "15-1255.00", "isco08": "2166", "note": "ISCO: Graphic and multimedia designers."},
     "renewable_energy_technician": {"soc": "47-2231", "onet": "47-2231.00", "isco08": "7411", "note": "SOC: Solar photovoltaic installers. ISCO: Building and related electricians."},
     "sustainability_analyst": {"soc": "13-1199", "onet": "13-1199.05", "isco08": "2133", "note": "SOC: Business operations specialists, all other (Sustainability Specialists in O*NET). ISCO: Environmental protection professionals."},
-    "care_worker": {"soc": "31-1122", "onet": "31-1122.00", "isco08": "5322", "note": "SOC: Personal care aides. ISCO: Home-based personal care workers."}
+    "care_worker": {"soc": "31-1122", "onet": "31-1122.00", "isco08": "5322", "note": "SOC: Personal care aides. ISCO: Home-based personal care workers."},
+    "production_operator": {"soc": "51-2092", "onet": "51-2092.00", "isco08": "8212", "note": "ISCO 8212 Electrical and electronic equipment assemblers; O*NET Team Assemblers."},
+    "cashier": {"soc": "41-2011", "onet": "41-2011.00", "isco08": "5230", "note": null},
+    "hotel_front_desk_clerk": {"soc": "43-4081", "onet": "43-4081.00", "isco08": "4224", "note": null},
+    "farm_worker": {"soc": "45-2092", "onet": "45-2092.00", "isco08": "9211", "note": "ISCO 9211 Crop farm labourers; O*NET Farmworkers and Laborers, Crop, Nursery, and Greenhouse."},
+    "engineering_technician": {"soc": "17-3011", "onet": "17-3011.00", "isco08": "3118", "note": "O*NET Architectural and Civil Drafters; ISCO 3118 Draughtspersons."},
+    "accounts_clerk": {"soc": "43-3031", "onet": "43-3031.00", "isco08": "4311", "note": null},
+    "supply_chain_specialist": {"soc": "13-1081", "onet": "13-1081.00", "isco08": "2421", "note": "O*NET Logisticians; ISCO has no logistician code, closest is 2421 Management and organization analysts."},
+    "bank_teller": {"soc": "43-3071", "onet": "43-3071.00", "isco08": "4211", "note": null},
+    "registered_nurse": {"soc": "29-1141", "onet": "29-1141.00", "isco08": "2221", "note": null},
+    "tvet_instructor": {"soc": "25-1194", "onet": "25-1194.00", "isco08": "2320", "note": "O*NET Career/Technical Education Teachers, Postsecondary."}
   }
 }

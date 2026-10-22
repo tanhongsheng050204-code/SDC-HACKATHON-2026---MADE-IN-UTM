@@ -1,0 +1,1527 @@
+{
+  "roles": {
+    "production_operator": {
+      "summary": "Assembles components, operates machinery, and inspects electronic products along manufacturing lines.",
+      "skills": [
+        {
+          "skill_id": "new:electronic_assembly",
+          "weight": 3
+        },
+        {
+          "skill_id": "safety_compliance",
+          "weight": 3
+        },
+        {
+          "skill_id": "electrical_systems",
+          "weight": 2
+        },
+        {
+          "skill_id": "adaptability",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "electronic_assembly",
+          "name": "Electronic component assembly",
+          "category": "technical",
+          "aliases": [
+            "smt assembly",
+            "pcb assembly",
+            "manual soldering",
+            "electronics manufacturing"
+          ],
+          "why": "Crucial technical competency for placing, soldering, and assembling delicate electronics on factory lines.",
+          "sdg": {
+            "sdg": 9,
+            "target": "9.2",
+            "reason": "Supports domestic manufacturing capacity and high-tech export production."
+          },
+          "course": {
+            "title": "Soldering Electric Components Like An Expert",
+            "provider": "Alison",
+            "url": "https://alison.com/course/soldering-electric-components-like-an-expert",
+            "hours": 3,
+            "level": "intro",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "In this free online course, learn how to solder like a professional by understanding the correct soldering process.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": -0.3,
+        "structured": 0.85,
+        "field": 0.8,
+        "shifts": 0.85,
+        "team": 0.6
+      },
+      "entry_level": true,
+      "entry_level_reason": "Malaysian electronics manufacturers actively hire SPM school leavers without prior experience for on-the-job training.",
+      "automation_exposure": 0.35,
+      "ai_complementarity": 0.15,
+      "exposure_reason": "Automated inspection and computerized reporting systems gradually replace routine quality logging and manual assembly monitoring.",
+      "exposed_by": [],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 20157,
+          "label": "assist",
+          "reason": "Automated optical inspection flags surface flaws while operators confirm complex defects."
+        },
+        {
+          "task_id": 20160,
+          "label": "assist",
+          "reason": "Digital displays and automated translation tools assist operators in reviewing assembly guidelines."
+        },
+        {
+          "task_id": 8468,
+          "label": "human",
+          "reason": "Physical line rotations require human dexterity, physical presence, and situational awareness."
+        },
+        {
+          "task_id": 8472,
+          "label": "human",
+          "reason": "Manual manipulation and precise routing of small wire harnesses require human motor skills."
+        },
+        {
+          "task_id": 20162,
+          "label": "human",
+          "reason": "Routine physical cleaning, clearing jams, and mechanical upkeep must be done manually on the line."
+        },
+        {
+          "task_id": 20161,
+          "label": "automate",
+          "reason": "IoT sensors and automated production dashboards capture and compile output numbers automatically."
+        },
+        {
+          "task_id": 20158,
+          "label": "human",
+          "reason": "Boxing, taping, and organizing finished goods across dynamic order lines remain physical human tasks."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 8,
+          "target": "8.5",
+          "reason": "Provides accessible formal manufacturing employment and foundational technical skills in Malaysia's industrial sector."
+        },
+        {
+          "sdg": 9,
+          "target": "9.2",
+          "reason": "Supplies the essential frontline operational workforce powering Malaysia's vital electrical and electronics export manufacturing."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "field": 1,
+            "shifts": 1
+          },
+          "text": {
+            "en": "You put on cleanroom gear and spend your shift monitoring machines on a busy factory floor.",
+            "ms": "Anda memakai pakaian bilik bersih dan menghabiskan syif memantau mesin di lantai kilang yang sibuk.",
+            "zh": "你穿上无尘服，在繁忙的工厂车间轮班监控生产设备。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "team": 1
+          },
+          "text": {
+            "en": "You follow standardized operating procedures alongside team members to assemble circuit boards on time.",
+            "ms": "Anda mematuhi prosedur operasi standard bersama rakan sepasukan untuk memasang papan litar mengikut jadual.",
+            "zh": "你与团队成员一起严格遵守标准作业程序，按时组装电路板。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"production operator\" OR \"operator pengeluaran\" OR \"assembly operator\" OR \"operator kilang\"",
+        "titles": [
+          "operator",
+          "production",
+          "assembler"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "None of the tracked AI capabilities (research-paper topics) fits factory work: robotics and machine vision are not tracked, so no capability link. Exposure raised 0.25 -> 0.35 for automated inspection and robotic assembly."
+      ]
+    },
+    "cashier": {
+      "summary": "Scans merchandise, processes payments, balances cash drawers, and assists retail customers during checkout.",
+      "skills": [
+        {
+          "skill_id": "customer_service",
+          "weight": 3
+        },
+        {
+          "skill_id": "new:point_of_sale_operations",
+          "weight": 3
+        },
+        {
+          "skill_id": "communication",
+          "weight": 2
+        },
+        {
+          "skill_id": "adaptability",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "point_of_sale_operations",
+          "name": "Point of Sale (POS) Operations",
+          "category": "technical",
+          "aliases": [
+            "pos systems",
+            "cashiering",
+            "cash register operation",
+            "payment terminal handling",
+            "barcode scanning"
+          ],
+          "why": "Modern retail relies on cash registers, contactless terminals, and digital POS interfaces to complete sales transactions accurately.",
+          "sdg": {
+            "sdg": 8,
+            "target": "8.2",
+            "reason": "Operating digital payment and checkout terminals supports productive and technologically modernized retail operations."
+          },
+          "course": {
+            "title": "Guide to Effective Cash Handling Techniques",
+            "provider": "Alison",
+            "url": "https://alison.com/course/guide-to-effective-cash-handling-techniques",
+            "hours": 3,
+            "level": "intro",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "This free online course will teach the critical skills for effective cash handling and cashiering operations.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": 0.8,
+        "structured": 0.8,
+        "field": 0.6,
+        "shifts": 0.8,
+        "team": 0.2
+      },
+      "entry_level": true,
+      "entry_level_reason": "Retailers and supermarkets across Malaysia regularly hire SPM school leavers and part-time workers with on-the-job register training.",
+      "automation_exposure": 0.75,
+      "ai_complementarity": 0.2,
+      "exposure_reason": "Self-checkout kiosks, mobile e-wallets, and automated computer-vision stores are rapidly replacing manual scanning and cash handling.",
+      "exposed_by": [],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 2400,
+          "label": "automate",
+          "reason": "Self-checkout terminals and contactless mobile payments directly process customer transactions without human cashier involvement."
+        },
+        {
+          "task_id": 2405,
+          "label": "automate",
+          "reason": "Automated barcode scanners, RFID readers, and smart shopping carts tally item prices automatically."
+        },
+        {
+          "task_id": 2401,
+          "label": "automate",
+          "reason": "Digital POS platforms automatically generate e-receipts and issue electronic credit returns to customer accounts."
+        },
+        {
+          "task_id": 2403,
+          "label": "human",
+          "reason": "Offering a genuine, warm greeting to entering shoppers requires authentic human hospitality and social presence."
+        },
+        {
+          "task_id": 18765,
+          "label": "assist",
+          "reason": "Store lookup software assists staff with inventory data while the cashier exercises empathy to resolve customer complaints."
+        },
+        {
+          "task_id": 2402,
+          "label": "assist",
+          "reason": "Smart cash recyclers and automated counting hardware help staff rapidly verify cash drawer balances before a shift."
+        },
+        {
+          "task_id": 2417,
+          "label": "assist",
+          "reason": "POS software automates return policy checks and receipt validation, while the cashier physically inspects damaged goods."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 8,
+          "target": "8.5",
+          "reason": "Cashier positions provide crucial first-job entry and youth employment opportunities across Malaysia's service economy."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "shifts": 1,
+            "field": 1
+          },
+          "text": {
+            "en": "You spend your working hours on your feet at a checkout counter, rotating through evening, weekend, and holiday shifts.",
+            "ms": "Anda menghabiskan waktu kerja dengan berdiri di kaunter bayaran, mengikut giliran syif petang, hujung minggu, dan cuti umum.",
+            "zh": "你的工作时间大多站在收银台前度过，并需要轮班应对晚班、周末及公共假期。"
+          }
+        },
+        {
+          "dims": {
+            "people": 1,
+            "structured": 1
+          },
+          "text": {
+            "en": "You follow standard checkout procedures repeatedly while engaging face-to-face with a continuous stream of shoppers.",
+            "ms": "Anda mematuhi prosedur bayaran standard secara berulang sambil berinteraksi bersemuka dengan pelanggan yang tidak putus-putus.",
+            "zh": "你重复执行标准的结账流程，同时与源源不断的顾客进行面对面的交流。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"cashier\" OR \"juruwang\" OR \"retail cashier\"",
+        "titles": [
+          "cashier",
+          "juruwang"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Self-checkout and e-payments, not LLM agents, change this job; no tracked capability fits."
+      ]
+    },
+    "hotel_front_desk_clerk": {
+      "summary": "Welcomes hotel guests, manages reservations and check-ins, and resolves frontline guest inquiries.",
+      "skills": [
+        {
+          "skill_id": "customer_service",
+          "weight": 3
+        },
+        {
+          "skill_id": "communication",
+          "weight": 3
+        },
+        {
+          "skill_id": "empathy",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 2
+        },
+        {
+          "skill_id": "scheduling",
+          "weight": 1
+        }
+      ],
+      "new_skills": [],
+      "work_context": {
+        "people": 0.85,
+        "structured": 0.4,
+        "field": -0.6,
+        "shifts": 0.9,
+        "team": 0.4
+      },
+      "entry_level": true,
+      "entry_level_reason": "Hotels in Malaysia widely recruit fresh SPM and diploma leavers with basic language skills for entry-level front-office roles.",
+      "automation_exposure": 0.55,
+      "ai_complementarity": 0.35,
+      "exposure_reason": "Self-service kiosks and conversational AI automate check-in, billing, and standard guest inquiries, shifting the role toward exception handling and hospitality.",
+      "exposed_by": [
+        "conversational_ai",
+        "document_understanding"
+      ],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 2610,
+          "label": "assist",
+          "reason": "Self-service check-in kiosks and digital ID scanners speed up registration while clerks handle complex check-ins and personal greetings."
+        },
+        {
+          "task_id": 2620,
+          "label": "automate",
+          "reason": "Direct booking engines, travel aggregator APIs, and conversational AI handle standard room bookings without human intervention."
+        },
+        {
+          "task_id": 2613,
+          "label": "automate",
+          "reason": "Automated point-of-sale systems and digital payment gateways reconcile charges and process checkout transactions automatically."
+        },
+        {
+          "task_id": 2619,
+          "label": "assist",
+          "reason": "AI dispatch platforms automatically route guest requests to maintenance or housekeeping staff based on location and priority."
+        },
+        {
+          "task_id": 2622,
+          "label": "human",
+          "reason": "De-escalating upset guests and showing genuine empathy during service failures requires nuanced human emotional intelligence."
+        },
+        {
+          "task_id": 18567,
+          "label": "assist",
+          "reason": "AI translation and recommendation tools help clerks quickly suggest local dining and attractions to international travelers."
+        },
+        {
+          "task_id": 18566,
+          "label": "automate",
+          "reason": "Property management systems with automated reconciliation algorithms perform night audits and balance ledgers with minimal oversight."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 8,
+          "target": "8.9",
+          "reason": "Front-desk personnel act as frontline ambassadors in sustainable tourism, driving local hospitality and guest engagement in Malaysia."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "people": 1,
+            "shifts": 1
+          },
+          "text": {
+            "en": "You work late-night rotating shifts greeting arriving travelers and calming guests who had stressful flights.",
+            "ms": "Anda bekerja mengikut syif giliran lewat malam menyambut pelancong yang baru tiba dan menenangkan tetamu yang keletihan.",
+            "zh": "你在轮班的深夜接待抵步的旅客，并安抚旅途劳顿的房客。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "field": -1
+          },
+          "text": {
+            "en": "You stand behind a lobby counter following strict standard operating procedures to verify bookings and process room keys.",
+            "ms": "Anda berdiri di kaunter lobi mengikut prosedur operasi standard yang ketat untuk mengesahkan tempahan dan menyerahkan kunci bilik.",
+            "zh": "你站在大堂柜台前，按照严格的标准作业程序核对预订并派发房卡。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"front desk\" OR \"hotel receptionist\" OR \"guest service agent\"",
+        "titles": [
+          "front desk",
+          "receptionist",
+          "guest service agent"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Gemini listed the same capabilities as both exposing and complementing the role; kept chatbots and ID/document reading as exposing it."
+      ]
+    },
+    "farm_worker": {
+      "summary": "Plants, maintains, and harvests crops or produce on agricultural plantations and farms.",
+      "skills": [
+        {
+          "skill_id": "new:crop_harvesting",
+          "weight": 3
+        },
+        {
+          "skill_id": "safety_compliance",
+          "weight": 3
+        },
+        {
+          "skill_id": "new:crop_care_and_spraying",
+          "weight": 2
+        },
+        {
+          "skill_id": "adaptability",
+          "weight": 2
+        },
+        {
+          "skill_id": "communication",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "crop_harvesting",
+          "name": "Crop harvesting and post-harvest handling",
+          "category": "technical",
+          "aliases": [
+            "harvesting crops",
+            "oil palm harvesting",
+            "fruit picking",
+            "crop sorting",
+            "post-harvest handling"
+          ],
+          "why": "Core physical skill required to harvest mature produce efficiently without damaging crops or trees in Malaysian plantations.",
+          "sdg": {
+            "sdg": 2,
+            "target": "2.4",
+            "reason": "Ensures sustainable food production systems and resilient agricultural practices."
+          },
+          "course": {
+            "title": "Post Harvest Handling and Market Access for Fresh Produce Farmers",
+            "provider": "Alison",
+            "url": "https://alison.com/course/post-harvest-handling-and-market-access-for-fresh-produce-farmers",
+            "hours": 3,
+            "level": "intro",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "In this free course, you will learn how to: Recognize factors that affect quality and consistency in the supply of fresh produce; Describe the appropriate pre-harvest and post-harvest techniques to minimize losses; Outline suitable harvesting techniques to avoid damage.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        },
+        {
+          "id": "crop_care_and_spraying",
+          "name": "Crop care and pest control application",
+          "category": "technical",
+          "aliases": [
+            "fertilizer application",
+            "weed control",
+            "pesticide spraying",
+            "pruning crops",
+            "irrigation management"
+          ],
+          "why": "Vital for maintaining crop health, preventing disease outbreaks, and supporting yield productivity on estates and smallholdings.",
+          "sdg": {
+            "sdg": 2,
+            "target": "2.4",
+            "reason": "Helps maintain productive agricultural land through proper nutrient and pest management."
+          },
+          "course": {
+            "title": "Pest Control and Management",
+            "provider": "Alison",
+            "url": "https://alison.com/course/pest-control-and-management",
+            "hours": 3,
+            "level": "intro",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "This free online course teaches you how to use chemical and non-chemical pest control techniques to manage infestations.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": 0.0,
+        "structured": 0.6,
+        "field": 1.0,
+        "shifts": 0.4,
+        "team": 0.7
+      },
+      "entry_level": true,
+      "entry_level_reason": "Plantations and farms widely hire general workers with no prior formal experience or qualifications.",
+      "automation_exposure": 0.05,
+      "ai_complementarity": 0.1,
+      "exposure_reason": "Physical estate labour remains largely untouched by software AI, though mobile tools increasingly assist with basic yield recording and pest detection.",
+      "exposed_by": [],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 23374,
+          "label": "human",
+          "reason": "Manual dexterity and navigating difficult plantation terrain require human hands."
+        },
+        {
+          "task_id": 23399,
+          "label": "human",
+          "reason": "Physical fieldwork across varied estate topography relies directly on manual physical labour."
+        },
+        {
+          "task_id": 23380,
+          "label": "assist",
+          "reason": "Mobile computer vision tools can assist workers in identifying crop diseases and pest infestations."
+        },
+        {
+          "task_id": 23392,
+          "label": "assist",
+          "reason": "Automated optical sorting and grading scanners help workers classify produce quality faster."
+        },
+        {
+          "task_id": 23387,
+          "label": "assist",
+          "reason": "Digital logbooks and mobile apps streamline the recording of harvest volumes and pesticide applications."
+        },
+        {
+          "task_id": 23371,
+          "label": "human",
+          "reason": "Navigating rugged agricultural fields and machinery safely continues to need hands-on human control."
+        },
+        {
+          "task_id": 23397,
+          "label": "human",
+          "reason": "Heavy physical lifting, loading fresh fruit bunches, and transport across rural tracks require human physical effort."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 2,
+          "target": "2.4",
+          "reason": "Maintains productive agricultural estates and food crops vital for national and global food security."
+        },
+        {
+          "sdg": 8,
+          "target": "8.5",
+          "reason": "Provides essential employment opportunities in rural agricultural and plantation sectors."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "field": 1,
+            "team": 1
+          },
+          "text": {
+            "en": "You work outdoors with your crew from early morning, harvesting fresh crop bunches across plantation rows.",
+            "ms": "Anda bekerja di luar bersama kru sejak awal pagi, menuai hasil tanaman di barisan ladang.",
+            "zh": "你大清早就和工友们在户外工作，在种植园里穿梭采收成熟的作物。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "field": 1
+          },
+          "text": {
+            "en": "You inspect plants for signs of pests or disease and spray treatments according to the daily farm routine.",
+            "ms": "Anda memeriksa tanaman untuk mengesan perosak atau penyakit dan menyembur racun mengikut jadual harian ladang.",
+            "zh": "你检查植物是否有病虫害迹象，并按照农场的每日规程进行喷药防治。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"plantation worker\" OR \"pekerja ladang\" OR \"farm worker\" OR \"general worker ladang\"",
+        "titles": [
+          "plantation",
+          "ladang",
+          "farm"
+        ]
+      },
+      "problems": []
+    },
+    "engineering_technician": {
+      "summary": "Prepares detailed engineering drawings, BIM models, and technical documentation for construction projects.",
+      "skills": [
+        {
+          "skill_id": "new:cad_bim_modelling",
+          "weight": 3
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 2
+        },
+        {
+          "skill_id": "communication",
+          "weight": 2
+        },
+        {
+          "skill_id": "excel",
+          "weight": 2
+        },
+        {
+          "skill_id": "safety_compliance",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "cad_bim_modelling",
+          "name": "CAD and BIM Modelling",
+          "category": "technical",
+          "aliases": [
+            "autocad drafting",
+            "revit modelling",
+            "bim coordination",
+            "building information modelling",
+            "engineering drawing preparation"
+          ],
+          "why": "Core technical capability required to produce 2D drafting and 3D digital building models according to engineering specifications.",
+          "sdg": {
+            "sdg": 9,
+            "target": "9.1",
+            "reason": "Enables the development of reliable, sustainable, and resilient infrastructure through accurate technical design."
+          },
+          "course": {
+            "title": "BIM Application for Engineers",
+            "provider": "Coursera",
+            "url": "https://www.coursera.org/learn/bim-application",
+            "hours": 20,
+            "level": "intermediate",
+            "cost": "free_audit",
+            "price_rm": 0,
+            "price_note": "Enroll for free.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": -0.4,
+        "structured": 0.5,
+        "field": -0.3,
+        "shifts": -0.8,
+        "team": 0.5
+      },
+      "entry_level": true,
+      "entry_level_reason": "Malaysian engineering and architecture firms frequently hire polytechnic and vocational diploma graduates for junior drafting roles.",
+      "automation_exposure": 0.45,
+      "ai_complementarity": 0.6,
+      "exposure_reason": "AI generative drafting tools can automate standard 2D drawing conversions and schedules, while technicians leverage AI for clash detection and code checking.",
+      "exposed_by": [
+        "generative_media"
+      ],
+      "complemented_by": [
+        "llm_agents"
+      ],
+      "tasks": [
+        {
+          "task_id": 21917,
+          "label": "assist",
+          "reason": "Generative drafting and CAD plugins assist technicians by accelerating routine line work and auto-generating standard views."
+        },
+        {
+          "task_id": 21918,
+          "label": "assist",
+          "reason": "Parametric AI tools speed up plan generation from sketches, but technicians must verify structural layouts."
+        },
+        {
+          "task_id": 21919,
+          "label": "assist",
+          "reason": "BIM tools automatically detect clashes between MEP and structural elements, while the technician coordinates the resolution."
+        },
+        {
+          "task_id": 21920,
+          "label": "assist",
+          "reason": "AI document extraction tools scan building bylaws to highlight non-compliance for the technician to review."
+        },
+        {
+          "task_id": 21928,
+          "label": "automate",
+          "reason": "BIM software automatically schedules and tallies dimensions and material quantities directly from digital models."
+        },
+        {
+          "task_id": 21931,
+          "label": "human",
+          "reason": "Explaining designs to site engineers and local contractors requires direct interpersonal communication and contextual judgment."
+        },
+        {
+          "task_id": 21943,
+          "label": "human",
+          "reason": "On-site inspection to verify builder compliance requires physical presence and real-time situational assessment."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 9,
+          "target": "9.1",
+          "reason": "Supports the development of quality and resilient infrastructure through accurate digital modeling and construction planning."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "field": -1,
+            "team": 1
+          },
+          "text": {
+            "en": "You review a 3D building model on dual screens, coordinating with structural engineers to resolve spatial clashes.",
+            "ms": "Anda menyemak model bangunan 3D pada dua skrin, menyelaras dengan jurutera struktur untuk menyelesaikan percanggahan ruang.",
+            "zh": "你在双屏幕上检查3D建筑模型，与结构工程师协调以解决空间冲突。"
+          }
+        },
+        {
+          "dims": {
+            "field": 1,
+            "people": 1
+          },
+          "text": {
+            "en": "You visit an active construction site with a tablet to verify that fabricated steel columns match the approved drawings.",
+            "ms": "Anda melawat tapak pembinaan dengan tablet untuk mengesahkan tiang keluli yang dipasang mengikut lukisan yang diluluskan.",
+            "zh": "你带着平板电脑前往施工现场，核对安装的钢柱是否符合已批准的图纸。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"BIM Modeller\" OR \"BIM Coordinator\" OR \"Drafter\" OR \"Pelukis Pelan\" OR \"CAD Drafter\"",
+        "titles": [
+          "bim",
+          "drafter",
+          "technician"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Document understanding was listed both ways; dropped it."
+      ]
+    },
+    "accounts_clerk": {
+      "summary": "Processes routine payroll, records financial transactions, and reconciles invoices and bank statements.",
+      "skills": [
+        {
+          "skill_id": "excel",
+          "weight": 3
+        },
+        {
+          "skill_id": "data_entry",
+          "weight": 3
+        },
+        {
+          "skill_id": "new:bookkeeping",
+          "weight": 3
+        },
+        {
+          "skill_id": "new:payroll_processing",
+          "weight": 2
+        },
+        {
+          "skill_id": "office_admin",
+          "weight": 1
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "bookkeeping",
+          "name": "Bookkeeping and ledger maintenance",
+          "category": "business",
+          "aliases": [
+            "bookkeeping",
+            "accounts maintenance",
+            "ledger posting",
+            "financial record keeping"
+          ],
+          "why": "Fundamental requirement for maintaining accurate debits, credits, and journals in accounting workflows.",
+          "sdg": {
+            "sdg": 8,
+            "target": "8.5",
+            "reason": "Transparent and accurate financial ledgers support business formalisation and productive employment."
+          },
+          "course": {
+            "title": "Bookkeeping basics",
+            "provider": "Coursera",
+            "url": "https://www.coursera.org/learn/bookkeeping-basics",
+            "hours": 14,
+            "level": "intro",
+            "cost": "free_audit",
+            "price_rm": 0,
+            "price_note": "Enroll for free.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        },
+        {
+          "id": "payroll_processing",
+          "name": "Payroll processing and statutory compliance",
+          "category": "business",
+          "aliases": [
+            "payroll administration",
+            "salary calculation",
+            "epf socso submission",
+            "statutory deductions"
+          ],
+          "why": "Crucial in Malaysia for calculating monthly wages, allowances, and statutory contributions including EPF, SOCSO, EIS, and PCB.",
+          "sdg": {
+            "sdg": 8,
+            "target": "8.5",
+            "reason": "Guarantees that workers receive accurate wages and social security protections on schedule."
+          },
+          "course": {
+            "title": "Effective Payroll Administration in Malaysia",
+            "provider": "Fin2u Academy",
+            "url": "https://fin2u.net/courses/effective-payroll-administration-in-malaysia/",
+            "hours": 2.3,
+            "level": "intro",
+            "cost": "paid",
+            "price_rm": 128,
+            "price_note": "Take this Course. RM 128.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": -0.6,
+        "structured": 0.8,
+        "field": -0.9,
+        "shifts": -0.9,
+        "team": -0.2
+      },
+      "entry_level": true,
+      "entry_level_reason": "School leavers with SPM or holders of introductory accounting certificates like LCCI are widely hired for clerical bookkeeping roles.",
+      "automation_exposure": 0.8,
+      "ai_complementarity": 0.2,
+      "exposure_reason": "Automated OCR extraction, automated reconciliation feeds, and integrated payroll software directly replace routine manual data entry and calculation tasks.",
+      "exposed_by": [
+        "document_understanding",
+        "llm_agents",
+        "automated_data_analysis"
+      ],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 2486,
+          "label": "automate",
+          "reason": "AI document extraction automatically verifies figures, postings, and tax codes across receipts and invoices without manual checking."
+        },
+        {
+          "task_id": 2490,
+          "label": "automate",
+          "reason": "Cloud accounting systems automatically classify and post routine ledger entries using predefined rule sets and machine-learned patterns."
+        },
+        {
+          "task_id": 2509,
+          "label": "automate",
+          "reason": "Automated three-way matching systems cross-reference purchase orders, delivery orders, and invoices electronically."
+        },
+        {
+          "task_id": 18561,
+          "label": "assist",
+          "reason": "Payroll systems automate statutory rate calculations, but clerks must still review irregular allowances, medical claims, and overtime hours."
+        },
+        {
+          "task_id": 2503,
+          "label": "assist",
+          "reason": "Bank feeds suggest automated matches, while the clerk manually reviews unmatched line items and payment exceptions."
+        },
+        {
+          "task_id": 2496,
+          "label": "human",
+          "reason": "Investigating disputed payments, contact with suppliers, and resolving undocumented discrepancies require direct human communication and problem-solving."
+        },
+        {
+          "task_id": 2510,
+          "label": "assist",
+          "reason": "Statutory software prepares EPF, SOCSO, and tax filings, while the clerk verifies totals and handles final portal submission."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 8,
+          "target": "8.5",
+          "reason": "Maintains accurate wage delivery and statutory contributions that safeguard formal worker protections."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "structured": 1,
+            "field": -1
+          },
+          "text": {
+            "en": "You spend your morning cross-referencing supplier invoices against delivery orders at your desk before processing payments.",
+            "ms": "Anda meluangkan waktu pagi menyemak silang invois pembekal dengan pesanan penghantaran di meja sebelum memproses bayaran.",
+            "zh": "你在办公桌前核对供应商发票与送货单，确认无误后安排付款。"
+          }
+        },
+        {
+          "dims": {
+            "people": -1,
+            "shifts": -1
+          },
+          "text": {
+            "en": "You reconcile bank statements and calculate monthly payroll deductions during regular office hours without unexpected disruptions.",
+            "ms": "Anda menyelaraskan penyata bank dan mengira potongan gaji bulanan dalam waktu pejabat biasa tanpa gangguan yang tidak dijangka.",
+            "zh": "你在固定办公时间内核对银行对账单并计算每月薪资扣除额，工作流程平稳有序。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"accounts clerk\" OR \"payroll clerk\" OR \"kerani akaun\" OR \"accounts assistant\"",
+        "titles": [
+          "accounts",
+          "payroll",
+          "clerk"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Same capabilities were listed as exposing and complementing; kept them as exposing."
+      ]
+    },
+    "supply_chain_specialist": {
+      "summary": "Plans and coordinates the movement of goods, materials, and inventory across supply chains.",
+      "skills": [
+        {
+          "skill_id": "excel",
+          "weight": 3
+        },
+        {
+          "skill_id": "new:inventory_management",
+          "weight": 3
+        },
+        {
+          "skill_id": "project_management",
+          "weight": 2
+        },
+        {
+          "skill_id": "scheduling",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 2
+        },
+        {
+          "skill_id": "risk_assessment",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "inventory_management",
+          "name": "Inventory management",
+          "category": "business",
+          "aliases": [
+            "stock control",
+            "inventory planning",
+            "materials management",
+            "stock replenishment",
+            "inventory control"
+          ],
+          "why": "Accurate stock tracking, buffer management, and demand replenishment are fundamental to ensuring supply chain resilience while controlling holding costs.",
+          "sdg": {
+            "sdg": 12,
+            "target": "12.5",
+            "reason": "Prevents product obsolescence and inventory scrap through balanced stock forecasting."
+          },
+          "course": {
+            "title": "A Holistic Approach to Inventory Management",
+            "provider": "Alison",
+            "url": "https://alison.com/course/a-holistic-approach-to-inventory-management",
+            "hours": 4,
+            "level": "intermediate",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "Improve supply chain efficiency and drive business success with optimized inventory practices in this free course.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": 0.2,
+        "structured": 0.2,
+        "field": -0.4,
+        "shifts": -0.5,
+        "team": 0.6
+      },
+      "entry_level": true,
+      "entry_level_reason": "Graduates in logistics, supply chain management, or business administration frequently secure entry-level specialist and executive positions in Malaysia.",
+      "automation_exposure": 0.35,
+      "ai_complementarity": 0.65,
+      "exposure_reason": "AI automates shipment documentation and inventory tracking while enhancing demand forecasting and route optimization.",
+      "exposed_by": [
+        "document_understanding"
+      ],
+      "complemented_by": [
+        "automated_data_analysis",
+        "llm_agents"
+      ],
+      "tasks": [
+        {
+          "task_id": 8934,
+          "label": "assist",
+          "reason": "AI forecasting tools optimize inventory allocation while specialists manage real-world stock constraints and supplier lead times."
+        },
+        {
+          "task_id": 8949,
+          "label": "assist",
+          "reason": "AI models suggest optimal freight routes and network designs, which specialists validate against local infrastructure and cost realities."
+        },
+        {
+          "task_id": 8935,
+          "label": "human",
+          "reason": "Cross-functional alignment and crisis negotiation during product shortages require human relationship management and judgment."
+        },
+        {
+          "task_id": 8937,
+          "label": "assist",
+          "reason": "AI dashboards monitor SLA metrics in real time while specialists handle performance discussions and client negotiations."
+        },
+        {
+          "task_id": 8950,
+          "label": "human",
+          "reason": "Subcontractor selection, relationship management, and contract enforcement rely heavily on interpersonal trust and human evaluation."
+        },
+        {
+          "task_id": 8940,
+          "label": "automate",
+          "reason": "Automated reporting tools and workflow integrations generate logistics status reports directly from ERP systems."
+        },
+        {
+          "task_id": 8948,
+          "label": "human",
+          "reason": "Evaluating and adopting new warehouse and freight technologies requires strategic business insight and contextual assessment."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 9,
+          "target": "9.1",
+          "reason": "Optimises freight transport networks and trade operations to build resilient logistics infrastructure."
+        },
+        {
+          "sdg": 12,
+          "target": "12.5",
+          "reason": "Minimises inventory obsolescence and material waste through efficient supply chain planning."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "people": 1,
+            "team": 1
+          },
+          "text": {
+            "en": "Meeting with freight forwarders and internal warehouse leads to resolve sudden port shipment delays.",
+            "ms": "Bermesyuarat dengan penghantar kargo dan ketua gudang untuk menyelesaikan kelewatan penghantaran di pelabuhan.",
+            "zh": "与货运代理和内部仓库主管开会，共同解决港口突发的货物延误问题。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "field": -1
+          },
+          "text": {
+            "en": "Auditing weekly inventory replenishment schedules and shipment records at your desk to prevent factory stockouts.",
+            "ms": "Menyemak jadual penambahan stok mingguan dan rekod penghantaran di meja kerja untuk mengelakkan kehabisan bekalan kilang.",
+            "zh": "在办公桌前核对每周补货计划和发货记录，以防工厂生产线断料。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"Supply Chain Specialist\" OR \"Logistics Specialist\" OR \"Supply Chain Executive\" OR \"Logistics Executive\"",
+        "titles": [
+          "supply",
+          "logistics",
+          "specialist"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "LLM agents were listed both ways; kept them as complementing."
+      ]
+    },
+    "bank_teller": {
+      "summary": "Processes routine counter transactions, manages cash deposits, and assists bank customers with accounts.",
+      "skills": [
+        {
+          "skill_id": "customer_service",
+          "weight": 3
+        },
+        {
+          "skill_id": "communication",
+          "weight": 2
+        },
+        {
+          "skill_id": "data_entry",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 2
+        },
+        {
+          "skill_id": "risk_assessment",
+          "weight": 1
+        }
+      ],
+      "new_skills": [],
+      "work_context": {
+        "people": 0.8,
+        "structured": 0.9,
+        "field": -0.9,
+        "shifts": -0.8,
+        "team": 0.4
+      },
+      "entry_level": true,
+      "entry_level_reason": "Malaysian commercial banks routinely recruit fresh diploma and bachelor's degree graduates for branch teller and customer service officer positions.",
+      "automation_exposure": 0.75,
+      "ai_complementarity": 0.25,
+      "exposure_reason": "Self-service deposit machines, mobile banking apps, and automated document verification handle most routine cash and cheque transactions previously done at counters.",
+      "exposed_by": [
+        "document_understanding",
+        "conversational_ai",
+        "llm_agents"
+      ],
+      "complemented_by": [],
+      "tasks": [
+        {
+          "task_id": 2551,
+          "label": "automate",
+          "reason": "Cash deposit machines and optical character recognition increasingly verify slips, notes, and cheque deposits automatically."
+        },
+        {
+          "task_id": 2550,
+          "label": "automate",
+          "reason": "Automated teller machines and digital fund transfers replace most over-the-counter cheque cashing and cash withdrawals."
+        },
+        {
+          "task_id": 2553,
+          "label": "automate",
+          "reason": "Core banking systems and digital banking platforms log transactions and generate electronic receipts automatically."
+        },
+        {
+          "task_id": 2549,
+          "label": "assist",
+          "reason": "Automated cash recyclers and smart vault software tally cash counts, while tellers handle physical sign-offs and variance reviews."
+        },
+        {
+          "task_id": 2560,
+          "label": "assist",
+          "reason": "AI diagnostic tools help flag transaction errors and account holds, while tellers manage customer interaction and remediation."
+        },
+        {
+          "task_id": 2561,
+          "label": "assist",
+          "reason": "Customer intelligence engines suggest relevant financial products, but tellers explain features and build rapport with clients."
+        },
+        {
+          "task_id": 21076,
+          "label": "human",
+          "reason": "Supporting branch visitors with complex queries and emotional distress relies on interpersonal tact and human empathy."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 8,
+          "target": "8.10",
+          "reason": "Strengthens the capacity of domestic financial institutions to encourage and expand access to banking services for all."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "people": 1,
+            "structured": 1
+          },
+          "text": {
+            "en": "You spend your day at a branch counter serving customers with deposits, withdrawals, and account inquiries under strict compliance rules.",
+            "ms": "Anda menghabiskan hari di kaunter cawangan melayani pelanggan dengan urusan deposit, pengeluaran, dan pertanyaan akaun mengikut peraturan pematuhan ketat.",
+            "zh": "您一整天在银行柜台为顾客办理存款、取款及账户咨询业务，严格遵守合规流程。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "field": -1
+          },
+          "text": {
+            "en": "You verify physical cash and balance your drawer transactions down to the exact sen at the end of each shift.",
+            "ms": "Anda menyemak wang tunai fizikal dan mengimbangi transaksi laci tunai anda sehingga sen yang tepat pada akhir setiap syif.",
+            "zh": "在每班结束时，您需要清点现金并核对抽屉内的每笔交易，确保账目分毫不差。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"bank teller\" OR \"bank cashier\" OR \"customer service teller\" OR \"pegawai kaunter bank\"",
+        "titles": [
+          "teller",
+          "cashier",
+          "counter"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Same capabilities were listed as exposing and complementing; kept them as exposing."
+      ]
+    },
+    "registered_nurse": {
+      "summary": "Assesses patient health, administers medications, and provides direct clinical care across healthcare settings.",
+      "skills": [
+        {
+          "skill_id": "patient_care",
+          "weight": 3
+        },
+        {
+          "skill_id": "empathy",
+          "weight": 3
+        },
+        {
+          "skill_id": "safety_compliance",
+          "weight": 2
+        },
+        {
+          "skill_id": "critical_thinking",
+          "weight": 2
+        },
+        {
+          "skill_id": "communication",
+          "weight": 2
+        }
+      ],
+      "new_skills": [],
+      "work_context": {
+        "people": 0.9,
+        "structured": -0.1,
+        "field": 0.85,
+        "shifts": 0.9,
+        "team": 0.85
+      },
+      "entry_level": true,
+      "entry_level_reason": "Fresh nursing diploma and degree graduates are routinely hired upon passing their Malaysian Nursing Board licensure examination.",
+      "automation_exposure": 0.15,
+      "ai_complementarity": 0.45,
+      "exposure_reason": "AI streamlines clinical documentation and monitoring while physical procedures, direct patient care, and clinical judgment remain human.",
+      "exposed_by": [],
+      "complemented_by": [
+        "document_understanding",
+        "llm_agents"
+      ],
+      "tasks": [
+        {
+          "task_id": 1841,
+          "label": "assist",
+          "reason": "AI-connected telemetry and automated charting capture vital signs, but nurses verify readings and correlate them with patient status."
+        },
+        {
+          "task_id": 20413,
+          "label": "human",
+          "reason": "Administering medications and observing subtle clinical reactions require direct human bedside presence and sensory observation."
+        },
+        {
+          "task_id": 1839,
+          "label": "assist",
+          "reason": "Document extraction and language tools help summarize nursing notes, though nurses must validate the record."
+        },
+        {
+          "task_id": 1840,
+          "label": "assist",
+          "reason": "Clinical decision support systems flag early deterioration trends, but the nurse evaluates the patient's holistic presentation."
+        },
+        {
+          "task_id": 1843,
+          "label": "human",
+          "reason": "Interprofessional rounds and multi-specialty care planning require collaborative dialogue, bedside context, and clinical judgment."
+        },
+        {
+          "task_id": 1847,
+          "label": "human",
+          "reason": "Hands-on physical preparation, positioning, and calming anxious patients during procedures require physical dexterity and empathy."
+        },
+        {
+          "task_id": 1850,
+          "label": "assist",
+          "reason": "Generative tools assist in drafting accessible patient education materials, while the nurse delivers contextual guidance to families."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 3,
+          "target": "3.c",
+          "reason": "Registered nurses form the core frontline health workforce vital for hospital operations, preventive healthcare, and patient recovery."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "people": 1,
+            "shifts": 1
+          },
+          "text": {
+            "en": "You work rotational night shifts tending to recovering patients and responding promptly to changes in their vital signs.",
+            "ms": "Anda bekerja syif malam secara bergilir-gilir untuk merawat pesakit yang sedang pulih dan bertindak segera terhadap perubahan tanda vital mereka.",
+            "zh": "你轮班值夜班照顾康复中的患者，并对他们生命体征的变化迅速作出反应。"
+          }
+        },
+        {
+          "dims": {
+            "team": 1,
+            "field": 1
+          },
+          "text": {
+            "en": "You collaborate closely with doctors and allied health staff on the hospital ward floor to execute care plans.",
+            "ms": "Anda bekerjasama rapat dengan doktor dan kakitangan kesihatan bersekutu di wad hospital untuk melaksanakan pelan rawatan.",
+            "zh": "你在医院病房与医生和专职医疗人员紧密合作，共同执行护理计划。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"registered nurse\" OR \"staff nurse\" OR \"jururawat\"",
+        "titles": [
+          "nurse",
+          "jururawat",
+          "staff nurse"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Document understanding was listed both ways; nursing care is not exposed, records work is assisted."
+      ]
+    },
+    "tvet_instructor": {
+      "summary": "Teaches technical and vocational skills through hands-on practical training and classroom instruction.",
+      "skills": [
+        {
+          "skill_id": "new:vocational_pedagogy",
+          "weight": 3
+        },
+        {
+          "skill_id": "safety_compliance",
+          "weight": 3
+        },
+        {
+          "skill_id": "communication",
+          "weight": 2
+        },
+        {
+          "skill_id": "problem_solving",
+          "weight": 2
+        },
+        {
+          "skill_id": "genai_tools",
+          "weight": 1
+        }
+      ],
+      "new_skills": [
+        {
+          "id": "vocational_pedagogy",
+          "name": "Vocational pedagogy and training",
+          "category": "human",
+          "aliases": [
+            "vocational instruction",
+            "workshop training",
+            "tvet teaching",
+            "practical skills delivery"
+          ],
+          "why": "Essential for structuring and delivering hands-on technical curricula according to industry and national skills standards.",
+          "sdg": {
+            "sdg": 4,
+            "target": "4.4",
+            "reason": "Equips youths and adults with relevant technical and vocational skills for employment."
+          },
+          "course": {
+            "title": "Instructional Design for Vocational and Technical Education",
+            "provider": "Alison",
+            "url": "https://alison.com/course/instructional-design-for-vocational-and-technical-education",
+            "hours": 3,
+            "level": "intermediate",
+            "cost": "free",
+            "price_rm": 0,
+            "price_note": "Master the art of developing vocational and technical education courses that are engaging in this free online course.",
+            "checked": "2026-10-22",
+            "found_via": "Gemini with Google Search"
+          }
+        }
+      ],
+      "work_context": {
+        "people": 0.8,
+        "structured": 0.6,
+        "field": 0.4,
+        "shifts": -0.6,
+        "team": 0.4
+      },
+      "entry_level": false,
+      "entry_level_reason": "Instructors typically require recognized technical trade qualifications, industry work experience, and a Vocational Training Officer certification.",
+      "automation_exposure": 0.18,
+      "ai_complementarity": 0.52,
+      "exposure_reason": "While AI can generate lesson plans and practice quizzes, hands-on workshop supervision and physical skills demonstration cannot be automated.",
+      "exposed_by": [],
+      "complemented_by": [
+        "llm_agents",
+        "generative_media"
+      ],
+      "tasks": [
+        {
+          "task_id": 6445,
+          "label": "human",
+          "reason": "Physical workshop safety and direct manual supervision must be actively managed by a human instructor."
+        },
+        {
+          "task_id": 6446,
+          "label": "human",
+          "reason": "Evaluating physical craftsmanship, manual dexterity, and practical technique requires real-time human observation."
+        },
+        {
+          "task_id": 6453,
+          "label": "human",
+          "reason": "Demonstrating tactile procedures and tool operations requires physical presence and real-time interaction."
+        },
+        {
+          "task_id": 6447,
+          "label": "assist",
+          "reason": "Generative media and AI presentation tools help instructors rapidly design engaging visual aids and instructional slides."
+        },
+        {
+          "task_id": 6448,
+          "label": "assist",
+          "reason": "AI can formulate written question banks and analyze test statistics while instructors oversee practical assessments."
+        },
+        {
+          "task_id": 6454,
+          "label": "assist",
+          "reason": "Instructors can use AI workflows to align course outlines quickly with evolving industrial competency standards."
+        },
+        {
+          "task_id": 6449,
+          "label": "automate",
+          "reason": "Document processing systems can automate routine attendance tracking, mark calculation, and institutional reporting."
+        }
+      ],
+      "sdgs": [
+        {
+          "sdg": 4,
+          "target": "4.4",
+          "reason": "Directly develops vocational and technical competencies in learners for employment and decent work."
+        },
+        {
+          "sdg": 8,
+          "target": "8.6",
+          "reason": "Equips youth with market-driven trade skills to substantially reduce the proportion of youth not in employment or training."
+        }
+      ],
+      "survey_cards": [
+        {
+          "dims": {
+            "people": 1,
+            "field": 1
+          },
+          "text": {
+            "en": "You are guiding a trainee in the workshop, demonstrating the correct and safe way to handle machinery.",
+            "ms": "Anda membimbing pelatih di bengkel, menunjukkan cara mengendalikan jentera dengan betul dan selamat.",
+            "zh": "您在车间指导学员，示范正确且安全地操作机械设备的方法。"
+          }
+        },
+        {
+          "dims": {
+            "structured": 1,
+            "people": 1
+          },
+          "text": {
+            "en": "You are evaluating students against practical skill competency rubrics at the end of a training module.",
+            "ms": "Anda menilai pelajar berpandukan rubrik kecekapan kemahiran amali pada akhir modul latihan.",
+            "zh": "您在培训模块结束时，依据实操技能标准评估学员的表现。"
+          }
+        }
+      ],
+      "openings": {
+        "query": "\"TVET instructor\" OR \"tenaga pengajar TVET\" OR \"vocational teacher\" OR \"vocational training officer\"",
+        "titles": [
+          "tvet",
+          "instructor",
+          "vocational"
+        ]
+      },
+      "problems": [],
+      "team_edits": [
+        "Teaching was listed as exposed to document reading and chatbots; AI assists instructors rather than replacing them."
+      ]
+    }
+  }
+}

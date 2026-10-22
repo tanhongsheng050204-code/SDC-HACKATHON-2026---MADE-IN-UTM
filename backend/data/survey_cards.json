@@ -88,5 +88,55 @@
   {"id": "card-care_worker-2", "role_ids": ["care_worker"], "dims": {"shifts": 1},
    "text": {"en": "You work early, late or overnight shifts.", "ms": "Anda bekerja syif awal pagi, lewat malam atau semalaman.", "zh": "您上早班、晚班或通宵班。"}},
   {"id": "card-care_worker-3", "role_ids": ["care_worker"], "dims": {"field": 1, "team": -1},
-   "text": {"en": "You visit clients in their own homes, on your own, instead of working at a desk.", "ms": "Anda melawat klien di rumah mereka secara sendirian, bukannya bekerja di meja.", "zh": "您独自上门拜访客户，而不是坐在办公桌前工作。"}}
+   "text": {"en": "You visit clients in their own homes, on your own, instead of working at a desk.", "ms": "Anda melawat klien di rumah mereka secara sendirian, bukannya bekerja di meja.", "zh": "您独自上门拜访客户，而不是坐在办公桌前工作。"}},
+
+  {"id": "card-production_operator-1", "role_ids": ["production_operator"], "dims": {"field": 1, "shifts": 1},
+   "text": {"en": "You put on cleanroom gear and spend your shift monitoring machines on a busy factory floor.", "ms": "Anda memakai pakaian bilik bersih dan menghabiskan syif memantau mesin di lantai kilang yang sibuk.", "zh": "你穿上无尘服，在繁忙的工厂车间轮班监控生产设备。"}},
+  {"id": "card-production_operator-2", "role_ids": ["production_operator"], "dims": {"structured": 1, "team": 1},
+   "text": {"en": "You follow standardized operating procedures alongside team members to assemble circuit boards on time.", "ms": "Anda mematuhi prosedur operasi standard bersama rakan sepasukan untuk memasang papan litar mengikut jadual.", "zh": "你与团队成员一起严格遵守标准作业程序，按时组装电路板。"}},
+
+  {"id": "card-cashier-1", "role_ids": ["cashier"], "dims": {"shifts": 1, "field": 1},
+   "text": {"en": "You spend your working hours on your feet at a checkout counter, rotating through evening, weekend, and holiday shifts.", "ms": "Anda menghabiskan waktu kerja dengan berdiri di kaunter bayaran, mengikut giliran syif petang, hujung minggu, dan cuti umum.", "zh": "你的工作时间大多站在收银台前度过，并需要轮班应对晚班、周末及公共假期。"}},
+  {"id": "card-cashier-2", "role_ids": ["cashier"], "dims": {"people": 1, "structured": 1},
+   "text": {"en": "You follow standard checkout procedures repeatedly while engaging face-to-face with a continuous stream of shoppers.", "ms": "Anda mematuhi prosedur bayaran standard secara berulang sambil berinteraksi bersemuka dengan pelanggan yang tidak putus-putus.", "zh": "你重复执行标准的结账流程，同时与源源不断的顾客进行面对面的交流。"}},
+
+  {"id": "card-hotel_front_desk_clerk-1", "role_ids": ["hotel_front_desk_clerk"], "dims": {"people": 1, "shifts": 1},
+   "text": {"en": "You work late-night rotating shifts greeting arriving travelers and calming guests who had stressful flights.", "ms": "Anda bekerja mengikut syif giliran lewat malam menyambut pelancong yang baru tiba dan menenangkan tetamu yang keletihan.", "zh": "你在轮班的深夜接待抵步的旅客，并安抚旅途劳顿的房客。"}},
+  {"id": "card-hotel_front_desk_clerk-2", "role_ids": ["hotel_front_desk_clerk"], "dims": {"structured": 1, "field": -1},
+   "text": {"en": "You stand behind a lobby counter following strict standard operating procedures to verify bookings and process room keys.", "ms": "Anda berdiri di kaunter lobi mengikut prosedur operasi standard yang ketat untuk mengesahkan tempahan dan menyerahkan kunci bilik.", "zh": "你站在大堂柜台前，按照严格的标准作业程序核对预订并派发房卡。"}},
+
+  {"id": "card-farm_worker-1", "role_ids": ["farm_worker"], "dims": {"field": 1, "team": 1},
+   "text": {"en": "You work outdoors with your crew from early morning, harvesting fresh crop bunches across plantation rows.", "ms": "Anda bekerja di luar bersama kru sejak awal pagi, menuai hasil tanaman di barisan ladang.", "zh": "你大清早就和工友们在户外工作，在种植园里穿梭采收成熟的作物。"}},
+  {"id": "card-farm_worker-2", "role_ids": ["farm_worker"], "dims": {"structured": 1, "field": 1},
+   "text": {"en": "You inspect plants for signs of pests or disease and spray treatments according to the daily farm routine.", "ms": "Anda memeriksa tanaman untuk mengesan perosak atau penyakit dan menyembur racun mengikut jadual harian ladang.", "zh": "你检查植物是否有病虫害迹象，并按照农场的每日规程进行喷药防治。"}},
+
+  {"id": "card-engineering_technician-1", "role_ids": ["engineering_technician"], "dims": {"field": -1, "team": 1},
+   "text": {"en": "You review a 3D building model on dual screens, coordinating with structural engineers to resolve spatial clashes.", "ms": "Anda menyemak model bangunan 3D pada dua skrin, menyelaras dengan jurutera struktur untuk menyelesaikan percanggahan ruang.", "zh": "你在双屏幕上检查3D建筑模型，与结构工程师协调以解决空间冲突。"}},
+  {"id": "card-engineering_technician-2", "role_ids": ["engineering_technician"], "dims": {"field": 1, "people": 1},
+   "text": {"en": "You visit an active construction site with a tablet to verify that fabricated steel columns match the approved drawings.", "ms": "Anda melawat tapak pembinaan dengan tablet untuk mengesahkan tiang keluli yang dipasang mengikut lukisan yang diluluskan.", "zh": "你带着平板电脑前往施工现场，核对安装的钢柱是否符合已批准的图纸。"}},
+
+  {"id": "card-accounts_clerk-1", "role_ids": ["accounts_clerk"], "dims": {"structured": 1, "field": -1},
+   "text": {"en": "You spend your morning cross-referencing supplier invoices against delivery orders at your desk before processing payments.", "ms": "Anda meluangkan waktu pagi menyemak silang invois pembekal dengan pesanan penghantaran di meja sebelum memproses bayaran.", "zh": "你在办公桌前核对供应商发票与送货单，确认无误后安排付款。"}},
+  {"id": "card-accounts_clerk-2", "role_ids": ["accounts_clerk"], "dims": {"people": -1, "shifts": -1},
+   "text": {"en": "You reconcile bank statements and calculate monthly payroll deductions during regular office hours without unexpected disruptions.", "ms": "Anda menyelaraskan penyata bank dan mengira potongan gaji bulanan dalam waktu pejabat biasa tanpa gangguan yang tidak dijangka.", "zh": "你在固定办公时间内核对银行对账单并计算每月薪资扣除额，工作流程平稳有序。"}},
+
+  {"id": "card-supply_chain_specialist-1", "role_ids": ["supply_chain_specialist"], "dims": {"people": 1, "team": 1},
+   "text": {"en": "Meeting with freight forwarders and internal warehouse leads to resolve sudden port shipment delays.", "ms": "Bermesyuarat dengan penghantar kargo dan ketua gudang untuk menyelesaikan kelewatan penghantaran di pelabuhan.", "zh": "与货运代理和内部仓库主管开会，共同解决港口突发的货物延误问题。"}},
+  {"id": "card-supply_chain_specialist-2", "role_ids": ["supply_chain_specialist"], "dims": {"structured": 1, "field": -1},
+   "text": {"en": "Auditing weekly inventory replenishment schedules and shipment records at your desk to prevent factory stockouts.", "ms": "Menyemak jadual penambahan stok mingguan dan rekod penghantaran di meja kerja untuk mengelakkan kehabisan bekalan kilang.", "zh": "在办公桌前核对每周补货计划和发货记录，以防工厂生产线断料。"}},
+
+  {"id": "card-bank_teller-1", "role_ids": ["bank_teller"], "dims": {"people": 1, "structured": 1},
+   "text": {"en": "You spend your day at a branch counter serving customers with deposits, withdrawals, and account inquiries under strict compliance rules.", "ms": "Anda menghabiskan hari di kaunter cawangan melayani pelanggan dengan urusan deposit, pengeluaran, dan pertanyaan akaun mengikut peraturan pematuhan ketat.", "zh": "您一整天在银行柜台为顾客办理存款、取款及账户咨询业务，严格遵守合规流程。"}},
+  {"id": "card-bank_teller-2", "role_ids": ["bank_teller"], "dims": {"structured": 1, "field": -1},
+   "text": {"en": "You verify physical cash and balance your drawer transactions down to the exact sen at the end of each shift.", "ms": "Anda menyemak wang tunai fizikal dan mengimbangi transaksi laci tunai anda sehingga sen yang tepat pada akhir setiap syif.", "zh": "在每班结束时，您需要清点现金并核对抽屉内的每笔交易，确保账目分毫不差。"}},
+
+  {"id": "card-registered_nurse-1", "role_ids": ["registered_nurse"], "dims": {"people": 1, "shifts": 1},
+   "text": {"en": "You work rotational night shifts tending to recovering patients and responding promptly to changes in their vital signs.", "ms": "Anda bekerja syif malam secara bergilir-gilir untuk merawat pesakit yang sedang pulih dan bertindak segera terhadap perubahan tanda vital mereka.", "zh": "你轮班值夜班照顾康复中的患者，并对他们生命体征的变化迅速作出反应。"}},
+  {"id": "card-registered_nurse-2", "role_ids": ["registered_nurse"], "dims": {"team": 1, "field": 1},
+   "text": {"en": "You collaborate closely with doctors and allied health staff on the hospital ward floor to execute care plans.", "ms": "Anda bekerjasama rapat dengan doktor dan kakitangan kesihatan bersekutu di wad hospital untuk melaksanakan pelan rawatan.", "zh": "你在医院病房与医生和专职医疗人员紧密合作，共同执行护理计划。"}},
+
+  {"id": "card-tvet_instructor-1", "role_ids": ["tvet_instructor"], "dims": {"people": 1, "field": 1},
+   "text": {"en": "You are guiding a trainee in the workshop, demonstrating the correct and safe way to handle machinery.", "ms": "Anda membimbing pelatih di bengkel, menunjukkan cara mengendalikan jentera dengan betul dan selamat.", "zh": "您在车间指导学员，示范正确且安全地操作机械设备的方法。"}},
+  {"id": "card-tvet_instructor-2", "role_ids": ["tvet_instructor"], "dims": {"structured": 1, "people": 1},
+   "text": {"en": "You are evaluating students against practical skill competency rubrics at the end of a training module.", "ms": "Anda menilai pelajar berpandukan rubrik kecekapan kemahiran amali pada akhir modul latihan.", "zh": "您在培训模块结束时，依据实操技能标准评估学员的表现。"}}
 ]

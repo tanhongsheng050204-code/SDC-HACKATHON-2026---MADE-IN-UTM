@@ -1,3 +1,6 @@
+from app.reference import get_reference
+
+
 def test_health(client):
     body = client.get("/api/health").json()
     assert body["status"] == "ok" and body["llm_mode"] == "offline"
@@ -52,7 +55,7 @@ def test_snapshot_import_requires_admin(client):
     assert client.post("/api/signals/import", json={}).status_code == 401
     listed = client.get("/api/signals").json()
     # The live forecast is the cited WEF snapshot; the illustrative seed is kept for history.
-    assert listed[0]["illustrative"] is False and listed[0]["signal_count"] == 13
+    assert listed[0]["illustrative"] is False and listed[0]["signal_count"] == len(get_reference().roles)
     assert "Future of Jobs Report 2025" in listed[0]["source"]
     assert any(s["illustrative"] for s in listed[1:])
 

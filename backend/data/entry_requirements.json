@@ -1,0 +1,51 @@
+{
+  "_note": "What it takes to be hired into each role, beyond skills (DECISIONS #43). 'usual' comes from the role's MASCO 2020 major group and is what employers usually ask for, not a rule: MASCO itself says the skills may also come from informal training and experience. 'licence' is a legal or official requirement to do the work; a role with one is never shown as a short next move unless it is the person's own job. Sources checked 22 Oct 2026; team: confirm each and fill reviewed_by (REVIEW_LOG.md).",
+  "masco_source": {"title": "MASCO 2020 (Ministry of Human Resources), Introduction, p. ix: education level by major group", "url": "https://jtksm.gov.my/sites/default/files/2022-12/MASCO_2020_BI_Edaran.pdf"},
+  "usual_by_group": {
+    "1": {"text": "No fixed education level: managers are hired on experience", "skill_level": null},
+    "2": {"text": "A university degree, or a Malaysian Skills Diploma (DKM) Level 5 and above", "skill_level": 4},
+    "3": {"text": "A diploma, a Malaysian Skills Certificate (SKM) Level 3 or a Malaysian Skills Diploma (DKM) Level 4", "skill_level": 3},
+    "4": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
+    "5": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
+    "6": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
+    "7": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
+    "8": {"text": "SPM or post-secondary education, or a Malaysian Skills Certificate (SKM) Level 1 to 3", "skill_level": 2},
+    "9": {"text": "Primary education", "skill_level": 1}
+  },
+  "licences": {
+    "registered_nurse": {
+      "name": "Registration with the Nursing Board Malaysia (Lembaga Jururawat Malaysia) and a yearly practising certificate",
+      "law": "Nurses Act 1950",
+      "route": "An LJM-recognised Diploma in Nursing (3 years full time), then the LJM licensing examination",
+      "route_months": 36,
+      "sources": [
+        {"title": "Nurses Act 1950 (Act 14), as published by the Ministry of Health Nursing Division", "url": "https://hq.moh.gov.my/nursing/wp-content/uploads/2015/04/1.-Akta-jururawat-141-1.pdf"},
+        {"title": "Lembaga Jururawat Malaysia (Nursing Board Malaysia), Ministry of Health", "url": "https://hq.moh.gov.my/nursing/"},
+        {"title": "IJN College, Diploma in Nursing: 3 years, then the LJM Licensing Examination", "url": "https://www.ijn.edu.my/diploma-in-nursing/"}
+      ],
+      "reviewed_by": null
+    },
+    "renewable_energy_technician": {
+      "name": "A wireman competency certificate from the Energy Commission (Suruhanjaya Tenaga) for electrical wiring work",
+      "law": "Electricity Regulations 1994 (examination for competent persons)",
+      "route": "An ST-accredited wireman course (PW2, about 2 years plus 6 months on the job at a skills college) and the ST competency examination",
+      "route_months": 30,
+      "sources": [
+        {"title": "Suruhanjaya Tenaga Directive 12/2026: what each certificate of competency (including Pendawai, wireman) allows, under the Electricity Regulations 1994", "url": "https://www.st.gov.my/sites/default/files/2026-06/arahan-ST-bilangan-12-2026.pdf"},
+        {"title": "VTAR Institute, Wireman PW2 competency course (ST-accredited): 2 years + 6 months OJT", "url": "https://www.vtar.edu.my/wireman-pw2-competency-course/"}
+      ],
+      "reviewed_by": null
+    },
+    "tvet_instructor": {
+      "name": "A Vocational Training Officer (VTO) certificate from the Department of Skills Development (JPK), to teach at JPK-accredited centres",
+      "law": "Department of Skills Development (JPK) accreditation of skills training centres",
+      "route": "A Malaysian Skills Certificate (SKM) Level 3 in your trade, then the VTO course at CIAST (about 9½ months: 3½ months of teaching methods and a 6-month internship)",
+      "route_months": 10,
+      "sources": [
+        {"title": "CIAST: Vocational Training Officer (VTO) certificate", "url": "https://www.ciast.gov.my/?p=1007"},
+        {"title": "Department of Skills Development (JPK), Ministry of Human Resources", "url": "https://www.dsd.gov.my/"}
+      ],
+      "reviewed_by": null
+    }
+  }
+}
