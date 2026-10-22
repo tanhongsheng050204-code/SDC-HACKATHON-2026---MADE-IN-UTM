@@ -287,7 +287,7 @@ export interface Course {
 }
 export interface TreeNode {
   skill_id: string; name: string; level: number; from_cv: boolean; unlocked: boolean;
-  prereqs: string[]; depth: number; in_role: boolean;
+  prereqs: string[]; depth: number; tier: "foundation" | "core" | "advanced"; in_role: boolean;
   course: { id: string; title: string; url: string; hours: number; cost: string } | null;
   step: number | null; course_done: boolean;
   evidence?: SkillEvidence | null; added_from_ads?: boolean;

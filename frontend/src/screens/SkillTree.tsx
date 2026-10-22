@@ -159,10 +159,10 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
   // Difficulty in three layers. The steps are the learning order, so the step number against the
   // total places each skill in a band: the first third Easy, the middle third Intermediate, the
   // last third Hard. Skills you already have have no step and no band.
-  const totalSteps = tree.total_steps || 0;
   const diffName = ["", t("tree.diffEasy"), t("tree.diffMedium"), t("tree.diffHard")];
-  const difficultyOf = (step: number | null) =>
-    !step || totalSteps < 1 ? 0 : Math.max(1, Math.min(3, Math.ceil((step * 3) / totalSteps)));
+  // Difficulty is the skill's own tier (foundation, core, advanced: data/skills.json), not its place in the plan.
+  const TIER_DIFF: Record<string, number> = { foundation: 1, core: 2, advanced: 3 };
+  const difficultyOf = (n: TreeNode) => TIER_DIFF[n.tier] ?? 0;
 
   return (
     <section className="pathway-page">
@@ -274,7 +274,7 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
             <div key={d} className="tree-row">
               {tree.nodes.filter((n) => n.depth === d).map((n) => {
                 const state = !n.unlocked ? t("tree.locked") : n.level ? levelName(n.level) : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
-                const diff = difficultyOf(n.step);
+                const diff = difficultyOf(n);
                 const cls = ["tree-node",
                   diff ? `diff-${diff}` : "",
                   n.from_cv ? "from-cv" : "",
