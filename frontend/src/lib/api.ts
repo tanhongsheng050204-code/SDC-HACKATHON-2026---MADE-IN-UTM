@@ -129,7 +129,7 @@ export interface RoleInfo {
   sdgs: Sdg[]; skill_sdgs: Record<string, Sdg[]>;
 }
 export interface Matches {
-  scenario: { id: Scenario; label: string; description: string }; signal_source: SignalSource; roles: RoleMatch[];
+  scenario: { id: Scenario; label: string; description: string; adoption?: number }; signal_source: SignalSource; roles: RoleMatch[];
   year: number; year_range: [number, number]; also_like: AlsoLike[];
   current_role: (Pick<RoleMatch, "role_id" | "title" | "summary" | "fit" | "outlook" | "at_risk"> & { is_current_role: true }) | null;
   shortest_route?: string | null;
