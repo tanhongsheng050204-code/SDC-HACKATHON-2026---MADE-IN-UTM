@@ -122,14 +122,16 @@ def _is_label(line: str) -> bool:
 def _spelled_by(line: str, words: set[str]) -> list[str] | None:
     """The email words that, run together, make up the whole line ("aisyahrahman"), else None."""
     letters = re.sub(r"[^a-z]", "", line)
-    if not letters:
+    if not letters or len(letters) > 60 or len(words) > 12:  # a name, not a paragraph; one or two emails
         return None
-    for w in sorted(words, key=len, reverse=True):
-        if letters == w:
-            return [w]
-        if letters.startswith(w) and (rest := _spelled_by(letters[len(w):], words)):
-            return [w, *rest]
-    return None
+    # Word-break over the letters: best[i] is a way to spell letters[:i] from the words.
+    best: list[list[str] | None] = [[]] + [None] * len(letters)
+    for i in range(len(letters)):
+        if best[i] is not None:
+            for w in words:
+                if letters.startswith(w, i) and best[i + len(w)] is None:
+                    best[i + len(w)] = best[i] + [w]
+    return best[-1] or None
 
 
 def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
