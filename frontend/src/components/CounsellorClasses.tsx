@@ -50,13 +50,17 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
   );
   if (!me) return error ? <p className="error" role="alert">{error}</p> : <p className="muted">{t("a.loading")}</p>;
   const joinLink = (code: string) => `${window.location.origin}/?join=${code}`;
+  const copy = (text: string, key: string) => navigator.clipboard?.writeText(text).then(() => setCopied(key)).catch(() => {});
+  const ready = open ? open.students.filter((s) => s.readiness !== null) : [];
+  const onTrack = open ? (open.counts.on_track ?? 0) + (open.counts.ahead ?? 0) + (open.counts.done ?? 0) : 0;
   const students = open ? open.students.filter((s) => filter === "all" || (filter === "no_date" ? s.status === null : s.status === filter)) : [];
 
   return (
     <div className="counsellor">
+      <p className="org-what">{t("cls.what")}</p>
+      <details className="org-format"><summary>{t("cls.more")}</summary><p>{t("cls.sub")}</p></details>
       <div className="card">
-        <h2>{t("cls.title")}</h2>
-        <p className="muted">{t("cls.sub")}</p>
+        <h2 className="sr-only">{t("cls.title")}</h2>
         {me.status === null && (
           <form className="progress-form" onSubmit={(e) => { e.preventDefault(); request(); }}>
             <label htmlFor={`${id}-n`}>{t("cls.yourName")}<input id={`${id}-n`} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} /></label>
@@ -68,25 +72,26 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
         {me.status === "revoked" && <p className="banner error" role="status">{t("cls.revoked")}</p>}
         {me.status === "approved" && (
           <>
-            <form className="progress-form" onSubmit={(e) => { e.preventDefault(); create(); }}>
-              <label htmlFor={`${id}-c`}>{t("cls.className")}<input id={`${id}-c`} value={className} maxLength={80} onChange={(e) => setClassName(e.target.value)} /></label>
-              <button className="btn ink" type="submit" disabled={className.trim().length < 2}>{t("cls.create")}</button>
-            </form>
             {me.classes.length === 0 ? <p className="muted">{t("cls.none")}</p> : (
               <ul className="class-list">
                 {me.classes.map((c) => (
                   <li key={c.id}>
-                    <span><strong>{c.name}</strong> · {tf("cls.members", { n: c.members })}<br />
-                      <small>{t("cls.code")}: <code className="class-code">{c.code}</code> · <span className="muted">{joinLink(c.code)}</span></small></span>
-                    <span className="actions">
-                      <button className="btn ink sm" onClick={() => show(c.id)}>{t("cls.open")}</button>
-                      <button className="btn quiet sm" onClick={() => navigator.clipboard?.writeText(joinLink(c.code)).then(() => setCopied(c.id)).catch(() => {})}>
-                        {copied === c.id ? t("cls.copied") : t("cls.copy")}</button>
+                    <span className="class-name"><strong>{c.name}</strong><span className="muted">{tf("cls.members", { n: c.members })}</span></span>
+                    <span className="class-join">
+                      <span className="muted">{t("cls.code")}</span><code className="class-code">{c.code}</code>
+                      <button className="btn quiet sm" onClick={() => copy(c.code, `${c.id}-code`)}>{copied === `${c.id}-code` ? t("cls.copied") : t("cls.copyCode")}</button>
+                      <button className="btn quiet sm" onClick={() => copy(joinLink(c.code), `${c.id}-link`)}>{copied === `${c.id}-link` ? t("cls.copied") : t("cls.copyLink")}</button>
                     </span>
+                    <button className="btn ink sm" onClick={() => show(c.id)}>{t("cls.open")}</button>
                   </li>
                 ))}
               </ul>
             )}
+            <form className="progress-form class-new" onSubmit={(e) => { e.preventDefault(); create(); }}>
+              <h3>{t("cls.newClass")}</h3>
+              <label htmlFor={`${id}-c`}>{t("cls.className")}<input id={`${id}-c`} value={className} maxLength={80} onChange={(e) => setClassName(e.target.value)} /></label>
+              <button className="btn ink" type="submit" disabled={className.trim().length < 2}>{t("cls.create")}</button>
+            </form>
           </>
         )}
         {error && <p className="error" role="alert">{error}</p>}
@@ -126,11 +131,18 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
                   <th scope="col">{t("cls.f.target_date")}</th><th scope="col">{t("cls.f.status")}</th><th scope="col">{t("cls.f.last_active")}</th>
                   <th scope="col"><span className="sr-only">{t("ci.open")}</span></th>
                 </tr></thead>
-                <tbody>{students.map((s, i) => (
+                <tbody>
+                  <tr className="class-sum">
+                    <th scope="row">{tf("cls.allRow", { n: open.students.length })}</th>
+                    <td>{tf("cls.destN", { n: new Set(open.students.map((s) => s.destination).filter(Boolean)).size })}</td>
+                    <td>{ready.length ? tf("cls.avgReady", { n: percent(ready.reduce((a, s) => a + s.readiness!, 0) / ready.length) }) : "—"}</td>
+                    <td colSpan={3} /><td>{tf("cls.onTrackN", { n: onTrack })}</td><td colSpan={2} />
+                  </tr>
+                  {students.map((s, i) => (
                   <tr key={i}>
                     <th scope="row">{s.display_name ?? t("cls.unnamed")}</th>
                     <td>{s.destination ? tr(s.destination) : "—"}</td>
-                    <td>{s.readiness === null ? "—" : `${percent(s.readiness)}%`}</td>
+                    <td>{s.readiness === null ? "—" : <><span className="ready-bar" aria-hidden="true"><i style={{ width: `${percent(s.readiness)}%` }} /></span> {percent(s.readiness)}%</>}</td>
                     <td>{s.courses_finished}</td>
                     <td>{s.skills_proven.length ? s.skills_proven.map((k) => `${tr(k.name)} (${k.level})`).join(", ") : "—"}</td>
                     <td>{s.target_date ? shortDate(s.target_date) : "—"}</td>
@@ -138,11 +150,18 @@ export function CounsellorClasses({ userId }: { userId: string | null }) {
                     <td>{shortDate(s.last_active)}</td>
                     <td>{s.key && <button className="btn sm" aria-pressed={checkin === s.key} onClick={() => setCheckin(checkin === s.key ? null : s.key!)}>{t("ci.open")}</button>}</td>
                   </tr>
-                ))}</tbody>
+                  ))}
+                </tbody>
               </table>
             </div>
           )}
-          {checkin && <CheckinPanel classId={open.id} memberKey={checkin} onClose={() => setCheckin(null)} />}
+          {checkin && (
+            <div className="sheet-backdrop" onClick={(e) => e.target === e.currentTarget && setCheckin(null)}>
+              <div className="sheet checkin-sheet" role="dialog" aria-modal="true" aria-label={t("ci.open")} onKeyDown={(e) => e.key === "Escape" && setCheckin(null)}>
+                <CheckinPanel classId={open.id} memberKey={checkin} onClose={() => setCheckin(null)} />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
