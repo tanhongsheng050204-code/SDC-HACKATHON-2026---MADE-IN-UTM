@@ -1,21 +1,19 @@
-// A live replay of the app's Today screen for the landing hero: Aisyah asks "Where to?", starts her
-// first course, finishes it, and her readiness and journey move on; then it plays again. Figures are
-// copied from the synthetic demo profile (Aisyah) so the picture matches what "Open the demo
-// profile" shows. With reduce motion or Lite mode it shows the finished state, still.
+// A live replay of the app's Today screen for the landing hero: Aisyah types a question in the top
+// bar's search, starts her first course, finishes it, and her readiness and journey move on; then it
+// plays again. Figures are copied from the synthetic demo profile (Aisyah) so the picture matches
+// what "Open the demo profile" shows. With reduce motion or Lite mode it shows the finished state, still.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { LogoMark } from "../../components/Brand";
 import { stillMode, useDemoLoop, useTyping } from "../../lib/demoLoop";
 import { t, tf, tr } from "../../lib/i18n";
-import { OUTLOOK_TEXT } from "../../lib/labels";
 
 // idle · typing · answer · press Start · course done · journey moves on · hold
 const PHASES = [700, 1900, 1300, 900, 1700, 1700, 2800];
 const TYPED = 1, ANSWER = 2, PRESS = 3, DONE = 4, MOVED = 5;
 
 const ROLES = [
-  { title: "AI operations specialist", fit: 47, after: 67 },
-  { title: "Engineering drafting and BIM technician", fit: 40, after: 40 },
-  { title: "Supply chain and logistics specialist", fit: 38, after: 38 },
+  { title: "AI operations specialist", fit: 47, after: 67, pct: "+43.5" },
+  { title: "Engineering drafting and BIM technician", fit: 40, after: 40, pct: "+20.8" },
+  { title: "Supply chain and logistics specialist", fit: 38, after: 38, pct: "+17.1" },
 ];
 
 export function HeroPreview() {
@@ -27,8 +25,9 @@ export function HeroPreview() {
   const typed = useTyping(t("hp.ask"), phase >= TYPED);
   const done = phase >= DONE;
   const moved = phase >= MOVED;
+  const ready = done ? 67 : 47;
 
-  // The pointer glides to the ask box while typing, then to Start the course.
+  // The pointer glides to the search box while typing, then to Start the course.
   const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
   useLayoutEffect(() => {
     const target = phase === TYPED || phase === ANSWER ? ask.current : phase === PRESS ? start.current : null;
@@ -38,19 +37,32 @@ export function HeroPreview() {
   }, [phase]);
 
   return (
-    <div className="lp-stage" ref={stage} aria-hidden="true">
+    <div className="lp-stage" aria-hidden="true">
       <div className="lp-window is-live" ref={win}>
         <Side on="home" />
         <div className="lp-main">
+          <div className="lp-topbar">
+            <b>{t("nav.home")}</b>
+            <div className={`lp-search ${phase === TYPED || phase === ANSWER ? "is-focus" : ""}`} ref={ask}>
+              <span>⌕</span>{typed ? <span>{typed}{phase === TYPED && <i className="lp-caret" />}</span> : <span className="lp-placeholder">{t("search.placeholder")}</span>}
+              {phase === ANSWER && (
+                <span className="lp-results">
+                  <span className="on">{tr("AI operations specialist")}<small>#1 · 47%</small></span>
+                  <span>💬 {tf("search.ask", { q: t("hp.ask") })}</span>
+                </span>
+              )}
+            </div>
+          </div>
           <p className="lp-hello">{t("hp.hello")}</p>
           <div className={`lp-next ${done ? "is-done" : ""}`}>
-            <small>{tf("v3.destTag", { role: tr("AI operations specialist") })}</small>
+            <small>{tf("home.dest", { role: tr("AI operations specialist") })}</small>
             <b key={done ? "b" : "a"} className="lp-swap">
               {done
                 ? tf("v3.nextCourse", { course: tr("Python"), h: 60, cost: t("v3.free") })
                 : tf("v3.nextCourse", { course: tr("Critical thinking"), h: 9, cost: t("v3.freeAudit") })}
             </b>
-            <span className="lp-next-bar"><span style={{ width: done ? "67%" : "47%" }} /></span>
+            <span className="lp-next-row"><span>{tf("v3.ready", { n: ready })}</span><span>≈ {done ? 62 : 71} h · RM 0</span></span>
+            <span className="lp-next-bar"><span style={{ width: `${ready}%` }} /></span>
             <em ref={start} className={phase === PRESS ? "is-pressed" : ""}>{t("v3.startCourse")}</em>
             {done && <span className="lp-toast">✓ {tr("Critical thinking")} · {tf("v3.ready", { n: 67 })}</span>}
           </div>
@@ -59,31 +71,20 @@ export function HeroPreview() {
             <i className={moved ? "done" : "now"}>{moved ? "✓" : "2"}</i><s className={moved ? "done" : ""} />
             <i className={moved ? "now" : ""}>3</i><s /><i>4</i>
           </div>
-          <div className="lp-rolecards">
-            {ROLES.map((r) => (
-              <div key={r.title} className={moved && r.after !== r.fit ? "is-up" : ""}>
-                <small>{tr(r.title)}</small><b>{moved ? r.after : r.fit}%</b><em>{OUTLOOK_TEXT.growing}</em>
-              </div>
+          <div className="lp-tiles">
+            <span><small>{t("home.yourJob")}</small><b>{tr("Data entry clerk")} <em className="risk">▼ −31.8%</em></b></span>
+            <span><small>{t("home.ready")}</small><b>{ready}%</b></span>
+            <span><small>{t("home.bestMatch")}</small><b>{moved ? 67 : 47}%</b></span>
+          </div>
+          <ol className="lp-rows">
+            {ROLES.map((r, i) => (
+              <li key={r.title} className={moved && r.after !== r.fit ? "is-up" : ""}>
+                <i>#{i + 1}</i><span>{tr(r.title)}</span>
+                <span className="lp-bar"><span style={{ width: `${moved ? r.after : r.fit}%` }} /></span>
+                <b>{moved ? r.after : r.fit}%</b><em className="good">▲ {r.pct}%</em>
+              </li>
             ))}
-          </div>
-        </div>
-        <div className="lp-aside">
-          <small>{t("home.whereTo")}</small>
-          <div className={`lp-step lp-ask ${phase === TYPED || phase === ANSWER ? "is-focus" : ""}`} ref={ask}>
-            <span className="lp-tag">{typed || <span className="lp-placeholder">{t("home.whereToPlaceholder")}</span>}{phase === TYPED && <i className="lp-caret" />}</span>
-          </div>
-          {phase >= ANSWER && (
-            <div className="lp-step lp-answer">
-              <span className="lp-tag">{t("shell.coach")}</span>
-              <b>{tr("AI operations specialist")}</b>
-              <span className="lp-meta">{tf("card.fit", { n: 47 })} · {OUTLOOK_TEXT.growing}</span>
-            </div>
-          )}
-          <div className="lp-step">
-            <span className="lp-tag"><LogoMark size={16} /> {t("fc.storyReady")}</span>
-            <b>{tr("AI operations specialist")}</b>
-            <span className="lp-meta">≈ {done ? 62 : 71} h · {done ? 67 : 47}% → 100%</span>
-          </div>
+          </ol>
         </div>
         {pointer && <span className={`lp-pointer ${phase === PRESS ? "is-click" : ""}`} style={{ left: pointer.x, top: pointer.y }} />}
       </div>
@@ -94,16 +95,21 @@ export function HeroPreview() {
 
 type Nav = "home" | "radar" | "tasks" | "pathway";
 
+// Laid out like the app's sidebar: Today, then the short headings Me, Explore and Build.
 function Side({ on }: { on: Nav }) {
+  const item = (id: Nav | "roles" | "impact" | "profile", label: string, extra?: string) => (
+    <span className={`lp-nav ${on === id ? "is-on" : ""}`}>{label}{extra && <i>{extra}</i>}</span>
+  );
   return (
     <div className="lp-side">
+      {item("home", t("nav.home"))}
+      <small className="lp-sidehead">{t("side.me")}</small>
+      {item("profile", t("nav.profile"))}{item("tasks", t("nav.tasks"))}{item("radar", t("nav.radar"))}
+      <small className="lp-sidehead">{t("side.explore")}</small>
+      {item("roles", t("nav.roles"), "13")}
+      <small className="lp-sidehead">{t("side.build")}</small>
+      {item("pathway", t("nav.pathway"))}{item("impact", t("nav.impact"))}
       <div className="lp-who"><span className="avatar">A</span><span>Aisyah (demo)</span></div>
-      <span className={`lp-nav ${on === "home" ? "is-on" : ""}`}>{t("nav.home")}</span>
-      <span className={`lp-nav ${on === "radar" ? "is-on" : ""}`}>{t("nav.radar")}</span>
-      <span className={`lp-nav ${on === "tasks" ? "is-on" : ""}`}>{t("nav.tasks")}</span>
-      <span className="lp-nav">{t("nav.roles")} <i>13</i></span>
-      <span className={`lp-nav ${on === "pathway" ? "is-on" : ""}`}>{t("nav.pathway")}</span>
-      <span className="lp-nav">{t("nav.impact")}</span>
     </div>
   );
 }

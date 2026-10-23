@@ -410,7 +410,7 @@ function MainApp({ demo }: { demo: string | null }) {
 
   const titles: Record<Screen, string> = {
     landing: "", home: t("nav.home"), intake: t("nav.profile"), review: t("nav.profile"), radar: t("nav.radar"), tasks: t("nav.tasks"),
-    roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("nav.workforce"), "review-kit": t("nav.reviewKit"),
+    roles: t("nav.roles"), role: role?.title ?? t("nav.roles"), impact: t("nav.impact"), tree: t("nav.pathway"), survey: t("nav.survey"), sources: t("nav.sources"), workforce: t("h.workforce"), "review-kit": t("nav.reviewKit"),
     profile: t("nav.profile"), admin: "Admin",
   };
   return (
@@ -418,9 +418,9 @@ function MainApp({ demo }: { demo: string | null }) {
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
       <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey}
         account={settings("side-account", <>
-          <span className="avatar" aria-hidden="true">{(profile?.display_name ?? t("set.title")).slice(0, 1)}</span>
-          <span><strong>{profile?.display_name ?? t("shell.yourProfile")}</strong>
-            <small>{profile ? tf("side.account", { n: profile.skills.length }) : t("set.title")}</small></span>
+          <span className="avatar" aria-hidden="true">{profile ? (profile.display_name ?? t("shell.yourProfile")).slice(0, 1) : <Icon name="settings" />}</span>
+          <span><strong>{profile ? profile.display_name ?? t("shell.yourProfile") : t("set.title")}</strong>
+            {profile && <small>{tf("side.account", { n: profile.skills.length })}</small>}</span>
         </>)}
         settings={settings("side-link", <><Icon name="settings" />{t("set.title")}</>)}
         onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : s === "intake" ? goProfile() : go(s))}

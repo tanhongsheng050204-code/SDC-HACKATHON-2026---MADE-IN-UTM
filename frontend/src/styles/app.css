@@ -1266,7 +1266,7 @@ input[type="search"].sources-search { border-radius: 12px; }
 .org-page { display: grid; gap: 16px; }
 .org-page > .tab-panel, .org-page .tab-panel { display: grid; gap: 16px; }
 .org-what { margin: 0; color: var(--ink-soft); }
-.org-start { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; }
+.org-start { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
 @media (max-width: 820px) { .org-start { grid-template-columns: 1fr; } }
 .org-sample, .org-own { display: grid; gap: 12px; align-content: start; padding: 22px; border-radius: var(--radius-card); }
 .org-sample { background: var(--ink); color: var(--page); }
@@ -1395,3 +1395,4 @@ button.settings-row:hover:not(:disabled) { background: var(--hover); }
 .search-box input[type="text"] { border: 0; background: none; box-shadow: none; padding: 8px 0; min-height: 0; }
 .search-box input[type="text"]:focus { outline: none; box-shadow: none; }
 button.settings-row:has(> .icon:first-child) { justify-content: flex-start; }
+.pathway-page .banner button.link { min-height: 0; padding: 0; }

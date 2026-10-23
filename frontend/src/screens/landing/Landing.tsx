@@ -71,7 +71,7 @@ function RibbonRoute() {
       <ol className="rb-list" aria-label={t("v3.tryRoute")}>
         <li><i />{r.from ? tr(r.from) : t("v3.yourSkills")}</li>
         {r.stops.map((s) => <li key={s.course}><i />{tr(s.course)} · {s.hours} h · {cost(s)}</li>)}
-        <li><i /><b>{tr(r.to)}</b>&nbsp;· {toLine}</li>
+        <li><i /><span><b>{tr(r.to)}</b> · {toLine}</span></li>
       </ol>
       <div className="lp-try">
         <div className="segmented" role="radiogroup" aria-label={t("v3.tryRoute")}>
