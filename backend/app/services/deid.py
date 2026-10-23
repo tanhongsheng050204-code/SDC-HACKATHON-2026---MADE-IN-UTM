@@ -122,8 +122,9 @@ def _is_label(line: str) -> bool:
 def _spelled_by(line: str, words: set[str]) -> list[str] | None:
     """The email words that, run together, make up the whole line ("aisyahrahman"), else None."""
     letters = re.sub(r"[^a-z]", "", line)
-    if not letters or len(letters) > 60 or len(words) > 12:  # a name, not a paragraph; one or two emails
+    if not letters or len(letters) > 60:  # a name, not a paragraph
         return None
+    words = {w for w in words if w in letters}
     # Word-break over the letters: best[i] is a way to spell letters[:i] from the words.
     best: list[list[str] | None] = [[]] + [None] * len(letters)
     for i in range(len(letters)):
