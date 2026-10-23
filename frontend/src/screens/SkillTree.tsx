@@ -1,18 +1,18 @@
 import { EntryRequirements, years } from "../components/EntryRequirements";
-import { hasCertificate } from "../components/PathwayList";
 import { useEffect, useRef, useState } from "react";
-import { Tabs } from "../components/Tabs";
 import { LoginToKeep } from "../components/AccountButton";
-import { PathwayList } from "../components/PathwayList";
-import { RouteMap } from "../components/RouteMap";
+import { PlanAbout, StepCourse } from "../components/PathwayList";
 import { StudyCalendar } from "../components/StudyCalendar";
-import { ProgressPanel } from "../components/ProgressPanel";
+import { ProgressPanel, STATUS_KEY, STATUS_TONE } from "../components/ProgressPanel";
 import { Citations } from "../components/SkillEvidence";
 import { ProofCheck } from "../components/ProofCheck";
-import { SkillRing } from "../components/SkillRing";
-import { api, Pathway, Profile, RoleInfo, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
-import { percent } from "../lib/format";
-import { levelName, t, tf, tr } from "../lib/i18n";
+import { Sheet } from "../components/Sheet";
+import { api, Pathway, Profile, Progress, RoleInfo, RoleMatch, SkillTree as Tree, TreeNode } from "../lib/api";
+import { percent, shortDate } from "../lib/format";
+import { t, tf, tr } from "../lib/i18n";
+
+type Step = Pathway["steps"][number];
+type Open = { kind: "step"; step: number } | { kind: "about" } | { kind: "goal" } | { kind: "licence" } | null;
 
 function EtaNumber({ value, format }: { value: number; format: (n: number) => string }) {
   const [shown, setShown] = useState(value);
@@ -62,25 +62,25 @@ function spawnConfetti(anchor: HTMLElement) {
   setTimeout(() => wrap.remove(), 800);
 }
 
-// My pathway: GPS-style route map from your skills to a destination role.
-// The Tree tab shows the skill dependency graph; the List tab shows ordered courses.
+// My pathway, read top to bottom like directions: the route and three facts, one card for the
+// next thing to do, then every step down to the destination. A step's course, the "finished"
+// tick and the three-question proof open in a side sheet; the weekly goal and sources do too.
 export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, onDestinations }: {
   profile: Profile; role: RoleMatch; userId: string | null;
   onProfile: (p: Profile) => void; onImpact: () => void; onBack: () => void; onDestinations: () => void;
 }) {
-  const [tab, setTab] = useState<"tree" | "list">("tree");
   const [tree, setTree] = useState<Tree | null>(null);
   const [plan, setPlan] = useState<Pathway | null>(null);
+  const [progress, setProgress] = useState<Progress | null>(null);
   const [freeOnly, setFreeOnly] = useState(false);
   const [currentRole, setCurrentRole] = useState<RoleInfo | null>(null);
-  const [open, setOpen] = useState<TreeNode | null>(null);
+  const [open, setOpen] = useState<Open>(null);
   const [proving, setProving] = useState<TreeNode | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [suggestedHours, setSuggestedHours] = useState<number | null>(null);
   const isDestination = profile.target_role_id === role.role_id;
-  const dragStart = useRef<number | null>(null);
   const completions = profile.completed_courses.join(",");
 
   function loadTree() {
@@ -103,7 +103,15 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
     return () => { cancelled = true; };
   }, [profile.id, role.role_id, freeOnly, completions, profile.skill_levels]);
 
-  // Fetch current role title for GPS header
+  // The weekly strip reads the same /progress the goal panel edits.
+  useEffect(() => {
+    let cancelled = false;
+    if (!isDestination || open?.kind === "goal") return;
+    api.progress(profile.id).then((p) => { if (!cancelled) setProgress(p); }).catch(() => { if (!cancelled) setProgress(null); });
+    return () => { cancelled = true; };
+  }, [profile.id, isDestination, completions, profile.weekly_hours, profile.target_date, open?.kind]);
+
+  // Fetch current role title for the route line
   useEffect(() => {
     let cancelled = false;
     setCurrentRole(null);
@@ -113,19 +121,19 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
   }, [profile.current_role_id]);
 
   async function refreshProfile() {
-    try { onProfile(await api.getProfile(profile.id)); } catch { /* tree already shows change */ }
+    try { onProfile(await api.getProfile(profile.id)); } catch { /* the path already shows the change */ }
   }
 
   async function setCourse(courseId: string, done: boolean, anchor?: HTMLElement) {
     if (saving) return;
     setSaving(true); setError(null);
-    // Tick the box straight away; the refreshed plan (hours, readiness) follows from the server.
+    // Tick the step straight away; the refreshed plan (hours, readiness) follows from the server.
     const before = plan;
     setPlan(p => p && { ...p, steps: p.steps.map(s => s.course.id === courseId ? { ...s, done } : s) });
     try {
       onProfile(await api.complete(profile.id, courseId, done));
       if (done && anchor) spawnConfetti(anchor);
-      setOpen(previous => previous?.course?.id === courseId ? { ...previous, course_done: done } : previous);
+      if (done) setNotice(t("pw.finishedToast"));
     } catch { setPlan(before); setError(t("target.failed")); }
     finally { setSaving(false); }
   }
@@ -136,34 +144,31 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
     refreshProfile();
   }
 
-  // ETA bar calculations (only when plan is loaded)
-  const paidKnown = plan
-    ? plan.steps.filter((s) => s.course.price_rm != null)
-        .reduce((sum, s) => sum + (s.course.price_rm ?? 0), 0)
-    : 0;
-  const paidUnknownCount = plan
-    ? plan.steps.filter((s) => s.course.cost === "paid" && s.course.price_rm == null).length
-    : 0;
+  if (!tree || !plan) return <p className={error ? "error" : "muted"} role="status">{error || t("a.loading")}</p>;
 
+  const nodesOf = (s: Step) => tree.nodes.filter((n) => n.step === s.step);
+  const proved = (s: Step) => { const ns = nodesOf(s); return ns.length > 0 && ns.every((n) => n.level >= 1); };
+  const locked = (s: Step) => !s.done && nodesOf(s).some((n) => !n.unlocked);
+  const toProve = (s: Step) => nodesOf(s).find((n) => n.level < 1 && n.unlocked);
+  const complete = (s: Step) => s.done && proved(s);
+  const next = plan.steps.find((s) => !complete(s));
+  const left = plan.steps.filter((s) => !complete(s)).length;
+  const isCore = (s: Step) => s.skills.some((k) => role.missing.some((m) => m.skill_id === k.skill_id && m.weight === 3));
+
+  const paidKnown = plan.steps.filter((s) => s.course.price_rm != null).reduce((sum, s) => sum + (s.course.price_rm ?? 0), 0);
+  const paidUnknown = plan.steps.filter((s) => s.course.cost === "paid" && s.course.price_rm == null).length;
   const totalWeight = [...role.covered, ...role.missing].reduce((s, r) => s + r.weight, 0);
-  const uncoveredWeight = plan
-    ? [...role.covered, ...role.missing]
-        .filter((m) => plan.uncovered_skills.includes(m.skill_id))
-        .reduce((s, m) => s + m.weight, 0)
-    : 0;
+  const uncoveredWeight = [...role.covered, ...role.missing].filter((m) => plan.uncovered_skills.includes(m.skill_id)).reduce((s, m) => s + m.weight, 0);
   const readinessAfter = totalWeight > 0 ? (totalWeight - uncoveredWeight) / totalWeight : 1;
+  const licence = plan.requirements?.needs_licence ? plan.requirements.licence : null;
+  const openStep = open?.kind === "step" ? plan.steps.find((s) => s.step === open.step) : undefined;
 
-  if (!tree) return <p className={error ? "error" : "muted"} role="status">{error || t("a.loading")}</p>;
-
-  const depths = Array.from(new Set(tree.nodes.map((n) => n.depth))).sort((a, b) => b - a);
-
-  // Difficulty in three layers. The steps are the learning order, so the step number against the
-  // total places each skill in a band: the first third Easy, the middle third Intermediate, the
-  // last third Hard. Skills you already have have no step and no band.
-  const diffName = ["", t("tree.diffEasy"), t("tree.diffMedium"), t("tree.diffHard")];
-  // Difficulty is the skill's own tier (foundation, core, advanced: data/skills.json), not its place in the plan.
-  const TIER_DIFF: Record<string, number> = { foundation: 1, core: 2, advanced: 3 };
-  const difficultyOf = (n: TreeNode) => TIER_DIFF[n.tier] ?? 0;
+  const stateOf = (s: Step) => complete(s) ? <span className="pw-tag ok">{t("pw.sProved")}</span>
+    : s.done ? <span className="pw-tag state">{t("pw.sDone")}</span>
+    : locked(s) ? <span className="pw-tag">{t("pw.sLocked")}</span>
+    : s === next ? <span className="pw-tag state">{t("pw.sNext")}</span>
+    : <span className="pw-tag">{t("pw.sLater")}</span>;
+  const costTag = (s: Step) => <span className={`pw-tag ${s.course.cost === "paid" ? "paid" : "free"}`}>{s.course.cost === "paid" ? t("pw.paid") : t("pw.free")}</span>;
 
   return (
     <section className="pathway-page">
@@ -171,180 +176,146 @@ export function SkillTree({ profile, role, userId, onProfile, onImpact, onBack, 
       <LoginToKeep userId={userId} isDemo={!!profile.is_demo} />
       {error && <p className="error" role="alert">{error}</p>}
 
-      {/* GPS header */}
-      <div className="gps-header">
-        <h1 className="gps-route">
-          <span className="eyebrow">
-            {profile.current_role_id ? `${t("path.from")} ${currentRole ? tr(currentRole.title) : t("a.loading")}` : t("path.fromSkills")}
-          </span>
-          <span className="gps-sep">{t("path.to")}</span>
-          <strong>{tr(role.title)}</strong>
-        </h1>
-        <button className="btn ink" onClick={onDestinations}>{t("path.changeDestination")}</button>
+      <div className="pw-route">
+        <h1><span className="pw-from">{profile.current_role_id ? (currentRole ? tr(currentRole.title) : "…") : t("pw.fromSkills")} →</span> {tr(role.title)}
+          <button className="link pw-change" onClick={onDestinations}>{t("pw.change")}</button></h1>
+        <div className="pw-facts">
+          <span className="pw-fact"><strong><EtaNumber value={plan.hours_left} format={h => `~${h} h`} /></strong><span>{t("pw.left")}</span></span>
+          <span className="pw-fact"><strong>{tf("pw.ofSteps", { n: left, total: plan.steps.length })}</strong><span>{t("pw.stepsToGo")}</span></span>
+          <span className="pw-fact"><strong><EtaNumber value={percent(plan.readiness)} format={n => `${n}%`} /> → {percent(readinessAfter)}%</strong><span>{t("pw.ready")}</span></span>
+          <span className="pw-fact"><strong>RM {paidKnown.toLocaleString()}{paidUnknown > 0 && ` ${tf("path.priceToConfirm", { n: paidUnknown })}`}</strong><span>{t("pw.toPay")}</span></span>
+          {licence && <span className="pw-fact"><strong>{tf("req.etaPlus", { time: years(licence.route_months) })}</strong><span>{tr(licence.name)}</span></span>}
+        </div>
       </div>
 
-      {/* Sticky ETA bar (only when plan is loaded) */}
-      {plan && (
-        <div className="eta-bar">
-          <div className="eta-item">
-            <span className="eta-value"><EtaNumber value={plan.hours_left} format={h => tf("path.etaHours", { h })} /></span>
-          </div>
-          {plan.requirements?.needs_licence && plan.requirements.licence && (
-            <><div className="eta-divider" /><div className="eta-item">
-              <span className="eta-value">{tf("req.etaPlus", { time: years(plan.requirements.licence.route_months) })}</span>
-            </div></>
-          )}
-          {(
+      {isDestination && progress && (
+        <div className="pw-week">
+          {progress.week.target ? (
             <>
-              <div className="eta-divider" />
-              <div className="eta-item">
-                <span className="eta-value">
-                  {`RM ${paidKnown.toLocaleString()}`}
-                  {paidKnown > 0 && paidUnknownCount > 0 ? " " : ""}
-                  {paidUnknownCount > 0 ? tf("path.priceToConfirm", { n: paidUnknownCount }) : ""}
-                </span>
-              </div>
+              <span>{tf("pw.week", { done: progress.week.hours_done, target: progress.week.target })}
+                {progress.finish_estimate && ` · ${tf("pw.finish", { date: shortDate(progress.finish_estimate) })}`}</span>
+              <span className="pw-week-bar" aria-hidden="true"><i style={{ width: `${Math.min(100, (progress.week.hours_done / progress.week.target) * 100)}%` }} /></span>
+              {progress.status && <span className={`badge ${STATUS_TONE[progress.status]}`}>{t(STATUS_KEY[progress.status])}</span>}
             </>
-          )}
-          <div className="eta-divider" />
-          <div className="eta-item">
-            <span className="eta-value">{tf("path.etaStops", { n: plan.steps.length })}</span>
-          </div>
-          <div className="eta-divider" />
-          <div className="eta-item">
-            <span className="eta-value"><EtaNumber value={percent(plan.readiness)} format={n => `${n}%`} /></span>
-            <span className="eta-label">{t("path.readinessNow")}</span>
-          </div>
-          <span className="eta-label">→</span>
-          <div className="eta-item">
-            <span className="eta-value">{percent(readinessAfter)}%</span>
-            <span className="eta-label">{t("path.readinessAfter")}</span>
-          </div>
+          ) : <span className="muted">{t("pw.weekNoGoal")}</span>}
+          <button className="link" onClick={() => setOpen({ kind: "goal" })}>{t("pw.editGoal")}</button>
         </div>
       )}
-      {plan && <div className="route-notes">
-        <p className="source">{t("path.etaSource")} {Array.from(new Set(plan.steps.map(s => s.course.checked).filter(Boolean))).map(date => tf("pl.checked", { date: date! })).join(" · ")}</p>
-        {plan.uncovered_skills.length > 0 && <p className="banner">{tf("pl.uncovered", { list: plan.uncovered_skills.map(id => tr([...role.covered, ...role.missing].find(s => s.skill_id === id)?.name ?? id)).join(", ") })}</p>}
-      </div>}
 
-      {/* Progress toward the destination: target date, weekly hours, on track or behind */}
-      {isDestination && <ProgressPanel profile={profile} roleTitle={role.title} onProfile={onProfile} suggestedHours={suggestedHours} />}
+      {next ? (
+        <div className="pw-next">
+          <span className="pw-next-k">{tf("pw.next", { n: next.step })}</span>
+          <h2>{next.skills.map((k) => tr(k.name)).join(", ")}</h2>
+          <p>{tr(next.course.title)} · {next.course.provider} · {next.course.cost === "paid" ? t("pw.paid") : t("pw.free")} · {tf("pl.hours", { h: next.course.hours })}</p>
+          <div className="pw-next-acts">
+            {locked(next) ? <span>{tf("pw.locked", { n: Math.max(1, next.step - 1) })}</span>
+              : !next.done ? (
+                <>
+                  {next.course.url && <a className="btn pw-p" href={next.course.url} target="_blank" rel="noreferrer">{t("pw.open")} ↗</a>}
+                  <button className="pw-s" disabled={saving} onClick={(e) => setCourse(next.course.id, true, e.currentTarget)}>{t("pw.finished")}</button>
+                </>
+              ) : (
+                <>
+                  {toProve(next) && <button className="pw-p" onClick={() => setProving(toProve(next)!)}>{t("pw.prove")}</button>}
+                  <button className="pw-s" onClick={() => setOpen({ kind: "step", step: next.step })}>{t("pw.details")}</button>
+                </>
+              )}
+          </div>
+        </div>
+      ) : (
+        <div className="pw-next">
+          <h2>{t("pw.allDone")}</h2>
+          <p>{t("pw.allDoneSub")}</p>
+        </div>
+      )}
+      {notice && <p className="muted" role="status">{notice}</p>}
 
-      {/* A licensed job: its qualification route comes before any course */}
-      {plan?.requirements?.needs_licence && <EntryRequirements req={plan.requirements} />}
+      <div className="pw-tools">
+        <button className="pw-chip" aria-pressed={freeOnly} disabled={saving} onClick={() => { setPlan(null); setFreeOnly(!freeOnly); }}>{t("path.freeOnly")}</button>
+        <button className="link" onClick={() => setOpen({ kind: "about" })}>ⓘ {t("pw.about")}</button>
+      </div>
 
-      {/* Route map + free-only toggle */}
-      <div className="pathway-layout">
-          {plan && <RouteMap key={`${plan.role_id}-${freeOnly}`} plan={plan} title={role.title} />}
-          <div className={`pathway-sheet ${expanded ? "expanded" : ""}`}>
-            <button className="sheet-handle" aria-expanded={expanded} aria-controls="pathway-steps"
-              onPointerDown={e => { dragStart.current = e.clientY; e.currentTarget.setPointerCapture(e.pointerId); }}
-              onPointerUp={e => { if (dragStart.current !== null) setExpanded(Math.abs(e.clientY - dragStart.current) > 20 ? e.clientY < dragStart.current : !expanded); dragStart.current = null; }}
-              onPointerCancel={() => { dragStart.current = null; }}
-              onClick={e => { if (e.detail === 0) setExpanded(!expanded); }}
-              onKeyDown={e => { if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); setExpanded(e.key === "ArrowUp"); } }}>
-              <span aria-hidden="true" />{t("path.sheetHandle")}
+      {role.covered.length > 0 && (
+        <details className="pw-have">
+          <summary>✓ {role.covered.length === 1 ? t("pw.haveOne") : tf("pw.have", { n: role.covered.length })}</summary>
+          <p className="muted">{role.covered.map((s) => tr(s.name)).join(" · ")}</p>
+        </details>
+      )}
+
+      <ol className="pw-path">
+        {licence && (
+          <li>
+            <span className="pw-dot warn" aria-hidden="true">!</span>
+            <button className="pw-step" onClick={() => setOpen({ kind: "licence" })}>
+              <span className="pw-step-top"><span className="pw-tag paid">{t("rp.licence")}</span></span>
+              <strong>{tf("pw.licence", { name: tr(licence.name) })}</strong>
+              <span className="muted">{tf("pw.licenceSub", { time: years(licence.route_months) })}</span>
             </button>
-          <div id="pathway-steps">
-            <label className="free-toggle">
-              <input
-                type="checkbox"
-                checked={freeOnly}
-                disabled={saving}
-                onChange={(e) => { setPlan(null); setFreeOnly(e.target.checked); }}
-              />
-              {t("path.freeOnly")}
-            </label>
-      <Tabs id="pathway" label={t("path.title")} tabs={[{ id: "tree", label: t("path.tabTree") }, { id: "list", label: t("path.tabList") }]} value={tab} onChange={setTab}>
-
-      {tab === "tree" && (
-        <div className="tree">
-          <p className="source">{t("path.sub")}</p>
-          <div className="tree-target">🎯 {tr(tree.role.title)}</div>
-          {/* Colour key: rows show how far each skill sits from the target; colour depth and the
-              chips carry the learning order and its difficulty. */}
-          <ul className="tree-legend">
-            <li><span className="swatch have" aria-hidden="true" />{t("tree.legendHave")}</li>
-            <li><span className="swatch diff-1" aria-hidden="true" />{t("tree.diffEasy")}</li>
-            <li><span className="swatch diff-2" aria-hidden="true" />{t("tree.diffMedium")}</li>
-            <li><span className="swatch diff-3" aria-hidden="true" />{t("tree.diffHard")}</li>
-            <li><span className="swatch locked" aria-hidden="true" />{t("tree.legendLocked")}</li>
-            <li><span className="swatch done" aria-hidden="true">✓</span>{t("tree.legendDone")}</li>
-          </ul>
-          {depths.map((d) => (
-            <div key={d} className="tree-row">
-              {tree.nodes.filter((n) => n.depth === d).map((n) => {
-                const state = !n.unlocked ? t("tree.locked") : n.level ? levelName(n.level) : n.from_cv ? t("tree.fromCv") : t("tree.notStarted");
-                const diff = difficultyOf(n);
-                const cls = ["tree-node",
-                  diff ? `diff-${diff}` : "",
-                  n.from_cv ? "from-cv" : "",
-                  n.step ? "has-step" : "",
-                  n.course_done ? "course-done" : "",
-                  n.unlocked ? "" : "locked"].filter(Boolean).join(" ");
-                return (
-                  <button key={n.skill_id} className={cls} onClick={() => setOpen(n)}
-                    aria-label={`${n.step ? `${t("path.step")} ${n.step}, ` : ""}${diff ? `${diffName[diff]}, ` : ""}${tr(n.name)}: ${state}, ${n.level} / 3`}>
-                    {n.step && <span className="tree-step">{t("path.step")} {n.step}</span>}
-                    {diff > 0 && <span className="tree-diff">{diffName[diff]}</span>}
-                    <SkillRing level={n.level} />
-                    <span className="tree-name">{tr(n.name)}</span>
-                    <small>{state}</small>
-                    {n.step && n.course && <span className="tree-course">{n.course_done ? "✓ " : ""}{tr(n.course.title)} · {n.course.hours} h</span>}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-          <p className="muted tree-foot">{t("tree.grows")}</p>
-        </div>
-      )}
-
-      {tab === "list" && (plan
-        ? <>
-            <PathwayList plan={plan} role={role} freeOnly={freeOnly} saving={saving} onToggle={setCourse} />
-            <StudyCalendar plan={plan} roleTitle={role.title} onUseAsTarget={isDestination ? setSuggestedHours : undefined} />
-            <div className="actions">
-              <button className="primary" onClick={onImpact}>{t("a.impact")}</button>
-              <button onClick={() => window.print()}>{t("a.print")}</button>
-            </div>
-          </>
-        : <p className="muted">{t("a.loading")}</p>)}
-      </Tabs>
-      </div></div></div>
-
-      {open && !proving && (
-        <div className="dialog-backdrop" onClick={() => setOpen(null)}>
-          <div className="dialog node-panel" role="dialog" aria-modal="true" aria-labelledby="node-title" onClick={(e) => e.stopPropagation()}>
-            <h2 id="node-title">{open.step ? `${t("path.step")} ${open.step}: ` : ""}{tr(open.name)}</h2>
-            <div className="card-row"><SkillRing level={open.level} /><span className="muted">{open.level ? levelName(open.level) : t("tree.notStarted")}</span></div>
-            {open.course
-              ? <p><a href={open.course.url} target="_blank" rel="noreferrer">{tr(open.course.title)} ↗</a> · {open.course.hours} h</p>
-              : <p className="muted">{t("path.noCourse")}</p>}
-            <p className="proof-practice">{open.course && hasCertificate(open.course.price_note)
-              ? tf("cert.forEmployers", { provider: open.course.provider ?? "" }) : t("cert.none")}</p>
-            {open.step && open.course && (
-              <label className="check"><input type="checkbox" checked={open.course_done} disabled={saving}
-                onChange={(e) => { setCourse(open.course!.id, e.target.checked, e.currentTarget); }} /> {t("path.courseDone")}</label>
-            )}
-            {open.evidence && open.evidence.job_ads > 0 && (
-              <details className="evidence-row">
-                <summary>{t("ev.seenIn").replace("{n}", String(open.evidence.job_ads))}{open.added_from_ads && <span className="badge good">{t("ev.added")}</span>}</summary>
-                <Citations items={open.evidence.citations} />
-              </details>
-            )}
-            {!open.unlocked && <p className="muted">{t("path.lockedNote")}</p>}
-            {open.level >= 3 && <p className="muted">{t("path.topLevel")}</p>}
-            <div className="dialog-actions">
-              <button className="btn ink" disabled={!open.unlocked || open.level >= 3} onClick={() => setProving(open)}>{t("path.prove")}</button>
-              <button className="btn quiet" onClick={() => setOpen(null)}>{t("tree.close")}</button>
-            </div>
+          </li>
+        )}
+        {plan.steps.map((s) => (
+          <li key={s.step}>
+            <span className={`pw-dot${complete(s) ? " done" : s === next ? " now" : ""}`} aria-hidden="true">{complete(s) ? "✓" : s.step}</span>
+            <button className={`pw-step${s === next ? " now" : ""}`} onClick={() => setOpen({ kind: "step", step: s.step })}>
+              <span className="pw-step-top">{t("path.step")} {s.step} {stateOf(s)} {isCore(s) && <span className="pw-tag core">{t("pw.core")}</span>} {costTag(s)}</span>
+              <strong>{s.skills.map((k) => tr(k.name)).join(", ")}</strong>
+              <span className="muted">{tr(s.course.title)} · {s.course.provider} · {tf("pl.hours", { h: s.course.hours })}</span>
+            </button>
+          </li>
+        ))}
+        <li>
+          <span className="pw-dot goal" aria-hidden="true">🎯</span>
+          <div className="pw-step goal">
+            <strong>{tr(role.title)}</strong>
+            <span className="muted">{next ? t("pw.goalReady") : t("pw.goalDone")}</span>
+            <button className="link" onClick={onImpact}>{t("pw.impact")} →</button>
           </div>
-        </div>
+        </li>
+      </ol>
+
+      {openStep && (
+        <Sheet title={tf("pw.stepTitle", { n: openStep.step, skill: openStep.skills.map((k) => tr(k.name)).join(", ") })} onClose={() => setOpen(null)}>
+          <StepCourse step={openStep} role={role} />
+          {locked(openStep) && <p className="muted">{t("path.lockedNote")}</p>}
+          <div className="sheet-actions">
+            {!openStep.done
+              ? <button className="primary" disabled={saving || locked(openStep)} onClick={(e) => setCourse(openStep.course.id, true, e.currentTarget)}>{t("path.courseDone")}</button>
+              : <>
+                  {nodesOf(openStep).filter((n) => n.unlocked && n.level < 3).map((n) => (
+                    <button key={n.skill_id} className="primary" onClick={() => setProving(n)}>
+                      {t("pw.prove")}{nodesOf(openStep).length > 1 ? ` · ${tr(n.name)}` : ""}</button>
+                  ))}
+                  <button className="link" disabled={saving} onClick={() => setCourse(openStep.course.id, false)}>{t("pw.undo")}</button>
+                </>}
+          </div>
+          {nodesOf(openStep).some((n) => n.level >= 3) && <p className="muted">{t("path.topLevel")}</p>}
+          {nodesOf(openStep).filter((n) => n.evidence && n.evidence.job_ads > 0).map((n) => (
+            <details key={n.skill_id} className="evidence-row">
+              <summary>{t("ev.seenIn").replace("{n}", String(n.evidence!.job_ads))}{n.added_from_ads && <span className="badge good">{t("ev.added")}</span>}</summary>
+              <Citations items={n.evidence!.citations} />
+            </details>
+          ))}
+        </Sheet>
+      )}
+      {open?.kind === "about" && (
+        <Sheet title={t("pw.about")} onClose={() => setOpen(null)}>
+          <PlanAbout plan={plan} role={role} freeOnly={freeOnly} />
+        </Sheet>
+      )}
+      {open?.kind === "goal" && (
+        <Sheet title={t("pw.goalTitle")} onClose={() => setOpen(null)}>
+          <ProgressPanel profile={profile} roleTitle={role.title} onProfile={onProfile} suggestedHours={suggestedHours} />
+          <StudyCalendar plan={plan} roleTitle={role.title} onUseAsTarget={setSuggestedHours} />
+        </Sheet>
+      )}
+      {open?.kind === "licence" && plan.requirements && (
+        <Sheet title={t("rp.entry")} onClose={() => setOpen(null)}>
+          <EntryRequirements req={plan.requirements} />
+        </Sheet>
       )}
       {proving && (
         <ProofCheck profileId={profile.id} node={proving} isDemo={!!profile.is_demo}
-          onDone={proven} onClose={() => { setProving(null); setOpen(null); }} />
+          onDone={proven} onClose={() => { setProving(null); }} />
       )}
     </section>
   );
