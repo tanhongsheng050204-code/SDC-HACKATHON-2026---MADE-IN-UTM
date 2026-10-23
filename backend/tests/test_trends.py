@@ -378,3 +378,17 @@ def test_refresh_still_runs_when_freehire_is_down(data_copy, client, monkeypatch
     assert any("freehire.me unavailable" in step and "countries=MY" not in step for step in state["steps"])
     pending = store.get_snapshot(state["snapshot_id"])["body"]
     assert not any(i["source"] == mypostings.SOURCE for i in pending["inputs"])
+
+
+def test_scheduled_refresh_needs_the_cron_secret_and_never_approves(client, monkeypatch):
+    from app.config import get_settings
+    from app.trends import refresh
+    monkeypatch.setenv("CRON_SECRET", "test-cron-secret")
+    get_settings.cache_clear()
+    started = []
+    monkeypatch.setattr(refresh, "start", lambda force=False: started.append(force) or True)
+    assert client.post("/api/cron/refresh").status_code == 401
+    assert client.post("/api/cron/refresh", headers=ADMIN).status_code == 401  # the admin token is not the cron secret
+    assert client.post("/api/cron/refresh", headers={"X-Cron-Secret": "test-cron-secret"}).status_code == 202
+    assert started == [False]  # same-day raw data is reused; no forced re-collection
+    assert client.get("/api/signals/pending", headers=ADMIN).json() == []  # nothing goes live without a person

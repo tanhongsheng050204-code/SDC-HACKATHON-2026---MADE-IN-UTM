@@ -1009,6 +1009,16 @@ def cron_alerts(x_cron_secret: str = Header(default="")):
     return {"email": "ok", **alerts.run_alerts(get_reference())}
 
 
+@router.post("/cron/refresh", status_code=202)
+def cron_refresh(x_cron_secret: str = Header(default="")):
+    """Weekly (GitHub Actions): collect new trend data. The snapshot still waits for an admin's approval."""
+    _require_cron(x_cron_secret)
+    if not refresh.start():
+        return {"state": "running"}
+    store.log_admin("trend_refresh_started", "scheduled")
+    return refresh.status()
+
+
 # --- career-centre classes ------------------------------------------------------------------------
 
 CLASS_VERSION = "2026-10-22"  # the "what your counsellor will see" wording a join consent refers to

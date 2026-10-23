@@ -6,13 +6,15 @@
 
 The five CVs are in `backend/data/eval/` (all invented). A teammate who did not write the skill dictionary lists the skills they see in `backend/data/eval/person_marked.json`; then `python scripts/eval_extraction.py` prints this table with recall filled in.
 
+The app's column below is the offline dictionary (`eval_extraction.py`, no API key, 23 Oct 2026). The live site reads CVs with Qwen on RunPod first, so re-run with the keys set if you want the live reader's numbers.
+
 | CV | Skills a person found | Skills the app found | Both | Recall (both ÷ person) | Notes |
 |---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | | office_admin, excel, data_entry | | | |
+| 2 | | marketing_analytics, statistics, machine_learning, sql, communication, data_visualization, genai_tools, python | | | |
+| 3 | | customer_service, excel | | | |
+| 4 | | problem_solving, solar_pv, electrical_systems, safety_compliance | | | |
+| 5 | | risk_assessment, critical_thinking, excel, scheduling, carbon_accounting, power_bi, project_management, esg_reporting | | | |
 
 Target: average recall ≥ 80%. Write down which skills were missed and whether aliases were added.
 
@@ -26,9 +28,9 @@ Reviewer: ______ (role: lecturer / career counsellor) · Date: ______
 |---|---|---|---|---|---|
 | Aisyah (working adult) | AI operations specialist (47% fit); Engineering drafting and BIM technician (40%); Supply chain and logistics specialist (38%) | | | | |
 | Wei Jie (graduate) | Digital marketing specialist (64% fit); Engineering drafting and BIM technician (40%); AI operations specialist (40%) | | | | |
-| Farid (career switcher) | ______ *(re-read from the live app: on 22 Oct the ranking changed so that roles with none of their core skills (UX / UI designer before) come after roles he can move into; DECISIONS #62)* | | | | |
-| HR sample company | | | | | |
-| Career-centre sample class | | | | | |
+| Farid (career switcher) | Digital marketing specialist (36% fit); AI operations specialist (26%); UX / UI designer (46%, after the first two because it uses none of his core skills; DECISIONS #62) *(live app, 23 Oct 2026)* | | | | |
+| HR sample company | 190 staff, 89 at risk, 18,093 training hours. Largest moves: data entry clerk → supply chain and logistics specialist (34 people); administrative assistant → engineering drafting and BIM technician (31); accounts and payroll clerk → supply chain and logistics specialist (16) *(live app, 23 Oct 2026)* | | | | |
+| Career-centre sample class | 52 students in 5 programmes. Best fit: engineering drafting and BIM technician (19 students); AI and machine learning specialist (9); digital marketing specialist (7) *(live app, 23 Oct 2026)* | | | | |
 
 One row per group in the brief: working adults, graduates and career switchers, HR and L&D teams, and TVET / university career centres. Each group also has an automated guarantee in `backend/tests/test_audiences.py` (`test_group_*`), so a change that stops serving a group fails the build.
 

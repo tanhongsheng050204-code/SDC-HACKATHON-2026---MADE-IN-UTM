@@ -9,12 +9,13 @@ on:
     - cron: "0 15 * * *"      # keep-awake, 23:00
     - cron: "0 0 * * 1"       # weekly digest, Monday 08:00 Malaysia time
     - cron: "0 1 * * *"       # job alerts, daily 09:00 Malaysia time
+    - cron: "0 18 * * 6"      # trend refresh, Sunday 02:00 Malaysia time
   workflow_dispatch:
     inputs:
       job:
         description: "Which job to run now"
         type: choice
-        options: [ping, weekly, alerts]
+        options: [ping, weekly, alerts, refresh]
         default: ping
 
 permissions:
@@ -28,7 +29,8 @@ jobs:
   keep-awake:
     # Render's free plan sleeps after 15 idle minutes; a ping every 10 minutes keeps it awake by day.
     if: >-
-      (github.event_name == 'schedule' && github.event.schedule != '0 0 * * 1' && github.event.schedule != '0 1 * * *')
+      (github.event_name == 'schedule' && github.event.schedule != '0 0 * * 1' && github.event.schedule != '0 1 * * *'
+       && github.event.schedule != '0 18 * * 6')
       || (github.event_name == 'workflow_dispatch' && inputs.job == 'ping')
     runs-on: ubuntu-latest
     timeout-minutes: 3
@@ -62,3 +64,18 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           curl -fsS --max-time 600 -X POST -H "X-Cron-Secret: $CRON_SECRET" "$API_URL/api/cron/alerts"
+
+  trend-refresh:
+    # Collects new arXiv, job-ad and OpenDOSM data into a snapshot that waits on the Admin page:
+    # nothing changes for users until a person approves it.
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule == '0 18 * * 6')
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'refresh')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Start a trend refresh
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS --max-time 120 --retry 2 -X POST -H "X-Cron-Secret: $CRON_SECRET" "$API_URL/api/cron/refresh"
