@@ -97,9 +97,17 @@ _HEADINGS = {"profile", "summary", "professional summary", "career summary", "ab
              "personal details", "personal information", "education", "experience", "work experience",
              "employment", "skills", "key skills", "languages", "projects", "certifications", "certificates",
              "achievements", "awards", "activities", "interests", "referee", "referees", "references", "reference",
-             "rujukan", "profil", "pendidikan", "pengalaman", "kemahiran", "bahasa"}
+             "rujukan", "profil", "pendidikan", "pengalaman", "kemahiran", "bahasa", "expertise", "language",
+             "hobbies", "contact me"}
+# Labels in a designed (Canva-style) CV's sidebar, which can come first in the PDF's text. Never a
+# name; but a referee's details use them too, so they do not end the Referees section.
+_LABELS = {"phone", "mobile", "tel", "telephone", "email", "e-mail", "address", "website", "portfolio", "linkedin",
+           "telefon", "emel", "alamat"}
 _REFEREE_HEADING = re.compile(r"^\s*(?:referees?|references?|rujukan)\s*:?\s*$", re.IGNORECASE)
 _CONNECTOR_START = re.compile(r"^(?:bin|binti|bt|bte|a/l|a/p|s/o|d/o|anak|@)(?:\s|$)", re.IGNORECASE)
+# Shared mailboxes say nothing about a person.
+_MAILBOX_WORDS = {"info", "admin", "contact", "hello", "sales", "career", "careers", "jobs", "office", "support",
+                  "enquiry", "enquiries", "mail", "email", "resume", "cv", "work", "official"}
 HEAD_LINES = 6  # how far down the first lines are searched for the owner's name
 
 
@@ -107,19 +115,33 @@ def _is_heading(line: str) -> bool:
     return line.strip().rstrip(":").lower() in _HEADINGS
 
 
+def _is_label(line: str) -> bool:
+    return line.strip().rstrip(":").lower() in _LABELS
+
+
 def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
     """scrub(), plus the places a CV carries people's names: a "Name:" line; the owner's name in the
     first lines (ended by a dash, comma or full stop), after any heading such as "PROFILE" or "RESUME",
     including a next line that starts "bin", "binti", "a/l" and so on (a sidebar breaks the name in
-    two); a name given as "My name is ..." or "Nama saya ..."; and whoever is listed under "Referees".
+    two); a name-shaped line holding a word of the email address; a name given as "My name is ..."
+    or "Nama saya ..."; and whoever is listed under "Referees".
     The words of the owner's name are then removed everywhere else too. Errs on the side of removing
     too much."""
     text = _NAME_LINE.sub("[NAME]", text)
     lines = text.splitlines()
     found = list(names) + [m.group(1) for m in SELF_NAMED.finditer(text)]
+    # A designed CV may put its sidebar (contact, skills) before the name in the text. The email
+    # usually spells the name ("mariana.anderson@..."): a name-shaped line holding one of its words
+    # is the owner's name wherever it sits.
+    hints = {w for m in _EMAIL.finditer(text) for w in re.split(r"[^a-z]+", m.group().split("@")[0].lower())
+             if len(w) >= 3 and w not in _MAILBOX_WORDS}
+    for i, line in enumerate(lines):
+        if hints and _looks_like_name(line.strip()) and hints & {w.lower() for w in line.split()}:
+            found.append(line.strip())
+            lines[i] = "[NAME]"
     seen = 0
     for i, line in enumerate(lines):
-        if not line.strip() or _is_heading(line):
+        if not line.strip() or _is_heading(line) or _is_label(line):
             continue
         seen += 1
         # "Siti Aminah Rahman — Sustainability Manager": the name is the first part of a headline.
@@ -139,7 +161,7 @@ def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
             referees = True
         elif _is_heading(line):
             referees = False
-        elif referees and line.strip() and _looks_like_name(_split_headline(line.strip())[0]):
+        elif referees and line.strip() and not _is_label(line) and _looks_like_name(_split_headline(line.strip())[0]):
             lines[i] = "[NAME]"
     return scrub("\n".join(lines), found)
 

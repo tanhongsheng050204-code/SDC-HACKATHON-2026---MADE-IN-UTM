@@ -228,7 +228,7 @@ function SendCheck({ preview, onBack, onDone }: { preview: SendPreview; onBack: 
 
 // An upload goes straight to "Check your skills": the file is scrubbed on the server, the scrubbed text
 // is what the AI reads, and that text waits on the next screen in a collapsed note (lib/sent.ts).
-function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+function useCvUpload(onDone: (skills: string[]) => void) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   async function upload(file: File | undefined) {
@@ -243,8 +243,29 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
     catch (e) { setError(e instanceof Error ? e.message : t("in.uploadFailed")); }
     finally { setBusy(false); }
   }
+  return { busy, error, upload };
+}
+
+// A designed CV is a file, not text: a screenshot or a copied file pasted with Ctrl+V is read like an upload.
+function pastedFile(data: DataTransfer | null): File | undefined {
+  return data?.files?.[0] ?? undefined;
+}
+
+function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
+  const { busy, error, upload } = useCvUpload(onDone);
+  const [over, setOver] = useState(false);
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const file = pastedFile(e.clipboardData);
+      if (file && !busy) { e.preventDefault(); upload(file); }
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  });
   return (
-    <div className="dropzone">
+    <div className={`dropzone${over ? " is-over" : ""}`}
+      onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
+      onDrop={(e) => { e.preventDefault(); setOver(false); if (!busy) upload(pastedFile(e.dataTransfer)); }}>
       <Icon name="upload" />
       <p><strong>{t("in.uploadTitle")}</strong></p>
       <p className="muted">{t("in.uploadSub")}</p>
@@ -252,6 +273,7 @@ function UploadCv({ onDone }: { onDone: (skills: string[]) => void }) {
         <input type="file" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png"
           disabled={busy} onChange={(e) => upload(e.target.files?.[0])} />
       </label>
+      <p className="muted">{t("in.pasteOrDrop")}</p>
       {error && <p className="error" role="alert">{error}</p>}
     </div>
   );
@@ -262,6 +284,7 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<SendPreview | null>(null);
+  const file = useCvUpload(onDone);
   const length = text.trim().length;
   async function check() {
     setBusy(true); setError(null);
@@ -273,7 +296,10 @@ function PasteCv({ onDone }: { onDone: (skills: string[]) => void }) {
   return (
     <>
       <label htmlFor="cv">{t("in.pasteLabel")}</label>
-      <textarea id="cv" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea id="cv" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)}
+        onPaste={(e) => { const f = pastedFile(e.clipboardData); if (f) { e.preventDefault(); file.upload(f); } }} />
+      {file.busy && <p className="muted" role="status">{t("in.reading")}</p>}
+      {file.error && <p className="error" role="alert">{file.error}</p>}
       <div className="row-between">
         <p className="muted counter" aria-live="polite">{length < 50 ? tf("in.moreChars", { n: 50 - length }) : `${length.toLocaleString()} / 20,000`}</p>
         <MicButton onText={(spoken) => setText((x) => `${x.trimEnd()}\n${spoken}`.trim().slice(0, 20000))} />

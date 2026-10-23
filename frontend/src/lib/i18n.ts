@@ -551,6 +551,7 @@ const STRINGS = {
   "impact.target": { en: "Target {n}", ms: "Sasaran {n}", zh: "具体目标 {n}" },
   "in.readFailed": { en: "We couldn't read that. Try picking skills from the list instead.", ms: "Kami tidak dapat membacanya. Cuba pilih kemahiran daripada senarai.", zh: "我们无法读取这些内容。请改为从列表中选择技能。" },
   "in.uploadFailed": { en: "Upload failed", ms: "Muat naik gagal", zh: "上传失败" },
+  "in.pasteOrDrop": { en: "Or paste a screenshot of your CV (Ctrl+V), or drop the file here.", ms: "Atau tampal tangkapan skrin CV anda (Ctrl+V), atau lepaskan fail di sini.", zh: "也可以粘贴简历截图（Ctrl+V），或把文件拖到这里。" },
   "in.uploadTitle": { en: "Upload your CV", ms: "Muat naik CV anda", zh: "上传您的简历" },
   "in.uploadSub": { en: "PDF, Word (.docx), text, or a scan or photo (JPG, PNG), up to 5 MB. Read in memory by our own systems and never stored.", ms: "PDF, Word (.docx), teks, atau imbasan atau foto (JPG, PNG), sehingga 5 MB. Dibaca dalam memori oleh sistem kami sendiri dan tidak disimpan.", zh: "PDF、Word（.docx）、纯文本，或扫描件、照片（JPG、PNG），最大 5 MB。只在我们自己的系统内存中读取，绝不保存。" },
   "in.chooseFile": { en: "Choose a file", ms: "Pilih fail", zh: "选择文件" },

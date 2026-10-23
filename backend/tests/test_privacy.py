@@ -89,3 +89,16 @@ def test_names_in_a_sentence_are_removed():
 def test_an_institution_does_not_swallow_the_next_sentence():
     from app.services.deid import scrub
     assert scrub("Graduated from Universiti Malaya. Python and SQL.") == "Graduated from [ORG]. Python and SQL."
+
+
+def test_a_designed_cv_with_the_sidebar_first_loses_the_name():
+    """A Canva-style CV whose PDF text starts with the sidebar: the name comes after "Phone", "Email"
+    and the skills. The email spells the name, so the name-shaped line holding it goes."""
+    from app.services.deid import scrub_cv
+    cv = ("Contact\nPhone\n012-345 6789\nEmail\nmariana.anderson@gmail.com\nAddress\nNo. 12, Jalan Mawar 3\n"
+          "Expertise\nSocial media marketing\nContent writing\nMariana Anderson\nMarketing Manager\n"
+          "Ran Instagram campaigns for Mariana's team.\nREFERENCE\nTan Wei Ming\nPhone\n03-1234 5678\nLim Mei Ling\n")
+    clean = scrub_cv(cv)
+    for leak in ("Mariana", "Anderson", "mariana", "6789", "Mawar", "Tan Wei", "Lim Mei"):
+        assert leak not in clean, leak
+    assert "Phone\n[PHONE]" in clean and "Social media marketing" in clean and "Marketing Manager" in clean

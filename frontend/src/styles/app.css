@@ -323,6 +323,7 @@ button.link.radar-more { justify-self: start; padding: 6px; text-decoration: non
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
 .dropzone { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 32px 20px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-card); background: var(--surface); color: var(--ink-soft); }
 .dropzone strong { color: var(--ink); }
+.dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); }
 .file-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: .65rem 1.1rem; border-radius: var(--radius-btn); font: 600 .92rem/1 var(--font); cursor: pointer; overflow: hidden; }
 .file-btn.ink { background: var(--ink); color: var(--page); box-shadow: var(--shadow-btn); }
 .file-btn.quiet { background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
