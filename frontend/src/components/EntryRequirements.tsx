@@ -7,7 +7,7 @@ export const years = (months: number) => (months < 18 ? tf("req.months", { n: mo
 const level = (id: string) => t(`req.lvl.${id}` as StringKey);
 
 /** The qualification in one line: the licence route, what most job ads ask for, or the MASCO default. */
-function qualificationText(req: Requirements, short = false): string {
+export function qualificationText(req: Requirements, short = false): string {
   const q = req.qualification;
   if (q.basis !== "ads") return tr(q.text);
   const fields = q.fields.slice(0, short ? 2 : 4).map((f) => tr(f));

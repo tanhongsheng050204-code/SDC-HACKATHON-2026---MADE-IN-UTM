@@ -468,7 +468,7 @@ function MainApp({ demo }: { demo: string | null }) {
             )}
             {screen === "role" && profile && role && (
               <RoleDetail profile={profile} role={role} scenario={scenario} adoption={route.adoption} onProfile={setProfile}
-                tab={route.tab ?? "overview"} onTab={setTab}
+                onRole={setRole} onFlash={flash} tab={route.tab ?? "overview"} onTab={setTab}
                 onImpact={() => go("impact")} onTree={() => go("tree")} onBack={() => go("roles")} />
             )}
             {screen === "impact" && role && <Impact role={role} onBack={() => go("role")} />}
