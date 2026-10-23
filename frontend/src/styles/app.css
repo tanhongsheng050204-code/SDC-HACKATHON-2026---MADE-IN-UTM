@@ -106,9 +106,6 @@ button.link:hover:not(:disabled) { background: none; }
 .shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 14px; padding: 14px 12px; border-right: 1px solid var(--line); background: var(--surface); overflow-y: auto; }
 .sidebar .brand { padding: 0 6px; }
-.who { display: flex; gap: 10px; align-items: center; padding: 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-card); }
-.who strong { display: block; font-size: .88rem; }
-.who small { color: var(--ink-soft); font-size: .76rem; }
 .avatar { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent, #fff); font-weight: 700; }
 .side-nav { display: grid; gap: 6px; }
 .side-group { display: grid; gap: 1px; }
@@ -129,14 +126,48 @@ button.link:hover:not(:disabled) { background: none; }
 .workspace main { width: 100%; padding: 0 28px; }  /* full width: no cap, so wide screens are used */
 .workspace main > section { display: grid; gap: 16px; padding: 26px 0 48px; }
 .page-head { display: grid; gap: 6px; }
+.side-label { display: flex; justify-content: space-between; align-items: center; }
+.side-done { color: var(--good); font-size: .8rem; }
+.side-more summary { list-style: none; cursor: pointer; }
+.side-more summary::-webkit-details-marker { display: none; }
+button.side-account { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); box-shadow: none; text-align: left; color: var(--ink); font-weight: 400; min-height: 0; }
+button.side-account:hover:not(:disabled) { border-color: var(--accent); background: var(--surface); }
+.side-account strong { display: block; font-size: .9rem; }
+.side-account small { color: var(--ink-soft); font-size: .76rem; }
+.bottom-nav { display: none; }
+.more-sheet { display: grid; gap: 4px; }
+.global-search { position: relative; flex: 1 1 auto; max-width: 460px; }
+.search-box { display: flex; align-items: center; gap: 8px; position: relative; padding: 0 10px; min-height: 42px; border: 1px solid var(--line-strong);
+  border-radius: 12px; background: var(--surface); color: var(--ink-soft); }
+.search-box:focus-within { border-color: var(--accent); }
+.search-box input { flex: 1; min-width: 0; border: 0; background: none; padding: 8px 0; min-height: 0; box-shadow: none; outline: none; color: var(--ink); }
+.search-box kbd { font: 600 .7rem var(--font); padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--ink-soft); }
+.search-list { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 40; list-style: none; margin: 0; padding: 6px; display: grid; gap: 2px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 40px -18px rgba(16, 36, 31, .4); }
+.search-list li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 10px; border-radius: 10px; cursor: pointer; color: var(--ink); }
+.search-list li[aria-selected="true"], .search-list li:hover { background: var(--hover); }
+.search-list small { color: var(--ink-soft); }
+.sheet .search-box { margin-bottom: 4px; }
+.sheet .search-list { position: static; box-shadow: none; border: 0; padding: 0; }
+.sheet .search-box kbd { display: none; }
+.search-icon { display: none; }
+.workbar { gap: 16px; }
+.workbar-actions { flex: 1 1 auto; justify-content: flex-end; }
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
-  .sidebar { position: sticky; z-index: 25; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 8px 12px; border-right: none; border-bottom: 1px solid var(--line); overflow-x: auto; }
-  .who, .side-label, .side-foot, .sidebar .brand span { display: none; }
-  .side-nav, .side-group { display: flex; gap: 2px; }
-  .side-link { white-space: nowrap; width: auto; }
-  .workbar { top: 53px; padding: 8px 16px; min-height: 48px; }
-  .workspace main { padding: 0 16px; }
+  .sidebar { display: none; }
+  .bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 4px 4px max(6px, env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--line); }
+  .bottom-nav button { display: grid; justify-items: center; gap: 2px; min-height: 52px; padding: 6px 0 2px; border: 0; background: none; box-shadow: none;
+    border-radius: 12px; font-size: .72rem; font-weight: 600; color: var(--ink-soft); }
+  .bottom-nav button.is-current { color: var(--accent); }
+  .bottom-nav button.is-current .icon { background: var(--accent-soft); border-radius: 99px; padding: 2px 12px; box-sizing: content-box; }
+  .bottom-nav button:disabled { opacity: .45; }
+  .workbar { padding: 8px 16px; min-height: 52px; }
+  .workspace main { padding: 0 16px 84px; }
+  .global-search { display: none; }
+  .search-icon { display: inline-grid; }
 }
 
 /* ---------- Cards, stats, grid ---------- */
@@ -515,7 +546,6 @@ main:focus { outline: none; }
 @media (max-width: 560px) { .home-kpis { grid-template-columns: 1fr; } }
 .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
 @media (max-width: 1000px) { .home-grid { grid-template-columns: 1fr; } }
-.home-roles { gap: 14px; }
 .home-list { list-style: none; margin: 0; padding: 0; display: grid; }
 .home-list li + li { border-top: 1px solid var(--line); }
 .home-role { display: grid; grid-template-columns: 34px minmax(0, 1.5fr) minmax(60px, 1fr) 118px; gap: 12px; align-items: center; width: 100%; padding: 12px 4px; border: none; border-radius: 8px; background: none; box-shadow: none; text-align: left; font-weight: 500; }
@@ -611,7 +641,6 @@ main:focus { outline: none; }
 .audience-choices { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 14px; }
 .card.audience { cursor: pointer; gap: 6px; }
 .card.audience:hover { background: var(--hover); }
-.card.lead { margin: 14px 0; gap: 8px; }
 .carry { font-size: .82rem; }
 .lp-switch { margin-top: 14px; }
 
@@ -696,19 +725,6 @@ main:focus { outline: none; }
 .emerging-start .link { font-weight: 600; padding: 0; }
 .emerging-live { display: grid; gap: 6px; }
 
-/* Scenario switch on Today: the buttons stay put whatever the length of the scenario's description
-   (Baseline's is one short line, Slow and Accelerated are long sentences), and the description
-   keeps two lines' height so the list below does not jump either. */
-.home-roles-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title seg" "note seg";
-  gap: 4px 16px; align-items: start; }
-.home-roles-head h2 { grid-area: title; margin: 0; }
-.home-roles-head .segmented { grid-area: seg; }
-.home-roles-head .scenario-note { grid-area: note; min-height: 3em; margin: 0; }  /* two lines at line-height 1.5 */
-@media (max-width: 760px) {
-  /* Buttons above the description, so their place never depends on its length. */
-  .home-roles-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "seg" "note"; gap: 8px; }
-  .scenario-note, .home-roles-head .scenario-note { min-height: 4.5em; }  /* the longest description is three lines on a 375 px phone */
-}
 
 /* Future roles as a map (RoleGraph) */
 .role-graph { margin: 0; padding: 8px; }
@@ -936,9 +952,6 @@ th .pick { width: 18px; height: 18px; vertical-align: middle; }
 .share-actions { display: flex; flex-direction: column; gap: 10px; }
 .share-link { word-break: break-all; font-size: .8rem; color: var(--ink-soft); display: block; margin-top: 4px; }
 /* Story banner on Today */
-.story-banner { cursor: pointer; border-left: 4px solid var(--gold-bright); gap: 8px; }
-.story-banner h3 { margin: 0; font-size: 1.05rem; }
-.story-banner p { margin: 0; }
 
 /* ---- Phase 5: Duolingo-style intake ---- */
 .intake-progress { height: 6px; border-radius: 3px; background: var(--line); margin: 0 0 28px; overflow: hidden; }
@@ -1316,3 +1329,69 @@ button.link.org-role:hover { color: var(--accent); }
 .ready-bar i { display: block; height: 100%; background: var(--accent); }
 .checkin-sheet .card.checkin { border: 0; box-shadow: none; padding: 0; }
 .grant-plan .heatmap tbody th { white-space: normal; min-width: 200px; }
+
+/* ---------- Today: one next step, the journey, three tiles, updates, best roles ---------- */
+.today { max-width: 980px; }
+.today-hello { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.today-hello h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); }
+.next-step .actions { align-items: center; }
+.today-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .today-tiles { grid-template-columns: 1fr 1fr; } .today-tiles > :first-child { grid-column: 1 / -1; } }
+button.today-tile { display: grid; gap: 2px; align-content: start; justify-items: start; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-card);
+  background: var(--surface); box-shadow: none; text-align: left; color: var(--ink); font-weight: 400; min-width: 0; min-height: 0; }
+button.today-tile:hover:not(:disabled) { border-color: var(--accent); background: var(--surface); }
+.today-tile small { color: var(--ink-soft); font-size: .8rem; }
+.today-tile strong { font-size: 1.3rem; font-weight: 800; overflow-wrap: anywhere; }
+.today-tile .outlook { font-size: 1rem; }
+.today-updates, .today-roles { display: grid; gap: 8px; }
+.today-updates h2, .today-roles h2 { margin: 0; font-size: 1.05rem; }
+.today-updates:not(:has(.update-row)) { display: none; }
+.update-list, .today-role-list { display: grid; margin: 0; padding: 0; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); overflow: hidden; }
+button.update-row { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 12px 16px; border: 0;
+  border-top: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; text-align: left; color: var(--ink); font-weight: 500; min-height: 0; }
+.update-list > :first-child { border-top: 0; }
+button.update-row:hover:not(:disabled) { background: var(--hover); }
+.update-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--accent-soft); }
+.update-row.warn .update-icon { background: var(--risk-bg); }
+.update-row.good .update-icon { background: var(--good-bg); }
+.update-go { color: var(--accent); font-weight: 700; font-size: .88rem; white-space: nowrap; }
+.today-sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.today-role-list li { border-top: 1px solid var(--line); }
+.today-role-list li:first-child { border-top: 0; }
+button.today-role { display: grid; grid-template-columns: 32px minmax(0, 1fr) minmax(90px, 140px) 80px; gap: 12px; align-items: center; width: 100%; padding: 12px 16px;
+  border: 0; border-radius: 0; background: none; box-shadow: none; text-align: left; color: var(--ink); font-weight: 500; min-height: 0; }
+button.today-role:hover:not(:disabled) { background: var(--hover); }
+.today-rank { color: var(--ink-soft); font-weight: 700; font-size: .85rem; }
+.today-role-name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 600; }
+.today-dest, .today-robust { font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+.today-robust { background: var(--gold-bg); color: var(--gold); }
+.today-fit { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .88rem; }
+.today-fit > span { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.today-fit > span i { display: block; height: 100%; background: var(--accent); }
+.today-role .outlook { text-align: right; font-size: .85rem; font-weight: 700; }
+@media (max-width: 640px) {
+  button.today-role { grid-template-columns: 28px minmax(0, 1fr) auto; }
+  .today-fit > span, .today-role .outlook { display: none; }
+}
+.install-snack { position: fixed; left: 270px; bottom: 20px; z-index: 35; display: flex; align-items: center; gap: 12px; max-width: 380px; padding: 10px 12px;
+  border-radius: 14px; background: var(--ink); color: var(--page); box-shadow: 0 16px 40px -16px rgba(16, 36, 31, .55); font-size: .9rem; font-weight: 600; }
+.install-snack img { border-radius: 8px; }
+.install-snack .btn { background: var(--page); color: var(--ink); border-color: var(--page); min-height: 34px; }
+.install-x { border: 0; background: none; box-shadow: none; color: var(--page); font-size: 1.3rem; padding: 0 4px; min-height: 0; }
+@media (max-width: 900px) { .install-snack { left: 12px; right: 12px; bottom: 76px; max-width: none; } }
+
+/* ---------- Settings: a side panel of short rows ---------- */
+.sheet.settings { gap: 6px; }
+.settings-group { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid var(--line); }
+.settings-group h3 { margin: 0; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.settings-group p { margin: 0; font-size: .86rem; }
+button.settings-row, .settings-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: none; text-align: left; color: var(--ink); font-weight: 600; }
+button.settings-row:hover:not(:disabled) { background: var(--hover); }
+.settings-row small { display: block; font-weight: 400; font-size: .8rem; color: var(--ink-soft); }
+.settings-row.danger { color: var(--risk); }
+.settings-lang { justify-self: start; }
+.settings-about p { color: var(--ink-soft); font-size: .82rem; }
+.search-box input[type="text"] { border: 0; background: none; box-shadow: none; padding: 8px 0; min-height: 0; }
+.search-box input[type="text"]:focus { outline: none; box-shadow: none; }
+button.settings-row:has(> .icon:first-child) { justify-content: flex-start; }

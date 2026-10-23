@@ -18,6 +18,7 @@ import { SignalXray } from "../components/SignalXray";
 import { EvidenceList } from "../components/SkillEvidence";
 import { Tabs } from "../components/Tabs";
 import { Icon } from "../components/Icon";
+import { DecisionCard } from "../components/PlanGuard";
 import { api, DayInJob, Profile, RoleCase as RoleCaseData, RoleMatch, RoleTasks, Scenario } from "../lib/api";
 import { onetUrl, percent } from "../lib/format";
 import { getLang, pick, t, tf, tr, type StringKey } from "../lib/i18n";
@@ -198,6 +199,7 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
         {reasons.map((r) => <span key={r.text} className={`role-reason ${r.ok ? "ok" : "warn"}`}>{r.ok ? "✓" : "△"} {r.text}</span>)}
         <button className="link" onClick={() => setSource("rank")}>{tf("rp.rank", { n: role.rank })}</button>
       </div>
+      {isTarget && <DecisionCard profile={profile} />}
 
       <Tabs id="role" label={tr(role.title)} tabs={tabs} value={tab} onChange={onTab}>
         {tab === "overview" && (

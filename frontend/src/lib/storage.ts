@@ -12,6 +12,8 @@ export const KEYS = {
   nameSkipped: "laluan.nameSkipped.",
   onboardingCounted: "laluan.onboardingCounted",  // session only: the anonymous onboarding_started count was sent
   installDismissed: "laluan.installDismissed",  // "Not now" on the Install Laluan card
+  visits: "laluan.visits",  // how many sessions opened Today; the install prompt waits for the second
+  visitCounted: "laluan.visitCounted",  // session only: this session was counted
   joinCode: "laluan.joinCode",  // session only: a class code from a ?join= link, used once on My profile
   replanSeen: "laluan.replanSeen.",  // + profile id: the forecast whose re-ranking "Got it" dismissed
   sdgLens: "laluan.sdgLens",  // the goal picked in the SDG lens on Future roles

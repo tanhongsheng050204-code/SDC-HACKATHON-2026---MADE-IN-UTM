@@ -4,6 +4,7 @@ import { percent, shortDate, signed } from "../lib/format";
 import { t, tf, tr, type StringKey } from "../lib/i18n";
 import { OUTLOOK_TEXT } from "../lib/labels";
 import { AiBadge } from "./AiBadge";
+import { UpdateRow } from "./UpdateRow";
 
 // Three small cards on Today, all worked out by rules from the person's own numbers:
 // why they chose their destination (and what changed since), plan checks, and what a counsellor
@@ -85,7 +86,7 @@ function checkText(c: PlanCheck, role: string): string {
   }
 }
 
-export function PlanChecks({ profile, roleTitle }: { profile: Profile; roleTitle: string | null }) {
+export function PlanChecks({ profile, roleTitle, row = false }: { profile: Profile; roleTitle: string | null; row?: boolean }) {
   const [checks, setChecks] = useState<PlanCheck[]>([]);
   useEffect(() => {
     let live = true;
@@ -94,7 +95,7 @@ export function PlanChecks({ profile, roleTitle }: { profile: Profile; roleTitle
   }, [profile.id, profile.target_role_id, profile.target_date, profile.weekly_hours, profile.completed_courses.length]);
   if (checks.length === 0 || !roleTitle) return null;
   const role = tr(roleTitle);
-  return (
+  const card = (
     <div className="card plan-checks" role="note">
       <div className="row-between"><span className="eyebrow">{t("check.title")}</span><AiBadge mode="rules" /></div>
       <ul>
@@ -105,6 +106,9 @@ export function PlanChecks({ profile, roleTitle }: { profile: Profile; roleTitle
       <small className="muted">{t("check.note")}</small>
     </div>
   );
+  if (!row) return card;
+  const warn = checks.some((c) => c.level === "warn");
+  return <UpdateRow icon={warn ? "⚠" : "ℹ"} tone={warn ? "warn" : ""} text={tf("upd.checks", { n: checks.length })} action={t("upd.view")} title={t("check.title")}>{() => card}</UpdateRow>;
 }
 
 export function actionText(a: Pick<CheckinAction, "kind" | "value" | "label">): string {
@@ -121,7 +125,7 @@ const STATUS_TEXT: Record<CheckinAction["status"], StringKey> = {
   proposed: "act.s.proposed", accepted: "act.s.accepted", declined: "act.s.declined", done: "act.s.done",
 };
 
-export function CounsellorActions({ profile, onChanged }: { profile: Profile; onChanged: () => void }) {
+export function CounsellorActions({ profile, onChanged, row = false }: { profile: Profile; onChanged: () => void; row?: boolean }) {
   const [actions, setActions] = useState<CheckinAction[]>([]);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -131,7 +135,7 @@ export function CounsellorActions({ profile, onChanged }: { profile: Profile; on
   }, [profile.id]);
   const open = actions.filter((a) => a.status === "proposed" || a.status === "accepted");
   const past = actions.filter((a) => a.status === "declined" || a.status === "done");
-  if (actions.length === 0) return null;
+  if (actions.length === 0 || (row && open.length === 0)) return null;
 
   async function answer(a: CheckinAction, how: "accept" | "decline" | "done") {
     setError(null);
@@ -141,7 +145,7 @@ export function CounsellorActions({ profile, onChanged }: { profile: Profile; on
     } catch (e) { setError(e instanceof Error ? e.message : t("act.failed")); }
   }
 
-  return (
+  const card = (
     <div className="card counsellor-actions">
       <span className="eyebrow">{t("act.title")}</span>
       {open.length === 0 ? <p className="muted">{t("act.allAnswered")}</p> : (
@@ -173,4 +177,6 @@ export function CounsellorActions({ profile, onChanged }: { profile: Profile; on
       <small className="muted">{t("act.note")}</small>
     </div>
   );
+  if (!row) return card;
+  return <UpdateRow icon="👤" tone="good" text={tf("upd.counsellor", { n: open.length })} action={t("upd.view")} title={t("act.title")}>{() => card}</UpdateRow>;
 }

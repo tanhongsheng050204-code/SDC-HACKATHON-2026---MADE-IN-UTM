@@ -1,6 +1,6 @@
 // Screens follow docs/03-APP_FLOW.md. Entry points: /?card=ID opens a read-only Future Card;
 // /?demo=clerk|student|hr opens a demo; ?view=... restores a screen (see lib/route.ts).
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccountButton } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
@@ -11,11 +11,12 @@ import { ScreenBoundary } from "./components/ScreenBoundary";
 import { Sidebar } from "./components/Sidebar";
 import { api, onAuthExpired, onRateLimited, onServerWaking, Audience, CoachProposal, Journey, Profile, RoleMatch, Scenario } from "./lib/api";
 import { authEnabled, getAccountName, getGoogleName, getUserId, onAuth, ready as authReady, setAccountName } from "./lib/auth";
-import { setDataText, t } from "./lib/i18n";
+import { setDataText, t, tf } from "./lib/i18n";
 import { readRoute, RoleTab, Route, Screen, writeRoute } from "./lib/route";
 import { KEYS, load, save } from "./lib/storage";
 import { clearOfflineData } from "./lib/pwa";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { GlobalSearch } from "./components/GlobalSearch";
 import { CardPage } from "./screens/CardPage";
 import { Unsubscribe } from "./screens/Unsubscribe";
 import { Legal, type LegalDoc } from "./screens/Legal";
@@ -355,10 +356,11 @@ function MainApp({ demo }: { demo: string | null }) {
     setWorkforceTab(tab);
     go("workforce", { role: undefined });
   }
-  const settings = (variant: string) => (
-    <Settings profile={profile} userId={userId} screen={screen} lang={lang} onLang={changeLang}
-      onLeave={leaveDemo} onDelete={() => deleteProfile()} className={variant} />
+  const settings = (variant: string, label?: ReactNode) => (
+    <Settings profile={profile} userId={userId} screen={screen} lang={lang} model={model} onLang={changeLang}
+      onLeave={leaveDemo} onDelete={() => deleteProfile()} className={variant}>{label}</Settings>
   );
+  const ask = (q?: string) => { setCoachQuestion(q); setCoachOpen(true); };
   const banners = (
     <>
       {noNetwork && <div className="banner info" role="status">{t("pwa.offline")}</div>}
@@ -414,7 +416,13 @@ function MainApp({ demo }: { demo: string | null }) {
   return (
     <div className="shell">
       <a className="skip-link" href="#main">{t("shell.skip")}</a>
-      <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey} model={model} settings={settings("side-link")}
+      <Sidebar current={screen} roleId={role?.role_id ?? null} profile={profile} journey={journey}
+        account={settings("side-account", <>
+          <span className="avatar" aria-hidden="true">{(profile?.display_name ?? t("set.title")).slice(0, 1)}</span>
+          <span><strong>{profile?.display_name ?? t("shell.yourProfile")}</strong>
+            <small>{profile ? tf("side.account", { n: profile.skills.length }) : t("set.title")}</small></span>
+        </>)}
+        settings={settings("side-link", <><Icon name="settings" />{t("set.title")}</>)}
         onGo={(s) => (s === "role" || s === "tree" || s === "impact" ? openTarget(s) : s === "intake" ? goProfile() : go(s))}
         onHome={() => go("landing")} />
       <div className="workspace">
@@ -422,12 +430,7 @@ function MainApp({ demo }: { demo: string | null }) {
           <span className="workbar-title">{titles[screen]}</span>
           <div className="workbar-actions">
             {profile?.story && <span className="badge">{profile.display_name}</span>}
-            {profile && (
-              <button className="coach-btn" onClick={() => { setCoachQuestion(undefined); setCoachOpen(true); }} aria-expanded={coachOpen}>
-                <span className="coach-btn-icon" aria-hidden="true"><Icon name="chat" /></span>
-                <span>{t("shell.coach")}<small>{t("shell.coachSub")}</small></span>
-              </button>
-            )}
+            {profile && <GlobalSearch profile={profile} scenario={scenario} onOpenRole={openRole} onAsk={ask} />}
             {settings("icon-btn")}
           </div>
         </header>
@@ -437,7 +440,7 @@ function MainApp({ demo }: { demo: string | null }) {
             {screen === "home" && profile && <InstallPrompt />}
             {screen === "home" && profile && (
               <Home profile={profile} scenario={scenario} journey={journey} onOpenRole={openRole} onGo={(s) => (s === "intake" ? goProfile() : go(s))}
-                onTarget={openTarget} onAsk={(q) => { setCoachQuestion(q); setCoachOpen(true); }}
+                onTarget={openTarget}
                 onProfileChanged={() => api.getProfile(profile.id).then(setProfile).catch(() => undefined)} />
             )}
             {screen === "intake" && (

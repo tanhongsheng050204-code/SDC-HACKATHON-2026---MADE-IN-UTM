@@ -3,11 +3,13 @@ import { api, Profile, Replan, RoleMatch } from "../lib/api";
 import { shortDate } from "../lib/format";
 import { t, tf, tr } from "../lib/i18n";
 import { KEYS, load, save } from "../lib/storage";
+import { UpdateRow } from "./UpdateRow";
 
 // Automatic re-planning: when a newer forecast re-ranks this person's roles, Today says what moved
 // and, if a different role is now the best fit, offers it. Nothing is switched for them.
-export function ReplanCard({ profile, roles, onOpenRole }: {
-  profile: Profile; roles: RoleMatch[]; onOpenRole: (r: RoleMatch) => void;
+// As a row, it is one line in Today's Updates and the card opens in a side panel.
+export function ReplanCard({ profile, roles, onOpenRole, row = false }: {
+  profile: Profile; roles: RoleMatch[]; onOpenRole: (r: RoleMatch) => void; row?: boolean;
 }) {
   const [data, setData] = useState<Replan | null>(null);
   const [seen, setSeen] = useState(() => load(KEYS.replanSeen + profile.id));
@@ -22,7 +24,7 @@ export function ReplanCard({ profile, roles, onOpenRole }: {
   const d = data.destination;
   const suggestion = data.new_top ? roles.find((r) => r.role_id === data.new_top!.role_id) : undefined;
   function gotIt() { save(KEYS.replanSeen + profile.id, data!.to_snapshot.id); setSeen(data!.to_snapshot.id); }
-  return (
+  const card = (
     <div className="card replan-card" role="status">
       <span className="eyebrow">{t("replan.title")}</span>
       <p>{tf("replan.intro", { date: shortDate(data.to_snapshot.imported) })}</p>
@@ -40,4 +42,6 @@ export function ReplanCard({ profile, roles, onOpenRole }: {
       <small className="muted">{t("replan.note")}</small>
     </div>
   );
+  if (!row) return card;
+  return <UpdateRow icon="🔀" text={t("upd.replan")} action={t("upd.view")} title={t("replan.title")}>{() => card}</UpdateRow>;
 }

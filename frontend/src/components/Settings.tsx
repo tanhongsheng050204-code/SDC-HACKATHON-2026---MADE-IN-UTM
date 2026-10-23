@@ -1,20 +1,22 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { api, type Profile } from "../lib/api";
 import { downloadMyData } from "../lib/exportFile";
 import { authEnabled, signOut } from "../lib/auth";
-import { Lang, t } from "../lib/i18n";
+import { Lang, LANGS, t } from "../lib/i18n";
+import { canPromptInstall, isIosSafari, isStandalone, onInstallable, promptInstall } from "../lib/pwa";
+import { LegalLinks } from "../screens/Legal";
 import { AccountButton } from "./AccountButton";
 import { Icon } from "./Icon";
-import { LangPicker } from "./Preferences";
 import { ReportProblem } from "./ReportProblem";
 
 // One place for the things a person changes or asks for about their own use of Laluan: language,
-// account, report a problem, and their data rights (download, delete). Opened from the top bar
-// and the sidebar, so it is reachable on every app screen and on a phone.
-export function Settings({ profile, userId, screen, lang, onLang, onLeave, onDelete, className = "icon-btn" }: {
-  profile: Profile | null; userId: string | null; screen: string; lang: Lang; onLang: (l: Lang) => void;
-  onLeave: () => void; onDelete: () => void; className?: string;
+// account, installing the app, their data rights (download, delete), help, and what the app runs
+// on. A side panel of short rows, opened from the top bar, the account button in the sidebar and
+// the phone's More sheet, so it is reachable on every app screen.
+export function Settings({ profile, userId, screen, lang, model = null, onLang, onLeave, onDelete, className = "icon-btn", children }: {
+  profile: Profile | null; userId: string | null; screen: string; lang: Lang; model?: string | null; onLang: (l: Lang) => void;
+  onLeave: () => void; onDelete: () => void; className?: string; children?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const id = useId();
@@ -34,56 +36,85 @@ export function Settings({ profile, userId, screen, lang, onLang, onLeave, onDel
   return (
     <>
       <button className={className} onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}
-        aria-label={className === "icon-btn" ? t("set.title") : undefined} title={t("set.title")}>
-        <Icon name="settings" />{className !== "icon-btn" && t("set.title")}
+        aria-label={children ? undefined : t("set.title")} title={t("set.title")}>
+        {children ?? <Icon name="settings" />}
       </button>
       {open && createPortal(
-        <div className="dialog-backdrop" onClick={() => setOpen(false)}>
-          <div className="dialog settings" role="dialog" aria-modal="true" aria-labelledby={`${id}-h`} onClick={(e) => e.stopPropagation()}>
-            <div className="settings-top">
+        <div className="sheet-backdrop" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+          <div className="sheet settings" role="dialog" aria-modal="true" aria-labelledby={`${id}-h`}>
+            <div className="sheet-head">
               <h2 id={`${id}-h`}>{t("set.title")}</h2>
-              <button ref={close} className="icon-btn" aria-label={t("set.close")} onClick={() => setOpen(false)}>×</button>
+              <button ref={close} className="sheet-x" aria-label={t("set.close")} onClick={() => setOpen(false)}>×</button>
             </div>
 
             <section className="settings-group">
               <h3>{t("set.language")}</h3>
-              <LangPicker lang={lang} onChange={onLang} />
+              <div className="segmented settings-lang" role="radiogroup" aria-label={t("set.language")}>
+                {LANGS.map((l) => <button key={l.id} role="radio" aria-checked={lang === l.id} lang={l.htmlLang} onClick={() => onLang(l.id)}>{l.label}</button>)}
+              </div>
             </section>
 
             <section className="settings-group">
               <h3>{t("set.account")}</h3>
               {userId ? (
-                <button className="btn" onClick={() => { setOpen(false); signOut(); }}><Icon name="arrowLeft" />{t("auth.logout")}</button>
+                <button className="settings-row" onClick={() => { setOpen(false); signOut(); }}><span>{t("auth.logout")}</span><Icon name="arrowLeft" /></button>
               ) : authEnabled ? (
-                <><p className="muted">{t("set.loginWhy")}</p><AccountButton userId={null} className="btn" /></>
+                <><AccountButton userId={null} className="settings-row" /><p className="muted">{t("set.loginWhy")}</p></>
               ) : (
                 <p className="muted">{t("set.noAccounts")}</p>
               )}
               {profile?.is_demo && (
-                <button className="btn quiet" onClick={() => { setOpen(false); onLeave(); }}><Icon name="arrowLeft" />{t("set.leaveDemo")}</button>
+                <button className="settings-row" onClick={() => { setOpen(false); onLeave(); }}><span>{t("set.leaveDemo")}</span><Icon name="arrowLeft" /></button>
               )}
             </section>
+
+            <InstallRow />
 
             {profile && (
               <section className="settings-group">
                 <h3>{t("set.data")}</h3>
+                <DownloadData profileId={profile.id} />
+                <button className="settings-row danger" onClick={() => { setOpen(false); onDelete(); }}><span>{t("shell.delete")}</span><Icon name="trash" /></button>
                 <p className="muted">{t("set.dataWhy")}</p>
-                <div className="settings-row">
-                  <DownloadData profileId={profile.id} />
-                  <button className="btn danger" onClick={() => { setOpen(false); onDelete(); }}><Icon name="trash" />{t("shell.delete")}</button>
-                </div>
               </section>
             )}
 
             <section className="settings-group">
               <h3>{t("set.help")}</h3>
-              <ReportProblem screen={screen} className="btn" />
+              <ReportProblem screen={screen} className="settings-row" />
+            </section>
+
+            <section className="settings-group settings-about">
+              <h3>{t("set.about")}</h3>
+              {model && <p>{t("shell.model")}: {model}</p>}
+              <p>{t("shell.estimates")}</p>
+              <p><LegalLinks /></p>
             </section>
           </div>
         </div>,
         document.body,
       )}
     </>
+  );
+}
+
+// "Install Laluan", for when the small prompt on Today was dismissed: the browser's own install
+// dialog where it offers one, or the Share-menu steps on iPhone Safari.
+function InstallRow() {
+  const [ready, setReady] = useState(canPromptInstall);
+  useEffect(() => onInstallable(() => setReady(true)), []);
+  const ios = !ready && isIosSafari();
+  if (isStandalone() || (!ready && !ios)) return null;
+  return (
+    <section className="settings-group">
+      <h3>{t("set.app")}</h3>
+      {ios ? <p className="muted">{t("pwa.ios")}</p> : (
+        <button className="settings-row" onClick={async () => {
+          if (await promptInstall()) api.usage("app_installed").catch(() => {});
+          setReady(canPromptInstall());
+        }}><span>{t("pwa.title")}<small>{t("set.installHint")}</small></span><Icon name="download" /></button>
+      )}
+    </section>
   );
 }
 
@@ -99,8 +130,8 @@ function DownloadData({ profileId }: { profileId: string }) {
   }
   return (
     <>
-      <button className="btn" onClick={download} disabled={state === "busy"} aria-busy={state === "busy"}>
-        <Icon name="download" />{t("shell.download")}
+      <button className="settings-row" onClick={download} disabled={state === "busy"} aria-busy={state === "busy"}>
+        <span>{t("shell.download")}</span><Icon name="download" />
       </button>
       {state === "failed" && <p className="error" role="alert">{t("shell.downloadFailed")}</p>}
     </>

@@ -3,7 +3,7 @@ export type IconName =
   | "user" | "users" | "radar" | "briefcase" | "route" | "globe" | "trash"
   | "sun" | "moon" | "upload" | "list" | "chat" | "book" | "home" | "mic" | "target"
   | "go-straight" | "turn-left" | "turn-right" | "flag" | "check"
-  | "arrowLeft" | "arrowRight" | "mapPin" | "arrowUp" | "download" | "settings" | "mail";
+  | "arrowLeft" | "arrowRight" | "mapPin" | "arrowUp" | "download" | "settings" | "mail" | "search" | "more" | "heart";
 
 const ICONS: Record<IconName, string> = {
   chat: "M4 5h16v11H9l-5 4z",
@@ -34,6 +34,9 @@ const ICONS: Record<IconName, string> = {
   arrowRight: "M5 12h14M12 19l7-7-7-7",
   mapPin: "M12 22C7 17 5 14 5 10a7 7 0 0 1 14 0c0 4-2 7-7 12zM12 10.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z",
   arrowUp: "M12 19V5M5 12l7-7 7 7",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+  more: "M5 12h.01M12 12h.01M19 12h.01",
+  heart: "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z",
 };
 
 export function Icon({ name }: { name: IconName }) {
