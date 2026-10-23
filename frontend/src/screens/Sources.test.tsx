@@ -30,4 +30,17 @@ describe("Sources", () => {
     expect(screen.getByText("O*NET 30.0 · US Department of Labor")).toBeInTheDocument();
     expect(screen.queryByText("TalentCorp · MyCOL 2024/2025")).not.toBeInTheDocument();
   });
+
+  it("lists every feed the trend refresh collects, with its publisher", async () => {
+    setup();
+    fireEvent.click(screen.getByRole("tab", { name: "Data sources" }));
+    await screen.findByText("In use now", { exact: false });
+    for (const by of [
+      "Stack Overflow · GitHub · npm · PyPI",
+      "OpenAlex · papers from Malaysian institutions",
+      "OpenDOSM · Labour Force Survey, Malaysia",
+      "OpenDOSM · employment by sector",
+      "OpenDOSM · consumer price index",
+    ]) expect(screen.getByText(by)).toBeInTheDocument();
+  });
 });

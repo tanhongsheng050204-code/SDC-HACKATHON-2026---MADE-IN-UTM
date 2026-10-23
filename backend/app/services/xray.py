@@ -1,14 +1,17 @@
 """Signal X-ray: the chain behind one outlook number, step by step, each with its source.
 
-published baseline -> job-posting demand -> Malaysian employment -> AI research momentum (all capped, from an approved
-trend refresh) -> AI adoption swing for the scenario -> scaling to the chosen year -> the number
-shown. It reuses the same formulas as the ranking (scenario.outlook), so the last step always
-equals the number on the role card.
+published baseline -> job-posting demand -> Malaysian employment -> Malaysian labour market ->
+live postings for the role -> AI research momentum (all capped, from an approved trend refresh) ->
+AI adoption swing for the scenario -> scaling to the chosen year -> the number shown. It reuses the
+same formulas as the ranking (scenario.outlook), so the last step always equals the number on the
+role card.
 """
 
 from app.reference import Reference
 from app.services.scenario import AI_SWING, outlook, signals_from_snapshot, year_fraction
-from app.trends.builder import CAP_POINTS, LOCAL_CAP
+from app.trends.builder import CAP_POINTS, LOCAL_AI_CAP, LOCAL_CAP, OPENINGS_CAP
+from app.trends.labour import CLIMATE_CAP
+from app.trends.sector import SECTOR_CAP
 
 NO_REFRESH = "no trend refresh approved yet, so this adds nothing"
 
@@ -40,6 +43,25 @@ def explain(ref: Reference, role_id: str, scenario_id: str, year: int | None = N
         parts.append(("local_points", "Malaysian employment",
                       "OpenDOSM: employee growth in this role's occupation group vs all employees",
                       f"±{LOCAL_CAP:g} points"))
+    if "sector_points" in row:  # added Oct 2026: the share of employment in the role's sector
+        parts.append(("sector_points", "Malaysian sector shift",
+                      "OpenDOSM employment by sector: the change in this role's sector's share of employment "
+                      "over five years",
+                      f"±{SECTOR_CAP:g} points"))
+    if "market_points" in row:  # added Oct 2026: the monthly Labour Force Survey
+        parts.append(("market_points", "Malaysian labour market",
+                      "OpenDOSM monthly Labour Force Survey: employment growth against its five-year median, "
+                      "less the change in unemployment; the same for every role",
+                      f"±{CLIMATE_CAP:g} points"))
+    if "openings_points" in row:  # added Oct 2026: live postings for this role
+        parts.append(("openings_points", "Live postings for this role",
+                      "freehire.me: this role's share of all Malaysian postings, against the last count",
+                      f"±{OPENINGS_CAP:g} points"))
+    if "local_ai_points" in row:  # added Oct 2026: research from Malaysian institutions only
+        parts.append(("local_ai_points", "Malaysian AI research",
+                      "OpenAlex: growth in papers from Malaysian institutions on capabilities that help or "
+                      "replace this role",
+                      f"±{LOCAL_AI_CAP:g} points"))
     parts.append(("ai_points", "AI research momentum", "research growth in capabilities that help or replace this role", cap))
     for key, label, source, limit in parts:
         value = float(row.get(key, 0.0)) if trend else 0.0

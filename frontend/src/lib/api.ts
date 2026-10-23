@@ -4,7 +4,10 @@ import { config } from "./config";
 const BASE = config.apiUrl;
 
 export type Scenario = "slow" | "baseline" | "accelerated";
-export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string }
+export interface Pay { group: string; median_rm: number; mean_rm: number; year: number; source: string; table: string; source_url: string;
+  /** The same median in horizon-year money, from the CPI block of the approved forecast snapshot. */
+  real?: { horizon_year: number; median_rm: number; inflation_pct: number; source: string; source_url: string } }
+
 export interface PrefMatch { dim: string; label: string; labels?: Record<string, string> }
 export type Audience = "worker" | "graduate" | "switcher";
 
@@ -166,6 +169,10 @@ export interface PendingPreview {
   inputs: { source: string; url: string; retrieved: string }[];
   roles: { role_id: string; title: string; before: number | null; after: number; label_before: string | null; label_after: string; change: number | null }[];
   skills: Record<"rising" | "steady" | "declining" | "no_data", number>;
+  /** Why every role can move at once: the market-wide channel, live postings, and prices. */
+  channels?: { labour_market_points: number | null; labour_latest_month: string | null;
+    roles_with_live_posting_points: number; inflation_pct: number | null;
+    sector_points?: Record<string, number> | null; malaysian_research_capabilities?: number };
 }
 export interface RefreshStatus { state: "idle" | "running" | "done" | "failed"; steps: string[]; snapshot_id: string | null; error: string | null }
 export interface InPlace { role_id: string; title: string; people: number; avg_hours: number; fees_each_rm: number; staff_time_rm: number; ai_skills: string[] }

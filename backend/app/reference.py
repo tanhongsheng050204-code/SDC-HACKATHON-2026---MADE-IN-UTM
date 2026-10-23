@@ -29,6 +29,9 @@ class Reference:
     capabilities: list[dict]
     job_terms: dict[str, str]
     my_posting_terms: dict[str, dict]
+    role_openings: dict[str, dict]  # role_id -> {"query", "titles"}: how a role is found in job ads
+    skill_sources: dict[str, dict]  # skill_id -> {stackoverflow, github, npm, pypi}: attention proxies
+    role_sectors: dict[str, str]  # role_id -> agriculture / industry / services (OpenDOSM)
     tasks: dict  # {"source", "source_url", "labels_note", "roles": {role_id: {...}}}
     skill_prereqs: dict[str, list[str]]
     skill_levels: list[dict]
@@ -104,6 +107,9 @@ def get_reference() -> Reference:
         capabilities=_read(data_dir / "capabilities.json")["capabilities"],
         job_terms=_read(data_dir / "job_terms.json")["terms"],
         my_posting_terms=_read(data_dir / "my_posting_terms.json")["terms"],
+        role_openings=_read(data_dir / "role_openings.json")["roles"],
+        skill_sources=_read(data_dir / "skill_sources.json")["skills"],
+        role_sectors=_read(data_dir / "role_sectors.json")["roles"],
         tasks=_tasks(data_dir / "tasks.json"),
         skill_prereqs=_read(data_dir / "skill_prereqs.json")["prereqs"],
         skill_levels=_read(data_dir / "skill_levels.json"),

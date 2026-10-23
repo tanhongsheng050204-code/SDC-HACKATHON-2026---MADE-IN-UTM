@@ -20,7 +20,20 @@ figures) is never edited; each refresh writes a new snapshot that adjusts it wit
   ai_complementarity      += 0.3 x mean momentum of complementing capabilities (clipped 0..1)
   Malaysian employment    = employee growth in the role's MASCO group - growth of all employees
                             (OpenDOSM, percentage points over 3 years), capped at +/-10 points
-  net_growth_pct          = baseline + demand adjustment + Malaysian employment + AI adjustment
+  Malaysian sector        = 2 x the change in the role's sector's share of employment over 5 years
+                            (OpenDOSM employment_sector), capped at +/-4 points
+  live Malaysian postings = change in the role's share of all Malaysian postings, capped at +/-8
+                            (freehire.me, role searches; needs a second count 28+ days later)
+  labour market           = (employment growth year on year - its five-year median)
+                            - 2 x (change in the unemployment rate over a year), capped at +/-3
+                            (OpenDOSM monthly Labour Force Survey; the same for every role)
+  Malaysian AI research   = 10 x (mean momentum of capabilities that complement the role
+                                  - mean momentum of those that expose it), capped at +/-5
+                            (OpenAlex, papers with a Malaysian institution only)
+  developer attention     = 0.15 x (Stack Overflow / GitHub / npm / PyPI momentum of the skill),
+                            added to the skill's trend before the role's demand is averaged
+  net_growth_pct          = baseline + demand adjustment + Malaysian employment + sector
+                            + AI adjustment + live postings + labour market + Malaysian AI research
 
 With history (quarterly job postings and research, yearly OpenDOSM; see forecast.py), each skill's
 trend becomes its forecast instead: the yearly rate of its baseline-scenario projection to the
@@ -36,10 +49,15 @@ from app.trends import forecast
 
 MOMENTUM_RANGE = (-1.0, 1.0)
 MIN_MENTIONS = 20  # postings mentioning a skill, both periods together, before its trend counts
+MIN_ROLE_POSTINGS = 15  # postings mentioning a role, both periods together, before its trend counts
 TREND_THRESHOLD = 0.15
 CAP_POINTS = 15.0
 EXPOSURE_STEP = 0.3
 LOCAL_CAP = 10.0  # Malaysian employment points; nine coarse groups, so a smaller cap
+OPENINGS_CAP = 8.0  # live Malaysian postings per role; role-title searches are noisier than skills
+LOCAL_AI_CAP = 5.0  # Malaysian-affiliated research; a thinner slice than the global counts
+ATTENTION_WEIGHT = 0.15  # developer attention, relative to job postings and AI momentum (1.0 each)
+MIN_LOCAL_PAPERS = 20  # Malaysian-affiliated papers, both windows together, before momentum counts
 
 
 def _clip(value: float, low: float, high: float) -> float:
@@ -52,8 +70,13 @@ def _change(recent: float, prior: float) -> float | None:
     return (recent - prior) / prior
 
 
-def momentum(research: dict) -> dict[str, float]:
-    growth = {cap_id: (c["recent"] + 1) / (c["prior"] + 1) for cap_id, c in research["counts"].items()}
+def momentum(research: dict, min_total: int = 0) -> dict[str, float]:
+    """Growth of each capability against the median capability. `min_total` drops capabilities with
+    too few papers to say anything (used for the Malaysian slice, where counts are small)."""
+    growth = {cap_id: (c["recent"] + 1) / (c["prior"] + 1) for cap_id, c in research["counts"].items()
+              if c["recent"] + c["prior"] >= min_total}
+    if not growth:
+        return {}
     typical = statistics.median(growth.values())
     return {cap_id: round(_clip(math.log2(g / typical), *MOMENTUM_RANGE), 4)
             for cap_id, g in growth.items()}
@@ -67,7 +90,8 @@ def _mean(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
-def _posting_trend(jobs: dict, skill_id: str, earlier: str) -> tuple[float | None, str | None]:
+def _posting_trend(jobs: dict, skill_id: str, earlier: str,
+                   min_mentions: int = MIN_MENTIONS) -> tuple[float | None, str | None]:
     """Change in the share of postings that mention the skill, and the line that explains it."""
     totals, mention = jobs["postings"], jobs["mentions"].get(skill_id)
     if not mention:
@@ -78,7 +102,7 @@ def _posting_trend(jobs: dict, skill_id: str, earlier: str) -> tuple[float | Non
     seen = mention["recent"] + mention["prior"]
     if seen == 0:
         return None, None
-    if seen < MIN_MENTIONS:
+    if seen < min_mentions:
         return None, f"{jobs['source']}: only {seen} postings mention it, too few for a trend"
     share_recent = mention["recent"] / totals["recent"] if totals["recent"] else 0.0
     share_prior = mention["prior"] / totals["prior"] if totals["prior"] else 0.0
@@ -89,14 +113,17 @@ def _posting_trend(jobs: dict, skill_id: str, earlier: str) -> tuple[float | Non
 
 def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict,
                   history: dict | None = None, scenarios: list[dict] | None = None,
-                  horizon_year: int = 2030, my_postings: dict | None = None) -> dict[str, dict]:
-    out = _two_period_signals(skills, capabilities, research, jobs, my_postings)
+                  horizon_year: int = 2030, my_postings: dict | None = None,
+                  attention: dict | None = None) -> dict[str, dict]:
+    out = _two_period_signals(skills, capabilities, research, jobs, my_postings, attention)
     if not history:
         return out
     cap_trends = forecast.capability_trends(history["research"]) if history.get("research") else {}
     jobs_series = history.get("jobs")
     for skill_id, signal in out.items():
-        f = forecast.skill_forecast(skill_id, capabilities, jobs_series, cap_trends, scenarios or [], horizon_year)
+        a = _attention_value(attention, skill_id)
+        f = forecast.skill_forecast(skill_id, capabilities, jobs_series, cap_trends, scenarios or [], horizon_year,
+                                    attention=a)
         if f is None:
             continue
         base = f["scenarios"]["baseline"]
@@ -110,8 +137,13 @@ def skill_signals(skills: dict, capabilities: list[dict], research: dict, jobs: 
     return out
 
 
+def _attention_value(attention: dict | None, skill_id: str) -> float | None:
+    entry = ((attention or {}).get("attention") or {}).get(skill_id)
+    return float(entry["value"]) if entry else None
+
+
 def _two_period_signals(skills: dict, capabilities: list[dict], research: dict, jobs: dict,
-                        my_postings: dict | None = None) -> dict[str, dict]:
+                        my_postings: dict | None = None, attention: dict | None = None) -> dict[str, dict]:
     m = _pressure(momentum(research))
     out: dict[str, dict] = {}
     for skill_id in skills:
@@ -133,6 +165,13 @@ def _two_period_signals(skills: dict, capabilities: list[dict], research: dict, 
             names = [c["name"] for c in capabilities
                      if skill_id in c["boosts_skills"] or skill_id in c["automates_skills"]]
             sources.append(f"{research['source']} research momentum: {', '.join(names)}")
+        # Attention is evidence about use, not about hiring: it nudges a trend that already exists
+        # from postings or research, and never creates one on its own.
+        entry = ((attention or {}).get("attention") or {}).get(skill_id)
+        if entry and trend is not None:
+            trend += ATTENTION_WEIGHT * entry["value"]
+            sources.append(f"Developer attention ({entry['label']}): "
+                           + ", ".join(f"{name} {value:+.2f}" for name, value in entry["readings"].items()))
         if trend is None:
             out[skill_id] = {"skill_id": skill_id, "trend": None, "label": "no_data",
                              "sources": sources or ["No mentions in this run's sources"]}
@@ -156,10 +195,30 @@ def local_points(dosm: dict, masco: str | None) -> float:
     return round(_clip(_growth(group) - _growth(dosm["overall"]), -LOCAL_CAP, LOCAL_CAP), 1)
 
 
+def openings_points(role_postings: dict | None, role_id: str) -> tuple[float, str | None]:
+    """Points from live Malaysian postings for this role: the change in its share of all postings.
+
+    A first run has no earlier count, so it reports the share and scores nothing; the points start
+    from the second refresh at least 28 days later. Too few postings also score nothing.
+    """
+    if not role_postings:
+        return 0.0, None
+    trend, line = _posting_trend(role_postings, role_id,
+                                 f"on {role_postings.get('prior_retrieved')}", MIN_ROLE_POSTINGS)
+    if trend is None:
+        return 0.0, line
+    return round(_clip(OPENINGS_CAP * trend, -OPENINGS_CAP, OPENINGS_CAP), 1), line
+
+
 def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research: dict,
-                 skills_out: dict[str, dict], dosm: dict | None = None) -> list[dict]:
+                 skills_out: dict[str, dict], dosm: dict | None = None,
+                 labour: dict | None = None, role_postings: dict | None = None,
+                 local_research: dict | None = None, sector: dict | None = None,
+                 role_sectors: dict[str, str] | None = None) -> list[dict]:
     series = (dosm or {}).get("series")
     m = _pressure(momentum(research))
+    local_m = _pressure(momentum(local_research, MIN_LOCAL_PAPERS)) if local_research else {}
+    market = float((labour or {}).get("points") or 0.0)
     by_role = {s["role_id"]: s for s in baseline["signals"]}
     out = []
     for role_id, base in by_role.items():
@@ -172,14 +231,32 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
         demand_points = round(_clip(CAP_POINTS * demand, -CAP_POINTS, CAP_POINTS), 1)
         ai_points = round(_clip(CAP_POINTS * (_mean(complementing) - _mean(exposing)),
                                 -CAP_POINTS, CAP_POINTS), 1)
+        local_ai_points = 0.0
+        if local_m:
+            local_ai_points = round(_clip(LOCAL_AI_CAP * (_mean([local_m.get(c["id"], 0.0) for c in capabilities
+                                                                 if role_id in c["complements_roles"]])
+                                                          - _mean([local_m.get(c["id"], 0.0) for c in capabilities
+                                                                   if role_id in c["exposes_roles"]])),
+                                          -LOCAL_AI_CAP, LOCAL_AI_CAP), 1)
         local = local_points(dosm, role.get("masco_major")) if dosm else 0.0
         group = forecast.group_forecast(series, role.get("masco_major") or "", baseline["horizon_year"]) if series else None
         if group:
             local = round(_clip(group["change_pct"], -LOCAL_CAP, LOCAL_CAP), 1)
-        growth = round(base["net_growth_pct"] + demand_points + local + ai_points, 1)
+        openings, openings_note = openings_points(role_postings, role_id)
+        sector_points = float(((sector or {}).get("points") or {}).get((role_sectors or {}).get(role_id) or "", 0.0))
+        growth = round(base["net_growth_pct"] + demand_points + local + ai_points + market + openings
+                       + sector_points + local_ai_points, 1)
         extra = {"local_points": local} if dosm else {}
         if group:
             extra["malaysia_forecast"] = group
+        if labour:
+            extra["market_points"] = market
+        if role_postings:
+            extra["openings_points"] = openings
+        if sector:
+            extra["sector_points"] = sector_points
+        if local_m:
+            extra["local_ai_points"] = local_ai_points
         out.append({
             "role_id": role_id,
             "net_growth_pct": growth,
@@ -192,24 +269,47 @@ def role_signals(roles: dict, capabilities: list[dict], baseline: dict, research
             "note": (f"Baseline {base['net_growth_pct']:+g}% ({baseline['snapshot_id']}); "
                      f"job-posting demand {demand_points:+g}; "
                      + (f"Malaysian employment {local:+g}; " if dosm else "")
+                     + (f"Malaysian sector {sector_points:+g}; " if sector else "")
+                     + (f"labour market {market:+g}; " if labour else "")
+                     + (f"live Malaysian postings {openings:+g}; " if role_postings else "")
+                     + (f"Malaysian AI research {local_ai_points:+g}; " if local_m else "")
                      + f"AI research momentum {ai_points:+g}"),
         })
     return out
 
 
+def _adjusted_by(labels: list[str]) -> str:
+    """Deduplicate source labels, keeping the order they were applied, and join them as 'a, b and c'."""
+    names: list[str] = []
+    for label in labels:
+        if label and label not in names:
+            names.append(label)
+    if not names:
+        return ""
+    if len(names) == 1:
+        return names[0]
+    return f"{', '.join(names[:-1])} and {names[-1]}"
+
+
 def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
-          dosm: dict | None = None, history: dict | None = None, my_postings: dict | None = None) -> dict:
+          dosm: dict | None = None, history: dict | None = None, my_postings: dict | None = None,
+          labour: dict | None = None, role_postings: dict | None = None,
+          prices: dict | None = None, attention: dict | None = None,
+          local_research: dict | None = None, sector: dict | None = None,
+          role_sectors: dict[str, str] | None = None) -> dict:
     caps = ref.capabilities
     scenarios = [{"id": k, **v} for k, v in ref.scenarios.items()]
     horizon = int(baseline["horizon_year"])
-    skills_out = skill_signals(ref.skills, caps, research, jobs, history, scenarios, horizon, my_postings=my_postings)
+    skills_out = skill_signals(ref.skills, caps, research, jobs, history, scenarios, horizon,
+                               my_postings=my_postings, attention=attention)
     stamp = now.strftime("%Y-%m-%d")
+    optional = (dosm, my_postings, role_postings, labour, attention, local_research, sector)
+    adjusted = _adjusted_by([research["source"] + " research momentum", jobs["source"]]
+                            + [s["source"] for s in optional if s])
     return {
         "snapshot_id": f"{stamp}-trend-{now:%H%M%S}",
         "kind": "trend-adjusted",
-        "source": (f"{baseline['source']} adjusted by {research['source']} research momentum "
-                   f"and {jobs['source']}" + (f" and {dosm['source']}" if dosm else "")
-                   + (f" and {my_postings['source']}" if my_postings else "")),
+        "source": f"{baseline['source']} adjusted by {adjusted}",
         "source_url": baseline["source_url"],
         "published": baseline["published"],
         "imported": now.isoformat(timespec="seconds"),
@@ -226,11 +326,37 @@ def build(ref, baseline: dict, research: dict, jobs: dict, now: dt.datetime,
             *([{"source": my_postings["source"], "url": my_postings["source_url"],
                 "retrieved": my_postings["retrieved"], "compared_with": my_postings.get("prior_retrieved")}]
               if my_postings else []),
+            *([{"source": role_postings["source"], "url": role_postings["source_url"],
+                "retrieved": role_postings["retrieved"], "compared_with": role_postings.get("prior_retrieved"),
+                "postings": role_postings["postings"]}] if role_postings else []),
+            *([{"source": labour["source"], "url": labour["source_url"], "retrieved": labour["retrieved"],
+                "latest_month": labour["latest_month"], "months": labour["months_used"]}] if labour else []),
+            *([{"source": prices["source"], "url": prices["source_url"], "retrieved": prices["retrieved"],
+                "latest_month": prices["latest_month"], "average_inflation_pct": prices["average_inflation_pct"]}]
+              if prices else []),
+            *([{"source": attention["source"], "url": attention["source_url"], "retrieved": attention["retrieved"],
+                "windows": attention["windows"], "skills": len(attention["attention"]),
+                "unavailable": attention["unavailable"]}] if attention else []),
+            *([{"source": local_research["source"], "url": local_research["source_url"],
+                "retrieved": local_research["retrieved"], "windows": local_research["windows"]}]
+              if local_research else []),
+            *([{"source": sector["source"], "url": sector["source_url"], "retrieved": sector["retrieved"],
+                "years": sector["years"]}] if sector else []),
         ],
         "capability_momentum": momentum(research),
-        "signals": role_signals(ref.roles, caps, baseline, research, skills_out, dosm),
+        "signals": role_signals(ref.roles, caps, baseline, research, skills_out, dosm, labour, role_postings,
+                                local_research, sector, role_sectors),
         "skill_signals": list(skills_out.values()),
         **({"forecast": _forecast_meta(history, dosm, list(ref.skills), horizon)} if history else {}),
+        **({"labour_market": labour} if labour else {}),
+        **({"prices": prices} if prices else {}),
+        **({"attention": {"source": attention["source"], "retrieved": attention["retrieved"],
+                          "windows": attention["windows"], "skills": attention["attention"],
+                          "unavailable": attention["unavailable"]}} if attention else {}),
+        **({"malaysian_research": {"source": local_research["source"], "retrieved": local_research["retrieved"],
+                                   "counts": local_research["counts"],
+                                   "momentum": momentum(local_research, MIN_LOCAL_PAPERS)}} if local_research else {}),
+        **({"sectors": sector} if sector else {}),
     }
 
 

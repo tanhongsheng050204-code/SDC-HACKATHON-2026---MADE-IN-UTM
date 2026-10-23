@@ -42,6 +42,15 @@
     "project_management": {"phrase": "project management"},
     "patient_care": {"phrase": "patient care"},
     "empathy": {"phrase": "empathy"},
-    "adaptability": {"phrase": "adaptability"}
+    "adaptability": {"phrase": "adaptability"},
+    "electronic_assembly": {"phrase": "pcb assembly"},
+    "point_of_sale_operations": {"phrase": "point of sale"},
+    "crop_harvesting": {"phrase": "harvesting"},
+    "crop_care_and_spraying": {"phrase": "spraying"},
+    "cad_bim_modelling": {"tags": ["autocad", "revit", "bim", "civil-3d"]},
+    "bookkeeping": {"phrase": "bookkeeping"},
+    "payroll_processing": {"phrase": "payroll"},
+    "inventory_management": {"phrase": "inventory management"},
+    "vocational_pedagogy": {"phrase": "vocational training"}
   }
 }

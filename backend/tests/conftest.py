@@ -49,6 +49,7 @@ def offline_history(monkeypatch):
 
     monkeypatch.setattr(jobs, "collect_series", offline)
     monkeypatch.setattr(research, "collect_series", offline)
+    monkeypatch.setattr(research, "collect_malaysia", offline)
 
 
 @pytest.fixture(autouse=True)
@@ -60,6 +61,31 @@ def offline_my_postings(monkeypatch):
         raise ValueError("no network in tests")
 
     monkeypatch.setattr(mypostings, "collect", offline)
+    monkeypatch.setattr(mypostings, "collect_roles", offline)
+
+
+@pytest.fixture(autouse=True)
+def offline_dosm_sources(monkeypatch):
+    """The monthly labour force, the CPI and the sector shares are optional: tests never fetch them."""
+    from app.trends import labour, prices, sector
+
+    def offline(*_args, **_kwargs):
+        raise RuntimeError("no network in tests")
+
+    monkeypatch.setattr(labour, "collect", offline)
+    monkeypatch.setattr(prices, "collect", offline)
+    monkeypatch.setattr(sector, "collect", offline)
+
+
+@pytest.fixture(autouse=True)
+def offline_attention(monkeypatch):
+    """Nor Stack Overflow, GitHub, npm or PyPI."""
+    from app.trends import attention
+
+    def offline(*_args, **_kwargs):
+        raise RuntimeError("no network in tests")
+
+    monkeypatch.setattr(attention, "collect", offline)
 
 
 @pytest.fixture(autouse=True)

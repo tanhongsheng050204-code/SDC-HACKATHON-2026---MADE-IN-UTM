@@ -20,6 +20,7 @@ import datetime as dt
 
 from app.reference import Reference
 from app.services.scenario import Outlook, outlook, outlooks, signals_from_snapshot, year_fraction
+from app.trends import prices as prices_module
 
 FIT_WEIGHT, OUTLOOK_WEIGHT = 0.6, 0.4
 PREFERENCE_BOOST = 0.05  # at most; same size as the SDG boost it replaced
@@ -135,11 +136,22 @@ def _skill_view(ref: Reference, rs: dict) -> dict:
 
 
 def pay(ref: Reference, role_id: str) -> dict:
-    """The DOSM median for the role's occupation group: a group figure, never a job offer."""
+    """The DOSM median for the role's occupation group: a group figure, never a job offer.
+
+    When the approved snapshot carries a price block, the same median is also shown in horizon-year
+    money, so a plan that runs to 2030 does not compare today's salary with tomorrow's prices.
+    """
     group = next(g for g in ref.salaries["groups"] if g["id"] == ref.roles[role_id]["masco_major"])
-    return {"group": group["name"], "median_rm": group["median_rm"], "mean_rm": group["mean_rm"],
-            "year": ref.salaries["year"], "source": ref.salaries["source"], "table": ref.salaries["table"],
-            "source_url": ref.salaries["source_url"]}
+    out = {"group": group["name"], "median_rm": group["median_rm"], "mean_rm": group["mean_rm"],
+           "year": ref.salaries["year"], "source": ref.salaries["source"], "table": ref.salaries["table"],
+           "source_url": ref.salaries["source_url"]}
+    prices = ref.latest_snapshot.get("prices")
+    real = prices_module.real_value(group["median_rm"], prices)
+    if real:
+        out["real"] = {"horizon_year": prices["horizon_year"], "median_rm": real,
+                       "inflation_pct": prices["average_inflation_pct"], "source": prices["source"],
+                       "source_url": prices["source_url"]}
+    return out
 
 
 def pay_change(ref: Reference, role_id: str, current_id: str | None) -> int | None:

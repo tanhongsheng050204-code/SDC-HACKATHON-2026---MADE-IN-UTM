@@ -17,7 +17,7 @@ import httpx
 
 from app.config import get_settings
 from app.reference import get_reference
-from app.trends import builder, dosm, jobs, mypostings, research, review
+from app.trends import attention, builder, dosm, jobs, labour, mypostings, prices, research, review, sector
 
 _lock = threading.Lock()
 _status: dict = {"state": "idle", "steps": [], "snapshot_id": None, "error": None}
@@ -79,6 +79,41 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
     except (httpx.HTTPError, KeyError, ValueError) as error:  # optional source: build without it
         _log(f"freehire.me unavailable, building without Malaysian postings ({_safe_error(error)})")
         my_postings = None
+    try:  # optional: how many Malaysian postings mention each role, the same search the role page uses
+        role_raw = _raw("role_postings", now.date(), lambda: mypostings.collect_roles(
+            ref.role_openings, now.date(), progress=_log), force)
+        role_prior = mypostings.previous(get_settings().data_dir / "raw" / "role_postings", now.date())
+        role_postings = mypostings.with_prior_roles(role_raw, role_prior)
+    except (httpx.HTTPError, KeyError, ValueError) as error:
+        _log(f"freehire.me role counts unavailable, building without them ({_safe_error(error)})")
+        role_postings = None
+    try:  # optional: monthly national labour force, for the market-wide adjustment
+        labour_raw = _raw("labour", now.date(), lambda: labour.collect(now.date(), progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"OpenDOSM monthly labour force unavailable, building without it ({_safe_error(error)})")
+        labour_raw = None
+    try:  # optional: prices, shown as 2030 money beside pay; never changes a score
+        prices_raw = _raw("prices", now.date(), lambda: prices.collect(now.date(), progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"OpenDOSM CPI unavailable, building without it ({_safe_error(error)})")
+        prices_raw = None
+    try:  # optional: Stack Overflow, GitHub, npm and PyPI, for each skill's developer attention
+        attention_raw = _raw("attention", now.date(), lambda: attention.collect(
+            ref.skill_sources, now.date(), progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"Developer attention unavailable, building without it ({_safe_error(error)})")
+        attention_raw = None
+    try:  # optional: the same capabilities, but only papers with a Malaysian institution
+        local_research_raw = _raw("local_research", now.date(), lambda: research.collect_malaysia(
+            ref.capabilities, now.date(), mailto=contact, api_key=openalex_key, progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"OpenAlex (Malaysia) unavailable, building without it ({_safe_error(error)})")
+        local_research_raw = None
+    try:  # optional: the share of Malaysian employment in each sector
+        sector_raw = _raw("sector", now.date(), lambda: sector.collect(now.date(), progress=_log), force)
+    except (httpx.HTTPError, KeyError, ValueError, RuntimeError) as error:
+        _log(f"OpenDOSM sector employment unavailable, building without it ({_safe_error(error)})")
+        sector_raw = None
     history = {}
     try:  # optional: the forecasts. Without history the snapshot uses the two-period comparison
         history["jobs"] = _raw("jobs_history", now.date(), lambda: jobs.collect_series(
@@ -89,7 +124,8 @@ def run(force: bool = False, now: dt.datetime | None = None) -> dict:
         _log(f"History incomplete, forecasting from what was collected ({_safe_error(error)})")
     _log("Building new snapshot")
     snapshot = builder.build(ref, baseline_snapshot(ref.snapshots), research_raw, jobs_raw, now, dosm_raw,
-                             history or None, my_postings)
+                             history or None, my_postings, labour_raw, role_postings, prices_raw,
+                             attention_raw, local_research_raw, sector_raw, ref.role_sectors)
     review.save_pending(snapshot)
     _log(f"Saved {snapshot['snapshot_id']} for review. Users keep the current forecast until an admin approves it.")
     return snapshot

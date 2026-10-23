@@ -1,0 +1,24 @@
+{
+  "_note": "Where each skill is measured outside job ads: Stack Overflow tags, GitHub topics, npm and PyPI packages. Only skills with a canonical tag or package are listed; a skill with no entry gets no developer-attention reading (reported as no data, never guessed). Terms were checked against the live APIs on 2026-10-23: every tag, package and topic below returned a count. Team: review additions (REVIEW_LOG.md).",
+  "skills": {
+    "excel": {"stackoverflow": ["excel"]},
+    "sql": {"stackoverflow": ["sql"]},
+    "python": {"stackoverflow": ["python"]},
+    "statistics": {"stackoverflow": ["statistics"], "pypi": ["statsmodels", "scipy"]},
+    "data_visualization": {"stackoverflow": ["data-visualization"], "github": ["data-visualization"], "pypi": ["matplotlib", "plotly"], "npm": ["d3"]},
+    "power_bi": {"stackoverflow": ["powerbi"]},
+    "machine_learning": {"stackoverflow": ["machine-learning"], "github": ["machine-learning"], "pypi": ["scikit-learn"]},
+    "deep_learning": {"stackoverflow": ["deep-learning"], "github": ["deep-learning"], "pypi": ["torch", "tensorflow"]},
+    "genai_tools": {"stackoverflow": ["large-language-model"], "pypi": ["openai", "langchain"], "npm": ["openai"]},
+    "mlops": {"stackoverflow": ["mlops"], "pypi": ["mlflow", "wandb"]},
+    "cloud_computing": {"stackoverflow": ["amazon-web-services", "azure", "google-cloud"], "pypi": ["boto3"], "npm": ["aws-sdk"]},
+    "javascript": {"stackoverflow": ["javascript"], "github": ["javascript"], "npm": ["typescript"]},
+    "git": {"stackoverflow": ["git"]},
+    "software_testing": {"stackoverflow": ["unit-testing", "selenium"], "npm": ["jest", "playwright", "cypress"], "pypi": ["pytest"]},
+    "api_design": {"stackoverflow": ["rest"], "pypi": ["fastapi"], "npm": ["express"]},
+    "cybersecurity_fundamentals": {"stackoverflow": ["cybersecurity"], "github": ["cybersecurity"]},
+    "seo": {"stackoverflow": ["seo"]},
+    "ux_research": {"stackoverflow": ["user-experience"]},
+    "ui_design": {"stackoverflow": ["figma"]}
+  }
+}

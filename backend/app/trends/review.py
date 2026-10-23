@@ -61,12 +61,24 @@ def preview(snapshot_id: str) -> dict:
         })
     roles.sort(key=lambda r: -abs(r["change"] or 0))
     skills = proposed.get("skill_signals", [])
+    market = proposed.get("labour_market") or {}
+    price = proposed.get("prices") or {}
     return {
         "snapshot_id": proposed["snapshot_id"], "imported": proposed["imported"],
         "live_snapshot_id": live["snapshot_id"], "inputs": proposed.get("inputs", []),
         "roles": roles,
         "skills": {label: sum(1 for s in skills if s["label"] == label)
                    for label in ("rising", "steady", "declining", "no_data")},
+        # Why every role can move together: the market-wide channel, and how many roles the
+        # role-specific posting channel can move this time (it needs two counts, 28+ days apart).
+        "channels": {"labour_market_points": market.get("points"),
+                     "labour_latest_month": market.get("latest_month"),
+                     "roles_with_live_posting_points": sum(1 for s in proposed.get("signals", [])
+                                                           if s.get("openings_points")),
+                     "inflation_pct": price.get("average_inflation_pct"),
+                     "sector_points": (proposed.get("sectors") or {}).get("points"),
+                     "malaysian_research_capabilities": len((proposed.get("malaysian_research") or {})
+                                                            .get("momentum") or {})},
     }
 
 

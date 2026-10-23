@@ -3,6 +3,9 @@ __pycache__/
 .pytest_cache/
 *.db
 .env
+# Real secrets live here: frontend.env is the frontend .env, backend.env is the backend .env
+frontend.env
+backend.env
 node_modules/
 dist/
 *.tsbuildinfo
@@ -10,12 +13,18 @@ dist/
 .vercel/
 .env.local
 backend/data/signals/pending/
+# Per-day raw counts from the collectors: regenerable, and they grow every refresh.
+# The published snapshot keeps its own copy of what it was built from.
+backend/data/raw/
 
 # Brainstorming mockups and plan-execution scratch
 .superpowers/
 
 # Local Claude Code settings, skills and preview config
 .claude/
+
+# Local assistant working notes (daily logs, project memory)
+.workbuddy-ai/
 
 # Vite dependency cache
 .vite/

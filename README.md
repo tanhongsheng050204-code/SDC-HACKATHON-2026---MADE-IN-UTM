@@ -33,7 +33,7 @@ AI is changing which jobs exist faster than training and skills frameworks can f
 | | Requirement | How Laluan delivers it | Where to see it |
 | --- | --- | --- | --- |
 | 1 | **Skills profile intake** | CV upload (PDF, Word, scan or photo), pasted text, three questions, voice, or a skill list. Names, emails, phone and IC numbers, addresses and employer names are removed **before any AI reads the text**, and the person sees exactly what will be sent. | Start with my skills |
-| 2 | **AI-trend signal layer** | A pipeline collects arXiv research, Malaysian job ads (freehire.me), Hacker News hiring threads and OpenDOSM employment on top of the WEF Future of Jobs 2025 baseline. Each refresh becomes a **dated snapshot**, runs weekly from GitHub Actions, and **goes live only after a person approves it**. | Future Skills Radar, Sources |
+| 2 | **AI-trend signal layer** | A pipeline collects arXiv research, Malaysian job ads (freehire.me, counted per role and per skill), Hacker News hiring threads, developer attention (Stack Overflow, GitHub, npm and PyPI), AI papers carrying a Malaysian institution, and OpenDOSM's labour-force, sector-employment and price series on top of the WEF Future of Jobs 2025 baseline. Each refresh becomes a **dated snapshot**, runs weekly from GitHub Actions, and **goes live only after a person approves it**. | Future Skills Radar, Sources |
 | 3 | **Future-role matching** | 23 roles ranked by *0.6 × skill fit + 0.4 × outlook*. **Why this rank?** shows the breakdown; every role lists the skills you have and the ones you're missing. | Future roles, role page |
 | 4 | **Personalised pathway** | Ordered courses for the missing skills, with hours, cost label and the date each link was checked. Free-only filter; HRD Corp-claimable programmes for workers. Tick a course and readiness updates. | Pathway |
 | 5 | **SDG mapping** | Every role and skill is linked to an SDG target, with a written reason for each link. Pick an SDG and Laluan shows which role serves it and what that choice costs you in fit and outlook. | SDG impact, Future roles → Any SDG |
@@ -56,7 +56,7 @@ AI is changing which jobs exist faster than training and skills frameworks can f
 
 ## What makes Laluan different
 
-- **Forecast x-ray.** Tap any outlook and see every step from the published WEF figure to the number on the card: Malaysian job-ad demand, OpenDOSM employment, AI research momentum and AI adoption, each with its source, snapshot and cap.
+- **Forecast x-ray.** Tap any outlook and see every step from the published WEF figure to the number on the card: Malaysian job-ad demand, OpenDOSM employment, the monthly labour market, live postings for the role, the Malaysian sector shift, Malaysian AI research, AI research momentum and AI adoption, each with its source, snapshot and cap.
 - **Your own tipping point.** Drag AI adoption from 0.5× to 2×. Laluan names the speed at which your current job turns *Declining* or another role overtakes your top match.
 - **Output changes when the data changes.** When a newer forecast is approved, Today says which roles moved and offers to re-plan. Nothing switches without you.
 - **Humans in charge.** A person approves every trend update (with a before/after table of every role that would move), the coach can only *suggest* a change that you then press **Apply** on, and every screen says "You decide". Laluan never ranks people for hiring.
@@ -107,7 +107,7 @@ The route itself (matching, forecasts, scenarios, the x-ray, tipping points and 
 | --- | --- |
 | **Language models** | **Google Gemini 3.8 Flash** for the coach, proof-check questions, interview feedback, the identity statement and survey reading. **Qwen 2.5 7B Instruct** (open model, on our RunPod worker) reads CVs first, so Gemini sees only confirmed skills. Our own OCR reads scans. The model in use is shown in the app. |
 | **What AI never does** | Rank roles, calculate forecasts, choose courses or make a decision for you. With no API key, everything still works with rules and templates. |
-| **Data** | Public or synthetic only: WEF Future of Jobs 2025, OpenDOSM, DOSM Salaries & Wages 2025, O\*NET 30.0, TalentCorp MyCOL, freehire.me job ads, arXiv, the Anthropic Economic Index, OpenAI's "GPTs are GPTs" and the ILO 2025 index. All demo people, CVs, companies and classes are invented. See the [data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf). |
+| **Data** | Public or synthetic only: WEF Future of Jobs 2025, OpenDOSM (monthly labour force, employment by sector, consumer prices, salaries), DOSM Salaries & Wages 2025, O\*NET 30.0, TalentCorp MyCOL, freehire.me job ads, arXiv and OpenAlex, Stack Overflow, GitHub, npm and PyPI developer activity, the Anthropic Economic Index, OpenAI's "GPTs are GPTs" and the ILO 2025 index. All demo people, CVs, companies and classes are invented. See the [data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf) and the [expansion record](docs/DATA_SOURCES_EXPANSION.md). |
 | **Your data** | CVs are read in memory and never stored; only confirmed skills, goals and progress are saved. Download or delete everything from the app. |
 
 ## Run it locally
@@ -118,7 +118,7 @@ cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.
 cd frontend && npm install && npm run dev                  # http://localhost:5173
 ```
 
-No API key is needed. Setup, configuration, deployment, tests (about 430 backend tests plus frontend tests, run in CI on SQLite and Postgres) and the project structure are in **[Developing Laluan](docs/DEVELOPMENT.md)**.
+No API key is needed. Setup, configuration, deployment, tests (about 490 backend tests plus frontend tests, run in CI on SQLite and Postgres) and the project structure are in **[Developing Laluan](docs/DEVELOPMENT.md)**.
 
 Stack: React 18 + TypeScript + Vite, FastAPI, Supabase Postgres and Auth (SQLite locally), Gemini and RunPod; Vercel and Render.
 
@@ -126,7 +126,7 @@ Stack: React 18 + TypeScript + Vite, FastAPI, Supabase Postgres and Auth (SQLite
 
 - SDC submission: [Preliminary proposal](docs/submission/SDC2026_MadeInUTM_Preliminary.md) · [Technical tools declaration](docs/submission/SDC2026_MadeInUTM_TechDeclaration.md) · [Data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf)
 - Design: [PRD](docs/01-PRD.md) · [TRD](docs/02-TRD.md) · [App flow](docs/03-APP_FLOW.md) · [UI/UX brief](docs/04-UI_UX_BRIEF.md) · [Backend schema](docs/05-BACKEND_SCHEMA.md) · [Implementation plan](docs/06-IMPLEMENTATION_PLAN.md)
-- How we built and checked it: [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md) · [Manual test plan](docs/MANUAL_TEST_PLAN.md)
+- How we built and checked it: [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md) · [Manual test plan](docs/MANUAL_TEST_PLAN.md) · [Data sources expansion](docs/DATA_SOURCES_EXPANSION.md)
 
 ## Team
 

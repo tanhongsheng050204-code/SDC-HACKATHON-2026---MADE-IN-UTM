@@ -183,7 +183,9 @@ export function RoleDetail({ profile, role, scenario, adoption, tab, onTab, onIm
           <div className="role-tile">
             <span className="role-tile-k">{t("rp.pay")} {info("pay", t("rp.pay"))}</span>
             <strong className="role-tile-v">{rm(role.pay.median_rm)}</strong>
-            <span className="role-tile-s">{t("rp.payMonth")}</span>
+            <span className="role-tile-s">{role.pay.real
+              ? tf("rp.payReal", { amount: rm(role.pay.real.median_rm), year: role.pay.real.horizon_year })
+              : t("rp.payMonth")}</span>
           </div>
         )}
         {req && (

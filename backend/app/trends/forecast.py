@@ -15,12 +15,15 @@ One method for every series, so each number can be explained and checked:
          log change by the horizon = b * D(h),   D(h) = phi * (1 - phi**h) / (1 - phi),  phi = DAMPING
      h is the years from the last data point to the middle of the horizon year. The 80% range uses
      b +/- Z80 * se. The range covers uncertainty in the trend, not one-off shocks.
-  4. A skill combines job-posting demand with AI research, the same two parts the snapshot builder
-     adds together:
+  4. A skill combines job-posting demand with AI research and developer attention, the same parts the
+     snapshot builder adds together:
          L(scenario) = D * b_jobs + adoption * D * 0.5 * (sum of b for capabilities that boost it
                                                          - sum of b for capabilities that automate it)
+                       + 0.15 * ln(2) * attention
      with adoption from data/scenarios.json (slow 0.5, baseline 1.0, accelerated 1.6). Only
-     capabilities growing faster than average (b > 0) count, as in the builder.
+     capabilities growing faster than average (b > 0) count, as in the builder. Attention is a
+     log2 ratio over a year, so it is converted to a yearly log rate (x ln 2) and weighted at 0.15,
+     well below job postings and research.
   5. Label from the projected change: rising above +THRESHOLD_PCT, declining below -THRESHOLD_PCT,
      else steady. "sure" only when the whole 80% range is on the same side. A skill is "emerging"
      when it is rising and its share grew faster in the recent half of the history than the first.
@@ -44,6 +47,7 @@ PARTIAL_SHARE = 0.6  # a quarter with fewer postings than this share of the medi
 MIN_SKILL_MENTIONS = 40  # postings mentioning the skill over the whole history
 BACKTEST_PERIODS = 4
 AI_SHARE = 0.5  # weight of research momentum in a skill's forecast, as in builder.skill_signals
+ATTENTION_SHARE = 0.15  # weight of developer attention, as in builder.ATTENTION_WEIGHT
 EMERGING_SPEEDUP = 0.05  # recent-half yearly log growth above the first half's
 
 
@@ -151,7 +155,8 @@ def _acceleration(points: list[tuple[float, float]]) -> float:
 
 
 def skill_forecast(skill_id: str, capabilities: list[dict], jobs_series: dict | None,
-                   cap_trends: dict[str, dict], scenarios: list[dict], horizon_year: int) -> dict | None:
+                   cap_trends: dict[str, dict], scenarios: list[dict], horizon_year: int,
+                   attention: float | None = None) -> dict | None:
     shares = skill_share(jobs_series, skill_id) if jobs_series else None
     pressing = lambda key: [cap_trends[c["id"]] for c in capabilities  # acceleration only, as the builder
                             if skill_id in c[key] and cap_trends.get(c["id"], {}).get("slope", 0) > 0]
@@ -168,20 +173,23 @@ def skill_forecast(skill_id: str, capabilities: list[dict], jobs_series: dict | 
     d = damped(years)
     ai = AI_SHARE * (sum(t["slope"] for t in boost) - sum(t["slope"] for t in automate))
     ai_var = AI_SHARE ** 2 * sum(t["se"] ** 2 for t in boost + automate)
+    # Attention is a log2 ratio over a year; ln(2) turns it into the log rate the band works in.
+    att = ATTENTION_SHARE * (attention or 0.0) * math.log(2)
     by_scenario = {}
     for s in scenarios:
         a = float(s["adoption"])
-        by_scenario[s["id"]] = band(d * (b_jobs + a * ai), d * math.sqrt(se_jobs ** 2 + a ** 2 * ai_var))
+        by_scenario[s["id"]] = band(d * (b_jobs + a * ai + att), d * math.sqrt(se_jobs ** 2 + a ** 2 * ai_var))
     baseline = by_scenario.get("baseline") or next(iter(by_scenario.values()))
     return {
         "horizon_year": horizon_year,
         "history": [{"period": p, "share_pct": round(v * 100, 2)} for p, v in shares.items()] if shares else [],
         "growth_per_year": round(b_jobs, 4) if shares else None,
         "ai_per_year": round(ai, 4),
+        "attention_per_year": round(att, 4),
         "scenarios": by_scenario,
         "emerging": bool(shares) and baseline["label"] == "rising"
                     and _acceleration(points) > EMERGING_SPEEDUP,
-        "annual_rate": round(math.exp(d * (b_jobs + ai) / max(1.0, years)) - 1, 4),
+        "annual_rate": round(math.exp(d * (b_jobs + ai + att) / max(1.0, years)) - 1, 4),
     }
 
 

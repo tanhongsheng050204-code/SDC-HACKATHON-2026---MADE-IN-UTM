@@ -17,6 +17,11 @@ function groups(): { title: StringKey; items: Source[] }[] {
     { title: "src.gJobs", items: [
       { title: t("src.forecastT"), by: "World Economic Forum · Future of Jobs Report 2025", what: t("src.forecastWhat"), url: "https://www.weforum.org/publications/the-future-of-jobs-report-2025/" },
       { title: t("src.trendT"), by: "arXiv / OpenAlex · Hacker News · OpenDOSM", what: `${t("src.trend1")} ${t("src.opendosm")} ${t("src.trend2")} backend/data/raw/.`, url: "https://open.dosm.gov.my/data-catalogue/wages_occupation" },
+      { title: t("src.myresearchT"), by: "OpenAlex · papers from Malaysian institutions", what: t("src.myresearch"), url: "https://openalex.org" },
+      { title: t("src.attentionT"), by: "Stack Overflow · GitHub · npm · PyPI", what: t("src.attention"), url: "https://api.stackexchange.com/docs" },
+      { title: t("src.labourT"), by: "OpenDOSM · Labour Force Survey, Malaysia", what: t("src.labour"), url: "https://open.dosm.gov.my/data-catalogue?id=lfs_month" },
+      { title: t("src.sectorT"), by: "OpenDOSM · employment by sector", what: t("src.sector"), url: "https://open.dosm.gov.my/data-catalogue?id=employment_sector" },
+      { title: t("src.cpiT"), by: "OpenDOSM · consumer price index", what: t("src.cpi"), url: "https://open.dosm.gov.my/data-catalogue?id=cpi_headline" },
       { title: t("src.mycolT"), by: "TalentCorp · MyCOL 2024/2025", what: t("src.mycol"), url: "https://www.talentcorp.com.my/mycol/" },
       { title: t("src.postingsT"), by: "freehire.me", what: t("src.postings"), url: "https://freehire.me" },
     ] },

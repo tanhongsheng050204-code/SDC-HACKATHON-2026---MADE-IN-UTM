@@ -1,0 +1,28 @@
+{
+  "_note": "Which of the three sectors in OpenDOSM's employment_sector series each role belongs to. DOSM publishes only agriculture / industry / services at this frequency, so a role inherits its sector's shift in the share of Malaysian employment. Team: review the assignments (REVIEW_LOG.md).",
+  "roles": {
+    "data_entry_clerk": "services",
+    "admin_assistant": "services",
+    "customer_service_rep": "services",
+    "data_analyst": "services",
+    "ai_ml_engineer": "services",
+    "ai_operations_specialist": "services",
+    "software_developer": "services",
+    "cybersecurity_analyst": "services",
+    "digital_marketing_specialist": "services",
+    "ux_designer": "services",
+    "renewable_energy_technician": "industry",
+    "sustainability_analyst": "services",
+    "care_worker": "services",
+    "production_operator": "industry",
+    "cashier": "services",
+    "hotel_front_desk_clerk": "services",
+    "farm_worker": "agriculture",
+    "engineering_technician": "industry",
+    "accounts_clerk": "services",
+    "supply_chain_specialist": "services",
+    "bank_teller": "services",
+    "registered_nurse": "services",
+    "tvet_instructor": "services"
+  }
+}

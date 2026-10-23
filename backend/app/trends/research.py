@@ -50,14 +50,19 @@ def _arxiv_count(client: httpx.Client, query: str, start: dt.date, end: dt.date)
 
 
 def _openalex_count(client: httpx.Client, query: str, start: dt.date, end: dt.date,
-                    mailto: str | None, api_key: str | None = None) -> int:
-    params = {"search": f'"{query}"', "per-page": 1,
-              "filter": f"from_publication_date:{start},to_publication_date:{end}"}
+                    mailto: str | None, api_key: str | None = None,
+                    country: str | None = None) -> int:
+    filters = [f"from_publication_date:{start}", f"to_publication_date:{end}"]
+    if country:  # only work with at least one institution in that country
+        filters.append(f"institutions.country_code:{country}")
+    params = {"search": f'"{query}"', "per-page": 1, "filter": ",".join(filters)}
     if mailto:
         params["mailto"] = mailto
     if api_key:  # without one, searches share a small free daily budget per IP address
         params["api_key"] = api_key
     response = client.get(OPENALEX_URL, params=params)
+    if response.status_code == 429:
+        raise SourceUnavailable("OpenAlex budget or rate limit")
     response.raise_for_status()
     return int(response.json()["meta"]["count"])
 
@@ -152,6 +157,43 @@ def collect_series(capabilities: list[dict], today: dt.date, *, client: httpx.Cl
         "source_url": ARXIV_URL if source == "arxiv" else OPENALEX_URL,
         "retrieved": today.isoformat(),
         "periods": [label for label, _, _ in spans],
+        "queries": {cap["id"]: cap["query"] for cap in capabilities},
+        "counts": counts,
+    }
+
+
+MALAYSIA = "MY"
+
+
+def collect_malaysia(capabilities: list[dict], today: dt.date, *, client: httpx.Client | None = None,
+                     mailto: str | None = None, api_key: str | None = None,
+                     progress: Callable[[str], None] = lambda _: None) -> dict:
+    """The same capability counts, restricted to papers with a Malaysian institution (OpenAlex only:
+    arXiv has no country filter). Same shape as collect(), so builder.momentum reads it unchanged.
+
+    This answers a different question from the global series: not "is this capability advancing?"
+    but "is Malaysia working on it?". Sixteen requests, so it stays inside OpenAlex's free budget
+    when no key is set; a 429 is reported and the snapshot is built without it.
+    """
+    own_client = client is None
+    client = client or httpx.Client(timeout=30, headers={"User-Agent": USER_AGENT},
+                                    follow_redirects=True)
+    spans = windows(today)
+    counts = {}
+    try:
+        for cap in capabilities:
+            progress(f"Malaysian research (OpenAlex): {cap['name']}")
+            counts[cap["id"]] = {name: _openalex_count(client, cap["query"], start, end, mailto, api_key,
+                                                       country=MALAYSIA)
+                                 for name, (start, end) in spans.items()}
+    finally:
+        if own_client:
+            client.close()
+    return {
+        "source": "OpenAlex, papers with a Malaysian institution",
+        "source_url": OPENALEX_URL,
+        "retrieved": today.isoformat(),
+        "windows": {name: [str(start), str(end)] for name, (start, end) in spans.items()},
         "queries": {cap["id"]: cap["query"] for cap in capabilities},
         "counts": counts,
     }

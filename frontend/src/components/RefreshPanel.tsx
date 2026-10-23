@@ -61,7 +61,7 @@ export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
   return (
     <details className="card admin" open={!!preview || undefined}>
       <summary>Admin: refresh trend data{preview && <span className="badge gold">1 waiting for review</span>}</summary>
-      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy), job-posting counts and Malaysian employment by occupation (OpenDOSM) and builds a new dated forecast. <strong>Nothing changes for users until a person approves it.</strong> Older forecasts are kept.</p>
+      <p className="muted">Pulls the latest AI research counts (arXiv, or OpenAlex if arXiv is busy), job-posting counts and Malaysian employment by occupation (OpenDOSM), the monthly Malaysian labour force (OpenDOSM), how many Malaysian postings name each role (freehire.me) and the consumer price index, then builds a new dated forecast. <strong>Nothing changes for users until a person approves it.</strong> Older forecasts are kept.</p>
       <div className="two-col">
         <label>Admin token <input type="password" value={token} onChange={(e) => setToken(e.target.value)} onBlur={() => loadPending()} /></label>
         <label>Your name (recorded with your decision) <input type="text" maxLength={60} value={reviewer} onChange={(e) => setReviewer(e.target.value)} /></label>
@@ -96,6 +96,16 @@ export function RefreshPanel({ onDone }: { onDone: () => Promise<void> }) {
           )}
           <p className="muted">Skill trends: {preview.skills.rising} rising, {preview.skills.steady} steady, {preview.skills.declining} declining, {preview.skills.no_data} without data.
             {preview.inputs.map((i) => <span key={i.source}> · {i.source} (retrieved {i.retrieved})</span>)}</p>
+          {preview.channels && (
+            <p className="muted">Market-wide: the labour market adds {signed(preview.channels.labour_market_points ?? 0)} points to every role
+              {preview.channels.labour_latest_month && ` (OpenDOSM, ${preview.channels.labour_latest_month})`}; live postings can move
+              {" "}{preview.channels.roles_with_live_posting_points} role{preview.channels.roles_with_live_posting_points === 1 ? "" : "s"} this time
+              {preview.channels.inflation_pct !== null && `; prices rising ${preview.channels.inflation_pct}% a year`}
+              {preview.channels.sector_points && Object.keys(preview.channels.sector_points).length > 0
+                && `; sector shift ${Object.entries(preview.channels.sector_points).map(([name, points]) => `${name} ${signed(points)}`).join(", ")}`}
+              {!!preview.channels.malaysian_research_capabilities
+                && `; Malaysian research measured for ${preview.channels.malaysian_research_capabilities} capabilities`}.</p>
+          )}
           <label>Reason (needed to reject) <input type="text" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. job-posting counts look too small this month" /></label>
           <div className="actions">
             <button className="primary" disabled={reviewer.trim().length < 2} onClick={() => decide("approve")}>Approve and publish</button>
