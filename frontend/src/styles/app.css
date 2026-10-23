@@ -1396,3 +1396,13 @@ button.settings-row:hover:not(:disabled) { background: var(--hover); }
 .search-box input[type="text"]:focus { outline: none; box-shadow: none; }
 button.settings-row:has(> .icon:first-child) { justify-content: flex-start; }
 .pathway-page .banner button.link { min-height: 0; padding: 0; }
+
+/* Landing: signed-in account as an avatar with a small menu */
+.account-menu { position: relative; }
+.account-menu summary { list-style: none; cursor: pointer; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-menu summary .avatar { width: 36px; height: 36px; border-radius: 50%; font-size: .95rem; }
+.account-menu[open] summary .avatar, .account-menu summary:hover .avatar { box-shadow: 0 0 0 3px var(--accent-soft); }
+.account-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 50; display: grid; gap: 10px; min-width: 200px; padding: 14px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 40px -18px rgba(16, 36, 31, .45); text-align: left; }
+.account-name { font-weight: 700; overflow-wrap: anywhere; }

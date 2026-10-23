@@ -214,6 +214,7 @@ const STRINGS = {
   "shell.waking": { en: "Waking up the server. The free hosting sleeps when idle, so this first step can take up to a minute.", ms: "Pelayan sedang dihidupkan. Hos percuma tidur apabila tidak digunakan, jadi langkah pertama ini boleh mengambil masa sehingga seminit.", zh: "正在唤醒服务器。免费主机闲置时会休眠，第一次操作可能需要一分钟。" },
   "shell.demoFailed": { en: "Couldn't open the demo profile. The server didn't answer; try again in a moment.", ms: "Tidak dapat membuka profil demo. Pelayan tidak menjawab; cuba lagi sebentar lagi.", zh: "无法打开示范资料，服务器没有响应，请稍后再试。" },
   "auth.login": { en: "Log in with Google", ms: "Log masuk dengan Google", zh: "使用 Google 登录" },
+  "auth.account": { en: "Your account", ms: "Akaun anda", zh: "您的账户" },
   "auth.logout": { en: "Log out", ms: "Log keluar", zh: "退出登录" },
   "auth.keep": { en: "Log in to keep your progress on any device.", ms: "Log masuk untuk menyimpan kemajuan anda pada mana-mana peranti.", zh: "登录即可在任何设备上保留您的进度。" },
   "auth.expired": { en: "Your login expired. Log in again to see your saved profile.", ms: "Log masuk anda telah tamat. Log masuk semula untuk melihat profil yang disimpan.", zh: "您的登录已过期。请重新登录以查看已保存的资料。" },

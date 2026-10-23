@@ -1,7 +1,7 @@
 // Screens follow docs/03-APP_FLOW.md. Entry points: /?card=ID opens a read-only Future Card;
 // /?demo=clerk|student|hr opens a demo; ?view=... restores a screen (see lib/route.ts).
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AccountButton } from "./components/AccountButton";
+import { AccountMenu } from "./components/AccountButton";
 import { LogoMark } from "./components/Brand";
 import { Coach } from "./components/Coach";
 import { Icon } from "./components/Icon";
@@ -396,7 +396,7 @@ function MainApp({ demo }: { demo: string | null }) {
           <a href="#faq">{t("landing.navFaq")}</a>
         </div>
         <div className="site-nav-actions">
-          <AccountButton userId={userId} />
+          <AccountMenu userId={userId} name={accountName ?? getGoogleName()} />
           {storedId && <button className="btn quiet sm" onClick={() => resume()}>{t("landing.continue")}</button>}
           <button className="btn ink sm" onClick={() => go("intake")}>{t("landing.start")}</button>
         </div>

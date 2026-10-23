@@ -20,6 +20,29 @@ export function AccountButton({ userId, className = "btn quiet sm" }: { userId: 
   );
 }
 
+// The landing page's account control: "Log in with Google" when signed out; when signed in, a round
+// avatar with the first letter of the name that opens a small menu with the name and Log out.
+export function AccountMenu({ userId, name }: { userId: string | null; name: string | null }) {
+  const menu = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const close = (e: MouseEvent) => { if (menu.current && !menu.current.contains(e.target as Node)) menu.current.open = false; };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+  if (!authEnabled) return null;
+  if (!userId) return <AccountButton userId={null} />;
+  const label = name?.trim() || t("auth.account");
+  return (
+    <details className="account-menu" ref={menu}>
+      <summary aria-label={label} title={label}><span className="avatar" aria-hidden="true">{label.slice(0, 1).toUpperCase()}</span></summary>
+      <div className="account-pop">
+        <span className="account-name">{label}</span>
+        <button className="btn quiet sm" onClick={() => signOut()}>{t("auth.logout")}</button>
+      </div>
+    </details>
+  );
+}
+
 export function LoginDialog({ onClose }: { onClose: () => void }) {
   const first = useRef<HTMLButtonElement>(null);
   useEffect(() => {
