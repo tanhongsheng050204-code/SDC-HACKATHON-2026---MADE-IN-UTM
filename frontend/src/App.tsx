@@ -479,7 +479,7 @@ function MainApp({ demo }: { demo: string | null }) {
               <SkillTree key={`${profile.id}-${role.role_id}`} profile={profile} role={role} userId={userId} onProfile={setProfile}
                 onImpact={() => go("impact")} onBack={() => go("role")} onDestinations={() => go("roles")} />
             )}
-            {screen === "sources" && <Sources onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
+            {screen === "sources" && <Sources profile={profile} onDelete={() => deleteProfile()} onReviewKit={() => go("review-kit")} onAdmin={() => go("admin")} />}
             {screen === "review-kit" && <ReviewKit />}
             {screen === "workforce" && <Workforce initialTab={workforceTab} userId={userId} />}
           </ScreenBoundary>

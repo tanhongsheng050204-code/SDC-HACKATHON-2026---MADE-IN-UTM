@@ -1208,3 +1208,43 @@ button.pw-step:hover:not(:disabled) { background: var(--surface); border-color: 
 .step-course p { margin: 0; }
 .step-sources summary, .plan-about summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
 .plan-about { display: grid; gap: 10px; }
+
+/* ---------- Sources: a privacy label and a searchable list of sources ---------- */
+.sources-page { display: grid; gap: 18px; max-width: 900px; }
+.sources-promise { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.privacy-label { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); overflow: hidden; }
+.privacy-label details { border-top: 1px solid var(--line); }
+.privacy-label details:first-child { border-top: 0; }
+.privacy-label summary { display: grid; grid-template-columns: 40px minmax(0, 1fr) 14px; gap: 12px; align-items: center; padding: 14px 16px; cursor: pointer; list-style: none; }
+.privacy-label summary::-webkit-details-marker { display: none; }
+.privacy-label summary::after { content: "›"; color: var(--ink-soft); transition: transform .15s; }
+.privacy-label details[open] summary::after { transform: rotate(90deg); }
+.privacy-label summary strong { display: block; }
+.privacy-label summary .muted { font-size: .88rem; }
+.privacy-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; font-weight: 800; }
+.privacy-icon.keep, .privacy-icon.rights { background: var(--good-bg); color: var(--good); }
+.privacy-icon.never { background: var(--risk-bg); color: var(--risk); }
+.privacy-icon.ai { background: var(--accent-soft); color: var(--accent); }
+.privacy-icon.who { background: var(--gold-bg); color: var(--gold); }
+.privacy-full { display: grid; gap: 8px; padding: 0 16px 16px 68px; color: var(--ink-soft); font-size: .92rem; }
+.privacy-full p { margin: 0; }
+.btn.danger-text { color: var(--risk); }
+.sources-now { display: grid; gap: 8px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); }
+.sources-now-k { font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--good); }
+.sources-now h2 { margin: 0; font-size: 1.05rem; }
+.sources-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0; font-size: .88rem; color: var(--ink-soft); }
+.sources-now summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
+.fairness-line { padding: 12px 16px; border-radius: var(--radius-card); background: var(--good-bg); }
+.fairness-line summary { cursor: pointer; font-weight: 700; color: var(--good); }
+.fairness-line summary.failed { color: var(--risk); }
+.fairness-line p { margin: 8px 0 0; font-size: .9rem; }
+input[type="search"].sources-search { border-radius: 12px; }
+.sources-group { display: grid; gap: 6px; }
+.sources-group h3 { margin: 0; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.sources-list { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); overflow: hidden; }
+.sources-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.sources-list li:first-child { border-top: 0; }
+.sources-what { grid-column: 1; font-size: .88rem; color: var(--ink-2); }
+.sources-by { grid-column: 1; font-size: .78rem; color: var(--ink-soft); }
+.sources-list a { grid-column: 2; grid-row: 1 / span 3; align-self: center; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.sources-foot { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: .86rem; color: var(--ink-soft); }
