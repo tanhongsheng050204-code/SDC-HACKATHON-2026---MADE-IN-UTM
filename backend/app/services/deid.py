@@ -119,6 +119,22 @@ def _is_label(line: str) -> bool:
     return line.strip().rstrip(":").lower() in _LABELS
 
 
+def _spelled_by(line: str, words: set[str]) -> list[str] | None:
+    """The email words that, run together, make up the whole line ("aisyahrahman"), else None."""
+    letters = re.sub(r"[^a-z]", "", line)
+    if not letters or len(letters) > 60:  # a name, not a paragraph
+        return None
+    words = {w for w in words if w in letters}
+    # Word-break over the letters: best[i] is a way to spell letters[:i] from the words.
+    best: list[list[str] | None] = [[]] + [None] * len(letters)
+    for i in range(len(letters)):
+        if best[i] is not None:
+            for w in words:
+                if letters.startswith(w, i) and best[i + len(w)] is None:
+                    best[i + len(w)] = best[i] + [w]
+    return best[-1] or None
+
+
 def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
     """scrub(), plus the places a CV carries people's names: a "Name:" line; the owner's name in the
     first lines (ended by a dash, comma or full stop), after any heading such as "PROFILE" or "RESUME",
@@ -136,8 +152,14 @@ def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
     hints = {w for m in _EMAIL.finditer(text) for w in re.split(r"[^a-z]+", m.group().split("@")[0].lower())
              if len(w) >= 3 and w not in _MAILBOX_WORDS}
     for i, line in enumerate(lines):
-        if hints and _looks_like_name(line.strip()) and hints & {w.lower() for w in line.split()}:
+        if not hints or not _looks_like_name(line.strip()):
+            continue
+        if hints & {w.lower() for w in line.split()}:
             found.append(line.strip())
+            lines[i] = "[NAME]"
+        elif (parts := _spelled_by(line.strip().lower(), hints)):
+            # A letter-spaced heading ("A I S Y A H   R A H M A N") comes out of a PDF as "AISYAHRAHMAN".
+            found.append(" ".join(parts))
             lines[i] = "[NAME]"
     seen = 0
     for i, line in enumerate(lines):

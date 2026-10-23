@@ -102,3 +102,14 @@ def test_a_designed_cv_with_the_sidebar_first_loses_the_name():
     for leak in ("Mariana", "Anderson", "mariana", "6789", "Mawar", "Tan Wei", "Lim Mei"):
         assert leak not in clean, leak
     assert "Phone\n[PHONE]" in clean and "Social media marketing" in clean and "Marketing Manager" in clean
+
+
+def test_a_letter_spaced_name_heading_read_as_one_word_is_removed():
+    """A PDF reader runs "A I S Y A H  R A H M A N" together; the email words still spell it."""
+    from app.services.deid import scrub_cv
+    cv = ("CONTACT\n012-345 6789\naisyah.rahman@example.com\nSKILLS\nData entry\nAISYAHRAHMAN\n"
+          "D A T A E N T R Y C L E R K\nPROFILE\nAisyah keys in 300 invoices a day.\n")
+    clean = scrub_cv(cv)
+    for leak in ("AISYAH", "Aisyah", "RAHMAN", "aisyah"):
+        assert leak not in clean, leak
+    assert "Data entry" in clean and "keys in 300 invoices" in clean
