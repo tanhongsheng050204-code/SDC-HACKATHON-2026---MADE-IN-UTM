@@ -57,3 +57,23 @@ def test_offline_answers_are_not_revised(monkeypatch):
     monkeypatch.setattr(coach, "generate_json", lambda prompt: (_ for _ in ()).throw(AssertionError("no AI call")))
     result = coach.answer(get_reference(), PROFILE, "How long will the plan take?")
     assert result["mode"] == "offline" and result["revised"] is False and result["dropped"] == 0
+
+
+def _offline(monkeypatch, question):
+    monkeypatch.setattr(coach, "_llm_available", lambda: False)
+    return coach.answer(get_reference(), PROFILE, question)
+
+
+def test_offline_keywords_match_whole_words(monkeypatch):
+    # "career" starts with "care" (an SDG 3 word); "pay" here is salary, not course fees.
+    assert "SDG 3" not in _offline(monkeypatch, "Which career suits me best?")["answer"]
+    assert "Free or free audit" not in _offline(monkeypatch, "Is the pay better?")["answer"]
+    assert "SDG 3" in _offline(monkeypatch, "I want to work in elderly care")["answer"]
+
+
+def test_offline_coach_names_the_first_course_in_every_language(monkeypatch):
+    for question in ("Which course should I take first?", "Kursus apa saya patut belajar?", "我应该学什么？"):
+        result = _offline(monkeypatch, question)
+        assert result["answer"].startswith("Your pathway to") and "starts with" in result["answer"]
+        assert result["grounding"]["all_supported"]
+    assert "ranks #1" in _offline(monkeypatch, "Kenapa ini peranan terbaik saya?")["answer"]

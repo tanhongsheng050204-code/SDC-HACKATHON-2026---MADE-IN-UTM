@@ -58,7 +58,7 @@ def read_skills(cell: str) -> list[str]:
 
 
 def parse(ref: Reference, text: str) -> tuple[list[dict], list[str]]:
-    reader = csv.DictReader(io.StringIO(text.strip()))
+    reader = csv.DictReader(io.StringIO(text.lstrip("\ufeff").strip()))  # Excel's "CSV UTF-8" starts with a BOM
     columns = [c.strip().lower() for c in (reader.fieldnames or [])]
     if "role" not in columns or "skills" not in columns:
         raise WorkforceError("The CSV needs a 'role' column and a 'skills' column")

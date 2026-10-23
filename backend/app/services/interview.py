@@ -19,6 +19,7 @@ from app.reference import Reference
 from app.services import guardrails
 from app.services.deid import scrub
 from app.services.matching import effective_skills
+from app.services.wording import mid_sentence, with_article
 
 QUESTIONS = 5
 LANGUAGES = {"en": "English", "ms": "Bahasa Malaysia", "zh": "Simplified Chinese"}
@@ -50,11 +51,11 @@ def plan(ref: Reference, profile: dict, role_id: str) -> list[dict]:
 
 def _template(role: dict, step: dict) -> str:
     if step["kind"] == "motivation":
-        return f"Why do you want to move into a role as a {role['title'].lower()}, and what do you already bring to it?"
+        return f"Why do you want to move into a role as {with_article(role['title'])}, and what do you already bring to it?"
     if step["have"]:
-        return (f"Tell me about a time you used {step['name'].lower()}. What was the situation, what did you do, "
+        return (f"Tell me about a time you used {mid_sentence(step['name'])}. What was the situation, what did you do, "
                 f"and what was the result?")
-    return (f"This role needs {step['name'].lower()}, which isn't on your profile yet. How would you learn it, "
+    return (f"This role needs {mid_sentence(step['name'])}, which isn't on your profile yet. How would you learn it, "
             f"and what have you done that comes closest?")
 
 

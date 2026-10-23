@@ -70,3 +70,22 @@ def test_titled_names_are_removed_anywhere():
     from app.services.deid import scrub
     assert scrub("Reported to Puan Siti Aminah and Ir. Lim Chee Keong weekly.") == "Reported to [NAME] and [NAME] weekly."
     assert scrub("Dr.Tan Wei Ming, Senior Lecturer") == "[NAME], Senior Lecturer"  # OCR can drop the space
+
+
+def test_names_in_a_sentence_are_removed():
+    """A name ended by a full stop, and "My name is ..." / "Nama saya ..." anywhere in the text."""
+    from app.services.deid import scrub_cv
+    cases = {
+        "Nur Aisyah binti Ahmad. Email aisyah@example.com, phone 012-345 6789. Data entry clerk.": ("Aisyah", "Ahmad"),
+        "My name is Tan Wei Jie and I know Python and SQL. Tan Wei Jie, 2026.": ("Tan", "Wei", "Jie"),
+        "Nama saya Siti Aminah binti Rahman. Saya kerani akaun.": ("Siti", "Aminah", "Rahman"),
+    }
+    for cv, leaks in cases.items():
+        clean = scrub_cv(cv)
+        assert all(leak not in clean for leak in leaks), clean
+    assert scrub_cv("Data entry clerk. I key invoices into SAP.") == "Data entry clerk. I key invoices into SAP."
+
+
+def test_an_institution_does_not_swallow_the_next_sentence():
+    from app.services.deid import scrub
+    assert scrub("Graduated from Universiti Malaya. Python and SQL.") == "Graduated from [ORG]. Python and SQL."

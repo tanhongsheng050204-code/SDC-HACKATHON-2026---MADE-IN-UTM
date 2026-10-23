@@ -16,25 +16,35 @@ from app.reference import Reference
 from app.services import grounding, guardrails, matching, pathway
 import re
 
-from app.services.deid import removed_counts, scrub
+from app.services.deid import SELF_NAMED, removed_counts, scrub
 
 SCENARIO_WORDS = {"accelerated": ("faster", "fast", "accelerat", "quick"), "slow": ("slower", "slow")}
 SDG_WORDS = {
     13: ("climate", "environment", "green", "carbon", "planet"),
     7: ("energy", "solar", "renewable"),
-    3: ("health", "care", "elderly", "wellbeing"),
-    4: ("education", "teach", "learning"),
+    3: ("health", "caring", "carer", "caregiv", "care work", "elderly", "wellbeing", "nurs"),  # not "care": it starts "career"
+    4: ("education", "teach", "school", "tvet"),  # not "learning": "machine learning" is about AI jobs
     8: ("decent work", "economy", "jobs for", "livelihood"),
     9: ("innovation", "industry", "infrastructure", "technology"),
     12: ("waste", "recycl", "consumption"),
     10: ("inequality", "inclusion", "fairness"),
 }
-INTENTS = {
-    "hours": ("how long", "hours", "time", "weeks", "months"),
-    "cost": ("cost", "free", "money", "pay", "price", "hrd", "afford"),
-    "risk": ("safe", "risk", "robust", "replace", "lose", "declin", "future of my job", "current"),
-    "why": ("why", "rank", "top", "best", "fit", "recommend"),
+INTENTS = {  # checked in this order; English, BM and 中文 keywords
+    "hours": ("how long", "hours", "time", "weeks", "months", "berapa lama", "jam", "多久", "小时", "时间"),
+    "cost": ("cost", "free", "money", "pay for", "price", "hrd", "afford", "percuma", "kos", "harga", "免费", "费用", "多少钱"),
+    "risk": ("safe", "risk", "robust", "replace", "lose", "declin", "future of my job", "current",
+             "selamat", "risiko", "风险", "安全"),
+    "next": ("course", "first", "start", "learn", "study", "next step", "kursus", "belajar", "mula", "课程", "学"),
+    "why": ("why", "rank", "top", "best", "fit", "recommend", "kenapa", "mengapa", "为什么", "最适合"),
 }
+
+
+def _mentions(q: str, words) -> bool:
+    """A keyword at the start of a word, so stems like "declin" still match but "lose" does not
+    match "close" or "top" "laptop". Chinese has no spaces between words: anywhere counts."""
+    return any(re.search(rf"(?<![a-z]){re.escape(w)}", q) if w.isascii() else w in q for w in words)
+
+
 SUGGESTIONS = ["Why is this my top role?", "How long will the plan take?", "Which courses are free?",
                "Is my current job at risk?", "What if AI adoption is faster?", "I care about climate change"]
 
@@ -125,18 +135,18 @@ def _offline(question: str, ref: Reference, profile: dict, scenario: str, source
     q = question.casefold()
     focus, plan = ctx["focus"], ctx["plan"]
     for target, words in SCENARIO_WORDS.items():
-        if any(w in q for w in words) and target != scenario:
+        if _mentions(q, words) and target != scenario:
             return {"answer": f"The {focus['title']} outlook by scenario: {ctx['outlooks']} [SOURCE-2].",
                     "cited": [2], "proposal": _proposal("scenario", target, ref)}
     for number, words in SDG_WORDS.items():
-        if any(w in q for w in words):
+        if _mentions(q, words):
             serving = [ref.roles[r]["title"] for r, tags in ref.sdg_map["roles"].items()
                        if any(t["sdg"] == number for t in tags)]
             sources.append(f"Roles that serve SDG {number} {ref.sdgs[number]['name']}: {', '.join(serving) or 'none'}.")
             n = len(sources)
             return {"answer": f"Roles that serve SDG {number} {ref.sdgs[number]['name']}: {', '.join(serving) or 'none'} [SOURCE-{n}].",
                     "cited": [n], "proposal": None}
-    intent = next((name for name, words in INTENTS.items() if any(w in q for w in words)), None)
+    intent = next((name for name, words in INTENTS.items() if _mentions(q, words)), None)
     if intent == "hours":
         answer = (f"Your pathway to {focus['title']} has {len(plan['steps'])} steps and about "
                   f"{plan.get('hours_left', 0)} hours left [SOURCE-3]." if plan["steps"] else
@@ -152,6 +162,14 @@ def _offline(question: str, ref: Reference, profile: dict, scenario: str, source
             parts.append(f"Paid steps: {', '.join(paid)} [SOURCE-3].")
         return {"answer": " ".join(parts) or f"You already have every skill we track for {focus['title']} [SOURCE-3].",
                 "cited": [3], "proposal": None}
+    if intent == "next":
+        if plan["steps"]:
+            first = plan["steps"][0]["course"]
+            answer = (f"Your pathway to {focus['title']} starts with {first['title']} from {first['provider']}, "
+                      f"{first['hours']} hours, {first['cost'].replace('_', ' ')} [SOURCE-3].")
+        else:
+            answer = f"You already have every skill we track for {focus['title']} [SOURCE-3]."
+        return {"answer": answer, "cited": [3], "proposal": None}
     if intent == "risk":
         return {"answer": sources[3] + " [SOURCE-4]", "cited": [4], "proposal": None}
     if intent == "why":
@@ -176,8 +194,7 @@ def _valid_proposal(raw, ref: Reference) -> dict | None:
 
 # A name the person gives in the question ("my name is …", "nama saya …", "我叫…"), so it is removed
 # with the profile's own display name. Contact details are caught by scrub() itself.
-_SELF_NAMED = re.compile(r"(?i:\bmy name is|\bnama saya(?:\s+ialah|\s+adalah)?|\bcall me|我叫|我的名字是)\s*"
-                         r"([A-Z\u4e00-\u9fff][\w'\u4e00-\u9fff-]*(?:\s+(?:bin|binti|bt|a/l|a/p|[A-Z][\w'-]*)){0,4})")
+_SELF_NAMED = SELF_NAMED
 
 
 def _self_check(text: str, cited: list[str], numbered: str, question: str) -> tuple[str, int]:

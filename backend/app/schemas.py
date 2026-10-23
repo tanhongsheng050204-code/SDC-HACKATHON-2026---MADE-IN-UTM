@@ -338,3 +338,11 @@ class ApplicationPatch(BaseModel):
     def _https_link(cls, v: str | None) -> str | None:
         return ApplicationIn._https_link(v)
 
+    @field_validator("title", "status")
+    @classmethod
+    def _not_cleared(cls, v):
+        # Leave a field out to keep it; a job always has a title and a status, so null is refused.
+        if v is None:
+            raise ValueError("This field can't be cleared")
+        return v
+

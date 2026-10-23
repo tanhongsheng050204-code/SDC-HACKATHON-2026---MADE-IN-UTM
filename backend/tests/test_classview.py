@@ -42,3 +42,10 @@ def test_top_gaps_come_with_courses(client):
     result = client.post("/api/class/analyse", json={"csv": client.get("/api/class/sample").text}).json()
     assert len(result["top_gaps"]) >= 3
     assert all(gap["course"] and gap["course"]["url"].startswith("http") for gap in result["top_gaps"])
+
+
+def test_csv_saved_by_excel_with_a_byte_order_mark_is_read(client):
+    for path in ("/api/workforce", "/api/class"):
+        sample = client.get(f"{path}/sample").text
+        plain = client.post(f"{path}/analyse", json={"csv": sample}).json()
+        assert client.post(f"{path}/analyse", json={"csv": "﻿" + sample}).json() == plain

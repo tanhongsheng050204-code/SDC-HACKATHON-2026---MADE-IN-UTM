@@ -104,3 +104,11 @@ def test_interview_rejects_unknown_roles_and_too_many_turns(client):
     assert client.post("/api/interview", json={"profile_id": pid, "role_id": "astronaut"}).status_code == 422
     six = [{"question": "q", "answer": "a"}] * 6
     assert client.post("/api/interview", json={"profile_id": pid, "role_id": "data_analyst", "turns": six}).status_code == 422
+
+
+def test_names_keep_their_capitals_and_article_in_a_sentence():
+    from app.services.wording import mid_sentence, with_article
+    assert with_article("AI operations specialist") == "an AI operations specialist"
+    assert with_article("Data analyst") == "a data analyst" and with_article("Administrative assistant") == "an administrative assistant"
+    assert with_article("UX / UI designer") == "a UX / UI designer" and with_article("TVET instructor") == "a TVET instructor"
+    assert [mid_sentence(n) for n in ("SQL", "Power BI", "Python", "Machine learning")] == ["SQL", "Power BI", "Python", "machine learning"]

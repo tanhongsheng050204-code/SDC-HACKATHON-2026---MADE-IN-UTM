@@ -17,6 +17,7 @@ from app.config import get_settings
 from app.llm import generate_json
 from app.reference import Reference
 from app.services.matching import effective_skills, fit_and_gap
+from app.services.wording import mid_sentence, with_article
 
 MAX_SKILLS = 3
 MAX_CHARS = 320
@@ -46,13 +47,16 @@ def facts(ref: Reference, profile: dict, role_id: str) -> dict:
 
 
 def rules_statement(f: dict) -> str:
-    who = f"I'm a {f['current'].lower()}" if f["current"] else "I'm starting out"
+    """`current_hidden`: a shared card leaves the job out, so it must not claim the person is starting out."""
+    hidden = f.get("current_hidden")
     if not f["have"]:
-        start = f"{who} moving into work as a {f['target'].lower()}."
+        who = f"I'm {with_article(f['current'])}" if f["current"] else "I'm" if hidden else "I'm starting out,"
+        start = f"{who} moving into work as {with_article(f['target'])}."
     else:
-        skills = _join(f["have"])
-        start = f"{who} who already brings {skills}, skills a {f['target'].lower()} uses every day."
-    return start + (f" I'm building {f['building']} next." if f["building"] else "")
+        who = (f"I'm {with_article(f['current'])} who already brings" if f["current"] else
+               "I already bring" if hidden else "I'm starting out and already bring")
+        start = f"{who} {_join(f['have'])}, skills {with_article(f['target'])} uses every day."
+    return start + (f" I'm building {mid_sentence(f['building'])} next." if f["building"] else "")
 
 
 @lru_cache(maxsize=512)
@@ -75,7 +79,7 @@ def public_statement(ref: Reference, profile: dict, role_id: str) -> str:
     """For a shared Future Card: no current job, and only skills the card shows as proven."""
     proven = {ref.skills[s]["name"] for s, lvl in (profile.get("skill_levels") or {}).items() if lvl >= 1 and s in ref.skills}
     f = facts(ref, profile, role_id)
-    return rules_statement({**f, "current": None, "have": [s for s in f["have"] if s in proven]})
+    return rules_statement({**f, "current": None, "current_hidden": True, "have": [s for s in f["have"] if s in proven]})
 
 
 def statement(ref: Reference, profile: dict, role_id: str, language: str = "en", use_model: bool = True) -> dict:

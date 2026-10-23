@@ -105,7 +105,10 @@ def test_identity_statement_uses_only_profile_facts(client):
 
 def test_rules_statement_for_a_student_with_no_matching_skills():
     text = identity.rules_statement({"target": "Data analyst", "current": None, "have": [], "building": "SQL"})
-    assert text == "I'm starting out moving into work as a data analyst. I'm building SQL next."
+    assert text == "I'm starting out, moving into work as a data analyst. I'm building SQL next."
+    with_skills = identity.rules_statement({"target": "AI operations specialist", "current": None, "have": ["Python"], "building": "Prompt engineering"})
+    assert with_skills == ("I'm starting out and already bring Python, skills an AI operations specialist uses every day. "
+                           "I'm building prompt engineering next.")
 
 
 def test_model_statement_off_the_facts_falls_back(monkeypatch):
@@ -123,7 +126,7 @@ def test_future_card_statement_reveals_no_current_job_or_unproven_skills(client)
     card = client.post(f"/api/profiles/{pid}/cards", json={"role_id": "data_analyst"}).json()
     view = client.get(f"/api/cards/{card['id'] if 'id' in card else card['card_id']}").json()
     assert "clerk" not in view["identity"].lower() and "brings" not in view["identity"]
-    assert view["identity"].startswith("I'm starting out")
+    assert view["identity"].startswith("I'm moving into work as")  # no job named, and no false "starting out"
 
 
 def test_identity_rejects_unknown_languages(client):

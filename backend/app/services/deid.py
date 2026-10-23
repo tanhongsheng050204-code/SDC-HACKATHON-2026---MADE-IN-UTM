@@ -44,8 +44,9 @@ _POSTCODE_TOWN = re.compile(r"(?<![\d-])\d{5}[ \t]+[A-Z][A-Za-z]+(?:[ \t]+[A-Z][
 _CAP = r"[A-Z][\w&'.\-]*"
 _COMPANY = re.compile(rf"(?:{_CAP}[ \t]+){{0,5}}{_CAP}[ \t]+(?:Sdn\.?[ \t]+Bhd\.?|Berhad|Bhd\.?|Ltd\.?|Limited|Inc\.?|LLC|PLC|"
                       rf"Corporation|Corp\.?|Holdings|Enterprise)(?![\w])")
+# The words after the institution word stop at a full stop: "Universiti Malaya. Python, SQL" keeps Python.
 _INSTITUTION = re.compile(rf"(?:{_CAP}[ \t]+){{0,4}}(?:University|Universiti|College|Kolej|Institute|Institut|Politeknik|"
-                          rf"Polytechnic|Academy|Akademi|Sekolah|SMK|SMJK)(?:[ \t]+(?:of|for|&|{_CAP}))*(?<![ \t]of)(?<![ \t]for)")
+                          rf"Polytechnic|Academy|Akademi|Sekolah|SMK|SMJK)(?:[ \t]+(?:of|for|&|[A-Z][\w&'\-]*))*(?<![ \t]of)(?<![ \t]for)")
 
 # Connectors inside Malaysian names that are ordinary words on their own.
 _NAME_CONNECTORS = {"bin", "binti", "bt", "bte", "b", "al", "ap", "a/l", "a/p", "s/o", "d/o", "anak", "mr", "mrs", "ms", "dr"}
@@ -69,10 +70,19 @@ _NAME_WORD = re.compile(r"^(?:[A-Z][a-z'\-]+|[A-Z]{2,}|bin|binti|bt|a/l|a/p|s/o|
 
 
 _HEADLINE_SEP = re.compile(r"\s+[—–|·-]\s+|\s*,\s+")
+_SENTENCE_END = re.compile(r"\.\s+")
+# "My name is Tan Wei Jie", "Nama saya Siti Aminah": a name the person gives in a sentence.
+SELF_NAMED = re.compile(r"(?i:\bmy name is|\bnama saya(?:\s+ialah|\s+adalah)?|\bcall me|我叫|我的名字是)\s*"
+                        r"([A-Z\u4e00-\u9fff][\w'\u4e00-\u9fff-]*(?:\s+(?:binti|bin|bt|a/l|a/p|[A-Z][\w'-]*)){0,4})")
 
 
 def _split_headline(line: str) -> tuple[str, str, str]:
     match = _HEADLINE_SEP.search(line)
+    # "Nur Aisyah binti Ahmad. Email ..., phone ...": a full stop ends the name before any comma does.
+    # Two words at least, so "Dr. Tan Wei Ming" is left whole for the titled-name rule.
+    stop = _SENTENCE_END.search(line)
+    if stop and (match is None or stop.start() < match.start()) and len(line[:stop.start()].split()) >= 2:
+        match = stop
     return (line, "", "") if match is None else (line[:match.start()], match.group(), line[match.end():])
 
 
@@ -99,13 +109,14 @@ def _is_heading(line: str) -> bool:
 
 def scrub_cv(text: str, names: Iterable[str] = ()) -> str:
     """scrub(), plus the places a CV carries people's names: a "Name:" line; the owner's name in the
-    first lines, after any heading such as "PROFILE" or "RESUME", including a next line that starts
-    "bin", "binti", "a/l" and so on (a sidebar breaks the name in two); and whoever is listed under
-    "Referees". The words of the owner's name are then removed everywhere else too. Errs on the side
-    of removing too much."""
+    first lines (ended by a dash, comma or full stop), after any heading such as "PROFILE" or "RESUME",
+    including a next line that starts "bin", "binti", "a/l" and so on (a sidebar breaks the name in
+    two); a name given as "My name is ..." or "Nama saya ..."; and whoever is listed under "Referees".
+    The words of the owner's name are then removed everywhere else too. Errs on the side of removing
+    too much."""
     text = _NAME_LINE.sub("[NAME]", text)
     lines = text.splitlines()
-    found = list(names)
+    found = list(names) + [m.group(1) for m in SELF_NAMED.finditer(text)]
     seen = 0
     for i, line in enumerate(lines):
         if not line.strip() or _is_heading(line):

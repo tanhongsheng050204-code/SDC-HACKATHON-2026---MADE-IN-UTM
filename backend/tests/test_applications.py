@@ -29,6 +29,10 @@ def test_bad_input_is_refused(client):
     assert client.post(base, json={"title": "X", "role_id": "astronaut"}).status_code == 422
     assert client.post(base, json={"title": "X", "cv": "..."}).status_code == 422  # no extra fields, never a CV
     assert client.patch(f"{base}/nope", json={"status": "applied"}).status_code == 404
+    made = client.post(base, json={"title": "X"}).json()
+    assert client.patch(f"{base}/{made['id']}", json={"title": None}).status_code == 422  # was a 500
+    assert client.patch(f"{base}/{made['id']}", json={"status": None}).status_code == 422
+    assert client.patch(f"{base}/{made['id']}", json={"employer": None}).status_code == 200  # optional fields can be cleared
 
 
 def test_applications_are_in_my_data_and_go_with_the_profile(client):

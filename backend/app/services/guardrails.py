@@ -19,6 +19,13 @@ INJECTION = [
     r"\bdisregard (all |any )?(the )?(previous|prior|above|system) (instructions|prompts?|rules)\b",
     r"\b(forget|override|bypass) (your|the|all) (instructions|rules|guardrails|system prompt|safety)\b",
     r"\b(reveal|show|print|repeat|leak) (me )?(your|the) (system prompt|hidden prompt|instructions|developer message|prompt)\b",
+    # Aimed at the assistant itself ("your"), so a CV that mentions ignoring safety rules still passes.
+    r"\b(ignore|disregard|forget) (all )?(of )?your (instructions|rules|prompts?|guidelines)\b",
+    r"\b(tell|give|share|send|output|display)( me)? (your|the) (system prompt|hidden prompt|developer message)\b",
+    r"\b(tell|give|share)( me)? your (instructions|prompt|rules)\b",
+    r"\bwhat(?:'s| is| are) your (system prompt|instructions|prompt|rules)\b",
+    r"\b(abaikan|lupakan) (semua )?(arahan|peraturan)\b",  # BM
+    r"忽略.{0,6}(指令|规则|提示)|系统提示|(显示|告诉我|输出).{0,4}(你的)?(指令|提示词)",  # 中文
     r"\byou are now\b",
     r"\bact as (an? )?(admin|administrator|developer|system|root)\b",
     r"\b(new|updated) (system )?instructions?:",
