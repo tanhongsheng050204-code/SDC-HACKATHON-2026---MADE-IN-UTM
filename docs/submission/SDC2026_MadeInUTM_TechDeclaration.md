@@ -1,6 +1,6 @@
 # SDC 2026 Hackathon · Technical Tools Declaration
 
-> Our answers to the official **SDC Hackathon Technical Tools Declaration Template**. The submitted PDF is named `SDC2026_MadeInUTM_TechDeclaration.pdf`. Fields marked ______ are filled in by the team leader before submission. No API keys or secrets appear in this document or in the repository.
+> Our answers to the official **SDC Hackathon Technical Tools Declaration Template**. This file is the source text; the submitted form is [`submission/SDC2026_MadeInUTM_TechDeclaration.pdf`](../../submission/SDC2026_MadeInUTM_TechDeclaration.pdf). No API keys or secrets appear in this document or in the repository.
 
 ## 1. Team and project overview
 
@@ -8,164 +8,174 @@
 | --- | --- |
 | Team name | Made in UTM |
 | Project / solution name | Laluan: a career GPS for the AI era |
-| Name (leader) | ______ |
-| Email and phone (leader) | ______ |
-| University affiliation(s) | ______ |
+| Name (leader) | Tan Hong Sheng |
+| Email and phone (leader) | tanhongsheng050204@gmail.com (phone as on the registration form) |
+| University affiliation(s) | Universiti Teknologi Malaysia (UTM) |
 | Live prototype URL | <https://laluan-psi.vercel.app> (API: <https://laluan-api.onrender.com/docs>) |
-| Code repository URL | <https://github.com/tanhongsheng050204-code/XMUM-HACKATHON> (public) |
+| Code repository URL | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM> (public) |
 
 ## 2. Architecture and technology stack
 
 ### 2.1 System architecture overview *(200 words max)*
 
-The user opens a React single-page app served by **Vercel**. It calls a **FastAPI** backend over HTTPS; the backend runs as a **Docker** container on **Render** (Singapore).
+The user opens a React single-page app on **Vercel**. It calls a **FastAPI** backend over HTTPS, running as a **Docker** container on **Render** (Singapore). Profiles, progress, trend snapshots and optional logins live in **Supabase** (Postgres and Auth, Singapore).
 
-When a CV arrives, the backend reads it in memory, removes names, emails, phone and IC numbers, and finds skills with a dictionary. If a Gemini key is set, it also asks **Google Gemini** to read the scrubbed text and uses Gemini embeddings for unfamiliar phrases. Without a key, everything runs on rules and templates.
+A CV is read in memory. Scans go through our own OCR (on **RunPod Serverless**, else on the server), then names, emails, phone and IC numbers are removed. An open model, **Qwen2.5-7B-Instruct on RunPod**, reads skills from the scrubbed text, and **faster-whisper on RunPod** transcribes voice input. **Google Gemini** writes coach answers, interview feedback and summaries; every sentence is checked against our sources before it is shown. Without keys, rules and templates take over.
 
-Matching, scenarios and pathways are deterministic Python over versioned **JSON reference data**: WEF growth figures, O\*NET tasks, the course catalogue and the SDG map. Profiles, course progress and shared Future Cards are kept in **SQLite**. AI-written text (coach answers, pathway summaries) passes a grounding check against these sources before it is shown.
+Matching, forecasts, scenarios and pathways are plain Python over versioned **JSON reference data** (WEF, O\*NET, courses, SDG map), with no AI call.
 
-A trend pipeline counts research papers (**arXiv**, falling back to **OpenAlex**) and job-posting mentions (**Algolia Hacker News API**, and Malaysian postings on **freehire.me**), builds a new dated snapshot and holds it until an admin approves it.
+**GitHub Actions** runs the tests on every push and a weekly trend refresh that collects arXiv/OpenAlex, freehire.me job ads, Hacker News, Stack Overflow, GitHub, npm, PyPI and OpenDOSM. Each new dated snapshot goes live only after an admin approves it. A diagram is in the appendix.
 
-**GitHub Actions** runs the backend tests and the frontend build on every push. A diagram is in the appendix.
-
-*Word count: 185*
+*Word count: 179*
 
 ### 2.2 Languages, frameworks and libraries
 
-Languages: TypeScript, Python 3.12, CSS, SQL (SQLite).
+Languages: TypeScript, Python 3.12, CSS, SQL (Postgres; SQLite locally).
 
 | Name and version | Purpose in project | Licence |
 | --- | --- | --- |
 | React 18.3.1, React DOM 18.3.1 | User interface | MIT |
 | TypeScript 5.6.3 | Typed frontend code | Apache-2.0 |
 | Vite 5.4.11, @vitejs/plugin-react 4.3.4 | Frontend dev server and build | MIT |
+| @supabase/supabase-js 2.45.4 | Google or Microsoft login in the browser | MIT |
 | qrcode 1.5.4 | QR code on the shareable Future Card | MIT |
 | @fontsource-variable/inter 5.3.0 (Inter font) | Self-hosted typeface | SIL OFL 1.1 |
 | FastAPI 0.148.0 (Starlette 1.9.0) | HTTP API | MIT / BSD-3 |
 | Pydantic 2.14.1 | Request validation (also rejects demographic fields) | MIT |
 | Uvicorn 0.54.0 | ASGI server | BSD-3 |
+| psycopg 3.3.6 | Supabase Postgres connection | LGPL-3.0 |
+| PyJWT 2.15.1 | Checking Supabase login tokens | MIT |
 | google-genai 1.75.0 | Gemini API client | Apache-2.0 |
-| HTTPX 0.28.1 | Calls to arXiv, OpenAlex, HN Algolia | BSD-3 |
+| HTTPX 0.28.1 | Calls to RunPod and the trend sources | BSD-3 |
 | pypdf 6.21.1 | Reading uploaded PDF CVs in memory | BSD-3 |
-| RapidOCR 2.1, ONNX Runtime, pypdfium2, PaddleOCR PP-OCRv4 English recogniser | Reading scanned CVs and photos with our own OCR (our RunPod worker first, else the API server), before scrubbing | Apache-2.0 / MIT / Apache-2.0 |
+| RapidOCR 2.1.0, ONNX Runtime 1.31.0, pypdfium2 5.14.0, Pillow 13.0.0 | Our own OCR for scanned CVs and photos (RunPod worker first, else the API server) | Apache-2.0 / MIT / Apache-2.0 / MIT-CMU |
+| runpod SDK 1.7 | The OCR worker's serverless handler | MIT |
 | python-multipart 0.0.32 | CV file uploads | Apache-2.0 |
-| pytest 8.4.2 | Backend tests (development only) | MIT |
+| sentry-sdk 2.72.0, @sentry/react 8.38.0 | Optional error reports, personal data removed | MIT |
+| pytest 8.4.2, Vitest 2.1.8, Testing Library, axe-core 4.10.2 | Tests and accessibility checks (development only) | MIT / MIT / MIT / MPL-2.0 |
 | PyMuPDF | One-off script that reads WEF Figure 2.3 from the report PDF; not part of the app | AGPL-3.0 |
-| nginx 1.27, Node 20, Python 3.12-slim (Docker images) | Local `docker compose` run and the API container | BSD-2 / MIT / PSF |
+| Python 3.12-slim, Node 20, nginx 1.27 (Docker images) | API container and local `docker compose` run | PSF / MIT / BSD-2 |
 
 ## 3. APIs and cloud services
 
 ### 3.1 External APIs
 
-| API and provider | Access tier | Purpose in project |
+| API and provider | Purpose in project | Access tier |
 | --- | --- | --- |
-| Gemini API (Google): `gemini-3.8-flash`, `gemini-embedding-001` | Free tier, optional *(team to confirm whether a sponsor key is used)* | Reading skills from scrubbed CV text, coach answers, pathway summaries, embeddings for unfamiliar skill phrases. The app runs fully without it (offline rules and templates). |
-| arXiv API (Cornell University) | Free | Counting AI research papers per capability for trend signals |
-| OpenAlex API (OurResearch) | Free | Fallback paper counts when arXiv is busy |
-| Hacker News Search API (Algolia) | Free | Counting skill mentions in “Who is hiring?” threads |
-| freehire.me public API (open source, MIT) | Free, no key | Counting skill mentions in Malaysian job postings, and showing the newest openings for each role with links to the original postings |
+| Gemini API (Google): `gemini-3.8-flash`, `gemini-embedding-001` | Coach answers, interview feedback, proof-check questions, summaries, embeddings for unfamiliar skill phrases. The app runs without it. | Free |
+| RunPod Serverless API | Qwen2.5-7B-Instruct reads skills from scrubbed CV text; faster-whisper transcribes voice; our OCR worker reads scans | Sponsor-provided credits |
+| Supabase (Postgres and Auth) | Database and optional Google or Microsoft login | Free |
+| arXiv API (Cornell University) | AI research papers per capability, for trend signals | Free |
+| OpenAlex API (OurResearch) | Fallback paper counts, and AI papers with a Malaysian institution | Free |
+| freehire.me public API | Malaysian job ads: skill and role counts, and the newest openings with links to the original postings | Free, no key |
+| Hacker News Search API (Algolia) | Skill mentions in “Who is hiring?” threads | Free |
+| Stack Exchange, GitHub, npm and PyPI Stats APIs | Developer attention per skill | Free |
+| OpenDOSM / data.gov.my API (Department of Statistics Malaysia) | Labour force, employment by sector, consumer prices and salaries | Free |
+| Gmail SMTP (Google) | Weekly digest and job-alert emails the user asked for | Free |
 
 Job-search links (MYFutureJobs, JobStreet, LinkedIn) are plain links that open in the browser; the app does not call those services.
 
 ### 3.2 Cloud platforms and deployment
 
-| Service and provider | Plan / region | Purpose in project |
+| Service and provider | Purpose in project | Plan / region |
 | --- | --- | --- |
-| Vercel | Hobby (free), global edge | Hosts the built React frontend; `VITE_API_URL` points to the API |
-| Render | Free web service, Singapore | Runs the FastAPI backend as a Docker container (from `render.yaml` and `backend/Dockerfile`) |
-| Supabase | Free, Singapore | Postgres for profiles, progress, Future Cards, trend snapshots and review decisions (row-level security on); Google login through Supabase Auth |
-| RunPod Serverless | Pay per second (US$25 credit) | Optional: an open model (Qwen2.5-7B) reads CVs and Whisper transcribes voice, so raw CV text and audio stay away from Google |
-| GitHub | Free, public repository | Source code; GitHub Actions runs tests and the build on every push |
-| Docker / Docker Compose | Local | One-command local run of the whole app (`docker compose up --build`) |
+| Vercel | Hosts the built React frontend (<https://laluan-psi.vercel.app>) | Hobby (free), global edge |
+| Render | Runs the FastAPI backend as a Docker container (`render.yaml`, `backend/Dockerfile`) | Free web service, Singapore |
+| Supabase | Postgres for profiles, progress, Future Cards, trend snapshots and review decisions (row-level security on); login through Supabase Auth | Free, Singapore |
+| RunPod Serverless | Open models for CV reading (Qwen2.5-7B-Instruct on vLLM), voice (faster-whisper) and our OCR worker (`runpod/ocr`), so raw CV text and audio stay away from Google | Sponsor credits, pay per second |
+| Replit | Development workspace and an alternative host for the same code | Sponsor-provided |
+| GitHub and GitHub Actions | Public repository; tests on every push; scheduled jobs (keep-awake ping, weekly trend refresh, digest and job alerts) | Free |
+| Docker / Docker Compose | One-command local run of the whole app (`docker compose up --build`) | Local |
 
 ## 4. AI tools, models and datasets
 
 ### 4.1 AI models used in the solution
 
-| Model and version | Source / provider | Licence / terms | Usage |
+| Model and version | Source / provider | Usage | Licence / terms |
 | --- | --- | --- | --- |
-| Gemini 3.8 Flash (`gemini-3.8-flash`) | Google, via the Gemini API | Gemini API Terms of Service | Pre-trained, called by API (optional) |
-| Gemini Embedding (`gemini-embedding-001`) | Google, via the Gemini API | Gemini API Terms of Service | Pre-trained, called by API (optional) |
+| Gemini 3.8 Flash (`gemini-3.8-flash`) | Google, via the Gemini API | Pre-trained, called by API | Gemini API Terms of Service |
+| Gemini Embedding (`gemini-embedding-001`) | Google, via the Gemini API | Pre-trained, called by API | Gemini API Terms of Service |
+| Qwen2.5-7B-Instruct | Alibaba Qwen team, served with vLLM on RunPod Serverless | Pre-trained, self-hosted | Apache-2.0 |
+| Whisper `small` (faster-whisper) | OpenAI / SYSTRAN, on RunPod Serverless | Pre-trained, self-hosted | MIT |
+| PaddleOCR PP-OCRv4 English recogniser and RapidOCR text detector | PaddlePaddle / RapidAI, run in our OCR worker | Pre-trained, self-hosted | Apache-2.0 |
 
-No model is trained or fine-tuned by the team. The model in use is shown in the app's sidebar and footer. The deployed demo currently runs in offline mode, with no model.
+No model is trained or fine-tuned by the team. The model in use is shown in the app's footer and at `/api/health`.
 
 ### 4.2 Datasets
 
-| Dataset name | Source / URL | Type | Personal data? | Licence |
+| Dataset name | Source / URL | Type | Licence | Personal data? |
 | --- | --- | --- | --- | --- |
-| WEF Future of Jobs Report 2025, Figure 2.3 (net job growth 2025–2030, 126 occupations) | <https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf> | Public | N | WEF terms of use; cited on every role |
-| O\*NET 30.0 task statements | <https://www.onetcenter.org/> | Public | N | CC BY 4.0 |
-| UN SDG goals, targets and colours | <https://sdgs.un.org/goals> | Public | N | UN SDG guidelines |
-| arXiv paper counts per AI capability | <https://export.arxiv.org/api/> | Public (counts only) | N | arXiv API terms |
-| OpenAlex paper counts (fallback) | <https://openalex.org/> | Public (counts only) | N | CC0 |
-| Hacker News “Who is hiring?” skill-mention counts | <https://hn.algolia.com/api> | Public (counts only; no posts stored) | N | HN / Algolia API terms |
-| Malaysian job postings (skill-mention counts, newest openings per role) | <https://freehire.me/docs/api> | Public (counts stored; postings shown live with links, not stored) | N | freehire terms; project MIT |
-| Anthropic Economic Index (observed AI exposure by occupation, task-level automation vs augmentation, Malaysia usage) | <https://huggingface.co/datasets/Anthropic/EconomicIndex> | Public (aggregates) | N | CC BY |
-| OpenAI “GPTs are GPTs” occupation exposure scores (2023) | <https://github.com/openai/GPTs-are-GPTs> | Public | N | MIT |
-| ILO Working Paper 140, Annex Table A1 (exposure by ISCO-08 occupation) | <https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure> | Public | N | CC BY 4.0 |
-| MyCOL 2024/2025 (TalentCorp critical occupations list) | <https://www.talentcorp.com.my/mycol/> | Public report (matches by job title, linked) | N | Cited with link |
-| Course catalogue (38 courses, prices and HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | N | Facts with links to the providers |
-| Roles, skills and SDG map | `backend/data/` | Self-created | N | Apache-2.0 (this repository) |
-| Demo personas (Aisyah, Wei Jie) and 5 evaluation CVs | `backend/data/demo_profiles.json`, `backend/data/eval/` | Synthetic | N (all invented) | Apache-2.0 (this repository) |
-| Sample company for the workforce view (190 people) | `backend/data/sample_workforce.csv` | Synthetic | N (roles and skills only) | Apache-2.0 (this repository) |
-| Landing-page photos (3) | Unsplash: Gema Saputera, Mimi Thian, Vitaly Gariev | Public | Shows people; not linked to any data | Unsplash License |
+| WEF Future of Jobs Report 2025, Figure 2.3 (net job growth 2025–2030, 126 occupations) | <https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf> | Public | WEF terms of use; cited on every role | N |
+| O\*NET 30.0 task statements | <https://www.onetcenter.org/> | Public | CC BY 4.0 | N |
+| UN SDG goals, targets and colours | <https://sdgs.un.org/goals> | Public | UN SDG guidelines | N |
+| OpenDOSM labour force, employment by sector, consumer prices, salaries; DOSM Salaries & Wages 2025 | <https://open.dosm.gov.my> | Public | CC BY 4.0 | N |
+| arXiv and OpenAlex paper counts | <https://export.arxiv.org/api/>, <https://openalex.org/> | Public (counts only) | arXiv API terms; CC0 | N |
+| Malaysian job postings | <https://freehire.me/docs/api> | Public (counts stored; postings shown live with links) | freehire terms; project MIT | N |
+| Hacker News “Who is hiring?” skill mentions | <https://hn.algolia.com/api> | Public (counts only) | HN / Algolia API terms | N |
+| Stack Overflow, GitHub, npm and PyPI activity | Each service's public API | Public (counts only) | Each API's terms | N |
+| Anthropic Economic Index | <https://huggingface.co/datasets/Anthropic/EconomicIndex> | Public (aggregates) | CC BY | N |
+| OpenAI “GPTs are GPTs” occupation exposure scores | <https://github.com/openai/GPTs-are-GPTs> | Public | MIT | N |
+| ILO Working Paper 140, Annex Table A1 | <https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure> | Public | CC BY 4.0 | N |
+| MyCOL 2024/2025 (TalentCorp critical occupations) | <https://www.talentcorp.com.my/mycol/> | Public report | Cited with link | N |
+| Course catalogue (prices, hours, HRD Corp status) | Providers' own pages, dated in `backend/data/courses.json` | Self-collected | Facts with links to the providers | N |
+| Roles, skills and SDG map | `backend/data/` | Self-created | Apache-2.0 (this repository) | N |
+| Demo personas, evaluation CVs, sample company (190 people) and class (52 students) | `backend/data/` | Synthetic | Apache-2.0 (this repository) | N (all invented) |
+| Landing-page photos (3) | Unsplash: Gema Saputera, Mimi Thian, Vitaly Gariev | Public | Unsplash License | N (not linked to any data) |
 
 ### 4.3 AI-assisted development tools
 
 Did the team use any generative-AI tool to help create code, design, text or other project material? **Yes.**
 
-| Tool and version | Extent of use | Used for |
+| Tool and version | Used for | Extent of use |
 | --- | --- | --- |
-| Claude Code (Anthropic), with Claude Opus models | Major | Drafting planning documents; writing and refactoring backend and frontend code and tests; the landing page and app screen layout (modelled on a reference site the team chose); Docker and deployment files; extracting WEF figures; drafting BM and Chinese interface text; drafting these declarations |
-| Google Gemini (inside the product) | Moderate | Drafting automate / assist / human labels for O\*NET tasks, for later human review |
-| ______ | ______ | *(team adds any other tools used, e.g. ChatGPT, GitHub Copilot, Canva AI)* |
+| Claude Code (Anthropic), with Claude Opus models | Planning documents; writing and refactoring backend and frontend code and tests; screen layouts (modelled on a reference site the team chose); Docker and deployment files; extracting WEF figures; BM and Chinese interface text; the demo GIFs, pitch deck and these declarations | Major |
+| Google Gemini (inside the product) | Drafting automate / assist / human labels for O\*NET tasks, each reviewed by a person | Moderate |
 
 **How the team reviewed, tested and took responsibility for AI-generated output** *(100 words max)*
 
-The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: about 410 automated backend tests, frontend component tests, a type-checked frontend build and lint, and CI on every push (on SQLite and Postgres). Each feature was clicked through in a browser, including on phone width. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against the course catalogue.
+The team chose the problem framing, users, features, design reference and data sources, and directed every change. AI-written code ships only with tests: about 490 automated backend tests, frontend component tests, a type-checked build and lint, and CI on every push (on SQLite and Postgres). Each feature was clicked through in a browser. Each problem found, and the fix, is logged in REVIEW_LOG.md, and design choices with their alternatives are in DECISIONS.md. Inside the app, AI never acts alone: the coach only suggests, trend updates need an admin's approval, and AI-written text is checked against our sources.
 
-*Word count: 93*
+*Word count: 94*
 
 ## 5. Sponsor-provided resources
 
-Did the project use any official SDC sponsor-provided resource? **______ (Yes / No).** *Team to confirm. As built, the prototype uses only free public services (Gemini API free tier when a key is set, Vercel Hobby, Render free). If a sponsor key or credits are used, list them here.*
+Did the project use any official SDC sponsor-provided resource? **Yes.**
 
 | Sponsor | Resource (API / credits / platform / data) | How it was used in the project |
 | --- | --- | --- |
-| ______ | ______ | ______ |
+| RunPod | Serverless GPU credits and API | Qwen2.5-7B-Instruct reads skills from scrubbed CV text, faster-whisper transcribes voice input, and our OCR worker (`runpod/ocr`) reads scanned CVs |
+| Replit | Platform | Development workspace and an alternative host for the same code |
 
 **Was the sponsor resource essential to the core functionality, or could it be replaced?** *(100 words max)*
 
-No single provider is essential. Every AI feature has an offline path: dictionary skill matching, template pathways and a rule-based coach. The deployed demo works with no API key, so a GenAI API makes CV reading and explanations richer but is not required. Hosting is plain Docker plus a static frontend, so Render and Vercel could be swapped for any container host and static host without code changes.
+Replaceable, by design. RunPod lets CV text and voice stay away from Google, with open models we choose, but if an endpoint is down or not set, Gemini or the dictionary reader reads the CV, the server's own OCR reads scans, and the browser's speech input replaces Whisper. Replit is one place the app runs; the same code runs on Vercel and Render, or locally with Docker. The core route (matching, forecasts, scenarios and pathways) is plain calculation and needs no sponsor resource.
 
-*Word count: 68*
+*Word count: 83*
 
 ## 6. Security, privacy and responsible use
 
 ### 6.1 Data handling and privacy *(150 words max)*
 
-**Collected:** the skills a person confirms, their current role, years of experience, chosen SDG goals and course progress, stored in SQLite under a random profile ID. No account, name, email or demographic data is required; the API rejects age, gender and background fields.
+**Collected:** confirmed skills, current role, years of experience, goals, SDG choices and course progress, under a random profile ID in Supabase (Singapore). An account (Google or Microsoft login) is optional; an email address is kept only while the user has emails or job alerts switched on. The API rejects age, gender and background fields.
 
-**CVs:** read in memory and never stored. Names, emails, phone and Malaysian IC numbers are removed before any text is sent to an AI API.
+**CVs:** read in memory and never stored. Names, emails, phone and IC numbers are removed before any AI (RunPod or Gemini) sees the text, and the user sees exactly what will be sent.
 
-**Third parties:** only scrubbed CV text and questions about a person's own results go to the Gemini API, and only when a key is set.
+**Retention:** profiles not saved to an account are deleted after 30 days unused, demo copies after a day. Users can download or delete everything at any time.
 
-**Retention:** profiles can be deleted at any time from the app, which also deletes their Future Cards; `cleanup.py` removes profiles untouched for 30 days, and the free host resets its database on each redeploy.
+**Protection:** HTTPS, row-level security, saved profiles open only through their login, logged admin actions, no IP addresses or profile IDs in logs. HR uploads with personal columns are refused; results are totals only.
 
-**Workforce view:** CSV files with name, email, IC, phone or staff-ID columns are refused; results are totals by role only.
-
-*Word count: 147*
+*Word count: 145*
 
 ### 6.2 Known limitations and risks *(150 words max)*
 
-- **Hallucination:** AI text could invent courses or numbers. Mitigation: courses, roles and figures come only from reference data, and every AI sentence is checked against those sources and flagged if unsupported.
-- **Forecast uncertainty:** WEF figures are global employer-survey estimates, not Malaysian statistics. Mitigation: three scenarios, a low–high range on every role, the word “estimate”, and a dated source on every card.
-- **Noisy trend signals:** job-posting data is tech-heavy. Mitigation: capped adjustments, minimum mention counts, and a person approves each update.
-- **Bias:** no demographic inputs are accepted; tests confirm names do not change rankings.
-- **Provider dependence and rate limits:** arXiv falls back to OpenAlex; the whole app runs offline without Gemini.
-- **Free hosting:** the API sleeps when idle (about a minute to wake); the app shows a notice and retries.
+- **Hallucination:** AI text could invent courses or numbers. Mitigation: courses, roles and figures come only from reference data, and every AI sentence is checked against those sources and rewritten or removed if unsupported.
+- **Forecast uncertainty:** WEF figures are global employer-survey estimates. Mitigation: Malaysian signals, three scenarios, 80% ranges, the word “estimate”, a published backtest and a dated source on every card.
+- **Noisy trend signals:** job-ad data is tech-heavy. Mitigation: capped adjustments, minimum counts, shrinkage towards no change, and a person approves each update.
+- **Bias:** no demographic inputs; CI checks that eight names from Malaysia's communities get identical results.
+- **Provider dependence and rate limits:** arXiv falls back to OpenAlex; RunPod falls back to Gemini; everything runs without any AI key.
+- **Free hosting:** the API can sleep when idle (about a minute to wake); the app shows a notice and retries.
 
-*Word count: 130*
+*Word count: 146*
 
 ## 7. Compliance and readiness
 
@@ -173,15 +183,15 @@ No single provider is essential. Every AI feature has an offline path: dictionar
 - [x] All third-party code, datasets and models are used in accordance with their licences, and attribution is provided where required.
 - [x] No API keys, passwords or other credentials are exposed in the code repository, prototype or this document.
 - [x] Any use of generative-AI tools for development has been disclosed and reviewed by the team.
-- [ ] Any use of official SDC sponsor resources has been declared in Section 5. *(tick after Section 5 is confirmed)*
+- [x] Any use of official SDC sponsor resources has been declared in Section 5.
 - [x] The prototype described here is accessible to judges through the links provided in Section 1.
-- [ ] All fields in this template have been completed within the word limits stated. *(tick once the ______ fields are filled)*
+- [x] All fields in this template have been completed within the word limits stated.
 
 ## 8. Declaration
 
 By submitting this document, the team leader confirms that the information provided is complete and accurate to the best of the team's knowledge, and that every API, cloud service, AI tool, dataset, model and sponsor resource used in the project has been declared.
 
-Signature: ______ Date: ______
+Signature: Tan Hong Sheng (Team Leader, typed) Date: 24 October 2026
 
 ## Appendix: system block diagram
 
@@ -189,12 +199,11 @@ Signature: ______ Date: ______
 flowchart LR
     U["User (browser)"] --> FE["React + TypeScript<br/>Vercel"]
     FE -->|HTTPS JSON| API["FastAPI · Docker<br/>Render, Singapore"]
-    API --> DEID["De-identification"] --> G["Gemini API (optional)"]
-    G --> GR["Grounding check"] --> API
-    API --> DB[("Supabase Postgres")]
+    API --> DEID["De-identification"] --> RP["RunPod Serverless<br/>Qwen2.5 · Whisper · OCR"]
+    API --> G["Gemini API"] --> GR["Grounding check"] --> API
+    API --> DB[("Supabase Postgres + Auth")]
     API --> REF[("JSON reference data:<br/>WEF · O*NET · courses · SDGs")]
-    T["Trend refresh"] --> AX["arXiv / OpenAlex"]
-    T --> HN["Algolia HN API"]
+    CI["GitHub Actions"] -->|weekly| T["Trend refresh<br/>arXiv · job ads · OpenDOSM"]
     T --> P["Pending snapshot"] -->|admin approves| REF
-    CI["GitHub Actions"] -.->|tests + build| API
+    CI -.->|tests on every push| API
 ```

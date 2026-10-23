@@ -21,7 +21,7 @@
 
 ## Pre-existing code
 
-Some utility functions were adapted from the team members' earlier personal projects. *(Keep or delete depending on the rules.)*
+None. All code was written during the SDC 2026 hackathon period.
 
 ## Data
 

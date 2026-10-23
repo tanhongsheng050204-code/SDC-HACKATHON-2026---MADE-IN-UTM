@@ -1,6 +1,6 @@
 # SDC 2026 Hackathon · Phase 1: Preliminary Project Proposal
 
-> Our answers to the official **SDC Hackathon Submission Template** (hosted by the XMUM AI Club; deadline 25 October 2026). The submitted PDF is named `SDC2026_MadeInUTM_Preliminary.pdf`. Fields marked ______ are filled in by the team leader before submission.
+> Our answers to the official **SDC Hackathon Submission Template** (hosted by the XMUM AI Club; deadline 25 October 2026). This file is the source text; the submitted form is [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](../../submission/SDC2026_MadeInUTM_Preliminary.pdf).
 
 ## 1. Team and project overview
 
@@ -10,12 +10,12 @@
 | Selected domain | Domain 1: The Aiversecity Future-Ready Workforce |
 | Selected SDG track (1–17) | **SDG 4** Quality Education (targets 4.3, 4.4), the domain's main SDG, with **SDG 8** Decent Work and Economic Growth (targets 8.2, 8.5) |
 | Project / solution name | **Laluan** (Malay for “path”): a career GPS for the AI era |
-| Name (leader) | ______ |
-| Email and phone (leader) | ______ |
-| University affiliation(s) | ______ |
-| Number of team members | ______ |
+| Name (leader) | Tan Hong Sheng |
+| Email and phone (leader) | tanhongsheng050204@gmail.com (phone as on the registration form) |
+| University affiliation(s) | Universiti Teknologi Malaysia (UTM) |
+| Number of team members | 4 |
 | Live prototype | <https://laluan-psi.vercel.app> |
-| Code repository | <https://github.com/tanhongsheng050204-code/XMUM-HACKATHON> |
+| Code repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM> |
 
 ## 2. Executive summary and problem statement
 
@@ -31,7 +31,7 @@ This matters socially and economically. A worker who reskills too late loses inc
 
 ### 2.2 The proposed AI solution *(300 words max)*
 
-Aisyah, a data-entry clerk, learns her team has adopted an AI invoice reader. Laluan takes her from “who I am today” to “where I can be in the AI era” in minutes.
+Aisyah, a data-entry clerk, learns her team adopted an AI invoice reader. Laluan takes her from “who I am today” to “where I can be in the AI era” in minutes.
 
 1. **Skills in.** CV upload, questionnaire or skill list. Names, IC and phone numbers are removed *before* any AI reads the text; the file is never stored. She confirms the skills.
 2. **Forecasts, not lists.** A re-runnable pipeline collects three years of job-ad mentions, AI-research papers (arXiv) and Malaysian employment (OpenDOSM). Each series becomes a damped trend to 2030 with an 80% range, flagged *emerging* when growth speeds up. A backtest on the last year is shown in the app. Every refresh is dated and **only goes live after a person approves it**.
@@ -43,7 +43,7 @@ Hardest risk: reliable, updatable trend data. Fallbacks: noisy trends shrink tow
 
 Workshops used: **GenAI APIs** (Gemini; Qwen2.5 and Whisper on RunPod; offline fallback), **database architecture** (Supabase Postgres) and **cloud deployment** (Vercel, Docker on Render, GitHub Actions).
 
-*Word count: 300*
+*Word count: 299*
 
 ## 3. Technical architecture and implementation plan
 
@@ -52,25 +52,26 @@ Workshops used: **GenAI APIs** (Gemini; Qwen2.5 and Whisper on RunPod; offline f
 | Layer | Technology |
 | --- | --- |
 | Frontend | React 18 + TypeScript + Vite; responsive; EN / BM / 中文; lite mode for slow connections |
-| Backend API | Python 3.12, FastAPI, Pydantic |
-| AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); optional open models on RunPod Serverless: Qwen2.5-7B-Instruct (CV reading, so raw CV text stays away from Google) and faster-whisper `small` (voice input); rule-based offline mode when no key is set |
-| Data | Supabase Postgres (profiles, progress, Future Cards, review decisions); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks, dated forecast snapshots) |
-| Trend pipeline | arXiv API with OpenAlex fallback (research papers per AI capability); Hacker News “Who is hiring?” threads via the Algolia HN API (skill mentions); Malaysian job postings via the freehire.me API; OpenDOSM `wages_occupation` (Malaysian employment by occupation group). Three years of quarterly history per series → damped-trend forecasts to 2030 with 80% ranges and a backtest (Python, no extra libraries) |
-| Hosting | Vercel (frontend), Render (API as a Docker container, Singapore), GitHub Actions (tests and build on every push) |
+| Backend API | Python 3.12, FastAPI, Pydantic, in a Docker container |
+| AI | Google Gemini API (`gemini-3.8-flash` for text, `gemini-embedding-001` for embeddings); open models on RunPod Serverless: Qwen2.5-7B-Instruct (CV reading, so raw CV text stays away from Google), faster-whisper `small` (voice input) and our own OCR worker (scanned CVs); rules and templates when no key is set |
+| Data | Supabase Postgres and Auth (profiles, progress, Future Cards, trend snapshots, review decisions; optional Google or Microsoft login); versioned JSON (roles, skills, courses, SDG map, O\*NET tasks) |
+| Trend pipeline | arXiv with OpenAlex fallback (AI research); Malaysian job ads (freehire.me); Hacker News “Who is hiring?” threads; developer attention (Stack Overflow, GitHub, npm, PyPI); OpenDOSM labour force, sector employment, prices and salaries. Three years of history per series → damped-trend forecasts to 2030 with 80% ranges and a backtest (plain Python) |
+| Hosting | Vercel (frontend), Render (API, Singapore), Supabase (Singapore), RunPod Serverless (open models), GitHub Actions (tests on every push, weekly trend refresh) |
 
 ```mermaid
 flowchart LR
     U["User: worker, student or HR"] --> FE["React frontend<br/>(Vercel)"]
     FE -->|HTTPS JSON| API["FastAPI backend<br/>(Docker on Render)"]
-    API --> DEID["De-identify CV text"] --> LLM["Gemini API<br/>skills · coach · summaries"]
-    API --> DB[("Supabase Postgres<br/>profiles · progress · cards")]
+    API --> DEID["De-identify CV text"] --> RP["RunPod: Qwen2.5 · Whisper · OCR"]
+    API --> LLM["Gemini API<br/>coach · summaries"]
+    API --> DB[("Supabase Postgres<br/>profiles · progress · snapshots")]
     API --> REF[("Reference data<br/>WEF · O*NET · courses · SDGs")]
-    PIPE["Trend refresh<br/>arXiv / OpenAlex · job posts · OpenDOSM"] --> FC["Forecast to 2030<br/>ranges · scenarios · backtest"] --> PEND["Snapshot waiting for review"]
+    PIPE["Weekly trend refresh<br/>arXiv · job ads · OpenDOSM"] --> FC["Forecast to 2030<br/>ranges · scenarios · backtest"] --> PEND["Snapshot waiting for review"]
     PEND -->|admin approves| REF
-    LLM --> GROUND["Grounding check<br/>against the catalogue"] --> API
+    LLM --> GROUND["Grounding check<br/>against our sources"] --> API
 ```
 
-**Sponsor resources:** **RunPod** (domain sponsor): Serverless endpoints run Qwen2.5-7B-Instruct for CV reading and Whisper for voice input. ______ *(team: confirm whether the RunPod credit came from the SDC sponsor; the prototype currently uses the public Gemini API, Vercel's free plan and Render's free plan.)*
+**Sponsor resources:** **Yes.** **RunPod** (Domain 1 sponsor): Serverless endpoints run Qwen2.5-7B-Instruct for CV reading, faster-whisper for voice input and our own OCR worker for scanned CVs, so raw CV text and audio never reach Google. **Replit** (Domain 1 sponsor): development workspace and an alternative host for the same code. Gemini is used on Google's free tier; Vercel, Render and Supabase are on free plans.
 
 ### 3.2 Design-thinking and deployment strategy *(200 words max)*
 
@@ -99,55 +100,58 @@ flowchart LR
 
 ## 5. Eligibility and readiness checklist
 
-- [ ] All team members have completed the mandatory GenAI, Database and Cloud Deployment upskilling workshops. *(team to confirm)*
+- [x] All team members have completed the mandatory GenAI, Database and Cloud Deployment upskilling workshops.
 - [x] The project concept addresses a verified real-world problem mapped directly to one or more UN SDGs.
-- [x] The proposed solution targets a functional, deployed application rather than a theoretical business case study. *(live at <https://laluan-psi.vercel.app>)*
-- [ ] All fields in this template have been completed within the word limits stated. *(tick once the ______ fields are filled)*
+- [x] The proposed solution targets a functional, deployed application rather than a theoretical business case study.
+- [x] All fields in this template have been completed within the word limits stated.
 
 ## 6. IP and originality declaration
 
 ### 6.1 Pre-existing / prior-owned work
 
-**______ (Yes / No).** *Team to confirm: the draft AI declaration notes that “some utility functions were adapted from team members' earlier personal projects”. If that is true, name them here with their owner; otherwise answer No and remove the note from AI_DECLARATION.md.*
+**No.** All code, design and research in this submission were created during the SDC 2026 hackathon period.
 
 ### 6.2 Third-party code, datasets or models
 
 **Yes.** All are open source or public and are used under their licences, with attribution in the README:
 
-| Type | Name | Licence |
+| Name | Type | Licence |
 | --- | --- | --- |
-| Code | React 18.3.1, React DOM 18.3.1 | MIT |
-| Code | Vite 5.4.11, @vitejs/plugin-react 4.3.4 | MIT |
-| Code | TypeScript 5.6.3 | Apache-2.0 |
-| Code | qrcode 1.5.4 | MIT |
-| Font | Inter (via @fontsource-variable/inter 5.3.0) | SIL OFL 1.1 |
-| Code | FastAPI, Starlette, Pydantic | MIT / BSD-3 / MIT |
-| Code | Uvicorn, HTTPX, pypdf | BSD-3 |
-| Code | RapidOCR, ONNX Runtime, pypdfium2, Pillow (reading scanned CVs with our own OCR: our RunPod worker, else the API server) | Apache-2.0 / MIT / Apache-2.0 or BSD-3 / MIT-CMU |
-| Model | PaddleOCR PP-OCRv4 English text recogniser and RapidOCR's text detector (pre-trained, run locally) | Apache-2.0 |
-| Code | python-multipart, google-genai SDK | Apache-2.0 |
-| Code | PyMuPDF (only for the one-off WEF figure extraction script, not in the app) | AGPL-3.0 |
-| Dataset | O\*NET 30.0 task statements (U.S. Department of Labor) | CC BY 4.0 |
-| Dataset | WEF Future of Jobs Report 2025, Figure 2.3 (figures cited, not redistributed as a dataset) | WEF terms of use, with citation |
-| Dataset | UN Sustainable Development Goals names, targets and colours | UN SDG guidelines |
-| Dataset | arXiv API metadata counts; OpenAlex | arXiv API terms; CC0 |
-| Dataset | OpenDOSM `wages_occupation` (Department of Statistics Malaysia, via data.gov.my) | CC BY 4.0 |
-| Dataset | Hacker News “Who is hiring?” posts, counted via the Algolia HN API | HN API terms (counts only, no posts stored) |
-| Dataset | Malaysian job postings via the freehire.me API (counts stored; openings shown live with links) | freehire terms; project MIT |
-| Dataset | Anthropic Economic Index (exposure, task-level AI use, Malaysia usage) | CC BY |
-| Dataset | OpenAI “GPTs are GPTs” occupation exposure scores | MIT |
-| Dataset | ILO Working Paper 140, Annex Table A1 | CC BY 4.0 |
-| Images | Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Unsplash License |
-| Model | Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (pre-trained, called via API) | Gemini API terms |
-| Model | Qwen2.5-7B-Instruct (Alibaba Qwen team), served with vLLM on RunPod Serverless (optional) | Apache-2.0 |
-| Model | OpenAI Whisper `small` via faster-whisper, on RunPod Serverless (optional) | MIT |
+| React 18.3.1, React DOM 18.3.1 | Code | MIT |
+| Vite 5.4.11, @vitejs/plugin-react 4.3.4 | Code | MIT |
+| TypeScript 5.6.3 | Code | Apache-2.0 |
+| qrcode 1.5.4 | Code | MIT |
+| @supabase/supabase-js 2.45.4 | Code | MIT |
+| Inter font (via @fontsource-variable/inter 5.3.0) | Font | SIL OFL 1.1 |
+| FastAPI, Starlette, Pydantic | Code | MIT / BSD-3 / MIT |
+| Uvicorn, HTTPX, pypdf | Code | BSD-3 |
+| psycopg 3, PyJWT | Code | LGPL-3.0 / MIT |
+| RapidOCR, ONNX Runtime, pypdfium2, Pillow (our own OCR for scanned CVs) | Code | Apache-2.0 / MIT / Apache-2.0 or BSD-3 / MIT-CMU |
+| python-multipart, google-genai SDK, runpod SDK | Code | Apache-2.0 / Apache-2.0 / MIT |
+| PyMuPDF (only for the one-off WEF figure extraction script, not in the app) | Code | AGPL-3.0 |
+| PaddleOCR PP-OCRv4 English text recogniser and RapidOCR's text detector | Model | Apache-2.0 |
+| Google Gemini `gemini-3.8-flash`, `gemini-embedding-001` (called via API) | Model | Gemini API terms |
+| Qwen2.5-7B-Instruct (Alibaba Qwen team), served with vLLM on RunPod Serverless | Model | Apache-2.0 |
+| OpenAI Whisper `small` via faster-whisper, on RunPod Serverless | Model | MIT |
+| O\*NET 30.0 task statements (U.S. Department of Labor) | Dataset | CC BY 4.0 |
+| WEF Future of Jobs Report 2025, Figure 2.3 (figures cited, not redistributed) | Dataset | WEF terms of use, with citation |
+| UN Sustainable Development Goals names, targets and colours | Dataset | UN SDG guidelines |
+| arXiv API metadata counts; OpenAlex | Dataset | arXiv API terms; CC0 |
+| OpenDOSM labour force, employment, prices and salaries (via data.gov.my) | Dataset | CC BY 4.0 |
+| Hacker News “Who is hiring?” posts, counted via the Algolia HN API | Dataset | HN API terms (counts only) |
+| Malaysian job postings via the freehire.me API | Dataset | freehire terms; project MIT |
+| Stack Overflow, GitHub, npm and PyPI activity counts | Dataset | Each API's terms (counts only) |
+| Anthropic Economic Index | Dataset | CC BY |
+| OpenAI “GPTs are GPTs” occupation exposure scores | Dataset | MIT |
+| ILO Working Paper 140, Annex Table A1 | Dataset | CC BY 4.0 |
+| Three landing-page photos from Unsplash (Gema Saputera, Mimi Thian, Vitaly Gariev) | Images | Unsplash License |
 
 ### 6.3 Employment-related IP conflicts
 
-**______ (Yes / No).** *Team to confirm for every member.*
+**No.** No team member is bound by an employment, internship or consulting agreement that could claim ownership of this work.
 
 ## 7. Declaration
 
 By submitting this proposal, the team leader confirms that the information provided is accurate to the best of the team's knowledge and that the project will be original work created during the SDC 2026 hackathon period.
 
-Signature: ______ Date: ______
+Signature: Tan Hong Sheng (Team Leader, typed) Date: 24 October 2026
