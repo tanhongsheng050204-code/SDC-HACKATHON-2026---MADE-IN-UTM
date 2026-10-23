@@ -47,7 +47,7 @@ export function HeroPreview() {
             <small>{tf("v3.destTag", { role: tr("AI operations specialist") })}</small>
             <b key={done ? "b" : "a"} className="lp-swap">
               {done
-                ? tf("v3.nextCourse", { course: tr("Prompt engineering"), h: 2, cost: t("v3.free") })
+                ? tf("v3.nextCourse", { course: tr("Python"), h: 60, cost: t("v3.free") })
                 : tf("v3.nextCourse", { course: tr("Critical thinking"), h: 9, cost: t("v3.freeAudit") })}
             </b>
             <span className="lp-next-bar"><span style={{ width: done ? "67%" : "47%" }} /></span>
@@ -92,7 +92,7 @@ export function HeroPreview() {
   );
 }
 
-type Nav = "home" | "radar" | "tasks";
+type Nav = "home" | "radar" | "tasks" | "pathway";
 
 function Side({ on }: { on: Nav }) {
   return (
@@ -102,7 +102,7 @@ function Side({ on }: { on: Nav }) {
       <span className={`lp-nav ${on === "radar" ? "is-on" : ""}`}>{t("nav.radar")}</span>
       <span className={`lp-nav ${on === "tasks" ? "is-on" : ""}`}>{t("nav.tasks")}</span>
       <span className="lp-nav">{t("nav.roles")} <i>13</i></span>
-      <span className="lp-nav">{t("nav.pathway")}</span>
+      <span className={`lp-nav ${on === "pathway" ? "is-on" : ""}`}>{t("nav.pathway")}</span>
       <span className="lp-nav">{t("nav.impact")}</span>
     </div>
   );
@@ -118,24 +118,32 @@ const OUTLOOK = [
   { title: "Data entry clerk", pct: -31.8, label: "declining", mine: true },
 ];
 
+const ARROW: Record<string, string> = { growing: "▲", stable: "▬", declining: "▼" };
+
+// Laid out like the Future Skills Radar screen: the "How fast will AI spread?" switch on Expected,
+// then the jobs rising and declining.
 function RadarScene() {
   return (
     <div className="lp-stage" aria-hidden="true">
       <div className="lp-window is-live">
         <Side on="radar" />
         <div className="lp-main lp-scene">
-          <p className="lp-hello">{t("nav.radar")}</p>
-          <small className="muted">{t("hp.radarSub")}</small>
+          <p className="lp-hello">{tf("radar.h", { year: 2030 })}</p>
+          <div className="lp-speed">
+            <small>{t("radar.speed")}</small>
+            <span className="lp-seg"><i>{t("radar.speedSlow")}</i><i className="on">{t("radar.speedBase")}</i><i>{t("radar.speedFast")}</i></span>
+          </div>
+          <b className="lp-scene-h">{t("fc.rolesTitle")}</b>
           <ul className="lp-outlook">
             {OUTLOOK.map((o, i) => (
               <li key={o.title} className={o.mine ? "is-mine" : ""} style={{ animationDelay: `${i * 0.12}s` }}>
                 <span>{tr(o.title)}{o.mine && <em>{t("radar.yours")}</em>}</span>
                 <span className="lp-outlook-bar"><span className={o.label} style={{ width: `${Math.min(100, Math.abs(o.pct) * 2)}%` }} /></span>
-                <b className={o.label}>{o.pct > 0 ? "+" : "−"}{Math.abs(o.pct).toFixed(1)}%</b>
+                <b className={o.label}>{ARROW[o.label]} {o.pct > 0 ? "+" : "−"}{Math.abs(o.pct).toFixed(1)}%</b>
               </li>
             ))}
           </ul>
-          <small className="lp-scene-src">WEF Future of Jobs Report 2025 · {OUTLOOK_TEXT.growing} / {OUTLOOK_TEXT.declining} · 2025–2030</small>
+          <small className="lp-scene-src">WEF Future of Jobs Report 2025 · {t("hp.radarSub")} · 2025–2030</small>
         </div>
       </div>
       <p className="lp-caption">{t("hp.caption")}</p>
@@ -143,32 +151,89 @@ function RadarScene() {
   );
 }
 
-// Aisyah's own job, task by task: O*NET 30.0 task statements for data entry keyers (43-9021.00),
-// labels drafted with AI assistance (backend/data/tasks.json).
-const TASKS = [
-  { text: "Compile, sort, and verify the accuracy of data before it is entered.", label: "automate" },
-  { text: "Compare data with source documents, or re-enter data in verification format to detect errors.", label: "automate" },
-  { text: "Locate and correct data entry errors, or report them to supervisors.", label: "assist" },
-  { text: "Select materials needed to complete work assignments.", label: "human" },
+// Laid out like "My job, task by task": a verdict, one square per task, then three columns.
+// Aisyah's job: O*NET 30.0 tasks for data entry keyers (43-9021.00), short titles and labels drafted
+// with AI assistance (backend/data/tasks.json).
+const TASKS: { short: string; label: "automate" | "assist" | "human" }[] = [
+  { short: "Check and sort data", label: "automate" },
+  { short: "Spot data entry errors", label: "automate" },
+  { short: "File completed documents", label: "automate" },
+  { short: "Fix data mistakes", label: "assist" },
+  { short: "Prepare work materials", label: "human" },
+];
+const COLUMNS = [
+  { label: "automate", title: "tasks.colAutomate" },
+  { label: "assist", title: "tasks.colAssist" },
+  { label: "human", title: "tasks.colHuman" },
 ] as const;
 
 function TasksScene() {
+  const ai = TASKS.filter((x) => x.label === "automate").length;
   return (
     <div className="lp-stage" aria-hidden="true">
       <div className="lp-window is-live">
         <Side on="tasks" />
         <div className="lp-main lp-scene">
-          <p className="lp-hello">{t("nav.tasks")}</p>
           <small className="muted">{tr("Data entry clerk")} · O*NET 30.0</small>
-          <ul className="lp-tasks">
-            {TASKS.map((task, i) => (
-              <li key={task.text} style={{ animationDelay: `${i * 0.15}s` }}>
-                <span>{tr(task.text)}</span>
-                <b className={`lp-task-tag ${task.label}`}>{t(`task.${task.label}`)}</b>
+          <p className="lp-hello">{t("tasks.vBig")}</p>
+          <small className="muted">{tf("tasks.vSub", { a: ai, n: TASKS.length })}</small>
+          <span className="lp-squares">{TASKS.map((x, i) => <i key={x.short} className={x.label} style={{ animationDelay: `${i * 0.1}s` }} />)}</span>
+          <div className="lp-cols">
+            {COLUMNS.map((c) => {
+              const mine = TASKS.filter((x) => x.label === c.label);
+              return (
+                <div key={c.label} className={`lp-col ${c.label}`}>
+                  <span className="lp-col-head"><b>{t(c.title)}</b><b>{Math.round((mine.length / TASKS.length) * 100)}%</b></span>
+                  {mine.map((x) => <span key={x.short} className="lp-chip">✓ {tr(x.short)}</span>)}
+                </div>
+              );
+            })}
+          </div>
+          <small className="lp-scene-src">{t("hp.tasksSrc")}</small>
+        </div>
+      </div>
+      <p className="lp-caption">{t("hp.caption")}</p>
+    </div>
+  );
+}
+
+// Laid out like the Pathway screen: the route, four figures, the next step in dark, then the steps.
+// Aisyah's live route (forecast 2026-10-22-trend-092120): three free courses, about 71 hours, 47% ready.
+const STEPS = [
+  { skill: "Critical thinking", course: "Critical Thinking Skills for the Professional", provider: "UC Davis (Coursera)", hours: 9 },
+  { skill: "Python", course: "CS50's Introduction to Programming with Python", provider: "Harvard University", hours: 60 },
+  { skill: "Prompt engineering and AI workflow design", course: "ChatGPT Prompt Engineering for Developers", provider: "DeepLearning.AI & OpenAI", hours: 2 },
+];
+
+function PathwayScene() {
+  const first = STEPS[0];
+  return (
+    <div className="lp-stage" aria-hidden="true">
+      <div className="lp-window is-live">
+        <Side on="pathway" />
+        <div className="lp-main lp-scene">
+          <p className="lp-route"><span>{tr("Data entry clerk")} →</span> {tr("AI operations specialist")}</p>
+          <div className="lp-figs">
+            <span><b>~71 h</b>{t("pw.left")}</span>
+            <span><b>{tf("pw.ofSteps", { n: 3, total: 3 })}</b>{t("pw.stepsToGo")}</span>
+            <span><b>47% → 100%</b>{t("pw.ready")}</span>
+            <span><b>RM 0</b>{t("pw.toPay")}</span>
+          </div>
+          <div className="lp-next-dark">
+            <small>{tf("pw.next", { n: 1 })}</small>
+            <b>{tr(first.skill)}</b>
+            <span>{tr(first.course)} · {first.provider} · {t("pw.free")} · {first.hours} h</span>
+            <span className="lp-next-btns"><i>{t("pw.open")} ↗</i><i>{t("pw.finished")}</i></span>
+          </div>
+          <ol className="lp-steps">
+            {STEPS.map((x, i) => (
+              <li key={x.course} style={{ animationDelay: `${0.2 + i * 0.12}s` }}>
+                <i>{i + 1}</i>
+                <span><small>{t("path.step")} {i + 1} · {i === 0 ? t("pw.sNext") : t("pw.sLater")} · {t("pw.free")}</small>
+                  <b>{tr(x.skill)}</b><em>{tr(x.course)} · {x.hours} h</em></span>
               </li>
             ))}
-          </ul>
-          <small className="lp-scene-src">{t("hp.tasksSrc")}</small>
+          </ol>
         </div>
       </div>
       <p className="lp-caption">{t("hp.caption")}</p>
@@ -180,10 +245,11 @@ const SCENES = [
   { key: "home", label: () => t("nav.home"), ms: 11500 },
   { key: "radar", label: () => t("nav.radar"), ms: 7000 },
   { key: "tasks", label: () => t("nav.tasks"), ms: 7000 },
+  { key: "pathway", label: () => t("nav.pathway"), ms: 7000 },
 ] as const;
 
-// The hero shows three app screens in turn: Today, Future Skills Radar and My job, task by task.
-// Picking one holds it; with reduce motion it stays on Today.
+// The hero shows four app screens in turn: Today, Future Skills Radar, My job, task by task, and
+// Pathway. Picking one holds it; with reduce motion it stays on Today.
 export function HeroScenes() {
   const [scene, setScene] = useState(0);
   const [held, setHeld] = useState(false);
@@ -192,6 +258,7 @@ export function HeroScenes() {
     const id = window.setTimeout(() => setScene((s) => (s + 1) % SCENES.length), SCENES[scene].ms);
     return () => window.clearTimeout(id);
   }, [scene, held]);
+  const Scene = [HeroPreview, RadarScene, TasksScene, PathwayScene][scene];
   return (
     <div className="lp-scenes">
       <div className="lp-scene-tabs" role="group" aria-label={t("hp.scenesAria")}>
@@ -200,7 +267,7 @@ export function HeroScenes() {
         ))}
       </div>
       <div key={scene} className="lp-scene-swap">
-        {scene === 0 ? <HeroPreview /> : scene === 1 ? <RadarScene /> : <TasksScene />}
+        <Scene />
       </div>
     </div>
   );

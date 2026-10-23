@@ -1,7 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { stillMode } from "../../lib/demoLoop";
-import { t, tr } from "../../lib/i18n";
-import { TASK_LABEL, TREND_TEXT } from "../../lib/labels";
+import { t, tf, tr } from "../../lib/i18n";
 
 // "One afternoon with Laluan": the main journey as a timeline. Pick a step on the left to see a
 // small picture of that screen on the right.
@@ -28,11 +27,17 @@ const steps = (): Step[] => [
     time: "14:05", title: t("jy.t2"),
     text: t("jy.x2"),
     panel: (
-      <div className="jp-card jp-radar" title={t("jy.example")}>
-        <div><p className="jp-label good">{TREND_TEXT.rising}</p><span>{tr("Using generative AI tools")}</span><span>{tr("Data visualisation")}</span><span className="mine">Excel <i>{t("radar.yours")}</i></span></div>
-        <div><p className="jp-label">{TREND_TEXT.steady}</p><span>{tr("Customer service")}</span><span>{tr("Communication")}</span></div>
-        <div><p className="jp-label risk">{TREND_TEXT.declining}</p><span className="mine">{tr("Data entry")} <i>{t("radar.yours")}</i></span><span>{tr("Office administration")}</span></div>
-        <p className="jp-note jp-span">{t("jy.exampleNote")}</p>
+      <div className="jp-card" title={t("jy.example")}>
+        <p className="jp-label">{t("jy.yourSkills")}</p>
+        <div className="jp-tiles">
+          <span className="rising">{tr("Using generative AI tools")} <b>▲</b></span>
+          <span className="rising">{tr("Spreadsheets (Excel / Google Sheets)")} <b>▲</b></span>
+          <span className="steady">{tr("Communication")} <b>▬</b></span>
+          <span className="steady">{tr("Scheduling and coordination")} <b>▬</b></span>
+          <span className="declining">{tr("Data entry")} <b>▼</b></span>
+          <span className="declining">{tr("Office administration")} <b>▼</b></span>
+        </div>
+        <p className="jp-note">{t("jy.exampleNote")}</p>
       </div>
     ),
   },
@@ -41,8 +46,13 @@ const steps = (): Step[] => [
     text: t("jy.x3"),
     panel: (
       <div className="jp-card">
-        <div className="split-bar"><span className="split automate" style={{ width: "60%" }} /><span className="split assist" style={{ width: "20%" }} /><span className="split human" style={{ width: "20%" }} /></div>
-        <ul className="jp-legend"><li><i className="swatch automate" />60% {TASK_LABEL.automate.text}</li><li><i className="swatch assist" />20% {TASK_LABEL.assist.text}</li><li><i className="swatch human" />20% {TASK_LABEL.human.text}</li></ul>
+        <b className="jp-verdict">{t("tasks.vBig")}</b>
+        <span className="lp-squares"><i className="automate" /><i className="automate" /><i className="automate" /><i className="assist" /><i className="human" /></span>
+        <ul className="jp-legend jp-cols-mini">
+          <li className="automate">{t("tasks.colAutomate")} <b>60%</b></li>
+          <li className="assist">{t("tasks.colAssist")} <b>20%</b></li>
+          <li className="human">{t("tasks.colHuman")} <b>20%</b></li>
+        </ul>
         <p className="jp-note">{tr("Data entry clerk")} · {t("jy.allTasks")} · O*NET 30.0</p>
       </div>
     ),
@@ -52,7 +62,7 @@ const steps = (): Step[] => [
     text: t("jy.x4"),
     panel: (
       <div className="jp-card">
-        <div className="seg-mini"><span>{t("sc.slow")}</span><span className="on">{t("sc.baseline")}</span><span>{t("sc.accelerated")}</span></div>
+        <div className="seg-mini"><small>{t("roles.speed")}</small><span>{t("roles.speedSlow")}</span><span className="on">{t("roles.speedBase")}</span><span>{t("roles.speedFast")}</span></div>
         <p className="jp-why"><b>{t("jy.why")}</b> {t("jy.whyText")}</p>
         <span className="badge gold">{t("card.robust")}: {t("jy.robust")}</span>
       </div>
@@ -64,11 +74,12 @@ const steps = (): Step[] => [
     panel: (
       <div className="jp-card">
         <ol className="jp-plan">
-          <li><b>{tr("Critical thinking")}</b><span className="badge good">{t("cost.free_audit")}</span></li>
-          <li><b>ChatGPT Prompt Engineering for Developers</b><span className="badge good">{t("cost.free")}</span></li>
+          <li><b>{tr("Critical thinking")}</b><span className="badge good">{t("cost.free_audit")} · 9 h</span></li>
+          <li><b>{tr("Python")}</b><span className="badge good">{t("cost.free")} · 60 h</span></li>
+          <li><b>{tr("Prompt engineering and AI workflow design")}</b><span className="badge good">{t("cost.free")} · 2 h</span></li>
         </ol>
-        <div className="fit"><div style={{ width: "50%" }} /></div>
-        <p className="jp-note">{t("path.readiness")} 50% · {t("jy.hoursLeft")}</p>
+        <div className="fit"><div style={{ width: "47%" }} /></div>
+        <p className="jp-note">{tf("jy.planLine", { from: 47, h: 71 })}</p>
       </div>
     ),
   },
@@ -77,7 +88,7 @@ const steps = (): Step[] => [
     text: t("jy.x6"),
     panel: (
       <div className="jp-card jp-share">
-        <div><p className="jp-label">{t("share.title")}</p><b>{t("jy.toward")}</b><span className="jp-note">{t("path.readiness")} 50% · {t("jy.stepsLeft")}</span></div>
+        <div><p className="jp-label">{t("share.title")}</p><b>{t("jy.toward")}</b><span className="jp-note">{t("path.readiness")} 47% · {t("jy.stepsLeft")}</span></div>
         <div className="jp-qr" />
       </div>
     ),
