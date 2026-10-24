@@ -30,7 +30,7 @@
 | GitHub Repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM> |
 | Live Demo | **<https://laluan-psi.vercel.app>** (no sign-up; API docs at <https://laluan-api.onrender.com/docs>) |
 | Replit | Validation sandbox for the app; see [How We Use Replit](#how-we-use-replit-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Replit_POU.pdf) |
-| RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Runpod_POU.pdf) |
+| RunPod Endpoints | Qwen2.5-7B CV reader `https://api.runpod.ai/v2/tkz2ystb9e77tu` · faster-whisper voice `https://api.runpod.ai/v2/m7wj9nadqy9v82` · OCR worker `https://api.runpod.ai/v2/lsamu8q64cbso5`; see [How We Use RunPod](#how-we-use-runpod-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Runpod_POU.pdf) |
 | Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (7 slides) |
 | Demo Video | **<https://www.youtube.com/watch?v=8IJ64e0ftos>** (pitch and live demo, 6:57) |
 | Preliminary Proposal | [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf) |
@@ -230,9 +230,17 @@ RunPod runs the open models, so a person's CV text and voice never have to reach
 
 | Endpoint | Workload | Code |
 | --- | --- | --- |
-| **CV reader** | Qwen2.5-7B-Instruct on a vLLM Serverless worker reads skill phrases from the CV **after** names, emails, phone and IC numbers are removed | [`backend/app/runpod.py`](backend/app/runpod.py) `generate_json`, called from [`services/skills.py`](backend/app/services/skills.py) |
-| **Voice input** | faster-whisper (`small`) turns a spoken answer into text; the audio is sent once and never stored | `runpod.transcribe`, route `/api/voice/transcribe` |
-| **OCR worker** | Our own worker reads scanned CVs and photos (RapidOCR with the PaddleOCR PP-OCRv4 recogniser) | [`runpod/ocr/handler.py`](runpod/ocr/handler.py), deployed from [`runpod/ocr/Dockerfile`](runpod/ocr/Dockerfile) |
+| **CV reader** | Qwen2.5-7B-Instruct on a vLLM Serverless worker (24 GB GPU) reads skill phrases from the CV **after** names, emails, phone and IC numbers are removed | [`backend/app/runpod.py`](backend/app/runpod.py) `generate_json`, called from [`services/skills.py`](backend/app/services/skills.py) |
+| **Voice input** | faster-whisper (`small`, 16 GB GPU) turns a spoken answer into text; the audio is sent once and never stored | `runpod.transcribe`, route `/api/voice/transcribe` |
+| **OCR worker** | Our own worker, built by RunPod from this repository, reads scanned CVs and photos (RapidOCR with the PaddleOCR PP-OCRv4 recogniser) | [`runpod/ocr/handler.py`](runpod/ocr/handler.py), deployed from [`runpod/ocr/Dockerfile`](runpod/ocr/Dockerfile) |
+
+Our three Serverless endpoints (the console pages need the team's RunPod login; the API URLs need its API key):
+
+| Endpoint | Endpoint ID | API URL | RunPod console |
+| --- | --- | --- | --- |
+| Qwen2.5-7B-Instruct (vLLM) | `tkz2ystb9e77tu` | `https://api.runpod.ai/v2/tkz2ystb9e77tu` | [open](https://console.runpod.io/serverless/user/endpoint/tkz2ystb9e77tu) |
+| faster-whisper | `m7wj9nadqy9v82` | `https://api.runpod.ai/v2/m7wj9nadqy9v82` | [open](https://console.runpod.io/serverless/user/endpoint/m7wj9nadqy9v82) |
+| OCR worker | `lsamu8q64cbso5` | `https://api.runpod.ai/v2/lsamu8q64cbso5` | [open](https://console.runpod.io/serverless/user/endpoint/lsamu8q64cbso5) |
 
 - **Setup:** the API reads `RUNPOD_API_KEY`, `RUNPOD_LLM_ENDPOINT`, `RUNPOD_WHISPER_ENDPOINT` and `RUNPOD_OCR_ENDPOINT` from its environment (see [`backend/.env.example`](backend/.env.example)). Keys live in Render's environment settings, never in the code.
 - **Fallbacks:** every call has a short deadline, so a cold start falls back instead of making the person wait: Qwen → Gemini on the scrubbed text → the skills dictionary; RunPod OCR → OCR on the API server; Whisper → the browser's own speech input.
