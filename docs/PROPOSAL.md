@@ -3,7 +3,7 @@
 > Draft for the team. Follow the official submission format and length limits (not yet known), and
 > rewrite the parts marked ✍️ in your own words. Every number here must stay sourced.
 
-**Team:** Made in UTM · **Domain:** 1, The Aiversecity Future-Ready Workforce · **Repo:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
+**Team:** Made in UTM · **Domain:** 1, The Aiversecity Future-Ready Workforce · **Repo:** https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM
 
 ## 1. Problem
 

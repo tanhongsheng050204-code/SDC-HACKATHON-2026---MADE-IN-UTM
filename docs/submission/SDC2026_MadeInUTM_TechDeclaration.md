@@ -12,7 +12,7 @@
 | Email and phone (leader) | tanhongsheng050204@gmail.com (phone as on the registration form) |
 | University affiliation(s) | Universiti Teknologi Malaysia (UTM) |
 | Live prototype URL | <https://laluan-psi.vercel.app> (API: <https://laluan-api.onrender.com/docs>) |
-| Code repository URL | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM> (public) |
+| Code repository URL | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM> (public) |
 
 ## 2. Architecture and technology stack
 

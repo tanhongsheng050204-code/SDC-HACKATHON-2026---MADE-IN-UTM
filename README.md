@@ -23,7 +23,7 @@
 
 | Resource | Link |
 | --- | --- |
-| GitHub Repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM> |
+| GitHub Repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM> |
 | Live Demo | **<https://laluan-psi.vercel.app>** (no sign-up; API docs at <https://laluan-api.onrender.com/docs>) |
 | Replit Project | ⏳ *to be added* |
 | RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) |
@@ -181,8 +181,8 @@ No API key is needed: without keys, Laluan reads CVs with a skills dictionary an
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM.git
-cd SDC-HACKATHON-2026---MADE-IN-UTM
+git clone https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM.git
+cd SDC-HACKATHON-2026-XMUM---Made-In-UTM
 
 # 2. Backend (http://localhost:8000, docs at /docs)
 cd backend

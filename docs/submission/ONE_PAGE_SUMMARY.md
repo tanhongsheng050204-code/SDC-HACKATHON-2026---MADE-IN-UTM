@@ -1,6 +1,6 @@
 # Laluan: see where your career goes before AI changes it
 
-**Team:** Made in UTM · **Domain 1:** The Aiversecity Future-Ready Workforce · **Live:** https://laluan-psi.vercel.app · **Code:** https://github.com/tanhongsheng050204-code/XMUM-HACKATHON
+**Team:** Made in UTM · **Domain 1:** The Aiversecity Future-Ready Workforce · **Live:** https://laluan-psi.vercel.app · **Code:** https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM
 
 ## The problem
 

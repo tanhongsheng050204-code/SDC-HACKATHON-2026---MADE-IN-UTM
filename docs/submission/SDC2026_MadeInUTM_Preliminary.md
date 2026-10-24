@@ -15,7 +15,7 @@
 | University affiliation(s) | Universiti Teknologi Malaysia (UTM) |
 | Number of team members | 4 |
 | Live prototype | <https://laluan-psi.vercel.app> |
-| Code repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026---MADE-IN-UTM> |
+| Code repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM> |
 
 ## 2. Executive summary and problem statement
 
