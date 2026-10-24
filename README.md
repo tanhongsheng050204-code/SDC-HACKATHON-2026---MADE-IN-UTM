@@ -4,6 +4,10 @@
 
 **SDC Hackathon 2026 @ XMUM (#1stSDGHack)** · Team **Made in UTM** · Domain 1: The Aiversecity Future-Ready Workforce
 
+[![Watch the pitch and demo on YouTube (6:57)](https://img.youtube.com/vi/8IJ64e0ftos/maxresdefault.jpg)](https://www.youtube.com/watch?v=8IJ64e0ftos)
+
+**▶ [Watch the pitch and demo (6:57)](https://www.youtube.com/watch?v=8IJ64e0ftos)** · **[Try the live app](https://laluan-psi.vercel.app)**
+
 ![From a skills profile to ranked future roles and a pathway](docs/media/hero.gif)
 
 ---
@@ -28,7 +32,7 @@
 | Replit | Validation sandbox for the app; see [How We Use Replit](#how-we-use-replit-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Replit_POU.pdf) |
 | RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Runpod_POU.pdf) |
 | Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (7 slides) |
-| Demo Video | ⏳ *to be added (YouTube)* |
+| Demo Video | **<https://www.youtube.com/watch?v=8IJ64e0ftos>** (pitch and live demo, 6:57) |
 | Preliminary Proposal | [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf) |
 | Technical Tools Declaration | [`submission/SDC2026_MadeInUTM_TechDeclaration.pdf`](submission/SDC2026_MadeInUTM_TechDeclaration.pdf) |
 
@@ -303,7 +307,7 @@ Every problem found and its fix is in the [review log](docs/REVIEW_LOG.md); desi
 
 - [x] Team name, domain (Domain 1) and SDG track filled in
 - [x] Slide deck link added ([`SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf))
-- [ ] Demo video link added
+- [x] Demo video link added ([YouTube, 6:57](https://www.youtube.com/watch?v=8IJ64e0ftos))
 - [x] Replit used, with proof of use in `submission/` ([`SDC2026_MadeInUTM_Replit_POU.pdf`](submission/SDC2026_MadeInUTM_Replit_POU.pdf))
 - [x] RunPod used, with proof of use in `submission/` ([`SDC2026_MadeInUTM_Runpod_POU.pdf`](submission/SDC2026_MadeInUTM_Runpod_POU.pdf))
 - [x] Preliminary submission completed ([`SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf))
