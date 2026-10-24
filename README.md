@@ -25,8 +25,8 @@
 | --- | --- |
 | GitHub Repository | <https://github.com/tanhongsheng050204-code/SDC-HACKATHON-2026-XMUM---Made-In-UTM> |
 | Live Demo | **<https://laluan-psi.vercel.app>** (no sign-up; API docs at <https://laluan-api.onrender.com/docs>) |
-| Replit Project | ⏳ *to be added* |
-| RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) |
+| Replit | Validation sandbox for the app; see [How We Use Replit](#how-we-use-replit-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Replit_POU.pdf) |
+| RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Runpod_POU.pdf) |
 | Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (7 slides) |
 | Demo Video | ⏳ *to be added (YouTube)* |
 | Preliminary Proposal | [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf) |
@@ -118,7 +118,7 @@ More: My job task by task, a skill tree with proof questions, interview practice
 | Backend | Python 3.12, FastAPI, Pydantic, in Docker |
 | Database | Supabase Postgres and Auth (SQLite for local runs); versioned JSON reference data |
 | AI / Compute | **RunPod Serverless** (Qwen2.5-7B-Instruct on vLLM, faster-whisper, our own OCR worker); Google Gemini 3.8 Flash and Gemini embeddings |
-| Hosting / Dev | Vercel (frontend), Render (API, Singapore), GitHub Actions (tests, weekly trend refresh); Replit ⏳ |
+| Hosting / Dev | Vercel (frontend), Render (API, Singapore), GitHub Actions (tests, weekly trend refresh); Replit (validation sandbox) |
 
 ---
 
@@ -173,7 +173,9 @@ The details are in **[How Laluan works](docs/HOW_IT_WORKS.md)**.
 
 ### Option 1 — Run on Replit
 
-⏳ *The Replit project link and run configuration are being added.*
+1. In Replit, choose **Create Repl → Import from GitHub** and paste this repository's URL.
+2. Optional: add `GEMINI_API_KEY` and the `RUNPOD_*` values from [`backend/.env.example`](backend/.env.example) in the **Secrets** tab (🔒). Without them the app runs on rules and templates.
+3. In the Shell, run the backend and frontend commands from Option 2 below.
 
 ### Option 2 — Run Locally
 
@@ -212,9 +214,11 @@ CI runs both on every push, against SQLite and Postgres. Setup, configuration an
 
 ## How We Use Replit *(Required)*
 
-⏳ *To be added.*
+- **Validation sandbox:** we used Replit (a Domain 1 sponsor) to test the web application in a clean cloud environment, check that the dependencies install from scratch, and confirm it runs the same way outside our own machines.
+- **Replit Agent:** the proof of use shows the team's Replit account usage, including Agent (AI) use, from 20 to 24 October 2026.
+- **Production stays elsewhere:** the live demo runs on Vercel and Render, so judges use the same deployment we tested.
 
-📄 Proof of use: `submission/SDC2026_MadeInUTM_Replit_POU.pdf` ⏳
+📄 Proof of use: [`submission/SDC2026_MadeInUTM_Replit_POU.pdf`](submission/SDC2026_MadeInUTM_Replit_POU.pdf)
 
 ## How We Use RunPod *(Required)*
 
@@ -239,7 +243,7 @@ curl -X POST https://api.runpod.ai/v2/$RUNPOD_OCR_ENDPOINT/runsync \
   -d '{"input": {"images": ["<base64 JPEG of a CV page>"]}}'
 ```
 
-📄 Proof of use: `submission/SDC2026_MadeInUTM_Runpod_POU.pdf` ⏳
+📄 Proof of use: [`submission/SDC2026_MadeInUTM_Runpod_POU.pdf`](submission/SDC2026_MadeInUTM_Runpod_POU.pdf), the RunPod console for all three endpoints (vLLM Qwen2.5-7B-Instruct, Faster Whisper, and the OCR worker built from this repository)
 
 ## AI disclosure and data
 
@@ -300,8 +304,8 @@ Every problem found and its fix is in the [review log](docs/REVIEW_LOG.md); desi
 - [x] Team name, domain (Domain 1) and SDG track filled in
 - [x] Slide deck link added ([`SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf))
 - [ ] Demo video link added
-- [ ] Replit used, with proof of use in `submission/`
-- [ ] RunPod used, with proof of use in `submission/`
+- [x] Replit used, with proof of use in `submission/` ([`SDC2026_MadeInUTM_Replit_POU.pdf`](submission/SDC2026_MadeInUTM_Replit_POU.pdf))
+- [x] RunPod used, with proof of use in `submission/` ([`SDC2026_MadeInUTM_Runpod_POU.pdf`](submission/SDC2026_MadeInUTM_Runpod_POU.pdf))
 - [x] Preliminary submission completed ([`SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf))
 - [x] Technology declaration completed ([`SDC2026_MadeInUTM_TechDeclaration.pdf`](submission/SDC2026_MadeInUTM_TechDeclaration.pdf))
 - [x] Submission files renamed with our team name (`MadeInUTM`)
