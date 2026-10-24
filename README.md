@@ -296,7 +296,7 @@ Every problem found and its fix is in the [review log](docs/REVIEW_LOG.md); desi
 
 | Name | Role | GitHub |
 | --- | --- | --- |
-| Tan Hong Sheng | Team Leader · Product Manager | [@ttanhs](https://github.com/ttanhs) |
+| Tan Hong Sheng | Team Leader · Product Manager | [@tanhongsheng050204-code](https://github.com/tanhongsheng050204-code) |
 | Shirlyn Siew Yu Jye | UI/UX Designer | [@shirlynsyj83](https://github.com/shirlynsyj83) |
 | Chek Chee Him | Frontend Developer | [@thebalanceder](https://github.com/thebalanceder) |
 | Thim Yee Song | Backend Developer | [@song-0707](https://github.com/song-0707) |
