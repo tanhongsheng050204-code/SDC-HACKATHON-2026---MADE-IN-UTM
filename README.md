@@ -31,7 +31,7 @@
 | Live Demo | **<https://laluan-psi.vercel.app>** (no sign-up; API docs at <https://laluan-api.onrender.com/docs>) |
 | Replit | Validation sandbox for the app; see [How We Use Replit](#how-we-use-replit-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Replit_POU.pdf) |
 | RunPod Endpoints | [Qwen2.5-7B CV reader](https://console.runpod.io/serverless/user/endpoint/tkz2ystb9e77tu) · [faster-whisper voice](https://console.runpod.io/serverless/user/endpoint/m7wj9nadqy9v82) · [OCR worker](https://console.runpod.io/serverless/user/endpoint/lsamu8q64cbso5) (RunPod console, team login); see [How We Use RunPod](#how-we-use-runpod-required) and the [proof of use (PDF)](submission/SDC2026_MadeInUTM_Runpod_POU.pdf) |
-| Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (7 slides) |
+| Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (17 slides; editable [.pptx](docs/submission/Laluan_Pitch_Deck.pptx)) |
 | Demo Video | **<https://www.youtube.com/watch?v=8IJ64e0ftos>** (pitch and live demo, 6:57) |
 | Preliminary Proposal | [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf) |
 | Technical Tools Declaration | [`submission/SDC2026_MadeInUTM_TechDeclaration.pdf`](submission/SDC2026_MadeInUTM_TechDeclaration.pdf) |
