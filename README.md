@@ -27,7 +27,7 @@
 | Live Demo | **<https://laluan-psi.vercel.app>** (no sign-up; API docs at <https://laluan-api.onrender.com/docs>) |
 | Replit Project | ⏳ *to be added* |
 | RunPod Endpoints | Three Serverless endpoints (Qwen2.5-7B CV reader, faster-whisper voice, our OCR worker); see [How We Use RunPod](#how-we-use-runpod-required) |
-| Slide Deck | ⏳ *to be added* |
+| Slide Deck | [`submission/SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf) (7 slides) |
 | Demo Video | ⏳ *to be added (YouTube)* |
 | Preliminary Proposal | [`submission/SDC2026_MadeInUTM_Preliminary.pdf`](submission/SDC2026_MadeInUTM_Preliminary.pdf) |
 | Technical Tools Declaration | [`submission/SDC2026_MadeInUTM_TechDeclaration.pdf`](submission/SDC2026_MadeInUTM_TechDeclaration.pdf) |
@@ -139,7 +139,7 @@ More: My job task by task, a skill tree with proof questions, interview practice
 │   └── src/lib/             # API client, i18n (EN / BM / 中文), auth
 ├── runpod/
 │   └── ocr/                 # RunPod Serverless OCR worker: handler.py, Dockerfile
-├── submission/              # SDC submission PDFs (Preliminary, Tech Declaration)
+├── submission/              # SDC submission PDFs (Preliminary, Tech Declaration, pitch deck)
 ├── docs/                    # PRD, TRD, how it works, user manual, decisions, review log, media/ GIFs
 ├── .github/workflows/       # ci.yml (tests and build), cron.yml (keep-awake, weekly refresh, digests)
 ├── docker-compose.yml       # whole app in one command
@@ -280,7 +280,7 @@ Every problem found and its fix is in the [review log](docs/REVIEW_LOG.md); desi
 
 ## Documents
 
-- SDC submission: [Preliminary proposal (PDF)](submission/SDC2026_MadeInUTM_Preliminary.pdf) · [Technical tools declaration (PDF)](submission/SDC2026_MadeInUTM_TechDeclaration.pdf) · [Data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf) · Markdown sources in [docs/submission](docs/submission)
+- SDC submission: [Pitch deck (PDF)](submission/SDC2026_MadeInUTM_PitchDeck.pdf) · [Preliminary proposal (PDF)](submission/SDC2026_MadeInUTM_Preliminary.pdf) · [Technical tools declaration (PDF)](submission/SDC2026_MadeInUTM_TechDeclaration.pdf) · [Data sources (PDF)](docs/submission/Laluan_Data_Sources.pdf) · Markdown sources in [docs/submission](docs/submission)
 - Design: [PRD](docs/01-PRD.md) · [TRD](docs/02-TRD.md) · [App flow](docs/03-APP_FLOW.md) · [UI/UX brief](docs/04-UI_UX_BRIEF.md) · [Backend schema](docs/05-BACKEND_SCHEMA.md) · [Implementation plan](docs/06-IMPLEMENTATION_PLAN.md)
 - How we built and checked it: [AI declaration](docs/AI_DECLARATION.md) · [Decisions](docs/DECISIONS.md) · [Review log](docs/REVIEW_LOG.md) · [Code to explain](docs/CODE_TO_EXPLAIN.md) · [Evaluation](docs/EVALUATION.md) · [Manual test plan](docs/MANUAL_TEST_PLAN.md) · [Data sources expansion](docs/DATA_SOURCES_EXPANSION.md)
 
@@ -298,7 +298,7 @@ Every problem found and its fix is in the [review log](docs/REVIEW_LOG.md); desi
 ## Submission Checklist
 
 - [x] Team name, domain (Domain 1) and SDG track filled in
-- [ ] Slide deck link added
+- [x] Slide deck link added ([`SDC2026_MadeInUTM_PitchDeck.pdf`](submission/SDC2026_MadeInUTM_PitchDeck.pdf))
 - [ ] Demo video link added
 - [ ] Replit used, with proof of use in `submission/`
 - [ ] RunPod used, with proof of use in `submission/`
