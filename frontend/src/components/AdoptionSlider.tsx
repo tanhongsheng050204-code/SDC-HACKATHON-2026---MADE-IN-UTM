@@ -51,6 +51,7 @@ export function SpeedPanel({ profileId, year, value, preset, onChange }: {
           {marks.map((m) => <li key={m.text} className={m.tone}>{m.text}</li>)}
         </ul>
       )}
+      {tip && marks.length === 0 && <p className="muted">{t("roles.tipNone")}</p>}
       {value !== undefined && <button className="link" onClick={() => onChange(undefined)}>{t("roles.reset")}</button>}
     </div>
   );

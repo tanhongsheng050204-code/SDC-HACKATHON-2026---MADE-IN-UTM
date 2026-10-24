@@ -36,14 +36,19 @@ function sentences(text: string): string[] {
   return out.filter(Boolean);
 }
 
+// "[SOURCE-1, SOURCE-2]" in an answer, shown as a small "[1, 2]" matching the numbered source list.
+const CITE = /^\[SOURCE-\d+(?:\s*,\s*SOURCE-\d+)*\]$/;
+const sourceNumber = (id: string) => id.replace(/^SOURCE-/, "");
+
 // Light formatting: **bold** as written, then money, percentages and hour counts in bold.
 // Built as nodes, never as HTML, so nothing from the model can inject markup.
 function Inline({ text }: { text: string }) {
-  const chunks = text.split(/(\*\*[^*]+\*\*)/g);
+  const chunks = text.split(/(\*\*[^*]+\*\*|\[SOURCE-\d+(?:\s*,\s*SOURCE-\d+)*\])/g);
   return (
     <>
       {chunks.map((chunk, i) => {
         if (chunk.startsWith("**") && chunk.endsWith("**") && chunk.length > 4) return <strong key={i}>{chunk.slice(2, -2)}</strong>;
+        if (CITE.test(chunk)) return <sup key={i} className="coach-cite">[{chunk.match(/\d+/g)!.join(", ")}]</sup>;
         const bits = chunk.split(/(RM\s?\d[\d,.]*|\d[\d,.]*\s?%|\b\d+(?:\.\d+)?\s?hours?\b)/gi);
         return <span key={i}>{bits.map((b, j) => (j % 2 === 1 ? <strong key={j}>{b}</strong> : <span key={j}>{b}</span>))}</span>;
       })}
@@ -69,7 +74,7 @@ function AnswerText({ text, onWhy }: { text: string; onWhy: (sentence: string) =
     out.push(
       <p key={`p${out.length}`}>
         {sentences(line).map((s, i) => (
-          <span key={i} className="coach-say" role="button" tabIndex={0} title={t("coach.whyHint")} aria-label={t("coach.whyHint")}
+          <span key={i} className="coach-say" role="button" tabIndex={0} title={t("coach.whyHint")}
             onClick={() => onWhy(s)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onWhy(s); } }}>
             <Inline text={s} />{" "}
@@ -98,8 +103,14 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
   useEffect(() => {
     save(storeKey, turns.length ? JSON.stringify(turns.slice(-MAX_KEPT)) : null, "session");
   }, [turns, storeKey]);
-  // A different profile or role in the same open drawer loads that thread instead.
-  useEffect(() => { setTurns(readTurns(storeKey)); setInterim(""); }, [storeKey]);
+  // A different profile or role in the same open drawer loads that thread instead. Only on a real
+  // change: re-reading on mount could replace a question the drawer was opened with.
+  const loadedKey = useRef(storeKey);
+  useEffect(() => {
+    if (loadedKey.current === storeKey) return;
+    loadedKey.current = storeKey;
+    setTurns(readTurns(storeKey)); setInterim("");
+  }, [storeKey]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -207,7 +218,7 @@ export function Coach({ profile, scenario, roleId, initialQuestion, onApply, onC
                 )}
                 {turn.reply.mode !== "blocked" && <Helpful target="coach" />}
                 <details><summary className="muted">{tf("coach.sources", { n: turn.reply.sources.length })}</summary>
-                  <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{s.id}</strong> {tr(s.text)}</li>)}</ul>
+                  <ul className="coach-sources">{turn.reply.sources.map((s) => <li key={s.id}><strong>{sourceNumber(s.id)}</strong> {tr(s.text)}</li>)}</ul>
                 </details>
                 {turn.reply.proposal && !turn.dismissed && (
                   <div className="proposal card">

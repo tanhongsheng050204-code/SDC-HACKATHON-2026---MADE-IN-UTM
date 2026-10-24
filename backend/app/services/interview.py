@@ -82,6 +82,10 @@ def _history(turns: list[dict]) -> str:
     return "\n".join(f"Q{i}: {t['question']}\nA{i}: {scrub(t['answer'])}" for i, t in enumerate(turns, 1)) or "(none yet)"
 
 
+BLOCKED_ANSWER = ("That reads like an instruction to the AI, not an interview answer, so it wasn't marked. "
+                  "Answer the question in your own words and you'll get feedback.")
+
+
 def next_turn(ref: Reference, profile: dict, role_id: str, turns: list[dict], language: str = "en") -> dict:
     role = ref.roles[role_id]
     steps = plan(ref, profile, role_id)
@@ -90,7 +94,7 @@ def next_turn(ref: Reference, profile: dict, role_id: str, turns: list[dict], la
         guard = guardrails.check(turns[-1]["answer"])
         if not guard.safe:  # ask the same question again; nothing reaches the model
             return {"number": len(turns), "total": total, "question": turns[-1]["question"],
-                    "focus": steps[len(turns) - 1]["name"], "feedback": guardrails.REFUSAL[guard.category],
+                    "focus": steps[len(turns) - 1]["name"], "feedback": BLOCKED_ANSWER,
                     "mode": "blocked", "done": False}
     done = len(turns) >= total
     step = None if done else steps[len(turns)]

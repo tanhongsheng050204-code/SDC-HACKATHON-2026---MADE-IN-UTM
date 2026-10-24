@@ -492,6 +492,7 @@ a.btn { display: inline-flex; align-items: center; justify-content: center; font
 .coach-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .coach-tools .btn { min-height: 30px; padding: .3rem .65rem; font-size: .78rem; font-weight: 500; }
 .coach-sources { margin: 6px 0 0; padding-left: 18px; font-size: .82rem; color: var(--ink-soft); display: grid; gap: 4px; }
+.coach-cite { font-size: .72em; color: var(--ink-soft); margin-left: 1px; }
 .proposal { display: grid; gap: 6px; border-color: var(--gold-bright); }
 .proposal p { margin: 0; }
 .coach-suggest { gap: 6px; }

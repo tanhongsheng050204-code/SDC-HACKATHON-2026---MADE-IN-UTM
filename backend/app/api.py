@@ -16,7 +16,7 @@ from app.reference import get_reference, reload_reference
 from app.schemas import (ActionAnswer, ActionIn, ApplicationIn, ApplicationPatch, CardRequest, DecisionReasonsIn, ClassIn, CounsellorDecision, CounsellorRequest, EmailSettingsIn, JoinRequest, FeedbackIn, PlanRequest, ProblemIn, UsageIn, CheckAnswers, CheckStart, ClaimRequest, InterpretRequest, SurveyIn, CoachRequest, CompleteRequest, ExtractRequest, IntakeTurnRequest, InterviewRequest, ProfileIn, TargetRequest, ReviewDecision, EvidenceDecision, LiveSearchRequest,
                          Scenario, SnapshotIn, WorkforceRequest, WorkforceSave)
 from app.services.scenario import outlook, signals_from_snapshot
-from app.services.deid import removed_counts, scrub, scrub_cv
+from app.services.deid import removed_counts, scrub, scrub_contacts, scrub_cv
 from app.services import (alerts, cards, checkins, classes, decisions, plancheck, fairness, region, replan, classview, coach, documents, exposure, identity, intake, interview, journey, matching,
                           openings, pathway, progress, proofcheck, rolecase, skills, skilltree, survey, tasks, tipping, upgrade,
                           workforce, xray)
@@ -672,6 +672,9 @@ def _application_fields(body, profile: dict) -> dict:
         fields["interview_date"] = fields["interview_date"].isoformat()
     if fields.get("note"):  # a short note, never contact details
         fields["note"] = scrub(fields["note"], [profile.get("display_name") or ""]).strip() or None
+    for key in ("title", "employer"):  # the job and company stay, contact details don't
+        if fields.get(key):
+            fields[key] = scrub_contacts(fields[key]).strip()
     if fields.get("role_id") and fields["role_id"] not in get_reference().roles:
         raise HTTPException(422, "Unknown role")
     return fields

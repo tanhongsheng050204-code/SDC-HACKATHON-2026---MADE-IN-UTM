@@ -84,6 +84,26 @@ def test_pathway_without_summary_makes_no_llm_call(monkeypatch):
     assert pathway.build(get_reference(), CLERK, "data_analyst", summarize=False)["summary_mode"] == "template"
 
 
+def test_first_pathway_view_does_not_wait_for_the_summary(monkeypatch):
+    """Gemini takes 10-15 s: the first view answers with the template and the next one has Gemini's."""
+    import threading
+    release = threading.Event()
+
+    def slow(*_a, **_k):
+        release.wait(5)
+        return {"summary": "Start with the first course and keep going."}
+    monkeypatch.setattr(pathway, "generate_json", slow)
+    first = pathway.build(get_reference(), CLERK, "data_analyst")
+    assert first["summary_mode"] == "template"
+    release.set()
+    for _ in range(50):
+        if not pathway._writing:
+            break
+        threading.Event().wait(0.05)
+    again = pathway.build(get_reference(), CLERK, "data_analyst")
+    assert again["summary_mode"] == "gemini" and again["summary"].startswith("Start with the first course")
+
+
 # ---------- free_only pathway ----------
 
 EMPTY = {"skills": [], "current_role_id": None, "audience": None, "completed_courses": []}

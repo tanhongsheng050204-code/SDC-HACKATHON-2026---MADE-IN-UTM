@@ -417,6 +417,7 @@ const STRINGS = {
   "roles.tipDecl": { en: "{at}×: {job} starts shrinking", ms: "{at}×: {job} mula berkurang", zh: "{at}×：{job}开始减少" },
   "roles.tipDeclBelow": { en: "{at}×: {job} shrinks if AI is slower than this", ms: "{at}×: {job} berkurang jika AI lebih perlahan daripada ini", zh: "{at}×：若 AI 比此更慢，{job}会减少" },
   "roles.tipOver": { en: "{at}×: {a} overtakes {b}", ms: "{at}×: {a} mengatasi {b}", zh: "{at}×：{a}超过{b}" },
+  "roles.tipNone": { en: "No tipping point between 0.5× and 2×: your top roles keep their order at every AI speed.", ms: "Tiada titik perubahan antara 0.5× dan 2×: peranan teratas anda kekal dalam susunan yang sama pada setiap kelajuan AI.", zh: "在 0.5× 到 2× 之间没有转折点：在任何 AI 速度下，您的前几名职位顺序都不变。" },
   "roles.tipOverBelow": { en: "{at}×: {a} overtakes {b} if AI is slower", ms: "{at}×: {a} mengatasi {b} jika AI lebih perlahan", zh: "{at}×：若 AI 更慢，{a}超过{b}" },
   "roles.year": { en: "Year", ms: "Tahun", zh: "年份" },
   "roles.earlier": { en: "Earlier year", ms: "Tahun lebih awal", zh: "更早的年份" },

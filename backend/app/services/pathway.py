@@ -6,6 +6,8 @@ and fewer hours. Gemini may add a short motivating summary; the grounding check 
 sentence that the catalogue and role data do not support (draft, then validate against evidence).
 """
 
+from concurrent.futures import ThreadPoolExecutor
+
 from app.llm import generate_json
 from app.reference import Reference
 from app.services import grounding
@@ -56,12 +58,25 @@ Total hours: {hours}"""
 
 
 _summaries: dict[str, str] = {}  # summary per plan prompt, for this process
+_writing: set[str] = set()  # prompts Gemini is writing a summary for right now
+_WRITER = ThreadPoolExecutor(max_workers=2, thread_name_prefix="pathway-summary")
 
 
-def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None, free_only: bool = False) -> dict:
+def _write_summary(prompt: str) -> None:
+    try:
+        _summaries[prompt] = str(generate_json(prompt)["summary"])
+    except Exception:
+        pass  # offline or failed: the template summary keeps standing
+    finally:
+        _writing.discard(prompt)
+
+
+def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, role_override: dict | None = None,
+          free_only: bool = False, wait_for_summary: bool = False) -> dict:
     """The plan is built from the skills the person reported, so finished steps stay visible
     (marked done) and readiness shows the progress since the plan was made. `role_override` is the
-    role with extra skills (the AI-assisted version of a job, app/services/upgrade.py)."""
+    role with extra skills (the AI-assisted version of a job, app/services/upgrade.py).
+    `wait_for_summary` waits for Gemini instead of answering with the template first."""
     role = role_override or ref.roles[role_id]
     fit, _, missing = fit_and_gap(role, set(profile["skills"]))
     readiness, _, _ = fit_and_gap(role, effective_skills(ref, profile))
@@ -105,10 +120,15 @@ def build(ref: Reference, profile: dict, role_id: str, summarize: bool = True, r
             steps=[(s["course"]["title"], s["course"]["provider"], s["course"]["hours"]) for s in steps],
             hours=total_hours,
         )
-        # The same plan always gets the same summary, so ask once: ticking a course or switching
-        # "Free courses only" back would otherwise wait on Gemini (about 14 s) every time.
+        # The same plan always gets the same summary, so ask once. Gemini takes 10-15 s, so the
+        # first view shows the template while the summary is written in the background; the next
+        # view (ticking a course, switching "Free courses only") shows Gemini's.
         if prompt not in _summaries:
-            _summaries[prompt] = str(generate_json(prompt)["summary"])
+            if wait_for_summary:
+                _write_summary(prompt)
+            elif prompt not in _writing:
+                _writing.add(prompt)
+                _WRITER.submit(_write_summary, prompt)
         summary, mode = _summaries[prompt], "gemini"
     except Exception:
         pass  # offline: the template summary stands

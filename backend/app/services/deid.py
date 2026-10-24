@@ -209,7 +209,15 @@ def scrub(text: str, names: Iterable[str] = ()) -> str:
     return text
 
 
-PLACEHOLDERS = ("NAME", "EMAIL", "PHONE", "IC", "DOB", "AGE", "ADDRESS", "ORG", "LINK")
+def scrub_contacts(text: str) -> str:
+    """Only IC numbers, phone numbers and emails: for fields where a company or job name is the
+    point (a tracked job's title and employer)."""
+    for pattern, tag in ((_IC, "[IC]"), (_MOBILE, "[PHONE]"), (_LANDLINE, "[PHONE]"), (_EMAIL, "[EMAIL]")):
+        text = pattern.sub(tag, text)
+    return text
+
+
+PLACEHOLDERS =("NAME", "EMAIL", "PHONE", "IC", "DOB", "AGE", "ADDRESS", "ORG", "LINK")
 
 
 def removed_counts(scrubbed: str) -> dict[str, int]:

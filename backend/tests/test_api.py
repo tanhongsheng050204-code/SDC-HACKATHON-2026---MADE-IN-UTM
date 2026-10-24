@@ -51,6 +51,17 @@ def test_intake_turn(client):
     assert {"customer_service", "excel"} <= set(reply["skills_found"])
 
 
+def test_intake_turn_reads_everyday_words(client):
+    """Without a CV people describe their work plainly; those answers must still find skills."""
+    for answer, expected in [
+        ("I answer customer calls all day, solve billing problems and write emails to customers.",
+         {"customer_service", "problem_solving", "communication"}),
+        ("Saya melayan pelanggan dan buat kemasukan data setiap hari.", {"customer_service", "data_entry"}),
+    ]:
+        reply = client.post("/api/intake/turn", json={"messages": [{"role": "user", "content": answer}]}).json()
+        assert expected <= set(reply["skills_found"]), answer
+
+
 def test_snapshot_import_requires_admin(client):
     assert client.post("/api/signals/import", json={}).status_code == 401
     listed = client.get("/api/signals").json()

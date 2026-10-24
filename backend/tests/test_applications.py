@@ -21,6 +21,16 @@ def test_track_a_job_from_saved_to_interview(client):
     assert client.get(f"/api/profiles/{pid}/applications").json() == []
 
 
+def test_contact_details_in_the_title_or_employer_are_removed(client):
+    pid = _profile(client)
+    base = f"/api/profiles/{pid}/applications"
+    made = client.post(base, json={"title": "Junior analyst, call 012-345 6789", "employer": "Acme Sdn Bhd, hr@acme.my"}).json()
+    assert "012-345 6789" not in made["title"] and made["title"].startswith("Junior analyst")
+    assert "hr@acme.my" not in made["employer"] and made["employer"].startswith("Acme Sdn Bhd")  # the company stays
+    moved = client.patch(f"{base}/{made['id']}", json={"title": "Analyst +60 12-345 6789"}).json()
+    assert "345 6789" not in moved["title"]
+
+
 def test_bad_input_is_refused(client):
     pid = _profile(client)
     base = f"/api/profiles/{pid}/applications"

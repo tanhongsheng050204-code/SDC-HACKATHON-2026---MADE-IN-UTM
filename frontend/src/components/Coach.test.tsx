@@ -17,7 +17,10 @@ describe("Coach", () => {
     render(<Coach profile={{ id: "p1" } as Profile} scenario="baseline" onApply={async () => {}} onClose={() => {}} />);
     fireEvent.change(screen.getByLabelText("Ask about your results"), { target: { value: "Call 012-345 6789, which job?" } });
     fireEvent.click(screen.getByRole("button", { name: "Ask" }));
-    expect(await screen.findByText(reply.answer)).toBeInTheDocument();
+    // The [SOURCE-1] tag is shown as a small "[1]" that matches the numbered source list.
+    expect(await screen.findByText(/Your top roles under the Baseline scenario are listed/)).toBeInTheDocument();
+    expect(screen.getByText("[1]")).toHaveClass("coach-cite");
+    expect(screen.queryByText(/SOURCE-1/)).toBeNull();
     expect(screen.getByText(/Checked and corrected against your sources/)).toBeInTheDocument();
     expect(screen.getByText(/1 unsupported sentence removed/)).toBeInTheDocument();
     expect(screen.getByText(/1 phone number/)).toBeInTheDocument();
